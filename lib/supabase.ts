@@ -170,15 +170,22 @@ export type CategoryWithCount = Category & { product_count: number }
 export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
   const [{ data: cats, error }, { data: counts, error: cErr }] = await Promise.all([
     supabase.from('categories').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
-    supabase.from('products').select('category_id').not('category_id', 'is', null),
+    supabase.from('products').select('category_text').not('category_text', 'is', null),
   ])
   if (error) throw error
   if (cErr) throw cErr
 
+  // Count by category_text — matches how catalog filtering works
   const countMap: Record<string, number> = {}
   for (const row of counts ?? []) {
-    if (row.category_id) countMap[row.category_id] = (countMap[row.category_id] ?? 0) + 1
+    if (row.category_text) {
+      const key = row.category_text.toLowerCase().trim()
+      countMap[key] = (countMap[key] ?? 0) + 1
+    }
   }
 
-  return (cats as Category[]).map(c => ({ ...c, product_count: countMap[c.id] ?? 0 }))
+  return (cats as Category[]).map(c => ({
+    ...c,
+    product_count: countMap[c.name.toLowerCase().trim()] ?? 0,
+  }))
 }
