@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
+import Sidebar from './Sidebar'
 
 export const dynamic = 'force-dynamic'
 
@@ -167,33 +168,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         {/* ── Filtered: sticky sidebar with count pills + 4-col grid ── */}
         {isFiltered && (
           <div className="filtered-layout">
-            <aside className="sidebar">
-              <p className="sidebar-section-title">Categorii</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', marginBottom: '24px' }}>
-                <Link href="/produse" className={`sidebar-link${!sp.categorie && !sp.brand ? ' active' : ''}`}>
-                  <span>Toate</span>
-                </Link>
-                {categories.map(c => (
-                  <Link key={c.id} href={`/produse?categorie=${encodeURIComponent(c.name)}`}
-                    className={`sidebar-link${sp.categorie === c.name ? ' active' : ''}`}>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    {c.product_count > 0 && (
-                      <span className="count-pill">{c.product_count.toLocaleString('ro')}</span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-
-              <p className="sidebar-section-title">Branduri</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                {brands.map(b => (
-                  <Link key={b.id} href={`/produse?brand=${encodeURIComponent(b.name)}`}
-                    className={`sidebar-link${sp.brand === b.name ? ' active' : ''}`}>
-                    <span>{b.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </aside>
+            <Sidebar
+              categories={categories}
+              brands={brands}
+              activeCat={sp.categorie}
+              activeSub={sp.subcategorie}
+              activeBrand={sp.brand}
+            />
 
             <main className="products-main">
               <div className="products-header">
