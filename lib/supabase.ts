@@ -207,30 +207,17 @@ export async function getSubcategoriesByCategoryName(categoryName: string): Prom
     .select('id')
     .ilike('name', categoryName)
     .single()
-  
+
   if (!cat) return []
 
-  const { data: subs, error } = await supabase
-    .from('subcategories')
-    .select('*')
-    .eq('parent_category_id', cat.id)
-    .order('sort_order', { ascending: true, nullsFirst: false })
+  // Get subcategories with product counts in one shot via RPC
+  const { data, error } = await supabase.rpc('get_subcategories_with_count', {
+    cat_id: cat.id,
+  })
 
-  if (error || !subs) return []
+  if (error || !data) return []
 
-  // Count products per subcategory via subcategory_id
-  const { data: counts } = await supabase
-    .from('products')
-    .select('subcategory_id')
-    .eq('category_id', cat.id)
-    .not('subcategory_id', 'is', null)
-
-  const countMap: Record<string, number> = {}
-  for (const row of counts ?? []) {
-    if (row.subcategory_id) countMap[row.subcategory_id] = (countMap[row.subcategory_id] ?? 0) + 1
-  }
-
-  return (subs as Subcategory[])
-    .map(s => ({ ...s, product_count: countMap[s.id] ?? 0 }))
+  return (data as { id: string; name: string; slug: string | null; parent_category_id: string; description: string | null; icon_url: string | null; sort_order: number | null; product_count: number }[])
     .filter(s => s.product_count > 0)
+    .sort((a, b) => (b.product_count - a.product_count))
 }
