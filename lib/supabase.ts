@@ -191,3 +191,40 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
     product_count: countMap[c.name.toLowerCase().trim()] ?? 0,
   }))
 }
+
+export type SubcategoryWithCount = Subcategory & { product_count: number }
+
+export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
+  // Get category id first
+  const { data: cat } = await supabase
+    .from('categories')
+    .select('id')
+    .ilike('name', categoryName)
+    .single()
+  
+  if (!cat) return []
+
+  const { data: subs, error } = await supabase
+    .from('subcategories')
+    .select('*')
+    .eq('parent_category_id', cat.id)
+    .order('sort_order', { ascending: true, nullsFirst: false })
+
+  if (error || !subs) return []
+
+  // Count products per subcategory via subcategory_id
+  const { data: counts } = await supabase
+    .from('products')
+    .select('subcategory_id')
+    .eq('category_id', cat.id)
+    .not('subcategory_id', 'is', null)
+
+  const countMap: Record<string, number> = {}
+  for (const row of counts ?? []) {
+    if (row.subcategory_id) countMap[row.subcategory_id] = (countMap[row.subcategory_id] ?? 0) + 1
+  }
+
+  return (subs as Subcategory[])
+    .map(s => ({ ...s, product_count: countMap[s.id] ?? 0 }))
+    .filter(s => s.product_count > 0)
+}

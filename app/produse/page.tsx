@@ -4,17 +4,18 @@ import { getProducts, getCategoriesWithCount, getBrands } from '@/lib/supabase'
 import Link from 'next/link'
 import Image from 'next/image'
 import LoadMore from './LoadMore'
+import SubcategoryBar from './SubcategoryBar'
 
 export const dynamic = 'force-dynamic'
 
-type SP = { brand?: string; categorie?: string; q?: string; p?: string }
+type SP = { brand?: string; categorie?: string; subcategorie?: string; q?: string; p?: string }
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams
   const pageSize = 100
 
   const [{ products, total }, categories, brands] = await Promise.all([
-    getProducts({ page: 1, pageSize, brandName: sp.brand, categoryText: sp.categorie, search: sp.q }),
+    getProducts({ page: 1, pageSize, brandName: sp.brand, categoryText: sp.categorie, subcategoryText: sp.subcategorie, search: sp.q }),
     getCategoriesWithCount(),
     getBrands(),
   ])
@@ -202,6 +203,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 </h1>
                 <span className="products-count">{total.toLocaleString('ro')} produse</span>
               </div>
+              {sp.categorie && (
+                <SubcategoryBar categoryName={sp.categorie} activeSub={sp.subcategorie} />
+              )}
 
               {/* 4-col grid — fixed, not auto-fill */}
               <div className="products-grid">

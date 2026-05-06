@@ -3,6 +3,7 @@ import { getProductBySlug } from '@/lib/supabase'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import GallerySection from './GallerySection'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -12,7 +13,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await getProductBySlug(slug)
   if (!product) notFound()
 
-  const img = product.main_image_storage_url || product.main_image_url
+  const mainImg = product.main_image_storage_url || product.main_image_url
 
   const specs = [
     { label: product.st1_label, value: product.st1_value, detail: product.st1_details },
@@ -32,7 +33,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     { title: product.app_03_title, detail: product.app_03_details },
   ].filter(a => a.title)
 
-  const gallery = [
+  // Gallery images (excluding main)
+  const galleryImgs = [
     product.gallery_storage_url_1 ?? product.gallery_url_1,
     product.gallery_storage_url_2 ?? product.gallery_url_2,
     product.gallery_storage_url_3 ?? product.gallery_url_3,
@@ -45,204 +47,288 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     product.subcategory_text ? { href: `/produse?categorie=${encodeURIComponent(product.category_text ?? '')}`, label: product.subcategory_text } : null,
   ].filter(Boolean) as { href: string; label: string }[]
 
-  const displayName = product.sku ?? product.slug
-
   return (
     <>
       <Nav />
       <style>{`
-        .bc-pill {
-          font-size: 12px; color: #888; text-decoration: none;
-          padding: 5px 12px; border: 1px solid #e0ddd9;
-          border-radius: 999px; background: #fff; transition: border-color 150ms;
-          white-space: nowrap;
+        .pdp { padding-top: 52px; background: rgb(244,244,244); }
+
+        /* ── TOP WHITE SECTION ── */
+        .pdp-top {
+          background: rgb(255,255,255);
+          border-bottom: 1px solid rgba(0,0,0,0.08);
         }
-        .bc-pill:hover { border-color: #111; color: #111; }
+        .pdp-top-inner {
+          max-width: 1440px; margin: 0 auto;
+          padding: 32px 12px 48px;
+          display: grid; grid-template-columns: 1fr 1fr;
+          gap: 80px; align-items: start;
+        }
+
+        /* Left */
+        .bc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+        .bc-pill {
+          font-family: 'Recursive', sans-serif;
+          font-size: 12px; color: rgba(0,0,0,0.5);
+          padding: 4px 12px;
+          border: 1px solid rgba(0,0,0,0.1);
+          border-radius: 999px; text-decoration: none;
+          transition: border-color 150ms, color 150ms;
+        }
+        .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
+        .pdp-brand {
+          font-family: 'Recursive', sans-serif;
+          font-weight: 500; font-size: 18px; color: rgb(0,0,0);
+          margin-bottom: 4px; letter-spacing: -0.02em;
+        }
+        .pdp-sku {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(28px, 3.5vw, 44px);
+          color: rgb(0,0,0); line-height: 1;
+          text-transform: uppercase; margin-bottom: 12px;
+        }
+        .pdp-desc {
+          font-family: 'Recursive', sans-serif;
+          font-size: 14px; color: rgba(0,0,0,0.5);
+          line-height: 1.65; margin-bottom: 28px;
+        }
+        .sku-field {
+          display: flex; align-items: center; justify-content: space-between;
+          background: rgb(244,244,244); border: 1px solid rgba(0,0,0,0.08);
+          border-radius: 4px; padding: 10px 14px; margin-bottom: 12px;
+        }
+        .sku-field-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 600;
+          letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.35);
+          margin-right: 8px;
+        }
+        .sku-field-value {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; font-weight: 500; color: rgb(0,0,0); flex: 1;
+        }
         .cere-btn {
           display: block; width: 100%; padding: 14px;
-          background: #e63022; color: #fff; border: none;
-          border-radius: 8px; font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          text-align: center; cursor: pointer; text-decoration: none;
-          transition: background 150ms;
+          background: rgb(217,44,43); color: rgb(255,255,255); border: none;
+          border-radius: 3px; font-family: 'Inter', sans-serif;
+          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; text-align: center;
+          text-decoration: none; cursor: pointer; transition: background 150ms;
         }
-        .cere-btn:hover { background: #cc2519; }
+        .cere-btn:hover { background: rgb(190,35,34); }
+
+        /* Right: main image */
+        .pdp-main-img {
+          position: relative; aspect-ratio: 1;
+          background: rgb(250,249,247); border-radius: 4px; overflow: hidden;
+        }
+
+        /* ── DARK SPECS ── */
+        .pdp-specs { background: rgb(30,30,30); }
+        .pdp-specs-inner {
+          max-width: 1440px; margin: 0 auto; padding: 60px 12px;
+        }
+        .specs-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(255,255,255,0.3); margin-bottom: 28px;
+        }
+        .specs-grid {
+          display: grid; gap: 16px;
+        }
+        .spec-card {
+          background: rgb(255,255,255); border-radius: 4px; padding: 24px;
+        }
+        .spec-card-label {
+          font-family: 'Recursive', sans-serif;
+          font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 6px;
+        }
+        .spec-card-value {
+          font-family: 'Bungee', sans-serif;
+          font-size: 28px; text-transform: uppercase;
+          letter-spacing: -0.01em; color: rgb(0,0,0);
+          line-height: 1; margin-bottom: 6px;
+        }
+        .spec-card-detail {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.5;
+        }
+
+        /* ── INFO CARDS (caracteristici / aplicatii) ── */
+        .info-section {
+          max-width: 1440px; margin: 0 auto; padding: 72px 12px;
+        }
+        .info-section-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(0,0,0,0.35); margin-bottom: 24px;
+        }
+        .info-grid {
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
         .info-card {
-          background: #fff; border: 1px solid #e8e6e2;
-          border-radius: 12px; padding: 28px 24px;
+          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.06);
+          border-radius: 4px; padding: 24px;
           display: flex; flex-direction: column; gap: 6px;
         }
-        .info-card-num {
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 11px; color: #aaa; letter-spacing: 0.04em;
+        .info-num {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px; color: rgba(0,0,0,0.3); font-weight: 500;
         }
-        .info-card-title {
-          font-size: 18px; font-weight: 700; color: #111;
-          letter-spacing: -0.02em; line-height: 1.2;
+        .info-title {
+          font-family: 'Recursive', sans-serif;
+          font-size: 17px; font-weight: 500;
+          color: rgb(0,0,0); letter-spacing: -0.02em; line-height: 1.25;
         }
-        .info-card-body {
-          font-size: 13px; color: #666; line-height: 1.6;
-          margin-top: 4px;
+        .info-body {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.6;
         }
-        .section-label {
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: #888; margin-bottom: 24px;
-        }
-        .spec-card-pdp {
-          background: #fff; border: 1px solid #e8e6e2;
-          border-radius: 10px; padding: 24px;
-        }
-        .thumb { cursor: pointer; border: 1px solid #e0ddd9; border-radius: 6px; overflow: hidden; }
-        .thumb:hover { outline: 2px solid #e63022; outline-offset: 2px; }
+
+        /* ── CTA BANNER ── */
         .cta-banner {
-          background: #1a1a1a; border-radius: 12px;
+          max-width: 1440px; margin: 0 auto; padding: 0 12px 72px;
+        }
+        .cta-banner-inner {
+          background: rgb(30,30,30); border-radius: 4px;
           padding: 32px 40px;
-          display: flex; justify-content: space-between; align-items: center;
-          gap: 24px;
+          display: flex; justify-content: space-between; align-items: center; gap: 24px;
         }
-        .cta-banner-primary {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 12px 20px; background: #e63022; color: #fff;
-          border-radius: 6px; font-size: 12px; font-weight: 700;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          text-decoration: none; white-space: nowrap; transition: background 150ms;
+        .cta-banner-eyebrow {
+          font-family: 'Recursive', sans-serif;
+          font-size: 12px; color: rgba(255,255,255,0.4);
+          margin-bottom: 4px;
         }
-        .cta-banner-primary:hover { background: #cc2519; }
-        .cta-banner-secondary {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 12px 20px;
-          border: 1px solid rgba(255,255,255,0.2); color: #fff;
-          border-radius: 6px; font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          text-decoration: none; white-space: nowrap;
+        .cta-banner-title {
+          font-family: 'Bungee', sans-serif;
+          font-size: 24px; text-transform: uppercase;
+          color: rgb(255,255,255); line-height: 1; letter-spacing: -0.01em;
+        }
+        .cta-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
+        .cta-primary {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 11px 20px; background: rgb(217,44,43); color: rgb(255,255,255);
+          border-radius: 3px; font-family: 'Inter', sans-serif;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
+          text-transform: uppercase; text-decoration: none; white-space: nowrap;
+          transition: background 150ms;
+        }
+        .cta-primary:hover { background: rgb(190,35,34); }
+        .cta-secondary {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 11px 20px;
+          border: 1px solid rgba(255,255,255,0.2); color: rgb(255,255,255);
+          border-radius: 3px; font-family: 'Inter', sans-serif;
+          font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
+          text-transform: uppercase; text-decoration: none; white-space: nowrap;
           transition: border-color 150ms;
         }
-        .cta-banner-secondary:hover { border-color: rgba(255,255,255,0.5); }
-        .footer-link { font-size: 13px; color: #888; text-decoration: none; display: block; margin-bottom: 8px; }
-        .footer-link:hover { color: #111; }
+        .cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
+
+        /* ── FOOTER ── */
+        .footer { background: rgb(244,244,244); border-top: 1px solid rgba(0,0,0,0.08); }
+        .footer-social {
+          padding: 18px 12px; max-width: 1440px; margin: 0 auto;
+          display: flex; gap: 48px; justify-content: center;
+          border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .footer-social a { font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(0,0,0,0.4); text-decoration: none; }
+        .footer-social a:hover { color: rgb(0,0,0); }
+        .footer-grid {
+          max-width: 1440px; margin: 0 auto; padding: 48px 12px;
+          display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
+        }
+        .footer-col-title {
+          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(0,0,0); margin-bottom: 14px;
+        }
+        .footer-link { font-family: 'Recursive', sans-serif; font-size: 13px; color: rgba(0,0,0,0.45); text-decoration: none; display: block; margin-bottom: 8px; }
+        .footer-link:hover { color: rgb(0,0,0); }
+        .footer-bottom {
+          border-top: 1px solid rgba(0,0,0,0.08); padding: 14px 12px;
+          max-width: 1440px; margin: 0 auto;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-bottom span, .footer-bottom a { font-family: 'Recursive', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); text-decoration: none; }
+        .footer-bottom a { color: rgb(217,44,43); }
       `}</style>
 
-      <div style={{ paddingTop: '48px', background: "rgb(244,244,244)", minHeight: '100vh' }}>
+      <div className="pdp">
 
-        {/* ── WHITE TOP SECTION ── */}
-        <div style={{ background: 'rgb(255,255,255)', borderBottom: '1px solid #e0ddd9' }}>
-          <div style={{
-            maxWidth: '1280px', margin: '0 auto',
-            padding: '40px 48px 60px',
-            display: 'grid', gridTemplateColumns: '1fr 1fr',
-            gap: '80px', alignItems: 'start',
-          }}>
+        {/* ── TOP: info left + main image right ── */}
+        <div className="pdp-top">
+          <div className="pdp-top-inner">
             {/* LEFT */}
             <div>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '40px' }}>
+              <div className="bc-row">
                 {breadcrumbs.map((b, i) => (
                   <Link key={i} href={b.href} className="bc-pill">{b.label}</Link>
                 ))}
               </div>
-
-              <p style={{ fontSize: '20px', fontWeight: 600, color: 'rgb(0,0,0)', marginBottom: '4px', letterSpacing: '-0.01em' }}>
-                {product.brand_name}
-              </p>
-              <h1 style={{
-                fontFamily: "'Bungee', sans-serif",
-                fontWeight: 800, fontSize: '44px', textTransform: 'uppercase',
-                letterSpacing: '-0.01em', lineHeight: 1, color: 'rgb(0,0,0)', marginBottom: '12px',
-              }}>
-                {displayName}
-              </h1>
+              <p className="pdp-brand">{product.brand_name}</p>
+              <h1 className="pdp-sku">{product.sku ?? product.slug}</h1>
               {product.short_description && (
-                <p style={{ fontSize: '14px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.6, marginBottom: '32px' }}>
-                  {product.short_description}
-                </p>
+                <p className="pdp-desc">{product.short_description}</p>
               )}
-
-              {/* SKU field */}
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                background: '#f5f3f0', border: '1px solid #e0ddd9',
-                borderRadius: '8px', padding: '12px 16px', marginBottom: '16px',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)', fontFamily: 'IBM Plex Mono, monospace', letterSpacing: '0.06em', textTransform: 'uppercase' }}>SKU:</span>
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'rgb(0,0,0)', fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {product.sku ?? product.slug}
-                  </span>
-                </div>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(0,0,0,0.3)', padding: '4px' }}>
+              <div className="sku-field">
+                <span className="sku-field-label">SKU:</span>
+                <span className="sku-field-value">{product.sku ?? product.slug}</span>
+                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(0,0,0,0.3)', padding: '2px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                   </svg>
                 </button>
               </div>
-
               <Link href="/contact" className="cere-btn">CERE OFERTA</Link>
             </div>
 
-            {/* RIGHT: image */}
-            <div>
-              <div style={{ position: 'relative', aspectRatio: '1', background: '#faf9f7', borderRadius: '4px', overflow: 'hidden' }}>
-                {img ? (
-                  <Image src={img} alt={product.name} fill style={{ objectFit: 'contain', padding: '32px' }} unoptimized />
-                ) : (
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc', fontFamily: 'IBM Plex Mono, monospace', fontSize: '12px' }}>NO IMAGE</div>
-                )}
-              </div>
-              {gallery.length > 0 && (
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                  {gallery.slice(0, 4).map((url, i) => (
-                    <div key={i} className="thumb" style={{ width: '72px', height: '72px', position: 'relative', background: '#faf9f7', flexShrink: 0 }}>
-                      <Image src={url} alt={`img ${i+2}`} fill style={{ objectFit: 'contain', padding: '8px' }} unoptimized />
-                    </div>
-                  ))}
-                </div>
+            {/* RIGHT: main image */}
+            <div className="pdp-main-img">
+              {mainImg ? (
+                <Image src={mainImg} alt={product.name} fill style={{ objectFit: 'contain', padding: '32px' }} unoptimized />
+              ) : (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(0,0,0,0.2)', fontFamily: 'Recursive, sans-serif', fontSize: '12px' }}>NO IMAGE</div>
               )}
             </div>
           </div>
         </div>
 
-        {/* ── DARK SPECS SECTION ── */}
+        {/* ── GALLERY: 80vh split columns with lightbox ── */}
+        {galleryImgs.length > 0 && (
+          <GallerySection images={galleryImgs} productName={product.name} />
+        )}
+
+        {/* ── DARK SPECS ── */}
         {specs.length > 0 && (
-          <div style={{ background: 'rgb(30,30,30)' }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 48px' }}>
-              <p className="section-label" style={{ color: 'rgba(255,255,255,0.4)' }}>Specificatii tehnice</p>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(specs.length, 3)}, 1fr)`, gap: '16px' }}>
-                {specs.map((spec, i) => (
-                  <div key={i} className="spec-card-pdp">
-                    <p style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', marginBottom: '8px' }}>{spec.label}</p>
-                    <p style={{
-                      fontFamily: "'Bungee', sans-serif",
-                      fontWeight: 800, fontSize: '32px', textTransform: 'uppercase',
-                      letterSpacing: '-0.01em', color: 'rgb(0,0,0)', lineHeight: 1, marginBottom: '6px',
-                    }}>{spec.value}</p>
-                    {spec.detail && <p style={{ fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.5 }}>{spec.detail}</p>}
+          <div className="pdp-specs">
+            <div className="pdp-specs-inner">
+              <p className="specs-label">Specificatii tehnice</p>
+              <div className="specs-grid" style={{ gridTemplateColumns: `repeat(${Math.min(specs.length, 3)}, 1fr)` }}>
+                {specs.map((s, i) => (
+                  <div key={i} className="spec-card">
+                    <p className="spec-card-label">{s.label}</p>
+                    <p className="spec-card-value">{s.value}</p>
+                    {s.detail && <p className="spec-card-detail">{s.detail}</p>}
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        )}
-
-        {/* ── FULL-WIDTH IMAGE BAND ── */}
-        {img && (
-          <div style={{ width: '100%', height: '80vh', position: 'relative', overflow: 'hidden', background: 'rgb(210,208,204)' }}>
-            <Image src={img} alt={product.name} fill style={{ objectFit: 'cover', objectPosition: 'center' }} unoptimized />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)' }} />
           </div>
         )}
 
         {/* ── CARACTERISTICI ── */}
         {caracteristici.length > 0 && (
-          <div style={{ background: "rgb(244,244,244)" }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 48px' }}>
-              <p className="section-label">Caracteristici</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+            <div className="info-section">
+              <p className="info-section-label">Caracteristici</p>
+              <div className="info-grid">
                 {caracteristici.map((c, i) => (
                   <div key={i} className="info-card">
-                    <span className="info-card-num">0{i + 1}</span>
-                    <span className="info-card-title">{c.title}</span>
-                    {c.detail && <span className="info-card-body">{c.detail}</span>}
+                    <span className="info-num">0{i + 1}</span>
+                    <span className="info-title">{c.title}</span>
+                    {c.detail && <span className="info-body">{c.detail}</span>}
                   </div>
                 ))}
               </div>
@@ -250,17 +336,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         )}
 
-        {/* ── APLICATII RECOMANDATE ── */}
+        {/* ── APLICATII ── */}
         {aplicatii.length > 0 && (
-          <div style={{ background: "rgb(244,244,244)", borderTop: '1px solid #e0ddd9' }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 48px' }}>
-              <p className="section-label">Aplicatii recomandate</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+            <div className="info-section">
+              <p className="info-section-label">Aplicatii recomandate</p>
+              <div className="info-grid">
                 {aplicatii.map((a, i) => (
                   <div key={i} className="info-card">
-                    <span className="info-card-num">0{i + 1}</span>
-                    <span className="info-card-title">{a.title}</span>
-                    {a.detail && <span className="info-card-body">{a.detail}</span>}
+                    <span className="info-num">0{i + 1}</span>
+                    <span className="info-title">{a.title}</span>
+                    {a.detail && <span className="info-body">{a.detail}</span>}
                   </div>
                 ))}
               </div>
@@ -269,62 +355,46 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         )}
 
         {/* ── CTA BANNER ── */}
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 48px 80px' }}>
-          <div className="cta-banner">
+        <div className="cta-banner">
+          <div className="cta-banner-inner">
             <div>
-              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px', letterSpacing: '0.02em' }}>
-                Cere o oferta personalizata
-              </p>
-              <p style={{
-                fontFamily: "'Bungee', sans-serif",
-                fontWeight: 800, fontSize: '28px', textTransform: 'uppercase',
-                color: '#fff', letterSpacing: '-0.01em', lineHeight: 1,
-              }}>
-                {product.brand_name} {product.sku ?? product.slug}
-              </p>
+              <p className="cta-banner-eyebrow">Cere o oferta personalizata</p>
+              <p className="cta-banner-title">{product.brand_name} {product.sku ?? product.slug}</p>
             </div>
-            <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
-              <Link href="/contact" className="cta-banner-primary">
-                CERE OFERTA PERSONALIZATA ↗
-              </Link>
-              <a href="tel:0765432111" className="cta-banner-secondary">
-                📞 SAU SUNA LA 0765 432 111
-              </a>
+            <div className="cta-banner-btns">
+              <Link href="/contact" className="cta-primary">CERE OFERTA PERSONALIZATA ↗</Link>
+              <a href="tel:0248222298" className="cta-secondary">📞 SAU SUNA LA 0248 222 298</a>
             </div>
           </div>
         </div>
 
         {/* ── FOOTER ── */}
-        <footer style={{ borderTop: '1px solid #e0ddd9', background: "rgb(244,244,244)" }}>
-          <div style={{ borderBottom: '1px solid #e0ddd9', padding: '20px 48px', display: 'flex', gap: '48px', justifyContent: 'center' }}>
-            {['Facebook', 'Instagram', 'YouTube', 'Email', 'Telefon'].map(s => (
-              <a key={s} href="#" style={{ color: 'rgba(0,0,0,0.4)', fontSize: '12px', textDecoration: 'none', fontWeight: 500 }}>{s}</a>
-            ))}
+        <footer className="footer">
+          <div className="footer-social">
+            {['Facebook', 'Instagram', 'YouTube', 'Email', 'Telefon'].map(s => <a key={s} href="#">{s}</a>)}
           </div>
-          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '48px' }}>
-            <p style={{ fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '320px' }}>
+          <div className="footer-grid">
+            <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
               Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
             </p>
             <div>
-              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(0,0,0)', marginBottom: '16px' }}>INFORMATII</p>
-              {['Termene si conditii', 'Politica de retur', 'Achizitii S.E.A.P.', 'ANPC SAL'].map(l => (
-                <a key={l} href="#" className="footer-link">{l}</a>
-              ))}
+              <p className="footer-col-title">INFORMATII</p>
+              {['Termene si conditii','Politica de retur','Achizitii S.E.A.P.','ANPC SAL'].map(l => <a key={l} href="#" className="footer-link">{l}</a>)}
             </div>
             <div>
-              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(0,0,0)', marginBottom: '16px' }}>CONTACT</p>
-              <p style={{ fontSize: '13px', color: '#444', marginBottom: '6px' }}>0248.222.298</p>
-              <p style={{ fontSize: '13px', color: '#444', marginBottom: '6px' }}>contact@zonascule.ro</p>
-              <p style={{ fontSize: '13px', color: '#444', marginBottom: '6px' }}>Sfanta Vineri 28, Pitesti</p>
-              <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)', fontFamily: 'IBM Plex Mono, monospace' }}>CIF / VAT: RO 6796092</p>
+              <p className="footer-col-title">CONTACT</p>
+              <p className="footer-link">0248.222.298</p>
+              <p className="footer-link">contact@zonascule.ro</p>
+              <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
             </div>
           </div>
-          <div style={{ borderTop: '1px solid #e0ddd9', padding: '16px 48px', display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)' }}>ZONA SCULE : Technology Promotion SRL</span>
-            <a href="https://x.com/silviux" style={{ fontSize: '11px', color: 'rgb(217,44,43)', textDecoration: 'none' }}>silviuX</a>
-            <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.3)' }}>2026</span>
+          <div className="footer-bottom">
+            <span>ZONA SCULE : Technology Promotion SRL</span>
+            <a href="https://x.com/silviux">silviuX</a>
+            <span>2026</span>
           </div>
         </footer>
+
       </div>
     </>
   )
