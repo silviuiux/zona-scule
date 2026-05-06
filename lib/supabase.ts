@@ -168,19 +168,21 @@ export async function getSubcategoriesByCategory(categoryId: string) {
 export type CategoryWithCount = Category & { product_count: number }
 
 export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
+  // Use rpc to get counts directly in DB — avoids 1000-row Supabase default limit
   const [{ data: cats, error }, { data: counts, error: cErr }] = await Promise.all([
     supabase.from('categories').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
-    supabase.from('products').select('category_text').not('category_text', 'is', null),
+    supabase.rpc('count_products_by_category'),
   ])
   if (error) throw error
-  if (cErr) throw cErr
+  if (cErr) {
+    // Fallback: return categories with 0 counts if RPC not available
+    return (cats as Category[]).map(c => ({ ...c, product_count: 0 }))
+  }
 
-  // Count by category_text — matches how catalog filtering works
   const countMap: Record<string, number> = {}
-  for (const row of counts ?? []) {
+  for (const row of (counts as { category_text: string; cnt: number }[] ?? [])) {
     if (row.category_text) {
-      const key = row.category_text.toLowerCase().trim()
-      countMap[key] = (countMap[key] ?? 0) + 1
+      countMap[row.category_text.toLowerCase().trim()] = row.cnt
     }
   }
 
