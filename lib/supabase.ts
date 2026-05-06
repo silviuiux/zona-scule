@@ -119,7 +119,13 @@ export async function getProducts({
   if (brandName) query = query.ilike('brand_name', brandName)
   if (categoryText) query = query.ilike('category_text', categoryText)
   if (subcategoryText) query = query.ilike('subcategory_text', subcategoryText)
-  if (search) query = query.ilike('name', `%${search}%`)
+  if (search) {
+    // Search across name, sku, brand_name and slug using OR
+    const s = search.trim()
+    query = query.or(
+      `name.ilike.%${s}%,sku.ilike.%${s}%,brand_name.ilike.%${s}%,slug.ilike.%${s}%,short_description.ilike.%${s}%`
+    )
+  }
   if (featured) query = query.eq('featured', true)
 
   const { data, error, count } = await query
