@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Nav from '@/components/Nav'
 import { getCategoriesWithCount, getBrands } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
+import HeroSearch from '@/components/HeroSearch'
 
 export const dynamic = 'force-dynamic'
 
@@ -96,7 +97,7 @@ export default async function HomePage() {
 
         /* ─── CATEGORIES (2-row grid, exact Framer layout) ── */
         .cats-section {
-          background: rgb(244, 244, 244);
+          background: transparent;
           max-width: 1440px; margin: 0 auto;
           padding: 0 12px 96px;
         }
@@ -239,14 +240,9 @@ export default async function HomePage() {
 
           {/* CTA row */}
           <div className="hero-cta-row">
-            <div className="hero-search-box">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-              <input placeholder="Cauta scule, branduri, accesorii" readOnly />
-            </div>
+            <HeroSearch />
             <Link href="/produse" className="hero-catalog-cta">
-              CATALOG ↗
+              CATALOG
             </Link>
           </div>
         </div>
