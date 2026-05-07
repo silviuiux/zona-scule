@@ -47,7 +47,7 @@ export default async function HomePage() {
           letter-spacing: -0.01em;
         }
         .authorized-link:hover { color: rgb(217, 44, 43); }
-        .hero-headline {
+        .hero-headline-old {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(60px, 8vw, 120px);
           line-height: 1;
@@ -55,7 +55,7 @@ export default async function HomePage() {
           color: rgb(0,0,0);
           text-transform: lowercase;
         }
-        .hero-headline .word-red {
+        .hero-headline-old .word-red {
           color: rgb(217, 44, 43);
           -webkit-text-stroke: 2px rgb(217, 44, 43);
           -webkit-text-fill-color: transparent;
