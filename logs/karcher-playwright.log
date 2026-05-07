@@ -1,0 +1,756 @@
+/Users/silviu.ardelean/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+🔧 Kärcher Playwright Enrichment Script
+Mode: LIVE | Resume: True
+
+Found 1000 products to process
+
+
+[1/1000] 6.680-362.0 —  Dust lip main brush rear
+  ✓ Found: accesorii/dust-lip-main-brush-rear-66803620.html
+  ✓ Extracted: Buză de etanșare pentru peria principală, montată în partea ...
+  ✓ DB updated
+
+[2/1000] 1.524-947.0 —  HD 7/14-4 MXA Plus *EU
+  ✓ Found: professional/aparate-de-spalat-cu-inalta-presiune/aparate-de
+  ✓ Extracted: Aparat profesional de curățat cu înaltă presiune, cu presiun...
+  ✓ DB updated
+
+[3/1000] 2.863-036.0 —  DOUBLE HANDLE
+  ✓ Found: accesorii/maner-dublu-pentru-conducerea-exacta-a-capului-de-
+  ✓ Extracted: Maner dublu pentru controlul precis al capului de pulverizar...
+  ✓ DB updated
+
+[4/1000] 1.378-610.0 —  NT 22/1 Ap Te L *EU
+  ✓ Found: professional/aspiratoare/aspiratoare-umed-uscate/clasa-ap/nt
+  ✓ Extracted: Aspirator umed și uscat profesional, compact și ușor, cu pri...
+  ✓ DB updated
+
+[5/1000] 6.295-565.0 —  abrasive coarse 25kg
+  ✓ Found: professional/produse-pentru-curatare-si-ingrijire/profession
+  ✓ Extracted: Soluție de sablat profesională cu granule de 0,25-1,4 mm, ex...
+  ✓ DB updated
+
+[6/1000] 1.445-150.0 — LBL 4 Battery *INT
+  ✓ Found: home-garden/aparate-pentru-gradina/suflante-si-aspiratoare-c
+  ✓ Extracted: Suflantă de frunze fără fir de 36 V, cu reglarea puterii în ...
+  ✓ DB updated
+
+[7/1000] 1.378-982.0 —  NT 22/1 Ap Te L *EU
+  ✓ Found: professional/aspiratoare/aspiratoare-umed-uscate/clasa-ap/nt
+  ✓ Extracted: Aspirator umed-uscat profesional compact cu priză pentru scu...
+  ✓ DB updated
+
+[8/1000] 4.762-623.0 —  Roll soft
+  ✓ Found: accesorii/rola-moale-47626230.html
+  ✓ Extracted: Element de fixare a periei moi pentru utilizare cu acționare...
+  ✓ DB updated
+
+[9/1000] 4.039-267.0 —  Add-on kit revolving signal light
+  ✓ Found: accesorii/atasament-grifoar-semnalizare-40392670.html
+  ✓ Extracted: Girofarul de semnalizare fără lumină orbitoare mărește sigur...
+  ✓ DB updated
+
+[10/1000] 4.112-043.0 —  PowerControl jet pipe 25027
+  ✓ Found: accesorii/lance-de-pulberizare-cu-regulator-de-presiune-027-
+  ✓ Extracted: Lancea de pulverizare PowerControl cu duza 027 permite regla...
+  ✓ DB updated
+
+[11/1000] 2.113-049.0 —  Power nozzle TR 15070
+  ✓ Found: accesorii/duza-de-putere-15-070-21130490.html
+  ✓ Extracted: Duză pentru jet tip evantai cu unghi de pulverizare de 15° a...
+  ✓ DB updated
+
+[12/1000] 2.637-595.0 —  Add-on kit craftsman and trade
+  ✓ Found: accesorii/set-universal-pentru-mestesugarit-id-35-26375950.h
+  ✓ Extracted: Set complet de accesorii pentru aspiratoare industriale și c...
+  ✓ DB updated
+
+[13/1000] 6.980-077.0 —  Double hook
+  ✓ Found: accesorii/double-hook-69800770.html
+  ✓ Extracted: Cârlig dublu pentru fixarea sacilor de gunoi și a altor acce...
+  ✓ DB updated
+
+[14/1000] 1.008-062.0 —  BRC 40/22 C
+  ✓ Found: professional/aspiratoare-cu-spalare-profesionale/masini-de-c
+  ✓ Extracted: Mașină compactă de curățat covoare prin injecție-extracție p...
+  ✓ DB updated
+
+[15/1000] 1.444-200.0 — GSH 18-20 Battery *INT
+  ✓ Found: home-garden/aparate-pentru-gradina/foarfeca-de-tuns-iarba-si
+  ✓ Extracted: Foarfeca de tuns iarbă și gardul viu cu acumulator GSH 18-20...
+  ✓ DB updated
+
+[16/1000] 6.369-015.0 —  Pad black
+  ✓ Found: accesorii/paduri-dur-negru-533-mm-5-bucata-63690150.html
+  ✓ Extracted: Pad disc negru foarte abraziv pentru curățarea completă a pa...
+  ✓ DB updated
+
+[17/1000] 6.470-223.0 —  Foot switch
+  ✓ Found: accesorii/supapa-de-picior-pentru-curatarea-tevilor-64702230
+  ✓ Extracted: Supapă fixă concepută pentru utilizarea comodă și sigură a a...
+  ✓ DB updated
+
+[18/1000] 2.641-709.0 — XH 6 Q extension hose Quick Connect
+  ✓ Found: accesorii/prelungire-furtun-de-inalta-presiune-6m-k3-k7-2641
+  ✓ Extracted: Prelungire pentru furtun de înaltă presiune de 6 m pentru fl...
+  ✓ DB updated
+
+[19/1000] 2.642-058.0 —  Add-on kit spray sucking B150R
+  ✓ Found: accesorii/set-de-fixare-aspirare-cu-pulverizare-26420580.htm
+  ✓ Extracted: Kit adițional conceput pentru mașinile de curățare Kärcher B...
+  ✓ DB updated
+
+[20/1000] 6.369-898.0 —  Disc brush hard black 430 mm
+  ✓ Found: accesorii/perie-disc-dura-dur-negru-430-mm-63698980.html
+  ✓ Extracted: Perie disc neagră, foarte abrazivă pentru curățarea completă...
+  ✓ DB updated
+
+[21/1000] 2.112-010.0 —  Easy-Foam-Set TR
+  ✓ Found: accesorii/set-easy-foam-cu-injector-de-agent-de-curatare-211
+  ✓ Extracted: Sistem de spumă HP pentru utilizare cu unități HD/HDS pentru...
+  ✓ DB updated
+
+[22/1000] 1.081-230.0 — SE 5 *EU
+  ✓ Found: home-garden/aspiratoare-cu-spalare/se-5-10812300.html
+  ✓ Extracted: Aparatul de curățat cu spray-extractie SE 5 asigură curățare...
+  ✓ DB updated
+
+[23/1000] 1.081-500.0 — SE 3-18 Compact *INT
+  ✓ Found: home-garden/aspiratoare-cu-spalare/se-3-18-compact-bateria-n
+  ✓ Extracted: Aspirator cu spray-extracție pe baterie de 18V pentru curăța...
+  ✓ DB updated
+
+[24/1000] 1.081-502.0 — SE 3-18 Compact BatterySet *EU
+  ✓ Found: home-garden/aspiratoare-cu-spalare/se-3-18-compact-battery-s
+  ✓ Extracted: Aparat de curățat cu spray-extracție pe baterie de 18V, idea...
+  ✓ DB updated
+
+[25/1000] 2.863-370.0 — Shoe!Cleaner SE 3,4,5,6
+  ✓ Found: accesorii/shoe-cleaner-se-3-compact-se-4-5-si-6-28633700.htm
+  ✓ Extracted: Accesoriu inovator pentru curățarea rapidă și temeinică a în...
+  ✓ DB updated
+
+[26/1000] 1.101-750.0 —  Puzzi 2/1 Bp *INT
+  ✓ Found: professional/aspiratoare-cu-spalare-profesionale/aspiratoare
+  ✓ Extracted: Aparat portabil de extracție prin pulverizare, fără fir, cu ...
+  ✓ DB updated
+
+[27/1000] 1.101-120.0 —  Puzzi 30/4 *EU
+  ✓ Found: professional/aspiratoare-cu-spalare-profesionale/aspiratoare
+  ✓ Extracted: Aparat de curățat cu spray-extracție profesional, ideal pent...
+  ✓ DB updated
+
+[28/1000] 1.081-150.0 — SE 4 *EU
+  ✓ Found: home-garden/aspiratoare-cu-spalare/se-4-10811500.html
+  ✓ Extracted: Aparatul de curățat cu spray-extracție SE 4 asigură o curăța...
+  ✓ DB updated
+
+[29/1000] 1.101-702.0 —  Puzzi 9/1 Bp Adv
+  ✓ Found: professional/aspiratoare-cu-spalare-profesionale/aspiratoare
+  ✓ Extracted: Singurul aspirator profesional cu extracție prin pulverizare...
+  ✓ DB updated
+
+[30/1000] 1.101-122.0 —  Puzzi 30/ 4 E *EU
+  ✓ Found: professional/aspiratoare-cu-spalare-profesionale/aspiratoare
+  ✓ Extracted: Cel mai silentios aspirator cu spălare din clasa lui, cu doa...
+  ✓ DB updated
+
+[31/1000] 6.906-103.0 —  Membrane filter NT351
+  ✓ Found: accesorii/membrana-filtranta-nt-27-1-nt-48-1-69061030.html
+  ✓ Extracted: Filtru din tesatură cu membrană din lână de poliester, lavab...
+  ✓ DB updated
+
+[32/1000] 6.670-128.0 —  Brush optional BD 30/4 C
+  ✓ Found: accesorii/perie-optionala-bd-30-4-c-moale-280-mm-66701280.ht
+  ✓ Extracted: Perie disc albă, moale pentru curățarea delicată a pardoseli...
+  ✓ DB updated
+
+[33/1000] 2.884-526.0 —  Power nozzle 40075
+  ✓ Found: accesorii/duza-de-putere-40-075-28845260.html
+  ✓ Extracted: Duză electrică cu unghi de pulverizare de 40° și jet tip eva...
+  ✓ DB updated
+
+[34/1000] 2.269-670.0 — Wipe Set RCV2
+  ✓ Found: accesorii/wipe-22696700.html
+  ✓ Extracted: Set de 2 lavete de șters cu fixare velcro, compatibile cu as...
+  ✓ DB updated
+
+[35/1000] 2.889-217.0 —  Filter bags-fleece 5x NT
+  ✓ Found: accesorii/pungi-pentru-filtru-din-material-textil-5-bucata-n
+  ✓ Extracted: Sac filtrant din pâslă, rezistent la rupere pentru aparatele...
+  ✓ DB updated
+
+[36/1000] 2.112-000.0 —  Inno-Foam-Set TR
+  ✓ Found: accesorii/set-inno-foam-cu-injector-rm-21120000.html
+  ✓ Extracted: Sistem inovator de spumă cu presiune ridicată pentru curățăt...
+  ✓ DB updated
+
+[37/1000] 1.056-131.0 — FCV 4 *EU
+  ✓ Found: home-garden/aspiratoare-verticale-cu-spalare/fcv-4-10561310.
+  ✓ Extracted: Aspirator vertical 3-în-1 cu funcție Xtra!Clean pentru aspir...
+  ✓ DB updated
+
+[38/1000] 2.112-013.0 —  Add-on kit foam nozzle TR
+  ✓ Found: accesorii/set-duza-de-spuma-21120130.html
+  ✓ Extracted: Set agent de spumare ideal pentru utilizarea în zonele sanit...
+  ✓ DB updated
+
+[39/1000] 2.863-006.0 — Filter bag fleece WD 4St.
+  ✓ Found: accesorii/sac-pentru-filtrare-din-fleece-pentru-wd-4-5-6-286
+  ✓ Extracted: Saci de filtrare din fleece extrem de rezistenți la rupere, ...
+  ✓ DB updated
+
+[40/1000] 2.863-021.0 — Extension hose special accessories SC 1
+  ✓ Found: accesorii/furtun-prelungitor-pentru-sc-1-28630210.html
+  ✓ Extracted: Furtun prelungitor flexibil pentru aparatele de curățare cu ...
+  ✓ DB updated
+
+[41/1000] 6.392-579.0 —  Hose assembly with coupler 50 m
+  ✓ Found: accesorii/hose-assembly-with-coupler-50-m-63925790.html
+  ✓ Extracted: Ansamblu de furtun flexibil cu lungime de 50 de metri, echip...
+  ✓ DB updated
+
+[42/1000] 4.111-041.0 —  Adapter complete TR22IG-3/8NPT
+  ✓ Found: accesorii/adaptor-complete-tr22ig-3-8npt-41110410.html
+  ✓ Extracted: Adaptor EASY!Lock pentru conectarea pistolului de presiune E...
+  ✓ DB updated
+
+[43/1000] 4.130-000.0 —  Spray/suction gun Puzzi DN32
+  ✓ Found: accesorii/maner-41300000.html
+  ✓ Extracted: Mâner modular pentru duza de pardoseală, tapițerie și rostur...
+  ✓ DB updated
+
+[44/1000] 2.863-008.0 —  Set round brush brass
+  ✓ Found: accesorii/set-perii-rotunde-din-alama-28630080.html
+  ✓ Extracted: Set de 3 perii rotunde din alama cu peri tari, ideale pentru...
+  ✓ DB updated
+
+[45/1000] 1.524-930.0 —  HD 7/14 -4M
+  ✓ Found: professional/aparate-de-spalat-cu-inalta-presiune/aparate-de
+  ✓ Extracted: Aparat mobil de curățat cu înaltă presiune, alimentat cu cur...
+  ✓ DB updated
+
+[46/1000] 4.111-038.0 —  Screw union TR nozzle TR22-TR20
+  ✓ Found: accesorii/conector-41110380.html
+  ✓ Extracted: Conector de înaltă presiune pentru fixarea duzelor și acceso...
+  ✓ DB updated
+
+[47/1000] 4.039-270.0 —  Add-on kit pre-sweep unit
+  ✓ Found: accesorii/atasament-unitate-prematurare-40392700.html
+  ✓ Extracted: Mopul de măturare preliminară poate mătura murdăria grosieră...
+  ✓ DB updated
+
+[48/1000] 2.641-748.0 —  Add-on kit filling
+  ✓ Found: accesorii/chit-montaj-sistem-de-umplere-26417480.html
+  ✓ Extracted: Sistem de umplere automată pentru mașini de curățat Kärcher....
+  ✓ DB updated
+
+[49/1000] 2.643-849.0 —  Add-on kit protection shield revolving s
+  ✓ Found: accesorii/atasament-plafon-de-protectie-b-250-26438490.html
+  ✓ Extracted: Plafon de protecție de înaltă calitate pentru mașina de frec...
+  ✓ DB updated
+
+[50/1000] 2.642-740.0 —  Add-on kit spray sucking B 80-120
+  ✓ Found: accesorii/set-de-fixare-aspirare-cu-pulverizare-26427400.htm
+  ✓ Extracted: Accesoriu care simplifică curățarea zonelor inaccesibile pen...
+  ✓ DB updated
+
+[51/1000] 2.644-219.0 —  Add-on kit Transport eyelets B100/B75
+  ✓ Found: accesorii/add-on-kit-transport-eyelets-b100-b75-26442190.htm
+  ✓ Extracted: Kit suplimentar de ocheți de transport pentru mașinile de cu...
+  ✓ DB updated
+
+[52/1000] 6.654-329.0 —  BC offb 24V/12A 100-230V/50-60Hz
+  ✓ Found: accesorii/incarcator-12a-ieb-24-v-66543290.html
+  ✓ Extracted: Încărcător de 24 V pentru acumulatori care nu necesită între...
+  ✓ DB updated
+
+[53/1000] 2.763-004.0 —  Brush-head R 65 S
+  ✓ Found: accesorii/cap-de-periere-r-65-s-27630040.html
+  ✓ Extracted: Cap de perie cu 2 stavila cilindrice și lățime de lucru de 6...
+  ✓ DB updated
+
+[54/1000] 6.369-508.0 —  Groove rake
+  ✓ Found: accesorii/razuitor-canelura-63695080.html
+  ✓ Extracted: Accesoriu compatibil cu companiile Thyssen + OTIS, destinat ...
+  ✓ DB updated
+
+[55/1000] 2.643-944.0 —  Add-on kit protection shield height
+  ✓ Found: accesorii/atasament-plafon-de-protectie-b300-26439440.html
+  ✓ Extracted: Plafon de protecție complet închis în partea superioară, pen...
+  ✓ DB updated
+
+[56/1000] 2.642-495.0 —  Add-on kit tank complete BDS 330
+  ✓ Found: accesorii/rezervor-adv-26424950.html
+  ✓ Extracted: Rezervor ușor de demontat pentru aplicarea simplă a fluidulu...
+  ✓ DB updated
+
+[57/1000] 2.763-001.0 —  Brush-head D 55 S
+  ✓ Found: accesorii/cap-de-periere-d-55-s-27630010.html
+  ✓ Extracted: Cap de periere cu 2 perii pe disc și sistem de schimbare rap...
+  ✓ DB updated
+
+[58/1000] 2.643-696.0 —  Add-on kit protection shield low
+  ✓ Found: accesorii/atasament-plafon-de-protectie-fara-sticla-26436960
+  ✓ Extracted: Plafon de protecție de înaltă calitate fără sticlă pentru pr...
+  ✗ DB update failed
+
+[59/1000] 2.643-977.0 —  Add-on kit drain hose ball valve BD 43
+  ✓ Found: accesorii/atasament-furtun-de-drenare-26439770.html
+  ✓ Extracted: Furtunul de drenare permite golirea comodă și controlată a a...
+  ✓ DB updated
+
+[60/1000] 2.644-239.0 —  Add-on kit spray bottle complete BDP 43/
+  ✓ Found: accesorii/add-on-kit-spray-bottle-complete-bdp-43-26442390.h
+  ✓ Extracted: Kit suplimentar complet cu sticlă de pulverizare pentru mași...
+  ✓ DB updated
+
+[61/1000] 8.640-259.0 —  ASSY, BRUSH & HUB, OFFSET PATTERN
+  ✓ Found: accesorii/perie-rola-430-mm-430-mm-86402590.html
+  ✓ Extracted: Perie rolă cu lungime de 430 mm, destinată echipamentelor pr...
+  ✓ DB updated
+
+[62/1000] 2.644-139.0 —  Add-on kit emergency stop B100/B75
+  ✓ Found: accesorii/atasament-oprire-de-urgenta-b100-b75-26441390.html
+  ✓ Extracted: Kit pentru cuplarea unui buton de oprire de urgență la mașin...
+  ✓ DB updated
+
+[63/1000] 2.815-114.0 —  Battery kit AGM 6x 6V/285Ah
+  ✓ Found: accesorii/acumulator-agm-6x-6v-285ah-36-v-285-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 36 V și capacitate 285 Ah (C5)...
+  ✓ DB updated
+
+[64/1000] 6.654-434.0 —  BC offb 24V/50A 230V/50-60Hz
+  ⚠ Not found on kaercher.com/ro
+
+[65/1000] 2.763-008.0 —  Brush-head D 90 S
+  ✓ Found: accesorii/cap-de-periere-d-90-s-27630080.html
+  ✓ Extracted: Cap de perie cu 2 perii cu discuri și lățime de lucru de 90 ...
+  ✗ DB update failed
+
+[66/1000] 2.763-020.0 —  Brush-head R 45 C
+  ✓ Found: accesorii/cap-de-periere-r45-c-27630200.html
+  ✓ Extracted: Cap de periere profesional echipat cu două perii cilindrice,...
+  ✓ DB updated
+
+[67/1000] 6.369-902.0 —  Disk grinding
+  ✓ Found: accesorii/port-pentru-hartia-de-slefuit-63699020.html
+  ✓ Extracted: Port pentru hârtie de șlefuit cu sistem Centerlock pentru fi...
+  ✓ DB updated
+
+[68/1000] 2.644-023.0 —  Add-on kit tank complete BD 17/5
+  ✓ Found: accesorii/add-on-kit-tank-complete-bd-17-5-26440230.html
+  ✓ Extracted: Kit suplimentar cu rezervor complet pentru mașina de spălat-...
+  ✓ DB updated
+
+[69/1000] 2.815-093.0 —  Battery kit AGM 2x 12V/198Ah
+  ✓ Found: accesorii/acumulator-agm-2x-12v-198ah-24-v-198-ah-fara-intre
+  ✓ Extracted: Kit acumulator cu tensiune de 24 V și capacitate 198 Ah (C5)...
+  ✓ DB updated
+
+[70/1000] 2.815-090.0 —  Battery kit AGM 2x 12V/80Ah
+  ✓ Found: accesorii/acumulator-agm-2x-12v-80ah-24-v-80-ah-fara-intreti
+  ✓ Extracted: Kit acumulator AGM cu tensiune de 24 V și capacitate 80 Ah (...
+  ✓ DB updated
+
+[71/1000] 2.643-986.0 —  Add-on kit drain hose ball valve BD 50
+  ✓ Found: accesorii/atasament-furtun-de-drenare-bd-50-5-26439860.html
+  ✓ Extracted: Furtun de drenare pentru golirea controlată a apei murdare d...
+  ✓ DB updated
+
+[72/1000] 2.641-243.0 —  Add-on kit water refilling tank with wal
+  ✓ Found: accesorii/abs-recipient-reumplere-apa-cu-fixare-pentru-peret
+  ✓ Extracted: Sistem de alimentare pentru încărcarea bateriilor umede, car...
+  ✓ DB updated
+
+[73/1000] 6.654-124.0 —  Battery 6V180AH
+  ✓ Found: accesorii/baterie-6-v-180-ah-fara-intretinere-66541240.html
+  ✓ Extracted: Acumulator de tracțiune fără întreținere, cu tensiune de 6V ...
+  ✓ DB updated
+
+[74/1000] 2.815-102.0 —  Battery kit Gel 4x 6V/240Ah
+  ✓ Found: accesorii/acumulator-gel-4x-6v-240ah-24-v-240-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 24 V și capacitate 240 Ah (C5)...
+  ✓ DB updated
+
+[75/1000] 2.763-023.0 —  Brush-head D 43 Bp
+  ✓ Found: accesorii/cap-de-periere-d-43-27630230.html
+  ✓ Extracted: Cap de periere echipat cu o perie disc, oferind o lățime de ...
+  ✓ DB updated
+
+[76/1000] 6.369-901.0 —  Disk DUO SPEED
+  ✓ Found: accesorii/port-pad-430-mm-430-mm-63699010.html
+  ✓ Extracted: Placă de acționare cu perie pentru curățarea cu tampoane, ut...
+  ✓ DB updated
+
+[77/1000] 2.644-089.0 —  Add-on kit protection shield B150R/B200R
+  ✓ Found: accesorii/add-on-kit-protection-shield-b150r-b200r-26440890.
+  ✓ Extracted: Kit de protecție suplimentar conceput special pentru mașinil...
+  ✓ DB updated
+
+[78/1000] 4.039-368.0 —  Add-on kit pre-sweep unit
+  ✓ Found: accesorii/add-on-kit-pre-sweep-unit-40393680.html
+  ✓ Extracted: Kit suplimentar de pre-măturare pentru mașinile de spălat-us...
+  ✓ DB updated
+
+[79/1000] 2.640-023.0 —  Add-on kit rollers suction bar
+  ✓ Found: accesorii/adaugare-set-de-cilindri-cu-bara-de-absorbtie-2640
+  ✓ Extracted: Set de role suplimentar care împiedică racleta să adere la p...
+  ✓ DB updated
+
+[80/1000] 6.654-067.0 —  Battery charger 24V
+  ✓ Found: accesorii/incarcator-24-v-24-v-66540670.html
+  ✓ Extracted: Încărcător profesional de 24V destinat acumulatorilor Kärche...
+  ✓ DB updated
+
+[81/1000] 2.815-104.0 —  Battery kit Gel 6x 6V/180Ah
+  ✓ Found: accesorii/acumulator-gel-6x-6v-180ah-36-v-180-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 36 V și capacitate 180 Ah (C5)...
+  ✓ DB updated
+
+[82/1000] 2.763-034.0 —  Brush-head R 120 S
+  ✓ Found: accesorii/cap-de-periere-r-120-s-27630340.html
+  ✓ Extracted: Cap de periere profesional cu două perii cilindrice și lățim...
+  ✓ DB updated
+
+[83/1000] 2.644-276.0 —  Add-on kit side scrubbing deck B200R
+  ✓ Found: accesorii/add-on-kit-side-scrubbing-deck-b200r-26442760.html
+  ✓ Extracted: Kit suplimentar de perie laterală pentru mașinile de spălat-...
+  ✓ DB updated
+
+[84/1000] 2.763-045.0 —  Brush-head D 110 S B200R
+  ✓ Found: accesorii/brush-head-d110-b150r-27630450.html
+  ✓ Extracted: Cap de perie profesional Kärcher compatibil cu mașinile de s...
+  ✓ DB updated
+
+[85/1000] 2.763-035.0 —  Brush-head D 100 S
+  ✓ Found: accesorii/cap-de-periere-d-100-s-27630350.html
+  ✓ Extracted: Cap de periere cu 2 perii disc, sistem de înlocuire rapidă a...
+  ✓ DB updated
+
+[86/1000] 2.763-039.0 —  Brush-head D 65 R
+  ✓ Found: accesorii/cap-de-periere-d-65-r-27630390.html
+  ✓ Extracted: Cap de periere cu tehnologie cu perie disc, ideal pentru sup...
+  ✓ DB updated
+
+[87/1000] 6.369-520.0 —  Guide comb black
+  ✓ Found: accesorii/pieptene-de-directie-negru-63695200.html
+  ✓ Extracted: Pieptene de direcție negru compatibil cu scări rulante de la...
+  ✓ DB updated
+
+[88/1000] 4.039-271.0 —  Add-on kit mop holder
+  ✓ Found: accesorii/kit-atasament-suport-mop-40392710.html
+  ✓ Extracted: Suportul pentru mop îți permite să transporți un mop pe apar...
+  ✓ DB updated
+
+[89/1000] 6.654-078.0 —  Battery charger maintenance free 24V
+  ✓ Found: accesorii/incarcator-24-v-24-v-66540780.html
+  ✓ Extracted: Încărcător de baterii fără întreținere pentru baterii Kärche...
+  ✓ DB updated
+
+[90/1000] 4.035-191.0 —  Battery charger for replacement 36V 65A
+  ✓ Found: accesorii/incarcator-de-schimb-36v-65a-36-v-40351910.html
+  ✓ Extracted: Încărcător independent pentru acumulator, special adaptat la...
+  ✓ DB updated
+
+[91/1000] 2.815-095.0 —  Battery kit AGM 4x 6V/285Ah
+  ✓ Found: accesorii/acumulator-agm-4x-6v-285ah-24-v-285-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 24 V și capacitate 285 Ah (C5)...
+  ✓ DB updated
+
+[92/1000] 6.654-367.0 —  BC offb 24V/12A 100-240V/50-60Hz
+  ✓ Found: accesorii/incarcator-tnr-loeschen-24-v-66543670.html
+  ✓ Extracted: Încărcător profesional pentru acumulatori de 24V, special de...
+  ✓ DB updated
+
+[93/1000] 2.763-006.0 —  Brush-head R 75 S
+  ✓ Found: accesorii/cap-de-periere-r-75-s-27630060.html
+  ✓ Extracted: Cap de periere cu 2 stavilari cilindrici și lățime de lucru ...
+  ✓ DB updated
+
+[94/1000] 2.763-003.0 —  Brush-head D 65 S
+  ✓ Found: accesorii/cap-de-periere-d-65-s-27630030.html
+  ✓ Extracted: Cap de periere cu 2 perii pe disc și sistem pentru schimbare...
+  ✓ DB updated
+
+[95/1000] 4.039-269.0 —  Add-on kit liner holder
+  ⚠ Not found on kaercher.com/ro
+
+[96/1000] 2.640-887.0 —  Add-on kit work illumination
+  ✓ Found: accesorii/lumina-de-lucru-abs-26408870.html
+  ✓ Extracted: Kit suplimentar de iluminare pentru mașinile Kärcher, concep...
+  ✓ DB updated
+
+[97/1000] 4.654-013.0 —  Battery charger 24V
+  ✓ Found: accesorii/incarcator-24v-24-v-46540130.html
+  ✓ Extracted: Încărcător pentru acumulatori de 24 V, special pentru setul ...
+  ✓ DB updated
+
+[98/1000] 2.815-092.0 —  Battery kit AGM 4x 6V/170Ah
+  ✓ Found: accesorii/acumulator-agm-4x-6v-170ah-24-v-170-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 24 V și capacitate 170 Ah (C5)...
+  ✓ DB updated
+
+[99/1000] 2.815-106.0 —  Battery kit wet 1x 36V/180Ah
+  ✓ Found: accesorii/acumulator-umed-1x-36v-180ah-36-v-180-ah-cu-intret
+  ✓ Extracted: Acumulator umed cu întreținere redusă, montat în jgheab, pen...
+  ✓ DB updated
+
+[100/1000] 2.815-103.0 —  Battery kit Gel 3x 12V/76Ah
+  ✓ Found: accesorii/acumulator-gel-3x-12v-76ah-36-v-76-ah-fara-intreti
+  ✓ Extracted: Kit acumulator cu tensiune de 36 V și capacitate 76 Ah (C5)....
+  ✓ DB updated
+
+[101/1000] 2.763-011.0 —  Brush-head R 55 W
+  ✓ Found: accesorii/cap-de-periere-r-55-w-27630110.html
+  ✓ Extracted: Cap de periere profesional cu două perii cilindrice, special...
+  ✓ DB updated
+
+[102/1000] 2.815-101.0 —  Battery kit Gel 4x 6V/180Ah
+  ✓ Found: accesorii/acumulator-gel-4x-6v-180ah-24-v-180-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 24 V și capacitate de 180 Ah (...
+  ✓ DB updated
+
+[103/1000] 2.763-051.0 —  Brush-head D 51
+  ✓ Found: accesorii/brush-head-d-51-27630510.html
+  ✓ Extracted: Cap de perie cu lățime de lucru de 510 mm, compatibil cu maș...
+  ✓ DB updated
+
+[104/1000] 2.763-047.0 —  Brush-head R 75
+  ✓ Found: accesorii/brush-head-r75-27630470.html
+  ✓ Extracted: Cap de perie cu rolă pentru mașini de spălat-uscat pardoseli...
+  ✓ DB updated
+
+[105/1000] 4.035-369.0 —  Cover tank flushing system complete
+  ✓ Found: accesorii/capac-pentru-curatare-a-rezervorului-pe-interior-4
+  ✓ Extracted: Capac pentru rezervorul de apă murdară destinat aparatelor d...
+  ✓ DB updated
+
+[106/1000] 6.980-080.0 —  Holder bottle
+  ✓ Found: accesorii/suport-sticla-69800800.html
+  ✓ Extracted: Suport dedicat pentru transportul sticlelor cu pulverizator....
+  ✓ DB updated
+
+[107/1000] 2.815-105.0 —  Battery kit Gel 6x 6V/240Ah
+  ✓ Found: accesorii/acumulator-gel-6x-6v-240ah-36-v-240-ah-fara-intret
+  ✓ Extracted: Kit acumulator cu tensiune de 36 V și capacitate 240 Ah (C5)...
+  ✓ DB updated
+
+[108/1000] 2.763-019.0 —  Brush-head R 45 W
+  ✓ Found: accesorii/cap-de-periere-r45-w-27630190.html
+  ✓ Extracted: Cap de periere profesional echipat cu două perii cilindrice,...
+  ✓ DB updated
+
+[109/1000] 6.369-894.0 —  Disk LOW SPEED
+  ✓ Found: accesorii/port-pad-330-mm-330-mm-63698940.html
+  ✓ Extracted: Placă de acționare cu tampoane pentru curățare la viteză red...
+  ✓ DB updated
+
+[110/1000] 6.369-899.0 —  Disk LOW SPEED 420
+  ✓ Found: accesorii/port-pad-430-mm-420-mm-63698990.html
+  ✓ Extracted: Placă cu tampoane pentru curățare la viteză redusă, compatib...
+  ✓ DB updated
+
+[111/1000] 6.680-124.0 —  Hose fresh water complete
+  ✓ Found: accesorii/furtun-de-umplere-66801240.html
+  ✓ Extracted: Furtun de alimentare cu apă de 1500 mm pentru conectarea sim...
+  ✓ DB updated
+
+[112/1000] 2.641-811.0 —  Metering station DS 3
+  ✓ Found: accesorii/ds3-rm-statie-de-dozare-26418110.html
+  ✓ Extracted: Stație de dozare direct conectabilă la robinet pentru introd...
+  ✓ DB updated
+
+[113/1000] 2.638-161.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381610.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori în m...
+  ✓ DB updated
+
+[114/1000] 2.638-036.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26380360.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori într...
+  ✓ DB updated
+
+[115/1000] 2.763-002.0 —  Brush-head R 55 S
+  ✓ Found: accesorii/cap-de-periere-r-55-s-27630020.html
+  ✓ Extracted: Cap de perie cu 2 stavălari cilindrici și lățime de lucru de...
+  ✓ DB updated
+
+[116/1000] 2.763-048.0 —  Brush-head R 85
+  ✓ Found: accesorii/brush-head-r85-27630480.html
+  ✓ Extracted: Cap de perie rotativ cu lățime de lucru de 850 mm, conceput ...
+  ✓ DB updated
+
+[117/1000] 6.670-129.0 —  Disk BD 30/4 C
+  ✓ Found: accesorii/disc-bd-30-4-c-270-mm-66701290.html
+  ✓ Extracted: Placă port pad pentru plasarea padurilor, compatibilă cu maș...
+  ✓ DB updated
+
+[118/1000] 6.369-521.0 —  Guide comb green
+  ✓ Found: accesorii/pieptene-de-directie-verde-63695210.html
+  ✓ Extracted: Pieptene de direcție verde compatibil cu scările rulante Sch...
+  ✓ DB updated
+
+[119/1000] 6.369-512.0 —  Guide comb white
+  ✓ Found: accesorii/pieptene-de-directie-alb-63695120.html
+  ✓ Extracted: Pieptene de direcție alb destinat mașinilor de curățat indus...
+  ✓ DB updated
+
+[120/1000] 2.763-033.0 —  Brush-head R 100 S
+  ✓ Found: accesorii/cap-de-periere-r-100-s-27630330.html
+  ✓ Extracted: Cap de periere cu două perii cilindrice pentru murdărie pers...
+  ✓ DB updated
+
+[121/1000] 2.763-046.0 —  Brush-head R 65
+  ✓ Found: accesorii/brush-head-r65-27630460.html
+  ✓ Extracted: Cap de perie cu lățime de lucru de 650 mm pentru mașini de s...
+  ✓ DB updated
+
+[122/1000] 4.036-061.0 —  Fixing kit S 65 an B90R
+  ✓ Found: accesorii/set-de-conectare-b-90-r-40360610.html
+  ✓ Extracted: Kit pentru cuplarea capului pentru podea S 65 la mașina de c...
+  ✓ DB updated
+
+[123/1000] 4.762-447.0 —  Disk pad BD 75
+  ✓ Found: accesorii/tampoane-plutitoare-375-mm-47624470.html
+  ✓ Extracted: Placă cu tampoane pentru curățare profesională, cu diametru ...
+  ✓ DB updated
+
+[124/1000] 6.371-273.0 —  Guide comb yellow
+  ✓ Found: accesorii/piepteni-iesire-galben-63712730.html
+  ✓ Extracted: Combinații exterioare pentru escalatoare Thyssen-Krupp și Fu...
+  ✓ DB updated
+
+[125/1000] 2.638-064.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26380640.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori într...
+  ✓ DB updated
+
+[126/1000] 4.762-493.0 —  Disk pad D 90
+  ✓ Found: accesorii/tampoane-plutitoare-d-90-445-mm-47624930.html
+  ✓ Extracted: Tampoane plutitoare cu diametru de 445 mm, ideale pentru maș...
+  ✓ DB updated
+
+[127/1000] 6.369-511.0 —  Guide comb green
+  ✓ Found: accesorii/pieptene-de-directie-verde-63695110.html
+  ✓ Extracted: Pieptene de direcție verde compatibil cu scări rulante și es...
+  ✓ DB updated
+
+[128/1000] 6.369-522.0 —  Guide comb white
+  ✓ Found: accesorii/pieptene-de-directie-alb-63695220.html
+  ✓ Extracted: Pieptene de direcție alb compatibil cu mașini de curățat pro...
+  ✓ DB updated
+
+[129/1000] 4.035-076.0 —  Key white KIK
+  ✓ Found: accesorii/cheie-kik-alb-40350760.html
+  ✓ Extracted: Cheie pentru utilizator destinată utilizării aparatelor prog...
+  ✓ DB updated
+
+[130/1000] 2.638-136.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381360.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori în m...
+  ✓ DB updated
+
+[131/1000] 4.071-223.0 —  Exhauster ring complete 43cm/17" Adv
+  ✓ Found: accesorii/inel-de-aspirare-43-cm-17-40712230.html
+  ✓ Extracted: Reduce cantitatea de praf rezultată în timpul operațiilor de...
+  ✓ DB updated
+
+[132/1000] 6.980-078.0 —  Holder handhold grey
+  ✓ Found: accesorii/holder-handhold-grey-69800780.html
+  ✓ Extracted: Clemă de mop pentru fixarea mopului la mașinile de spălat pa...
+  ✓ DB updated
+
+[133/1000] 2.638-101.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381010.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori într...
+  ✓ DB updated
+
+[134/1000] 2.638-152.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381520.html
+  ✓ Extracted: Kit de instalare pentru instalarea setului de acumulatori în...
+  ✓ DB updated
+
+[135/1000] 1.527-209.0 — T 11/1 Classic Re!Plast *EU
+  ✓ Found: professional/aspiratoare/aspiratoare-uscate/aspiratoare-usca
+  ✓ Extracted: Aspirator uscat profesional fabricat din 60% material recicl...
+  ✓ DB updated
+
+[136/1000] 6.369-914.0 —  Guide comb blue
+  ✓ Found: accesorii/piepteni-intrare-albastru-63699140.html
+  ✓ Extracted: Piepteni de intrare de culoare albastră, compatibili cu mode...
+  ✓ DB updated
+
+[137/1000] 6.371-322.0 —  Guide comb orange
+  ✓ Found: accesorii/piepteni-iesire-portocaliu-63713220.html
+  ✓ Extracted: Pieptene de ieșire portocaliu compatibil cu mașini de curăța...
+  ✓ DB updated
+
+[138/1000] 2.638-105.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381050.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori într...
+  ✓ DB updated
+
+[139/1000] 2.638-106.0 —  Mounting kit battery kit
+  ✓ Found: accesorii/kit-instalare-acumulator-26381060.html
+  ✓ Extracted: Kit de instalare pentru montarea setului de acumulatori într...
+  ✓ DB updated
+
+[140/1000] 9.987-883.0 — IVR-L 100/24-2
+  ✓ Found: professional/aspiratoare-industriale/aspirator-pentru-murdar
+  ✓ Extracted: Aspirator industrial compact de tip Ringler cu capacitate de...
+  ✓ DB updated
+
+[141/1000] 9.987-900.0 — IVS 100/75 M Z22 *EU
+  ✓ Found: professional/aspiratoare-industriale/aspiratoare-pentru-zone
+  ✓ Extracted: Aspirator industrial de înaltă performanță cu suflantă cu ca...
+  ✓ DB updated
+
+[142/1000] 4.762-446.0 —  Disk pad BD 65
+  ✓ Found: accesorii/tampoane-plutitoare-335-mm-335-mm-47624460.html
+  ✓ Extracted: Placă cu tampoane pentru curățare profesională, cu diametrul...
+  ✓ DB updated
+
+[143/1000] 1.573-721.0 — IVS 100/55 Lp *EU
+  ✓ Found: professional/aspiratoare-industriale/aspiratoare-pentru-sarc
+  ✓ Extracted: Aspirator industrial cu sistem de eliminare Longopac, putere...
+  ✓ DB updated
+
+[144/1000] 1.783-223.0 —  BR 30/4 C +MF *EU
+  ✓ Found: professional/masini-de-spalat-pardoseli/masini-de-spalat-par
+  ✓ Extracted: Mașină de frecat și uscat compactă și ușoară (11,5 kg), idea...
+  ✓ DB updated
+
+[145/1000] 1.291-250.0 —  BDS 43/DUO C
+  ✓ Found: professional/masini-de-spalat-pardoseli/alte-solutii-de-cura
+  ✓ Extracted: Mașină universală cu un singur disc pentru curățarea, lustru...
+  ✓ DB updated
+
+[146/1000] 6.371-272.0 —  Guide comb yellow
+  ✓ Found: accesorii/piepteni-intrare-galben-63712720.html
+  ✓ Extracted: Combinații interioare pentru escalatoare Thyssen-Krupp și Fu...
+  ✓ DB updated
+
+[147/1000] 9.753-023.0 —  Mop holder complete
+  ✓ Found: accesorii/suport-mop-complet-97530230.html
+  ✓ Extracted: Suport dedicat pentru depozitarea comodă a mopului, ce se fi...
+  ✓ DB updated
+
+[148/1000] 1.008-056.0 —  BRC 45/45 C
+  ✓ Found: aparate-iesite-din-gama/brc-45-45-c-10080560.html
+  ✓ Extracted: Aparat profesional pentru curățarea mochetelor și covoare. P...
+  ✓ DB updated
+
+[149/1000] 1.480-255.0 —  B 260 RI Bp Dose+SB+R120
+  ✓ Found: professional/masini-de-spalat-pardoseli/masini-de-spalat-par
+  ✓ Extracted: Mașină de spălat pardoseli B 260 RI Bp cu performanță ridica...
+  ✓ DB updated
+
+[150/1000] 5.035-348.0 —  Key grey KIK
+  ✓ Found: accesorii/cheie-kik-gri-50353480.html
+  ✓ Extracted: Cheia KIK gri este rezervată supervizorului, care poate ofer...
+  ✓ DB updated
+
+[151/1000] 6.369-509.0 —  Guide comb grey
+  ✓ Found: accesorii/pieptene-de-directie-albastru-63695090.html

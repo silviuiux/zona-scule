@@ -18,6 +18,10 @@ body {
   color: var(--black);
   font-family: 'Recursive', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* #8: dot pattern via CSS background — 2px dots, 16px grid */
+  background-image: radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-attachment: fixed; /* parallax-like: grid moves slower than content */
 }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }

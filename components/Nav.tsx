@@ -113,12 +113,9 @@ export default function Nav() {
           </svg>
         </Link>
 
-        {/* Catalog */}
+        {/* #2: Catalog → direct to /produse listing, no dropdown */}
         <Link href="/produse" className="nav-catalog">
           Catalog
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="m6 9 6 6 6-6"/>
-          </svg>
         </Link>
 
         {/* Search */}

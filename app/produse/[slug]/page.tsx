@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
+import HeroImage from './HeroImage'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -33,7 +34,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     { title: product.app_03_title, detail: product.app_03_details },
   ].filter(a => a.title)
 
-  // Gallery images (excluding main)
   const galleryImgs = [
     product.gallery_storage_url_1 ?? product.gallery_url_1,
     product.gallery_storage_url_2 ?? product.gallery_url_2,
@@ -41,10 +41,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     product.gallery_storage_url_4 ?? product.gallery_url_4,
   ].filter(Boolean) as string[]
 
+  // Breadcrumbs — #10: radius 4px, links to listing with category/subcategory
   const breadcrumbs = [
     { href: '/produse', label: 'Catalog' },
-    product.category_text ? { href: `/produse?categorie=${encodeURIComponent(product.category_text)}`, label: product.category_text } : null,
-    product.subcategory_text ? { href: `/produse?categorie=${encodeURIComponent(product.category_text ?? '')}`, label: product.subcategory_text } : null,
+    product.category_text ? {
+      href: `/produse?categorie=${encodeURIComponent(product.category_text)}`,
+      label: product.category_text
+    } : null,
+    product.subcategory_text ? {
+      href: `/produse?categorie=${encodeURIComponent(product.category_text ?? '')}&subcategorie=${encodeURIComponent(product.subcategory_text)}`,
+      label: product.subcategory_text
+    } : null,
   ].filter(Boolean) as { href: string; label: string }[]
 
   return (
@@ -54,28 +61,35 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .pdp { padding-top: 52px; background: rgb(244,244,244); }
 
         /* ── TOP WHITE SECTION ── */
+        /* #4: full white background, no border on image */
         .pdp-top {
           background: rgb(255,255,255);
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          border-bottom: 1px solid rgba(0,0,0,0.06);
         }
         .pdp-top-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 32px 12px 48px;
+          padding: 40px 12px 60px;
           display: grid; grid-template-columns: 1fr 1fr;
-          gap: 80px; align-items: start;
+          gap: 80px;
+          /* #6: vertically center left content */
+          align-items: center;
         }
 
-        /* Left */
+        /* Left content */
         .bc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+        /* #10: breadcrumb pills with border-radius 4px */
         .bc-pill {
           font-family: 'Recursive', sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.5);
           padding: 4px 12px;
           border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 999px; text-decoration: none;
+          border-radius: 4px;
+          text-decoration: none;
           transition: border-color 150ms, color 150ms;
+          white-space: nowrap;
         }
         .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
+
         .pdp-brand {
           font-family: 'Recursive', sans-serif;
           font-weight: 500; font-size: 18px; color: rgb(0,0,0);
@@ -117,16 +131,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
         .cere-btn:hover { background: rgb(190,35,34); }
 
-        /* Right: main image */
-        .pdp-main-img {
-          position: relative; aspect-ratio: 1;
-          background: rgb(250,249,247); border-radius: 4px; overflow: hidden;
-        }
-
-        /* ── DARK SPECS ── */
+        /* ── DARK SPECS — #3: comes right after hero, before gallery ── */
+        /* #9: padding 96px top/bottom for sections */
         .pdp-specs { background: rgb(30,30,30); }
         .pdp-specs-inner {
-          max-width: 1440px; margin: 0 auto; padding: 60px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 96px 12px;
         }
         .specs-label {
           font-family: 'Inter', sans-serif;
@@ -134,11 +143,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           letter-spacing: 0.1em; text-transform: uppercase;
           color: rgba(255,255,255,0.3); margin-bottom: 28px;
         }
-        .specs-grid {
-          display: grid; gap: 16px;
-        }
+        .specs-grid { display: grid; gap: 16px; }
+        /* #9: spec cards — 96px top, 32px bottom padding */
         .spec-card {
-          background: rgb(255,255,255); border-radius: 4px; padding: 24px;
+          background: rgb(255,255,255); border-radius: 4px;
+          padding: 96px 24px 32px;
         }
         .spec-card-label {
           font-family: 'Recursive', sans-serif;
@@ -155,9 +164,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.5;
         }
 
-        /* ── INFO CARDS (caracteristici / aplicatii) ── */
+        /* ── INFO CARDS ── */
+        /* #9: section padding 96px */
         .info-section {
-          max-width: 1440px; margin: 0 auto; padding: 72px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 96px 12px;
         }
         .info-section-label {
           font-family: 'Inter', sans-serif;
@@ -165,12 +175,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           letter-spacing: 0.1em; text-transform: uppercase;
           color: rgba(0,0,0,0.35); margin-bottom: 24px;
         }
-        .info-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-        }
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        /* #9: info cards — 96px top, 32px bottom */
         .info-card {
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.06);
-          border-radius: 4px; padding: 24px;
+          border-radius: 4px; padding: 96px 24px 32px;
           display: flex; flex-direction: column; gap: 6px;
         }
         .info-num {
@@ -188,9 +197,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
 
         /* ── CTA BANNER ── */
-        .cta-banner {
-          max-width: 1440px; margin: 0 auto; padding: 0 12px 72px;
-        }
+        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 0 12px 72px; }
         .cta-banner-inner {
           background: rgb(30,30,30); border-radius: 4px;
           padding: 32px 40px;
@@ -198,8 +205,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
         .cta-banner-eyebrow {
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.4);
-          margin-bottom: 4px;
+          font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px;
         }
         .cta-banner-title {
           font-family: 'Bungee', sans-serif;
@@ -257,10 +263,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       <div className="pdp">
 
-        {/* ── TOP: info left + main image right ── */}
+        {/* ── TOP: info left (centered) + hero image right ── */}
         <div className="pdp-top">
           <div className="pdp-top-inner">
-            {/* LEFT */}
+
+            {/* LEFT — #6: vertically centered via align-items:center on grid */}
             <div>
               <div className="bc-row">
                 {breadcrumbs.map((b, i) => (
@@ -268,7 +275,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 ))}
               </div>
               <p className="pdp-brand">{product.brand_name}</p>
-              <h1 className="pdp-sku">{product.sku ?? product.slug}</h1>
+              <h1 className="pdp-sku">{product.model || product.sku || product.slug}</h1>
               {product.short_description && (
                 <p className="pdp-desc">{product.short_description}</p>
               )}
@@ -284,23 +291,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <Link href="/contact" className="cere-btn">CERE OFERTA</Link>
             </div>
 
-            {/* RIGHT: main image */}
-            <div className="pdp-main-img">
-              {mainImg ? (
-                <Image src={mainImg} alt={product.name} fill style={{ objectFit: 'contain', padding: '32px' }} unoptimized />
-              ) : (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(0,0,0,0.2)', fontFamily: 'Recursive, sans-serif', fontSize: '12px' }}>NO IMAGE</div>
-              )}
-            </div>
+            {/* RIGHT: #4 no border/box, pure white bg, #5 hover + lightbox */}
+            <HeroImage src={mainImg} alt={product.name} />
           </div>
         </div>
 
-        {/* ── GALLERY: 80vh split columns with lightbox ── */}
-        {galleryImgs.length > 0 && (
-          <GallerySection images={galleryImgs} productName={product.name} />
-        )}
-
-        {/* ── DARK SPECS ── */}
+        {/* ── #3: SPECS come immediately after hero ── */}
         {specs.length > 0 && (
           <div className="pdp-specs">
             <div className="pdp-specs-inner">
@@ -316,6 +312,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </div>
+        )}
+
+        {/* ── GALLERY: 80vh split columns — after specs ── */}
+        {galleryImgs.length > 0 && (
+          <GallerySection images={galleryImgs} productName={product.name} />
         )}
 
         {/* ── CARACTERISTICI ── */}
