@@ -48,42 +48,38 @@ def sb_update(sku, data):
 
 # ── Claude extraction ─────────────────────────────────────────────────────────
 
+def clean_page_text(text, max_chars=3500):
+    """Strip non-printable chars, collapse whitespace, truncate."""
+    import re as _re
+    text = _re.sub(r'\n{3,}', '\n\n', text)
+    text = _re.sub(r' {2,}', ' ', text)
+    # Keep only printable ASCII + Romanian diacritics + newlines
+    cleaned = ''.join(c for c in text if c.isprintable() or c == '\n')
+    return cleaned[:max_chars].strip()
+
 def extract_with_claude(sku, product_name, page_text):
     """Send page text to Claude, get structured JSON back."""
-    prompt = f"""Ești expert în produse industriale Kärcher. Analizează textul de mai jos de pe pagina produsului cu SKU "{sku}" ({product_name}).
+    page_clean = clean_page_text(page_text)
 
-Extrage datele și returnează DOAR JSON valid, fără alt text:
-
-{{
-  "model": "Titlul oficial al produsului în română, cu majuscule (ex: SET DE FILTRE AF 20, ASPIRATOR T 9/1 Bp). Exact cum apare pe pagina Kärcher.",
-  "short_description": "2-3 propoziții care descriu exact ce face produsul. MAX 300 caractere. În română.",
-  "st1_label": "Prima specificație tehnică (ex: Putere motor, Debit aer, Presiune)",
-  "st1_value": "Valoarea cu unitate (ex: 1200 W, 120 bar)",
-  "st1_details": "Explicație scurtă în română",
-  "st2_label": "A doua specificație",
-  "st2_value": "Valoarea",
-  "st2_details": "Explicație",
-  "st3_label": "A treia specificație",
-  "st3_value": "Valoarea",
-  "st3_details": "Explicație",
-  "c1_title": "Prima caracteristică cheie (max 5 cuvinte)",
-  "c1_details": "Descriere în română (max 100 caractere)",
-  "c2_title": "A doua caracteristică",
-  "c2_details": "Descriere",
-  "c3_title": "A treia caracteristică",
-  "c3_details": "Descriere",
-  "app_01_title": "Prima aplicație recomandată",
-  "app_01_details": "Descriere aplicație (max 100 caractere)",
-  "app_02_title": "A doua aplicație",
-  "app_02_details": "Descriere",
-  "app_03_title": "A treia aplicație",
-  "app_03_details": "Descriere"
-}}
-
-Dacă nu găsești o valoare, pune null. Nu inventa date.
-
-TEXT PAGINA (primele 6000 caractere):
-{page_text[:6000]}"""
+    system = "Ești expert în produse industriale. Răspunzi DOAR cu JSON valid, fără text suplimentar, fără markdown."
+    user = (
+        f'SKU: {sku}\nProdus: {product_name}\n\n'
+        f'Extrage din textul următor și returnează JSON cu exact aceste chei '
+        f'(pune null dacă nu găsești):\n'
+        f'model, short_description, '
+        f'st1_label, st1_value, st1_details, '
+        f'st2_label, st2_value, st2_details, '
+        f'st3_label, st3_value, st3_details, '
+        f'c1_title, c1_details, c2_title, c2_details, c3_title, c3_details, '
+        f'app_01_title, app_01_details, app_02_title, app_02_details, app_03_title, app_03_details\n\n'
+        f'Reguli:\n'
+        f'- model: titlul oficial al produsului, cu majuscule\n'
+        f'- short_description: 2-3 propoziții, max 250 caractere, în română\n'
+        f'- st*_label/value/details: specificații tehnice cheie cu valori și unități\n'
+        f'- c*_title/details: caracteristici și beneficii cheie\n'
+        f'- app_*: aplicații recomandate\n\n'
+        f'TEXT PAGINA:\n{page_clean}'
+    )
 
     r = requests.post(
         'https://api.anthropic.com/v1/messages',
@@ -94,16 +90,20 @@ TEXT PAGINA (primele 6000 caractere):
         },
         json={
             'model': 'claude-sonnet-4-5',
-            'max_tokens': 1000,
-            'messages': [{'role': 'user', 'content': prompt}]
+            'max_tokens': 800,
+            'system': system,
+            'messages': [{'role': 'user', 'content': user}]
         },
         timeout=30
     )
-    
+
     if not r.ok:
-        raise Exception(f"Claude API error: {r.status_code}")
-    
+        raise Exception(f"Claude API error: {r.status_code} — {r.text[:200]}")
+
     text = r.json()['content'][0]['text'].strip()
+    # Strip markdown fences if model added them
+    text = re.sub(r'^```(?:json)?\s*', '', text)
+    text = re.sub(r'\s*```$', '', text)
     match = re.search(r'\{[\s\S]*\}', text)
     if not match:
         raise Exception("No JSON in Claude response")

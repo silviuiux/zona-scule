@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav'
 import { getCategoriesWithCount, getBrands } from '@/lib/supabase'
+import AnimatedHero from '@/components/AnimatedHero'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,8 +11,6 @@ export default async function HomePage() {
     getCategoriesWithCount(),
     getBrands(),
   ])
-
-  const supplierNames = ['BOSCH', 'Makita', 'PFERD', 'STEINHELL']
 
   return (
     <>
@@ -229,27 +228,15 @@ export default async function HomePage() {
       {/* ── HERO ── */}
       <section className="hero">
         <div className="hero-inner">
-          {/* Authorized supplier row */}
-          <div className="authorized-row">
-            <span className="authorized-label">Authorized supplier:</span>
-            {supplierNames.map(b => (
-              <Link key={b} href={`/produse?brand=${encodeURIComponent(b)}`} className="authorized-link">{b}</Link>
-            ))}
-          </div>
+          <AnimatedHero brands={brands} />
 
-          {/* Headline — Bungee, lowercase, matches Framer "toate / de care ai nevoie" */}
-          <h1 className="hero-headline">
-            toate <span className="word-red">sculele</span><br />
-            de care ai nevoie
-          </h1>
-
-          {/* Subline — Recursive regular, 50% opacity */}
+          {/* Subline */}
           <p className="hero-sub">
             Lider in furnizarea de scule electrice,<br />
             industriale si de constructii de peste 26 de ani
           </p>
 
-          {/* CTA row — search + button, exact Framer sizing */}
+          {/* CTA row */}
           <div className="hero-cta-row">
             <div className="hero-search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="2">

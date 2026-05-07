@@ -1,9 +1,10 @@
 'use client'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import type { CategoryWithCount } from '@/lib/supabase'
+import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
 
 type Sub = { id: string; name: string; product_count: number }
+type BrandCat = { name: string; product_count: number }
 
 export default function Sidebar({
   categories,
@@ -13,28 +14,46 @@ export default function Sidebar({
   activeBrand,
 }: {
   categories: CategoryWithCount[]
-  brands: { id: string; name: string }[]
+  brands: BrandWithCount[]
   activeCat?: string
   activeSub?: string
   activeBrand?: string
 }) {
   const [expandedCat, setExpandedCat] = useState<string | undefined>(activeCat)
+  const [expandedBrand, setExpandedBrand] = useState<string | undefined>(activeBrand)
   const [subs, setSubs] = useState<Sub[]>([])
-  const [loading, setLoading] = useState(false)
+  const [brandCats, setBrandCats] = useState<BrandCat[]>([])
+  const [loadingSubs, setLoadingSubs] = useState(false)
+  const [loadingBrandCats, setLoadingBrandCats] = useState(false)
 
-  // Fetch subcategories when expanded cat changes
+  // Fetch subcategories when category expands
   useEffect(() => {
     if (!expandedCat) { setSubs([]); return }
-    setLoading(true)
+    setLoadingSubs(true)
     fetch(`/api/subcategories?categorie=${encodeURIComponent(expandedCat)}`)
       .then(r => r.json())
-      .then(data => { setSubs(data); setLoading(false) })
-      .catch(() => setLoading(false))
+      .then(data => { setSubs(data); setLoadingSubs(false) })
+      .catch(() => setLoadingSubs(false))
   }, [expandedCat])
 
+  // Fetch brand categories when brand expands
+  useEffect(() => {
+    if (!expandedBrand) { setBrandCats([]); return }
+    setLoadingBrandCats(true)
+    fetch(`/api/brand-categories?brand=${encodeURIComponent(expandedBrand)}`)
+      .then(r => r.json())
+      .then(data => { setBrandCats(data); setLoadingBrandCats(false) })
+      .catch(() => setLoadingBrandCats(false))
+  }, [expandedBrand])
+
   const handleCatClick = (catName: string) => {
-    // Toggle: click same cat closes it
     setExpandedCat(prev => prev === catName ? undefined : catName)
+    setExpandedBrand(undefined) // close brand accordion
+  }
+
+  const handleBrandClick = (brandName: string) => {
+    setExpandedBrand(prev => prev === brandName ? undefined : brandName)
+    setExpandedCat(undefined) // close category accordion
   }
 
   return (
@@ -60,17 +79,17 @@ export default function Sidebar({
         }
         .sidebar-block { margin-bottom: 28px; }
 
-        /* Category row — button not link (handles expand) */
-        .cat-row {
+        /* Row shared by cats and brands */
+        .sidebar-row {
           display: flex; align-items: center;
           width: 100%; background: none; border: none;
           cursor: pointer; padding: 0; text-align: left;
           border-radius: 3px; transition: background 100ms;
         }
-        .cat-row:hover { background: rgba(0,0,0,0.03); }
-        .cat-row.active { background: rgba(217,44,43,0.06); }
+        .sidebar-row:hover { background: rgba(0,0,0,0.03); }
+        .sidebar-row.active { background: rgba(217,44,43,0.06); }
 
-        .cat-row-link {
+        .sidebar-row-link {
           flex: 1; display: flex; align-items: center; justify-content: space-between;
           padding: 6px 8px;
           font-family: 'Recursive', sans-serif;
@@ -78,10 +97,10 @@ export default function Sidebar({
           text-decoration: none; gap: 6px; min-width: 0;
           transition: color 150ms;
         }
-        .cat-row.active .cat-row-link { color: rgb(217,44,43); font-weight: 500; }
-        .cat-row-link:hover { color: rgb(0,0,0); }
+        .sidebar-row.active .sidebar-row-link { color: rgb(217,44,43); font-weight: 500; }
+        .sidebar-row-link:hover { color: rgb(0,0,0); }
 
-        .cat-name {
+        .row-name {
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
         }
         .count-pill {
@@ -92,26 +111,26 @@ export default function Sidebar({
           background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.4);
           min-width: 22px; text-align: center;
         }
-        .cat-row.active .count-pill {
+        .sidebar-row.active .count-pill {
           background: rgba(217,44,43,0.12); color: rgb(217,44,43);
         }
         .chevron {
           flex-shrink: 0; margin-right: 6px;
           color: rgba(0,0,0,0.3); transition: transform 200ms;
-          display: flex; align-items: center;
+          display: flex; align-items: center; background: none; border: none; cursor: pointer;
+          padding: 2px;
         }
-        .chevron.open { transform: rotate(90deg); }
-        .cat-row.active .chevron { color: rgb(217,44,43); }
+        .sidebar-row.active .chevron { color: rgb(217,44,43); }
 
-        /* Subcategory list */
-        .sub-list {
+        /* Expandable list — shared for subcats and brand cats */
+        .expand-list {
           overflow: hidden;
           transition: max-height 250ms ease, opacity 200ms ease;
           max-height: 0; opacity: 0;
         }
-        .sub-list.open { max-height: 800px; opacity: 1; }
+        .expand-list.open { max-height: 1000px; opacity: 1; }
 
-        .sub-link {
+        .expand-link {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 8px 5px 20px;
           font-family: 'Recursive', sans-serif;
@@ -119,28 +138,25 @@ export default function Sidebar({
           text-decoration: none; border-radius: 3px; gap: 6px;
           transition: color 150ms, background 150ms;
         }
-        .sub-link:hover { color: rgb(0,0,0); background: rgba(0,0,0,0.03); }
-        .sub-link.active {
+        .expand-link:hover { color: rgb(0,0,0); background: rgba(0,0,0,0.03); }
+        .expand-link.active {
           color: rgb(217,44,43); font-weight: 500;
           background: rgba(217,44,43,0.04);
         }
-        .sub-link.active .count-pill {
+        .expand-link.active .count-pill {
           background: rgba(217,44,43,0.12); color: rgb(217,44,43);
         }
-        .sub-name {
+        .expand-name {
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
         }
-        .sub-loading {
+        .expand-loading {
           padding: 6px 8px 6px 20px;
           font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.3);
-          font-style: italic;
+          font-size: 11px; color: rgba(0,0,0,0.3); font-style: italic;
         }
 
-        /* Brand links */
         .sidebar-link {
-          display: block;
-          padding: 5px 8px;
+          display: block; padding: 5px 8px;
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.55);
           text-decoration: none; border-radius: 3px;
@@ -153,41 +169,34 @@ export default function Sidebar({
 
       <aside className="sidebar">
 
-        {/* ── Categories ── */}
+        {/* ── CATEGORII ── */}
         <div className="sidebar-block">
           <p className="sidebar-section-title">Categorii</p>
 
-          {/* All */}
-          <div className="cat-row">
-            <Link href="/produse" className="cat-row-link" style={{ color: !activeCat && !activeBrand ? 'rgb(217,44,43)' : undefined }}>
-              <span className="cat-name">Toate</span>
+          <div className="sidebar-row">
+            <Link href="/produse" className="sidebar-row-link"
+              style={{ color: !activeCat && !activeBrand ? 'rgb(217,44,43)' : undefined }}>
+              <span className="row-name">Toate</span>
             </Link>
           </div>
 
           {categories.map(cat => {
             const isActive = activeCat === cat.name
             const isExpanded = expandedCat === cat.name
-
             return (
               <div key={cat.id}>
-                <div className={`cat-row${isActive ? ' active' : ''}`}>
-                  {/* Clicking the row navigates AND toggles */}
+                <div className={`sidebar-row${isActive ? ' active' : ''}`}>
                   <Link
                     href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-                    className="cat-row-link"
+                    className="sidebar-row-link"
                     onClick={() => handleCatClick(cat.name)}
                   >
-                    <span className="cat-name">{cat.name}</span>
+                    <span className="row-name">{cat.name}</span>
                     {cat.product_count > 0 && (
                       <span className="count-pill">{cat.product_count.toLocaleString('ro')}</span>
                     )}
                   </Link>
-                  {/* Chevron toggles expand without navigating */}
-                  <button
-                    className="chevron"
-                    onClick={e => { e.preventDefault(); handleCatClick(cat.name) }}
-                    aria-label="Expandează subcategorii"
-                  >
+                  <button className="chevron" onClick={e => { e.preventDefault(); handleCatClick(cat.name) }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
                       style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 200ms' }}>
                       <path d="m9 18 6-6-6-6"/>
@@ -195,21 +204,14 @@ export default function Sidebar({
                   </button>
                 </div>
 
-                {/* Subcategory list */}
-                <div className={`sub-list${isExpanded ? ' open' : ''}`}>
-                  {loading && isExpanded && (
-                    <span className="sub-loading">Se încarcă...</span>
-                  )}
-                  {!loading && isExpanded && subs.length === 0 && (
-                    <span className="sub-loading">Fără subcategorii</span>
-                  )}
-                  {!loading && isExpanded && subs.map(sub => (
-                    <Link
-                      key={sub.id}
+                <div className={`expand-list${isExpanded ? ' open' : ''}`}>
+                  {loadingSubs && isExpanded && <span className="expand-loading">Se încarcă...</span>}
+                  {!loadingSubs && isExpanded && subs.length === 0 && <span className="expand-loading">—</span>}
+                  {!loadingSubs && isExpanded && subs.map(sub => (
+                    <Link key={sub.id}
                       href={`/produse?categorie=${encodeURIComponent(cat.name)}&subcategorie=${encodeURIComponent(sub.name)}`}
-                      className={`sub-link${activeSub === sub.name ? ' active' : ''}`}
-                    >
-                      <span className="sub-name">{sub.name}</span>
+                      className={`expand-link${activeSub === sub.name ? ' active' : ''}`}>
+                      <span className="expand-name">{sub.name}</span>
                       {sub.product_count > 0 && (
                         <span className="count-pill">{sub.product_count.toLocaleString('ro')}</span>
                       )}
@@ -221,15 +223,51 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* ── Brands ── */}
+        {/* ── BRANDURI ── */}
         <div className="sidebar-block">
           <p className="sidebar-section-title">Branduri</p>
-          {brands.map(b => (
-            <Link key={b.id} href={`/produse?brand=${encodeURIComponent(b.name)}`}
-              className={`sidebar-link${activeBrand === b.name ? ' active' : ''}`}>
-              {b.name}
-            </Link>
-          ))}
+
+          {brands.map(brand => {
+            const isActive = activeBrand === brand.name
+            const isExpanded = expandedBrand === brand.name
+            return (
+              <div key={brand.id}>
+                <div className={`sidebar-row${isActive ? ' active' : ''}`}>
+                  <Link
+                    href={`/produse?brand=${encodeURIComponent(brand.name)}`}
+                    className="sidebar-row-link"
+                    onClick={() => handleBrandClick(brand.name)}
+                  >
+                    <span className="row-name">{brand.name}</span>
+                    {brand.product_count > 0 && (
+                      <span className="count-pill">{brand.product_count.toLocaleString('ro')}</span>
+                    )}
+                  </Link>
+                  <button className="chevron" onClick={e => { e.preventDefault(); handleBrandClick(brand.name) }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                      style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 200ms' }}>
+                      <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Brand categories accordion */}
+                <div className={`expand-list${isExpanded ? ' open' : ''}`}>
+                  {loadingBrandCats && isExpanded && <span className="expand-loading">Se încarcă...</span>}
+                  {!loadingBrandCats && isExpanded && brandCats.map(cat => (
+                    <Link key={cat.name}
+                      href={`/produse?brand=${encodeURIComponent(brand.name)}&categorie=${encodeURIComponent(cat.name)}`}
+                      className={`expand-link${activeCat === cat.name ? ' active' : ''}`}>
+                      <span className="expand-name">{cat.name}</span>
+                      {cat.product_count > 0 && (
+                        <span className="count-pill">{cat.product_count.toLocaleString('ro')}</span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
 
       </aside>

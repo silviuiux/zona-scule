@@ -152,13 +152,35 @@ export async function getCategories() {
   return data as Category[]
 }
 
-export async function getBrands() {
+export type BrandWithCount = Brand & { product_count: number }
+
+export async function getBrands(): Promise<BrandWithCount[]> {
+  // Get brands + product counts from products table directly
   const { data, error } = await supabase
+    .from('products')
+    .select('brand_name')
+    .not('brand_name', 'is', null)
+
+  if (error) throw error
+
+  const countMap: Record<string, number> = {}
+  for (const row of data ?? []) {
+    if (row.brand_name) {
+      countMap[row.brand_name] = (countMap[row.brand_name] ?? 0) + 1
+    }
+  }
+
+  // Get brand records
+  const { data: brands, error: bErr } = await supabase
     .from('brands')
     .select('*')
     .order('name')
-  if (error) throw error
-  return data as Brand[]
+  if (bErr) throw bErr
+
+  return (brands as Brand[])
+    .map(b => ({ ...b, product_count: countMap[b.name] ?? 0 }))
+    .filter(b => b.product_count > 0)
+    .sort((a, b) => b.product_count - a.product_count)
 }
 
 export async function getSubcategoriesByCategory(categoryId: string) {
