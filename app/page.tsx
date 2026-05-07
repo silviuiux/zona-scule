@@ -250,6 +250,39 @@ export default async function HomePage() {
           font-size: 11px; color: rgba(0,0,0,0.35); text-decoration: none;
         }
         .footer-bottom a { color: rgb(217, 44, 43); }
+
+        /* ══ RESPONSIVE ══════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+          /* Hero */
+          .hero { min-height: auto; padding-top: 72px; padding-bottom: 48px; }
+          .hero-inner { gap: 20px; padding: 0 16px; }
+          .hero-cta-row { flex-direction: column; width: 100%; }
+          .hero-search-box { width: 100%; }
+          .hero-catalog-cta { justify-content: center; }
+
+          /* Categories */
+          .cats-section { padding: 0 16px 64px; }
+          .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .cat-card { height: 260px; }
+
+          /* Services */
+          .services-section { padding: 0 16px 64px; gap: 40px; }
+          .services-grid { grid-template-columns: 1fr; }
+          .service-card { height: auto; }
+          .service-img { height: 260px; }
+
+          /* Footer */
+          .footer-social { gap: 24px; flex-wrap: wrap; }
+          .footer-grid { grid-template-columns: 1fr; gap: 32px; padding: 36px 16px; }
+          .footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+          /* Single column categories on very small screens */
+          .cats-row { grid-template-columns: 1fr; }
+          .cat-card { height: 220px; }
+        }
       `}</style>
 
       {/* ── HERO ── */}

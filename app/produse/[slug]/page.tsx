@@ -260,6 +260,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
         .footer-bottom span, .footer-bottom a { font-family: 'Recursive', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); text-decoration: none; }
         .footer-bottom a { color: rgb(217,44,43); }
+
+        /* ══ RESPONSIVE ═════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          .pdp-top-inner {
+            grid-template-columns: 1fr !important;
+            gap: 32px; padding: 32px 16px 40px;
+          }
+          .pdp-top-inner > :last-child { order: -1; }
+          .pdp-sku { font-size: clamp(24px, 7vw, 44px); }
+          .specs-grid {
+            display: flex !important;
+            overflow-x: auto; gap: 10px; padding-bottom: 8px;
+          }
+          .spec-card { min-width: 220px; padding: 40px 20px 24px; }
+          .pdp-specs-inner { padding: 48px 16px; }
+          .info-grid { grid-template-columns: 1fr !important; }
+          .info-section { padding: 48px 16px; }
+          .cta-banner-inner {
+            flex-direction: column; align-items: flex-start;
+            padding: 24px 20px; gap: 16px;
+          }
+          .cta-banner-btns { flex-direction: column; width: 100%; }
+          .cta-primary, .cta-secondary { text-align: center; justify-content: center; }
+          .footer-grid { grid-template-columns: 1fr !important; gap: 24px; padding: 28px 16px; }
+          .footer-bottom { flex-direction: column; gap: 6px; }
+        }
       `}</style>
 
       <div className="pdp">

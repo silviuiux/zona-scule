@@ -44,7 +44,10 @@ def sb_update(sku, data):
         },
         json=data
     )
-    return r.status_code in (200, 204)
+    if r.status_code not in (200, 204):
+        print(f"  ✗ DB error {r.status_code}: {r.text[:150]}")
+        return False
+    return True
 
 # ── Claude extraction ─────────────────────────────────────────────────────────
 
@@ -57,8 +60,8 @@ def clean_page_text(text, max_chars=3500):
     cleaned = ''.join(c for c in text if c.isprintable() or c == '\n')
     return cleaned[:max_chars].strip()
 
-def extract_with_claude(sku, product_name, page_text):
-    """Send page text to Claude, get structured JSON back."""
+def extract_with_claude(sku, product_name, page_text, attempt=1):
+    """Send page text to Claude, get structured JSON back. Retries once on failure."""
     page_clean = clean_page_text(page_text)
 
     system = "Ești expert în produse industriale. Răspunzi DOAR cu JSON valid, fără text suplimentar, fără markdown."
@@ -106,6 +109,10 @@ def extract_with_claude(sku, product_name, page_text):
     text = re.sub(r'\s*```$', '', text)
     match = re.search(r'\{[\s\S]*\}', text)
     if not match:
+        if attempt < 2:
+            print(f"  ↺ Retry extraction (attempt {attempt+1})")
+            time.sleep(1)
+            return extract_with_claude(sku, product_name, page_text, attempt + 1)
         raise Exception("No JSON in Claude response")
     return json.loads(match.group(0))
 

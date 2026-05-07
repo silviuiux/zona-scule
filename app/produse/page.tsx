@@ -133,6 +133,64 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           gap: 16px;
           margin-bottom: 40px;
         }
+
+        /* ── MOBILE SIDEBAR DRAWER ── */
+        .sidebar-toggle {
+          display: none;
+        }
+        .sidebar-backdrop {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          /* Sidebar becomes an off-canvas drawer */
+          .filtered-layout { flex-direction: column; }
+
+          .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 280px; z-index: 200;
+            transform: translateX(-100%);
+            transition: transform 300ms ease;
+            height: 100vh; top: 0;
+            padding-top: 72px;
+            background: rgb(244,244,244);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+          }
+          .sidebar.open {
+            transform: translateX(0);
+          }
+          .sidebar-backdrop {
+            display: block;
+            position: fixed; inset: 0; z-index: 199;
+            background: rgba(0,0,0,0.4);
+            opacity: 0; pointer-events: none;
+            transition: opacity 300ms;
+          }
+          .sidebar-backdrop.open {
+            opacity: 1; pointer-events: all;
+          }
+          .sidebar-toggle {
+            display: flex; align-items: center; gap: 8px;
+            background: rgb(255,255,255);
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-family: 'Recursive', sans-serif;
+            font-size: 13px; font-weight: 500; color: rgb(0,0,0);
+            cursor: pointer; margin-bottom: 16px;
+          }
+
+          /* Product grid responsive */
+          .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .products-main { padding: 20px 12px 60px; }
+
+          /* Cat grid on unfiltered page */
+          .cat-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        @media (max-width: 480px) {
+          .products-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
 
       <div className="catalog-page">
@@ -168,6 +226,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         {/* ── Filtered: sticky sidebar with count pills + 4-col grid ── */}
         {isFiltered && (
           <div className="filtered-layout">
+            {/* Mobile sidebar backdrop */}
+            <div className="sidebar-backdrop" id="sidebar-backdrop" onClick={() => {
+              document.querySelector('.sidebar')?.classList.remove('open')
+              document.getElementById('sidebar-backdrop')?.classList.remove('open')
+            }} />
             <Sidebar
               categories={categories}
               brands={brands}
@@ -184,6 +247,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 </h1>
                 <span className="products-count">{total.toLocaleString('ro')} produse</span>
               </div>
+              {/* Mobile filter toggle */}
+              <button
+                className="sidebar-toggle"
+                onClick={() => {
+                  document.querySelector('.sidebar')?.classList.toggle('open')
+                  document.getElementById('sidebar-backdrop')?.classList.toggle('open')
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/>
+                </svg>
+                Filtre
+              </button>
               {sp.categorie && (
                 <SubcategoryBar categoryName={sp.categorie} activeSub={sp.subcategorie} />
               )}

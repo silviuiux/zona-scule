@@ -74,6 +74,14 @@ export default function ContactPage({
         .contact-map iframe {
           width: 100%; height: 100%; border: none;
         }
+
+        @media (max-width: 768px) {
+          .contact-inner { padding: 48px 16px 64px; }
+          .contact-cards { grid-template-columns: 1fr; gap: 10px; }
+          .contact-bottom { grid-template-columns: 1fr; }
+          .contact-map { min-height: 300px; }
+          .contact-title { font-size: clamp(40px, 10vw, 72px); }
+        }
       `}</style>
 
       <div className="contact-page">
