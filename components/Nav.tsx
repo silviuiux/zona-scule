@@ -113,10 +113,7 @@ export default function Nav() {
           </svg>
         </Link>
 
-        {/* #2: Catalog → direct to /produse listing, no dropdown */}
-        <Link href="/produse" className="nav-catalog">
-          Catalog
-        </Link>
+        {/* #2: Catalog removed from nav */}
 
         {/* Search — icon inside on right */}
         <form className="nav-search-form" onSubmit={handleSearch}>

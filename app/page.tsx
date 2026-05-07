@@ -117,19 +117,45 @@ export default async function HomePage() {
         .cat-card:hover { transform: scale(1.01); }
         .cat-card-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 55%);
+          background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);
+          transition: opacity 300ms ease;
+        }
+        /* Product count — top left */
+        .cat-card-count {
+          position: absolute; top: 14px; left: 16px;
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.7);
+          background: rgba(0,0,0,0.25);
+          padding: 3px 8px; border-radius: 999px;
+        }
+        /* Bottom content */
+        .cat-card-bottom {
+          position: absolute; bottom: 0; left: 0; right: 0;
+          padding: 16px;
         }
         .cat-card-label {
-          position: absolute; bottom: 16px; left: 16px; right: 16px;
           font-family: 'Recursive', sans-serif;
           font-size: 15px; font-weight: 500;
           color: rgb(255,255,255); letter-spacing: -0.01em;
           line-height: 1.3;
+          display: block; margin-bottom: 0;
         }
+        /* Desc hidden by default, slides in on hover */
         .cat-card-desc {
-          position: absolute; bottom: 38px; left: 16px; right: 16px;
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4;
+          font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5;
+          display: block;
+          max-height: 0; overflow: hidden;
+          opacity: 0;
+          margin-top: 0;
+          transition: max-height 300ms ease-in-out, opacity 250ms ease-in-out, margin-top 300ms ease;
+        }
+        .cat-card:hover .cat-card-desc {
+          max-height: 80px;
+          opacity: 1;
+          margin-top: 6px;
         }
 
         /* ─── SERVICES ────────────────────────── */
@@ -139,8 +165,8 @@ export default async function HomePage() {
           display: flex; flex-direction: column; gap: 64px;
         }
         .services-header {
-          display: flex; flex-direction: column; gap: 16px;
-          align-items: center; text-align: center;
+          display: flex; flex-direction: column; gap: 8px;
+          align-items: flex-start; text-align: left;
         }
         .section-title {
           font-family: 'Bungee', sans-serif;
@@ -268,8 +294,17 @@ export default async function HomePage() {
                     }} />
                   )}
                   <div className="cat-card-overlay" />
-                  {cat.description && <span className="cat-card-desc">{cat.description}</span>}
-                  <span className="cat-card-label">{cat.name}</span>
+                  {/* Product count — top */}
+                  {cat.product_count > 0 && (
+                    <span className="cat-card-count">{cat.product_count.toLocaleString('ro')} produse</span>
+                  )}
+                  {/* Bottom: title + desc on hover */}
+                  <div className="cat-card-bottom">
+                    <span className="cat-card-label">{cat.name}</span>
+                    {cat.description && (
+                      <span className="cat-card-desc">{cat.description}</span>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>
