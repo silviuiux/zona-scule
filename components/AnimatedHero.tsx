@@ -3,20 +3,26 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 const WORDS = [
-  { text: 'SCULELE',        href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
-  { text: 'ACCESORIILE',    href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
-  { text: 'ECHIPAMENTELE',  href: '/produse?categorie=Echipament%20de%20protec%C8%9Bie' },
+  { text: 'SCULELE',       href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
+  { text: 'ACCESORIILE',   href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
+  { text: 'ECHIPAMENTELE', href: '/produse?categorie=Echipament%20de%20protec%C8%9Bie' },
 ]
 
 type Brand = { name: string; product_count: number }
 
 export default function AnimatedHero({ brands }: { brands: Brand[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
+  const [phase, setPhase] = useState<'visible' | 'exiting'>('visible')
 
   useEffect(() => {
     const t = setInterval(() => {
-      setActiveIdx(i => (i + 1) % WORDS.length)
-    }, 2000)
+      // exit current
+      setPhase('exiting')
+      setTimeout(() => {
+        setActiveIdx(i => (i + 1) % WORDS.length)
+        setPhase('visible')
+      }, 350)
+    }, 2500)
     return () => clearInterval(t)
   }, [])
 
@@ -24,10 +30,11 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
     .map(name => brands.find(b => b.name.toLowerCase() === name.toLowerCase()))
     .filter((b): b is Brand => !!b && b.product_count > 0)
 
+  const fs = 'clamp(52px, 6.5vw, 96px)'
+
   return (
     <>
       <style>{`
-        /* Brand chips */
         .brand-chips {
           display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
         }
@@ -43,97 +50,108 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           transition: border-color 150ms, color 150ms, background 150ms;
           display: inline-flex; align-items: center; gap: 5px;
         }
-        .brand-chip:hover {
-          border-color: rgb(217,44,43); color: rgb(217,44,43);
-          background: rgba(217,44,43,0.04);
-        }
-        .brand-chip-count {
-          font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.35);
-          font-family: 'Inter', sans-serif;
-        }
+        .brand-chip:hover { border-color: rgb(217,44,43); color: rgb(217,44,43); background: rgba(217,44,43,0.04); }
+        .brand-chip-count { font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.35); font-family: 'Inter', sans-serif; }
         .brand-chip:hover .brand-chip-count { color: rgba(217,44,43,0.6); }
 
-        /* Stacked headline */
-        .hero-headline {
+        /* Headline wrapper — two lines */
+        .hero-title {
           display: flex; flex-direction: column;
-          gap: 0; line-height: 1;
-          font-family: 'Bungee Inline', 'Bungee', sans-serif;
-          font-size: clamp(56px, 6.5vw, 96px);
+          gap: 0; line-height: 1.05;
+        }
+
+        /* Line 1: "TOATE [ANIMATED WORD]" — inline flex */
+        .hero-line1 {
+          display: flex; align-items: baseline;
+          gap: 0.25em;
+          overflow: hidden; /* clips the slide animation */
+          height: 1.1em;
+        }
+
+        .hero-word-toate {
+          font-family: 'Bungee', sans-serif;
+          font-size: ${fs};
+          text-transform: uppercase;
+          color: rgb(0,0,0);
+          letter-spacing: 0.01em;
+          flex-shrink: 0;
+          line-height: 1;
+        }
+
+        /* Clip container for animated word */
+        .hero-word-clip {
+          overflow: hidden;
+          height: 1.05em;
+          display: flex; align-items: flex-start;
+        }
+
+        .hero-animated-word {
+          font-family: 'Bungee Inline', sans-serif;
+          font-size: ${fs};
           text-transform: uppercase;
           color: rgb(217,44,43);
           letter-spacing: 0.01em;
-          overflow: hidden;
-        }
-
-        /* Each word row — clip to one line height */
-        .word-row {
-          overflow: hidden;
-          height: 1.05em; /* one line */
-        }
-
-        /* The word itself slides from top → resting → exits bottom */
-        .word-inner {
+          text-decoration: none;
           display: block;
+          line-height: 1;
           transform: translateY(-110%);
           opacity: 0;
-          transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
-                      opacity 300ms ease;
-          text-decoration: none;
-          color: rgb(217,44,43);
+          transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease;
         }
-        .word-inner.visible {
+        .hero-animated-word.visible {
           transform: translateY(0);
           opacity: 1;
         }
-        .word-inner.exiting {
+        .hero-animated-word.exiting {
           transform: translateY(110%);
           opacity: 0;
+          transition: transform 300ms cubic-bezier(0.55, 0, 1, 0.45), opacity 200ms ease;
         }
 
-        /* "Todas / de care ai nevoie" parts stay static */
-        .hero-headline-static {
-          font-family: 'Bungee Inline', 'Bungee', sans-serif;
-          font-size: clamp(56px, 6.5vw, 96px);
+        /* Line 2: "DE CARE AI NEVOIE" */
+        .hero-line2 {
+          font-family: 'Bungee', sans-serif;
+          font-size: ${fs};
           text-transform: uppercase;
-          letter-spacing: 0.01em;
           color: rgb(0,0,0);
-          line-height: 1.05;
+          letter-spacing: 0.01em;
+          line-height: 1;
         }
       `}</style>
 
       {/* Brand chips */}
       <div className="brand-chips">
         <span className="brand-chips-label">Distribuitor autorizat:</span>
-        {topBrands.map(b => (
+        {topBrands.length > 0 ? topBrands.map(b => (
           <Link key={b.name} href={`/produse?brand=${encodeURIComponent(b.name)}`} className="brand-chip">
             {b.name.toUpperCase()}
             <span className="brand-chip-count">{b.product_count.toLocaleString('ro')}</span>
           </Link>
-        ))}
+        )) : (
+          // Fallback static chips while brands load
+          ['KARCHER', 'MILWAUKEE', 'PFERD', 'FFGROUP'].map(n => (
+            <Link key={n} href={`/produse?brand=${encodeURIComponent(n)}`} className="brand-chip">{n}</Link>
+          ))
+        )}
       </div>
 
-      {/* Headline: "TOATE / [SCULELE|ACCESORIILE|ECHIPAMENTELE] / DE CARE AI NEVOIE" */}
-      <div>
-        <p className="hero-headline-static">TOATE</p>
-
-        {/* Animated stacked words — only activeIdx is visible */}
-        <div className="hero-headline">
-          {WORDS.map((w, i) => (
-            <div key={w.text} className="word-row">
-              <Link
-                href={w.href}
-                className={`word-inner${
-                  i === activeIdx ? ' visible' :
-                  i === (activeIdx - 1 + WORDS.length) % WORDS.length ? ' exiting' : ''
-                }`}
-              >
-                {w.text}
-              </Link>
-            </div>
-          ))}
+      {/* Headline */}
+      <div className="hero-title">
+        {/* Line 1: TOATE [SCULELE / ACCESORIILE / ECHIPAMENTELE] */}
+        <div className="hero-line1">
+          <span className="hero-word-toate">TOATE</span>
+          <div className="hero-word-clip">
+            <Link
+              href={WORDS[activeIdx].href}
+              className={`hero-animated-word ${phase}`}
+            >
+              {WORDS[activeIdx].text}
+            </Link>
+          </div>
         </div>
 
-        <p className="hero-headline-static">DE CARE AI NEVOIE</p>
+        {/* Line 2: DE CARE AI NEVOIE */}
+        <span className="hero-line2">DE CARE AI NEVOIE</span>
       </div>
     </>
   )

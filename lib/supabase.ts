@@ -155,27 +155,16 @@ export async function getCategories() {
 export type BrandWithCount = Brand & { product_count: number }
 
 export async function getBrands(): Promise<BrandWithCount[]> {
-  // Get brands + product counts from products table directly
-  const { data, error } = await supabase
-    .from('products')
-    .select('brand_name')
-    .not('brand_name', 'is', null)
-
+  const [{ data: brands, error }, { data: counts, error: cErr }] = await Promise.all([
+    supabase.from('brands').select('*').order('name'),
+    supabase.rpc('count_products_by_brand'),
+  ])
   if (error) throw error
 
   const countMap: Record<string, number> = {}
-  for (const row of data ?? []) {
-    if (row.brand_name) {
-      countMap[row.brand_name] = (countMap[row.brand_name] ?? 0) + 1
-    }
+  for (const row of (counts as { brand_name: string; cnt: number }[] ?? [])) {
+    if (row.brand_name) countMap[row.brand_name] = row.cnt
   }
-
-  // Get brand records
-  const { data: brands, error: bErr } = await supabase
-    .from('brands')
-    .select('*')
-    .order('name')
-  if (bErr) throw bErr
 
   return (brands as Brand[])
     .map(b => ({ ...b, product_count: countMap[b.name] ?? 0 }))
