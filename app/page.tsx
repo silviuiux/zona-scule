@@ -125,22 +125,14 @@ export default async function HomePage() {
           position: absolute; bottom: 0; left: 0; right: 0;
           padding: 16px;
         }
-        /* Count — above title, hidden by default, appears on hover */
+        /* Count — always visible above title */
         .cat-card-count {
           font-family: 'Inter', sans-serif;
           font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.6);
+          color: rgba(255,255,255,0.55);
           display: block;
-          max-height: 0; overflow: hidden;
-          opacity: 0;
-          margin-bottom: 0;
-          transition: max-height 300ms ease-in-out, opacity 250ms ease-in-out, margin-bottom 300ms ease;
-        }
-        .cat-card:hover .cat-card-count {
-          max-height: 24px;
-          opacity: 1;
-          margin-bottom: 4px;
+          margin-bottom: 5px;
         }
         .cat-card-label {
           font-family: 'Recursive', sans-serif;

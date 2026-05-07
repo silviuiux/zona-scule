@@ -48,7 +48,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           transition: border-color 150ms, color 150ms, background 150ms;
           display: inline-flex; align-items: center; gap: 5px;
         }
-        .brand-chip:hover { border-color: rgb(217,44,43); color: rgb(217,44,43); background: rgba(217,44,43,0.04); }
+        .brand-chip:hover { border-color: rgba(0,0,0,0.25); color: rgb(0,0,0); background: rgb(244,244,244); }
         .brand-chip-count { font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.35); font-family: 'Inter', sans-serif; }
         .brand-chip:hover .brand-chip-count { color: rgba(217,44,43,0.6); }
 
