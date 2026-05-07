@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
 import HeroImage from './HeroImage'
+import EditableBreadcrumb from './EditableBreadcrumb'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -269,11 +270,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             {/* LEFT — #6: vertically centered via align-items:center on grid */}
             <div>
-              <div className="bc-row">
-                {breadcrumbs.map((b, i) => (
-                  <Link key={i} href={b.href} className="bc-pill">{b.label}</Link>
-                ))}
-              </div>
+              <EditableBreadcrumb
+                productId={product.id}
+                categoryText={product.category_text}
+                subcategoryText={product.subcategory_text}
+              />
               <p className="pdp-brand">{product.brand_name}</p>
               <h1 className="pdp-sku">{product.model || product.sku || product.slug}</h1>
               {product.short_description && (
