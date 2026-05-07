@@ -16,12 +16,11 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
 
   useEffect(() => {
     const t = setInterval(() => {
-      // exit current
       setPhase('exiting')
       setTimeout(() => {
         setActiveIdx(i => (i + 1) % WORDS.length)
         setPhase('visible')
-      }, 350)
+      }, 320)
     }, 2500)
     return () => clearInterval(t)
   }, [])
@@ -29,8 +28,6 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
   const topBrands = ['Karcher', 'Milwaukee', 'Makita', 'Pferd', 'FFGroup']
     .map(name => brands.find(b => b.name.toLowerCase() === name.toLowerCase()))
     .filter((b): b is Brand => !!b && b.product_count > 0)
-
-  const fs = 'clamp(52px, 6.5vw, 96px)'
 
   return (
     <>
@@ -54,52 +51,56 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         .brand-chip-count { font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.35); font-family: 'Inter', sans-serif; }
         .brand-chip:hover .brand-chip-count { color: rgba(217,44,43,0.6); }
 
-        /* Headline wrapper — two lines */
+        /* ── Hero title ── */
         .hero-title {
-          display: flex; flex-direction: column;
-          gap: 0; line-height: 1.05;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
         }
 
-        /* Line 1: "TOATE [ANIMATED WORD]" — inline flex */
+        /* Line 1: TOATE + animated word — horizontal stack, gap 18px, vertically centered */
         .hero-line1 {
-          display: flex; align-items: baseline;
-          gap: 0.25em;
-          overflow: hidden; /* clips the slide animation */
-          height: 1.1em;
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          /* NO overflow hidden here — let text breathe */
         }
 
         .hero-word-toate {
           font-family: 'Bungee', sans-serif;
-          font-size: ${fs};
+          font-size: clamp(52px, 6.5vw, 96px);
           text-transform: uppercase;
           color: rgb(0,0,0);
           letter-spacing: 0.01em;
-          flex-shrink: 0;
           line-height: 1;
+          flex-shrink: 0;
         }
 
-        /* Clip container for animated word */
+        /* Fixed height container matching Framer's 96px — clips slide animation */
         .hero-word-clip {
+          height: clamp(52px, 6.5vw, 96px);
           overflow: hidden;
-          height: 1.05em;
-          display: flex; align-items: flex-start;
+          display: flex;
+          align-items: flex-start;
         }
 
         .hero-animated-word {
           font-family: 'Bungee Inline', sans-serif;
-          font-size: ${fs};
+          font-size: clamp(52px, 6.5vw, 96px);
           text-transform: uppercase;
           color: rgb(217,44,43);
           letter-spacing: 0.01em;
           text-decoration: none;
           display: block;
           line-height: 1;
+          white-space: nowrap;
+          /* starts hidden above */
           transform: translateY(-110%);
           opacity: 0;
           transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease;
         }
         .hero-animated-word.visible {
-          transform: translateY(0);
+          transform: translateY(0%);
           opacity: 1;
         }
         .hero-animated-word.exiting {
@@ -108,10 +109,10 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           transition: transform 300ms cubic-bezier(0.55, 0, 1, 0.45), opacity 200ms ease;
         }
 
-        /* Line 2: "DE CARE AI NEVOIE" */
+        /* Line 2: DE CARE AI NEVOIE */
         .hero-line2 {
           font-family: 'Bungee', sans-serif;
-          font-size: ${fs};
+          font-size: clamp(52px, 6.5vw, 96px);
           text-transform: uppercase;
           color: rgb(0,0,0);
           letter-spacing: 0.01em;
@@ -127,17 +128,14 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
             {b.name.toUpperCase()}
             <span className="brand-chip-count">{b.product_count.toLocaleString('ro')}</span>
           </Link>
-        )) : (
-          // Fallback static chips while brands load
-          ['KARCHER', 'MILWAUKEE', 'PFERD', 'FFGROUP'].map(n => (
-            <Link key={n} href={`/produse?brand=${encodeURIComponent(n)}`} className="brand-chip">{n}</Link>
-          ))
-        )}
+        )) : ['KARCHER', 'MILWAUKEE', 'PFERD', 'FFGROUP'].map(n => (
+          <Link key={n} href={`/produse?brand=${encodeURIComponent(n)}`} className="brand-chip">{n}</Link>
+        ))}
       </div>
 
       {/* Headline */}
       <div className="hero-title">
-        {/* Line 1: TOATE [SCULELE / ACCESORIILE / ECHIPAMENTELE] */}
+        {/* Line 1: TOATE [animated] */}
         <div className="hero-line1">
           <span className="hero-word-toate">TOATE</span>
           <div className="hero-word-clip">
@@ -150,7 +148,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           </div>
         </div>
 
-        {/* Line 2: DE CARE AI NEVOIE */}
+        {/* Line 2 */}
         <span className="hero-line2">DE CARE AI NEVOIE</span>
       </div>
     </>

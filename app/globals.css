@@ -14,14 +14,28 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--surface);
+  background-color: rgb(244, 244, 244);
   color: var(--black);
   font-family: 'Recursive', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  /* #8: dot pattern via CSS background — 2px dots, 16px grid */
-  background-image: radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px);
+  position: relative;
+}
+
+/* Dot pattern as fixed pseudo-element — visible everywhere including hero */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
   background-size: 16px 16px;
-  background-attachment: fixed; /* parallax-like: grid moves slower than content */
+}
+
+/* All page content sits above the dot layer */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }

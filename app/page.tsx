@@ -19,7 +19,8 @@ export default async function HomePage() {
         /* ─── HERO ─────────────────────────────── */
         .hero {
           padding-top: 60px;
-          background: rgb(244, 244, 244);
+          /* transparent so body dot pattern shows through */
+          background: transparent;
           min-height: 82vh;
           display: flex; align-items: center;
           overflow: hidden;
