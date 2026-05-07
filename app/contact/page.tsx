@@ -1,18 +1,23 @@
 import Nav from '@/components/Nav'
+import ContactForm from './ContactForm'
 
-export default function ContactPage() {
+export default function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sku?: string; brand?: string; model?: string }>
+}) {
   return (
     <>
       <Nav />
       <style>{`
         .contact-page {
           padding-top: 52px;
-          background: rgb(244,244,244);
           min-height: 100vh;
         }
-        .contact-hero {
+        /* Same max-width container for everything */
+        .contact-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 12px 48px;
+          padding: 80px 12px 96px;
         }
         .contact-title {
           font-family: 'Bungee', sans-serif;
@@ -30,10 +35,10 @@ export default function ContactPage() {
           font-size: 14px; color: rgba(0,0,0,0.5);
           line-height: 1.6; max-width: 400px; margin-bottom: 48px;
         }
-        /* Info cards */
+        /* Info cards — same width as form+map below */
         .contact-cards {
           display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 16px; margin-bottom: 64px;
+          gap: 16px; margin-bottom: 16px;
         }
         .contact-card {
           background: rgb(255,255,255);
@@ -55,52 +60,16 @@ export default function ContactPage() {
           color: rgb(0,0,0); line-height: 1.1;
           letter-spacing: -0.01em;
         }
-        /* Map + Form split */
+        /* Form + Map — same grid as cards above */
         .contact-bottom {
           display: grid; grid-template-columns: 1fr 1fr;
-          gap: 0; min-height: 600px;
+          gap: 16px; min-height: 600px;
         }
-        /* Form */
-        .contact-form-wrap {
-          padding: 48px 12px 64px 12px;
-          background: rgb(244,244,244);
-        }
-        .contact-form {
-          max-width: 520px;
-          display: flex; flex-direction: column; gap: 16px;
-        }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5); font-weight: 500;
-        }
-        .form-input, .form-textarea {
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 3px; padding: 10px 12px;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgb(0,0,0);
-          outline: none; transition: border-color 150ms;
-          width: 100%;
-        }
-        .form-input::placeholder, .form-textarea::placeholder { color: rgba(0,0,0,0.3); }
-        .form-input:focus, .form-textarea:focus { border-color: rgb(0,0,0); }
-        .form-textarea { resize: vertical; min-height: 100px; }
-        .form-submit {
-          padding: 14px; background: rgb(0,0,0); color: rgb(255,255,255);
-          border: none; border-radius: 3px;
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          cursor: pointer; transition: background 150ms;
-          margin-top: 8px;
-        }
-        .form-submit:hover { background: rgb(217,44,43); }
         /* Map */
         .contact-map {
           position: relative; overflow: hidden;
           background: rgb(230,228,224);
+          border-radius: 4px; min-height: 500px;
         }
         .contact-map iframe {
           width: 100%; height: 100%; border: none;
@@ -108,15 +77,14 @@ export default function ContactPage() {
       `}</style>
 
       <div className="contact-page">
-        <div className="contact-hero">
+        <div className="contact-inner">
           <h1 className="contact-title">
             CONTACT<br />
             <span className="red">ZONA SCULE</span>
           </h1>
           <p className="contact-sub">
-            Scule electrice profesionale de la BOSCH, Makita,
-            Stihl si DeWalt. Fiecare produs este selectat pentru
-            performanta industriala.
+            Echipa noastră este disponibilă pentru consultanță,
+            oferte personalizate și service. Răspundem în max 24h.
           </p>
 
           {/* Info cards */}
@@ -134,50 +102,19 @@ export default function ContactPage() {
               <span className="contact-card-value">Sf Vineri 28, Pitesti</span>
             </div>
           </div>
-        </div>
 
-        {/* Form + Map */}
-        <div className="contact-bottom">
-          <div className="contact-form-wrap">
-            <form className="contact-form">
-              <div className="form-group">
-                <label className="form-label">Nume</label>
-                <input className="form-input" placeholder="Nae Protopopitoricescoviki" />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Email</label>
-                  <input className="form-input" type="email" placeholder="nae.p@mail.com" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Telefon</label>
-                  <input className="form-input" type="tel" placeholder="0700 00 00 00" />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Companie</label>
-                <input className="form-input" placeholder="ProtoAuto" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Produse de interes</label>
-                <input className="form-input" placeholder="Numele produsului sau categoria" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Mesajul tau</label>
-                <textarea className="form-textarea" placeholder="Descrie ce ai nevoie..." />
-              </div>
-              <button type="submit" className="form-submit">Contact</button>
-            </form>
-          </div>
-
-          <div className="contact-map">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2842.1234567890!2d24.8693!3d44.8561!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b2bc8b5b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sStrada%20Sf%C3%A2nta%20Vineri%2028%2C%20Pite%C8%99ti!5e0!3m2!1sro!2sro!4v1620000000000!5m2!1sro!2sro"
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Zona Scule Showroom"
-            />
+          {/* Form + Map — same width as cards */}
+          <div className="contact-bottom">
+            <ContactForm searchParams={searchParams} />
+            <div className="contact-map">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2842.1234567890!2d24.8693!3d44.8561!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b2bc8b5b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sStrada%20Sf%C3%A2nta%20Vineri%2028%2C%20Pite%C8%99ti!5e0!3m2!1sro!2sro!4v1620000000000!5m2!1sro!2sro"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Zona Scule Showroom"
+              />
+            </div>
           </div>
         </div>
       </div>

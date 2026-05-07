@@ -120,20 +120,27 @@ export default async function HomePage() {
           background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);
           transition: opacity 300ms ease;
         }
-        /* Product count — top left */
-        .cat-card-count {
-          position: absolute; top: 14px; left: 16px;
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.7);
-          background: rgba(0,0,0,0.25);
-          padding: 3px 8px; border-radius: 999px;
-        }
         /* Bottom content */
         .cat-card-bottom {
           position: absolute; bottom: 0; left: 0; right: 0;
           padding: 16px;
+        }
+        /* Count — above title, hidden by default, appears on hover */
+        .cat-card-count {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.6);
+          display: block;
+          max-height: 0; overflow: hidden;
+          opacity: 0;
+          margin-bottom: 0;
+          transition: max-height 300ms ease-in-out, opacity 250ms ease-in-out, margin-bottom 300ms ease;
+        }
+        .cat-card:hover .cat-card-count {
+          max-height: 24px;
+          opacity: 1;
+          margin-bottom: 4px;
         }
         .cat-card-label {
           font-family: 'Recursive', sans-serif;

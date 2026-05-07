@@ -288,7 +288,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   </svg>
                 </button>
               </div>
-              <Link href="/contact" className="cere-btn">CERE OFERTA</Link>
+              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cere-btn">CERE OFERTA</Link>
             </div>
 
             {/* RIGHT: #4 no border/box, pure white bg, #5 hover + lightbox */}
@@ -363,7 +363,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <p className="cta-banner-title">{product.brand_name} {product.sku ?? product.slug}</p>
             </div>
             <div className="cta-banner-btns">
-              <Link href="/contact" className="cta-primary">CERE OFERTA PERSONALIZATA ↗</Link>
+              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cta-primary">CERE OFERTA PERSONALIZATA ↗</Link>
               <a href="tel:0248222298" className="cta-secondary">📞 SAU SUNA LA 0248 222 298</a>
             </div>
           </div>
