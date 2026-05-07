@@ -293,12 +293,11 @@ export default async function HomePage() {
                     }} />
                   )}
                   <div className="cat-card-overlay" />
-                  {/* Product count — top */}
-                  {cat.product_count > 0 && (
-                    <span className="cat-card-count">{cat.product_count.toLocaleString('ro')} produse</span>
-                  )}
-                  {/* Bottom: title + desc on hover */}
+                  {/* Bottom: count + title + desc on hover */}
                   <div className="cat-card-bottom">
+                    <span className="cat-card-count">
+                      {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
+                    </span>
                     <span className="cat-card-label">{cat.name}</span>
                     {cat.description && (
                       <span className="cat-card-desc">{cat.description}</span>
