@@ -49,12 +49,15 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
       <style>{`
-        .pcard-link { text-decoration: none; display: block; }
+        /* min-width: 0 prevents grid items from expanding past 1fr when an inner
+           element (e.g. .pcard-model with white-space: nowrap) has long content. */
+        .pcard-link { text-decoration: none; display: block; min-width: 0; }
         .pcard {
           background: rgb(255, 255, 255);
           border-radius: 4px;
           overflow: hidden;
           display: flex; flex-direction: column;
+          min-width: 0;
           transition: box-shadow 200ms, transform 200ms;
         }
         .pcard-link:hover .pcard {
@@ -70,6 +73,7 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-info {
           padding: 16px;
           display: flex; flex-direction: column; gap: 8px;
+          min-width: 0;
         }
         .pcard-brand {
           font-family: 'Recursive', sans-serif;
