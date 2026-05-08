@@ -49,13 +49,12 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
       <style>{`
-        .pcard-link { text-decoration: none; display: block; height: 100%; }
+        .pcard-link { text-decoration: none; display: block; }
         .pcard {
           background: rgb(255, 255, 255);
           border-radius: 4px;
           overflow: hidden;
           display: flex; flex-direction: column;
-          height: 100%;
           transition: box-shadow 200ms, transform 200ms;
         }
         .pcard-link:hover .pcard {
