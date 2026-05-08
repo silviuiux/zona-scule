@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.brand_name && (
             <p className="pcard-brand">{product.brand_name}</p>
           )}
-          <p className="pcard-model">{product.sku ?? product.name}</p>
+          <p className="pcard-model">{product.model ?? product.short_description ?? product.name}</p>
           {specs.length > 0 && (
             <div className="pcard-specs">
               {specs.map((s, i) => (
@@ -49,12 +49,13 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
       <style>{`
-        .pcard-link { text-decoration: none; display: block; }
+        .pcard-link { text-decoration: none; display: block; height: 100%; }
         .pcard {
           background: rgb(255, 255, 255);
           border-radius: 4px;
           overflow: hidden;
           display: flex; flex-direction: column;
+          height: 100%;
           transition: box-shadow 200ms, transform 200ms;
         }
         .pcard-link:hover .pcard {
@@ -80,10 +81,9 @@ export default function ProductCard({ product }: { product: Product }) {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.5);
           line-height: 1.4;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
+          white-space: nowrap;
           overflow: hidden;
+          text-overflow: ellipsis;
         }
         .pcard-specs {
           display: flex; flex-wrap: wrap; gap: 12px;
