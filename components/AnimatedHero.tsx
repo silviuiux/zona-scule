@@ -119,6 +119,15 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           letter-spacing: 0.01em;
           line-height: 1;
         }
+
+        /* On mobile, stack the animated word below TOATE so it doesn't overflow */
+        @media (max-width: 768px) {
+          .hero-line1 {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+          }
+        }
       `}</style>
 
       {/* Brand chips */}
