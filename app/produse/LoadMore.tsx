@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/supabase'
 
@@ -17,6 +17,14 @@ export default function LoadMore({
   const [products, setProducts] = useState<Product[]>([])
   const [page, setPage] = useState(2)
   const [loading, setLoading] = useState(false)
+
+  // Reset state when filters change (so navigating to a new category clears stale loaded items)
+  const filterKey = `${filters.brand ?? ''}|${filters.categorie ?? ''}|${filters.q ?? ''}`
+  useEffect(() => {
+    setProducts([])
+    setPage(2)
+    setLoading(false)
+  }, [filterKey])
 
   const loadedCount = initialCount + products.length
   const hasMore = loadedCount < total
@@ -40,14 +48,9 @@ export default function LoadMore({
 
   return (
     <>
-      {/* Additional products loaded via Load More */}
+      {/* Additional products loaded via Load More — reuses .products-grid for identical responsive behavior */}
       {products.length > 0 && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '16px',
-          marginBottom: '40px',
-        }}>
+        <div className="products-grid">
           {products.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
