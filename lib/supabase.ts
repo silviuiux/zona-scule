@@ -110,21 +110,29 @@ export async function getProducts({
 } = {}) {
   let query = supabase
     .from('products')
-    .select('*', { count: 'exact' })
+    .select('*', { count: 'estimated' })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)
     .order('name')
     .range((page - 1) * pageSize, page * pageSize - 1)
 
-  if (brandName) query = query.ilike('brand_name', brandName)
-  if (categoryText) query = query.ilike('category_text', categoryText)
-  if (subcategoryText) query = query.ilike('subcategory_text', subcategoryText)
+  if (brandName) query = query.eq('brand_name', brandName)
+  if (categoryText) query = query.eq('category_text', categoryText)
+  if (subcategoryText) query = query.eq('subcategory_text', subcategoryText)
   if (search) {
-    // Search across name, sku, brand_name and slug using OR
-    const s = search.trim()
-    query = query.or(
-      `name.ilike.%${s}%,sku.ilike.%${s}%,brand_name.ilike.%${s}%,slug.ilike.%${s}%,short_description.ilike.%${s}%`
-    )
+    // Use the generated `search_vector` tsvector column with the existing GIN
+    // index (`products_search_idx`). Build a prefix tsquery so partial words
+    // ("scul" → "scule", "bos" → "bosch") still match. Tokens are AND-ed.
+    const tsq = search
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(t => t.replace(/[!&|()'":\\<>*]/g, '') + ':*')
+      .filter(t => t.length > 2) // drop empty after sanitizing
+      .join(' & ')
+    if (tsq) {
+      query = query.textSearch('search_vector', tsq, { config: 'simple' })
+    }
   }
   if (featured) query = query.eq('featured', true)
 
