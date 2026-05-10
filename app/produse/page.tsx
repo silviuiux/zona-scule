@@ -23,6 +23,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   ])
 
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
+  // Find the active category record so we can render its hero banner image.
+  const activeCategory = sp.categorie
+    ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
+    : null
+  const headerTitle = sp.categorie ?? sp.brand ?? sp.q ?? ''
 
   return (
     <>
@@ -35,8 +40,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
         /* ─── Unfiltered photo grid ─── */
         .cat-grid-page {
-          max-width: 1440px; margin: 0 auto;
-          padding: 48px 12px 96px;
+          max-width: 1600px; margin: 0 auto;
+          padding: 48px 24px 96px;
         }
         .page-title {
           font-family: 'Bungee', sans-serif;
@@ -76,52 +81,45 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           font-family: 'Recursive', sans-serif;
           font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4;
         }
+        /* ─── Category hero banner (above the filtered layout) ─── */
+        .cat-hero {
+          width: 100%;
+          height: clamp(280px, 36vw, 460px);
+          overflow: hidden;
+          position: relative;
+          background: rgba(0,0,0,0.04);
+        }
+        .cat-hero-img {
+          width: 100%; height: 100%;
+          object-fit: cover; object-position: center;
+          display: block;
+        }
+
         /* ─── Filtered layout ─── */
         .filtered-layout {
-          display: flex; max-width: 1440px; margin: 0 auto;
+          display: flex; max-width: 1600px; margin: 0 auto;
         }
+        /* Page title: single-line ALL CAPS for filtered views */
+        .filtered-title {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(40px, 5vw, 72px);
+          line-height: 1; color: rgb(0,0,0);
+          text-transform: uppercase;
+          letter-spacing: 0.005em;
+          margin: 0;
+        }
+        /* Desktop sidebar dimensions live here; visual styling is owned by
+           components/Sidebar.tsx. Mobile drawer overrides are below. */
         .sidebar {
-          width: 220px; flex-shrink: 0;
-          padding: 32px 16px 40px 12px;
+          width: 280px; flex-shrink: 0;
+          padding: 32px 16px 40px 24px;
           border-right: 1px solid rgba(0,0,0,0.08);
           position: sticky; top: 52px;
           height: calc(100vh - 52px);
           overflow-y: auto;
         }
-        .sidebar-section-title {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(0,0,0,0.35); margin-bottom: 8px;
-          padding-left: 8px;
-        }
-        .sidebar-link {
-          display: flex; align-items: center; justify-content: space-between;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; padding: 6px 8px;
-          border-radius: 3px; color: rgba(0,0,0,0.6);
-          text-decoration: none; transition: color 150ms, background 150ms;
-          gap: 8px;
-        }
-        .sidebar-link:hover { color: rgb(0,0,0); background: rgba(0,0,0,0.04); }
-        .sidebar-link.active { color: rgb(217,44,43); background: rgba(217,44,43,0.06); font-weight: 500; }
-        /* Count pill */
-        .count-pill {
-          flex-shrink: 0;
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 500;
-          padding: 2px 6px;
-          background: rgba(0,0,0,0.07);
-          border-radius: 999px;
-          color: rgba(0,0,0,0.4);
-          min-width: 22px; text-align: center;
-        }
-        .sidebar-link.active .count-pill {
-          background: rgba(217,44,43,0.12);
-          color: rgb(217,44,43);
-        }
         /* Products area */
-        .products-main { flex: 1; padding: 32px 12px 80px; min-width: 0; }
+        .products-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
         .products-header { margin-bottom: 24px; display: flex; align-items: baseline; justify-content: space-between; }
         .products-count {
           font-family: 'Recursive', sans-serif;
@@ -224,48 +222,65 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </div>
         )}
 
-        {/* ── Filtered: sticky sidebar with count pills + 4-col grid ── */}
+        {/* ── Filtered view ── */}
         {isFiltered && (
-          <div className="filtered-layout">
-            {/* Mobile sidebar backdrop */}
-            <MobileFilterBackdrop />
-            <Sidebar
-              categories={categories}
-              brands={brands}
-              activeCat={sp.categorie}
-              activeSub={sp.subcategorie}
-              activeBrand={sp.brand}
-            />
-
-            <main className="products-main">
-              <div className="products-header">
-                <h1 className="page-title" style={{ fontSize: 'clamp(32px, 4vw, 56px)', marginBottom: 0 }}>
-                  zona<br />
-                  <span className="red">{sp.categorie ?? sp.brand ?? sp.q}</span>
-                </h1>
-                <span className="products-count">{total.toLocaleString('ro')} produse</span>
-              </div>
-              {/* Mobile filter toggle */}
-              <MobileFilterToggle />
-              {sp.categorie && (
-                <SubcategoryBar categoryName={sp.categorie} activeSub={sp.subcategorie} />
-              )}
-
-              {/* 4-col grid — fixed, not auto-fill */}
-              <div className="products-grid">
-                {products.map(p => <ProductCard key={p.id} product={p} />)}
-              </div>
-
-              {/* Load More button — client component */}
-              {total > pageSize && (
-                <LoadMore
-                  initialCount={products.length}
-                  total={total}
-                  filters={{ brand: sp.brand, categorie: sp.categorie, q: sp.q }}
+          <>
+            {/* Full-width category hero banner */}
+            {activeCategory?.hero_image_url && (
+              <div className="cat-hero">
+                <img
+                  src={activeCategory.hero_image_url}
+                  alt={activeCategory.name}
+                  className="cat-hero-img"
                 />
-              )}
-            </main>
-          </div>
+              </div>
+            )}
+
+            <div className="filtered-layout">
+              {/* Mobile sidebar backdrop */}
+              <MobileFilterBackdrop />
+              <Sidebar
+                categories={categories}
+                brands={brands}
+                activeCat={sp.categorie}
+                activeSub={sp.subcategorie}
+                activeBrand={sp.brand}
+              />
+
+              <main className="products-main">
+                <div className="products-header">
+                  <h1 className="filtered-title">{headerTitle}</h1>
+                  {/* Count for brand / search views (no subcategory bar) */}
+                  {!sp.categorie && (
+                    <span className="products-count">{total.toLocaleString('ro')} produse</span>
+                  )}
+                </div>
+                {/* Mobile filter toggle */}
+                <MobileFilterToggle />
+                {sp.categorie && (
+                  <SubcategoryBar
+                    categoryName={sp.categorie}
+                    activeSub={sp.subcategorie}
+                    total={activeCategory?.product_count}
+                  />
+                )}
+
+                {/* 4-col grid — fixed, not auto-fill */}
+                <div className="products-grid">
+                  {products.map(p => <ProductCard key={p.id} product={p} />)}
+                </div>
+
+                {/* Load More button — client component */}
+                {total > pageSize && (
+                  <LoadMore
+                    initialCount={products.length}
+                    total={total}
+                    filters={{ brand: sp.brand, categorie: sp.categorie, q: sp.q }}
+                  />
+                )}
+              </main>
+            </div>
+          </>
         )}
       </div>
     </>
