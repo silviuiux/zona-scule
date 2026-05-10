@@ -23,7 +23,10 @@ export default async function HomePage() {
           padding-bottom: 24px;
           /* transparent so body dot pattern shows through */
           background: transparent;
-          min-height: 62vh;
+          /* Sized so the 4th cat card (col 3, offset 0, height 400px) is
+             cut off by exactly 5px at the bottom of the first fold.
+             Falls back to a sane minimum on short viewports. */
+          min-height: max(320px, calc(100vh - 395px));
           display: flex; align-items: center;
           overflow: hidden;
         }
