@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 type Cat = {
   id: string
@@ -11,44 +10,40 @@ type Cat = {
   product_count: number
 }
 
-// First-row stagger: each card starts pushed down by N px, then collapses to 0
-// as the second row reaches viewport center. Tweak these to taste.
-const FIRST_ROW_OFFSETS = [0, 90, 180, 270]
-const FALL_DISTANCE = 380 // px of scroll over which the collapse happens
+// Per-column vertical offset (px). Applied to EVERY row identically so the
+// 16px row gap is preserved — cards in the same column move together.
+// Reversed so column 0 sits lowest ("barely visible") and column 3 stays put.
+const COL_OFFSETS = [270, 180, 90, 0]
+// Scroll distance (px) over which the cards converge from staggered → aligned.
+const FALL_DISTANCE = 520
 
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
-  const rowRefs = useRef<(HTMLDivElement | null)[]>([])
+  const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const isMobile = window.matchMedia?.('(max-width: 768px)').matches
-    const firstRow = rowRefs.current[0]
-    const secondRow = rowRefs.current[1]
-    if (!firstRow || !secondRow) return
+    const root = rootRef.current
+    if (!root) return
 
-    const firstRowCards = Array.from(
-      firstRow.querySelectorAll<HTMLElement>('.cat-card')
-    )
-    if (firstRowCards.length === 0) return
+    const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
+    if (allCards.length === 0) return
 
-    // On reduced-motion or mobile, snap to aligned (no stagger).
+    // On reduced-motion / mobile, snap to aligned (no stagger).
     if (reduce || isMobile) {
-      firstRowCards.forEach(el => el.style.setProperty('--cat-offset', '0px'))
+      allCards.forEach(el => el.style.setProperty('--cat-offset', '0px'))
       return
     }
 
     let raf = 0
     const update = () => {
       raf = 0
-      const rect = secondRow.getBoundingClientRect()
-      const center = window.innerHeight / 2
-      // dy: distance of second row's top from viewport center.
-      // > 0 → second row still below center; <= 0 → reached / above center.
-      const dy = rect.top - center
-      const progress = Math.max(0, Math.min(1, 1 - dy / FALL_DISTANCE))
-
-      firstRowCards.forEach((el, i) => {
-        const base = FIRST_ROW_OFFSETS[i] ?? 0
+      // Progress is driven directly by scrollY: as soon as the user scrolls,
+      // the cards begin converging. By scrollY === FALL_DISTANCE they are aligned.
+      const progress = Math.max(0, Math.min(1, window.scrollY / FALL_DISTANCE))
+      allCards.forEach(el => {
+        const col = Number(el.dataset.col ?? 0)
+        const base = COL_OFFSETS[col] ?? 0
         el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
       })
     }
@@ -73,24 +68,16 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   }
 
   return (
-    <>
+    <div ref={rootRef}>
       {rows.map((row, rowIdx) =>
         row.length > 0 ? (
-          <div
-            key={rowIdx}
-            ref={(el) => {
-              rowRefs.current[rowIdx] = el
-            }}
-            className={`cats-row${rowIdx === 0 ? ' cats-row--staggered' : ''}`}
-          >
+          <div key={rowIdx} className="cats-row">
             {row.map((cat, i) => {
-              // Pre-set the initial offset for the first row so SSR / first paint
-              // matches the "fully staggered" state before JS hydrates and starts
-              // listening to scroll. Avoids a snap.
-              const initialStyle: CSSProperties | undefined =
-                rowIdx === 0
-                  ? ({ ['--cat-offset' as string]: `${FIRST_ROW_OFFSETS[i] ?? 0}px` } as CSSProperties)
-                  : undefined
+              // Pre-set initial offset so SSR / first paint already shows the
+              // staggered state — no snap when JS hydrates.
+              const initialStyle = ({
+                ['--cat-offset' as string]: `${COL_OFFSETS[i] ?? 0}px`,
+              } as CSSProperties)
 
               return (
                 <Link
@@ -98,15 +85,15 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
                   href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
                   className="cat-card"
                   style={initialStyle}
+                  data-col={i}
                 >
                   <div className="cat-card-img-wrap">
                     {cat.hero_image_url ? (
-                      <Image
+                      <img
                         src={cat.hero_image_url}
                         alt={cat.name}
-                        fill
-                        style={{ objectFit: 'cover' }}
-                        unoptimized
+                        className="cat-card-img"
+                        loading="lazy"
                       />
                     ) : (
                       <div
@@ -137,6 +124,6 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
           </div>
         ) : null
       )}
-    </>
+    </div>
   )
 }

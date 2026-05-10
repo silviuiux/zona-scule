@@ -151,6 +151,13 @@ export default async function HomePage() {
           transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
           will-change: transform;
         }
+        .cat-card-img {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+        }
         .cat-card:hover .cat-card-img-wrap {
           transform: scale(1.0);
         }
