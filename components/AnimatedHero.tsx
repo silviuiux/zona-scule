@@ -33,24 +33,33 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
     <>
       <style>{`
         .brand-chips {
-          display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+          display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
         }
         .brand-chips-label {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.5);
         }
+        /* Brand link: name + count are one underlined element, regular weight,
+           no border / no chip background. */
         .brand-chip {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 600; color: rgb(0,0,0);
-          text-decoration: none; padding: 3px 10px;
-          border: 1px solid rgba(0,0,0,0.15); border-radius: 4px;
-          background: rgb(244,244,244);
-          transition: border-color 150ms, color 150ms, background 150ms;
-          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 13px; font-weight: 400;
+          color: rgb(0,0,0);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          text-decoration-thickness: 1px;
+          padding: 0; border: none; background: none;
+          display: inline-flex; align-items: baseline; gap: 5px;
+          transition: color 150ms;
         }
-        .brand-chip:hover { border-color: rgba(0,0,0,0.25); color: rgb(0,0,0); background: rgb(244,244,244); }
-        .brand-chip-count { font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.35); font-family: 'Inter', sans-serif; }
-        .brand-chip:hover .brand-chip-count { color: rgba(217,44,43,0.6); }
+        .brand-chip:hover { color: rgb(217, 44, 43); }
+        /* Count rides along inside the same underlined link, slightly smaller */
+        .brand-chip-count {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px; font-weight: 400;
+          color: inherit;
+          letter-spacing: 0.01em;
+        }
 
         /* ── Hero title ── */
         .hero-title {
