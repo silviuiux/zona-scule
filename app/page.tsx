@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import Nav from '@/components/Nav'
 import { getCategoriesWithCount, getBrands } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
+import CategoryGrid from '@/components/CategoryGrid'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,6 +32,31 @@ export default async function HomePage() {
           width: 100%;
           display: flex; flex-direction: column;
           gap: 26px;
+        }
+
+        /* ─── Hero entrance — slide-in from right + fade ── */
+        @keyframes hero-in {
+          from { opacity: 0; transform: translateX(40px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .hero-inner .brand-chips,
+        .hero-inner .hero-title,
+        .hero-inner .hero-sub,
+        .hero-inner .hero-cta-row {
+          opacity: 0;
+          animation: hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .hero-inner .brand-chips  { animation-delay:  80ms; }
+        .hero-inner .hero-title   { animation-delay: 220ms; }
+        .hero-inner .hero-sub     { animation-delay: 360ms; }
+        .hero-inner .hero-cta-row { animation-delay: 500ms; }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-inner .brand-chips,
+          .hero-inner .hero-title,
+          .hero-inner .hero-sub,
+          .hero-inner .hero-cta-row {
+            animation: none; opacity: 1;
+          }
         }
         .authorized-row {
           display: flex; align-items: center; gap: 10px;
@@ -112,9 +137,26 @@ export default async function HomePage() {
           border-radius: 8px; background: rgb(200,200,200);
           text-decoration: none; display: block;
           height: 400px;
-          transition: transform 200ms;
+          /* Transform driven by --cat-offset (set by <CategoryGrid /> on scroll
+             for the staggered first row). No transition: rAF updates this every
+             frame so a transition would lag behind the user's scroll. */
+          transform: translate3d(0, var(--cat-offset, 0px), 0);
+          will-change: transform;
         }
-        .cat-card:hover { transform: scale(1.01); }
+        /* Image fills the card; default 110% scale, eases back to 100% on hover */
+        .cat-card-img-wrap {
+          position: absolute; inset: 0;
+          overflow: hidden;
+          transform: scale(1.1);
+          transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: transform;
+        }
+        .cat-card:hover .cat-card-img-wrap {
+          transform: scale(1.0);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cat-card-img-wrap { transition: none; }
+        }
         .cat-card-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);
@@ -306,41 +348,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CATEGORIES — 5 rows × 4 cols ── */}
+      {/* ── CATEGORIES — staggered first row collapses on scroll ── */}
       <section className="cats-section">
-        {[0, 1, 2, 3, 4].map(row => (
-          categories.slice(row * 4, row * 4 + 4).length > 0 && (
-            <div key={row} className="cats-row">
-              {categories.slice(row * 4, row * 4 + 4).map((cat, i) => (
-                <Link
-                  key={cat.id}
-                  href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-                  className="cat-card"
-                >
-                  {cat.hero_image_url ? (
-                    <Image src={cat.hero_image_url} alt={cat.name} fill style={{ objectFit: 'cover' }} unoptimized />
-                  ) : (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: `hsl(${(row * 90 + i * 22) % 360}, 6%, ${74 - i * 2}%)`
-                    }} />
-                  )}
-                  <div className="cat-card-overlay" />
-                  {/* Bottom: count + title + desc on hover */}
-                  <div className="cat-card-bottom">
-                    <span className="cat-card-count">
-                      {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
-                    </span>
-                    <span className="cat-card-label">{cat.name}</span>
-                    {cat.description && (
-                      <span className="cat-card-desc">{cat.description}</span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )
-        ))}
+        <CategoryGrid categories={categories} />
       </section>
 
       {/* ── SERVICES — exact Framer CardS1 colors ── */}

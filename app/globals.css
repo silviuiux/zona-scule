@@ -21,7 +21,9 @@ body {
   position: relative;
 }
 
-/* Dot pattern as fixed pseudo-element — visible everywhere including hero */
+/* Dot pattern as fixed pseudo-element — visible everywhere including hero.
+   --dot-y is updated by <DotsParallax /> on scroll so the pattern moves at
+   80% of scroll speed (subtle parallax depth). Default 0px before JS runs. */
 body::before {
   content: '';
   position: fixed;
@@ -30,6 +32,8 @@ body::before {
   pointer-events: none;
   background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
   background-size: 16px 16px;
+  background-position: 0 var(--dot-y, 0px);
+  will-change: background-position;
 }
 
 /* All page content sits above the dot layer */
