@@ -152,9 +152,9 @@ export default async function HomePage() {
           text-decoration: none; display: block;
           height: 400px;
           /* Two independent vertical motions on each card:
-             1. Stagger (scroll-driven, instant) — goes on `transform` via
+             1. Stagger (scroll-driven, instant) — goes on transform via
                 --cat-offset, updated every rAF, NO transition (would lag scroll)
-             2. Reveal (in-view-triggered) — goes on `translate` (separate CSS
+             2. Reveal (in-view-triggered) — goes on translate (separate CSS
                 property), has a 700ms transition so it eases in once. The two
                 properties compose visually but transition independently. */
           transform: translate3d(0, var(--cat-offset, 0px), 0);
