@@ -84,15 +84,30 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         /* ─── Category hero banner (above the filtered layout) ─── */
         .cat-hero {
           width: 100%;
-          height: clamp(280px, 36vw, 460px);
+          height: clamp(140px, 15vh, 220px);
           overflow: hidden;
           position: relative;
           background: rgba(0,0,0,0.04);
         }
+        /* Parallax: banner scrolls at 40% of page speed.
+           --cat-banner-y = +0.6 * scrollY (downward translate) means the image
+           appears to scroll up only 40% as fast as the page. The image is
+           taller than its container with 200px of buffer above and below so
+           the edges never reveal background during the translation. */
         .cat-hero-img {
-          width: 100%; height: 100%;
-          object-fit: cover; object-position: center;
+          position: absolute;
+          top: -200px;
+          left: 0; right: 0;
+          width: 100%;
+          height: calc(100% + 400px);
+          object-fit: cover;
+          object-position: center;
           display: block;
+          transform: translate3d(0, var(--cat-banner-y, 0px), 0);
+          will-change: transform;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cat-hero-img { transform: none; }
         }
 
         /* ─── Filtered layout ─── */

@@ -2,13 +2,22 @@
 import { useEffect } from 'react'
 
 /**
- * Sets a CSS variable `--dot-y` on :root that the body::before dot pattern
- * reads from background-position. Dots move at 80% of scroll speed, so when
- * the page scrolls 100px the dots appear to move 80px — a subtle parallax.
+ * Updates CSS variables on :root every scroll for the page's parallax layers:
  *
- * Implementation: body::before is position:fixed, so by default dots don't
- * move at all (0% speed). We shift its background-position by -scrollY * 0.8,
- * which makes the pattern appear to scroll at 80% of foreground speed.
+ *   --dot-y         : background-position offset for body::before dot pattern.
+ *                     Dots move at 80% of scroll speed (slower than foreground
+ *                     → depth illusion). At scrollY=100, dots shift up 80px.
+ *
+ *   --hero-y        : transform offset for .hero-inner content (homepage).
+ *                     Hero races at 120% of scroll speed (faster than fg →
+ *                     foreground pop). At scrollY=100, content shifts up an
+ *                     extra 20px on top of natural scroll → 120% effective.
+ *
+ *   --cat-banner-y  : transform offset for .cat-hero-img on /produse.
+ *                     Banner moves at 40% of scroll speed (much slower than
+ *                     foreground → background depth). At scrollY=100, the
+ *                     image translates DOWN 60px so it appears to scroll up
+ *                     only 40px → 40% effective.
  */
 export default function DotsParallax() {
   useEffect(() => {
@@ -19,7 +28,10 @@ export default function DotsParallax() {
     let raf = 0
     const update = () => {
       raf = 0
-      root.style.setProperty('--dot-y', `${-window.scrollY * 0.8}px`)
+      const y = window.scrollY
+      root.style.setProperty('--dot-y', `${-y * 0.8}px`)
+      root.style.setProperty('--hero-y', `${-y * 0.2}px`)
+      root.style.setProperty('--cat-banner-y', `${y * 0.6}px`)
     }
     const onScroll = () => {
       if (raf) return
