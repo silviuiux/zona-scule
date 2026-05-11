@@ -19,11 +19,11 @@ export default async function SubcategoryBar({
       <style>{`
         .subcat-bar {
           position: sticky;
-          top: 52px; /* flush below the fixed nav */
+          top: 52px;
           z-index: 50;
-          /* bleed out of products-main padding so the bg goes edge-to-edge */
-          margin: -32px -32px 32px;
-          padding: 14px 32px;
+          /* align with product grid — no horizontal bleed */
+          margin: -32px 0 32px;
+          padding: 32px 0;
           background: rgb(244, 244, 244);
           border-bottom: 1px solid rgba(0,0,0,0.07);
           display: flex; gap: 10px;
@@ -66,8 +66,8 @@ export default async function SubcategoryBar({
         @media (max-width: 768px) {
           .subcat-bar {
             top: 52px;
-            margin: -20px -12px 20px;
-            padding: 12px 12px;
+            margin: -20px 0 20px;
+            padding: 32px 0;
           }
         }
       `}</style>
