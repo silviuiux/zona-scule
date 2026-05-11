@@ -20,6 +20,7 @@ const FALL_DISTANCE = 520
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
+  // ── Effect 1: scroll-driven stagger (existing) ──
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const isMobile = window.matchMedia?.('(max-width: 768px)').matches
@@ -58,6 +59,69 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
       if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
+  // ── Effect 2: in-view reveal (fade + translate up) ──
+  // Adds `.in-view` to each card to trigger the CSS transition on opacity
+  // and `translate`. The first row fires on page load after a 600ms delay;
+  // subsequent rows fire when they enter the viewport via IntersectionObserver.
+  // A small per-card stagger (60ms) within each row keeps the reveal feeling
+  // organic instead of all-at-once.
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
+    if (allCards.length === 0) return
+
+    // Reduced motion: snap everything to revealed state, no animation.
+    if (reduce) {
+      allCards.forEach(el => el.classList.add('in-view'))
+      return
+    }
+
+    const timeouts: number[] = []
+    const reveal = (cards: HTMLElement[], baseDelay: number) => {
+      cards.forEach((card, i) => {
+        timeouts.push(
+          window.setTimeout(() => card.classList.add('in-view'), baseDelay + i * 60)
+        )
+      })
+    }
+
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
+
+    // First row: fixed 600ms delay on load
+    if (rows[0]) {
+      const firstRowCards = Array.from(rows[0].querySelectorAll<HTMLElement>('.cat-card'))
+      reveal(firstRowCards, 600)
+    }
+
+    // Other rows: intersection-triggered, one-shot
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const rowCards = Array.from(
+              entry.target.querySelectorAll<HTMLElement>('.cat-card')
+            )
+            reveal(rowCards, 0)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        threshold: 0.15,             // 15% of the row in view triggers it
+        rootMargin: '0px 0px -40px 0px', // fire slightly before fully entering
+      }
+    )
+    rows.slice(1).forEach(row => observer.observe(row))
+
+    return () => {
+      observer.disconnect()
+      timeouts.forEach(clearTimeout)
     }
   }, [])
 

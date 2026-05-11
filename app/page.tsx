@@ -150,11 +150,27 @@ export default async function HomePage() {
           border-radius: 8px; background: rgb(200,200,200);
           text-decoration: none; display: block;
           height: 400px;
-          /* Transform driven by --cat-offset (set by <CategoryGrid /> on scroll
-             for the staggered first row). No transition: rAF updates this every
-             frame so a transition would lag behind the user's scroll. */
+          /* Two independent vertical motions on each card:
+             1. Stagger (scroll-driven, instant) — goes on `transform` via
+                --cat-offset, updated every rAF, NO transition (would lag scroll)
+             2. Reveal (in-view-triggered) — goes on `translate` (separate CSS
+                property), has a 700ms transition so it eases in once. The two
+                properties compose visually but transition independently. */
           transform: translate3d(0, var(--cat-offset, 0px), 0);
-          will-change: transform;
+          opacity: 0;
+          translate: 0 24px;
+          transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                      translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: transform, translate, opacity;
+        }
+        .cat-card.in-view {
+          opacity: 1;
+          translate: 0 0;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cat-card {
+            opacity: 1; translate: 0 0; transition: none;
+          }
         }
         /* Image fills the card; default 110% scale, eases back to 100% on hover */
         .cat-card-img-wrap {
