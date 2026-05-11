@@ -18,10 +18,17 @@ export default async function SubcategoryBar({
     <>
       <style>{`
         .subcat-bar {
+          position: sticky;
+          top: 52px; /* flush below the fixed nav */
+          z-index: 50;
+          /* bleed out of products-main padding so the bg goes edge-to-edge */
+          margin: -32px -32px 32px;
+          padding: 14px 32px;
+          background: rgb(244, 244, 244);
+          border-bottom: 1px solid rgba(0,0,0,0.07);
           display: flex; gap: 10px;
-          overflow-x: auto; padding-bottom: 4px;
+          overflow-x: auto;
           scrollbar-width: none; -ms-overflow-style: none;
-          margin-bottom: 32px;
         }
         .subcat-bar::-webkit-scrollbar { display: none; }
 
@@ -55,6 +62,14 @@ export default async function SubcategoryBar({
           letter-spacing: 0.02em;
         }
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
+
+        @media (max-width: 768px) {
+          .subcat-bar {
+            top: 52px;
+            margin: -20px -12px 20px;
+            padding: 12px 12px;
+          }
+        }
       `}</style>
 
       <div className="subcat-bar">
