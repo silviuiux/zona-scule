@@ -84,7 +84,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         /* ─── Category hero banner (above the filtered layout) ─── */
         .cat-hero {
           width: 100%;
-          height: clamp(140px, 15vh, 220px);
+          height: clamp(200px, 25vh, 340px);
           overflow: hidden;
           position: relative;
           background: rgba(0,0,0,0.04);

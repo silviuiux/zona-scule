@@ -2,6 +2,13 @@ import Link from 'next/link'
 import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
 
 /**
+ * Feature flag: brands block in the sidebar. Currently hidden — flip to `true`
+ * to bring it back. The brands list itself is still passed in and rendered
+ * conditionally, so this is a pure visibility toggle (no code removed).
+ */
+const SHOW_BRANDS = false
+
+/**
  * Sidebar for the /produse listing page.
  *
  * Flat list — no accordion. Subcategories now live in the SubcategoryBar
@@ -134,8 +141,8 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* ── BRANDURI ── */}
-        {brands.length > 0 && (
+        {/* ── BRANDURI ── (hidden via SHOW_BRANDS flag) */}
+        {SHOW_BRANDS && brands.length > 0 && (
           <div className="sidebar-block">
             <p className="sidebar-section-title">Branduri</p>
             {brands.map(brand => {
