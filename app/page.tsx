@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import Nav from '@/components/Nav'
 import { getCategoriesWithCount, getBrands } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
@@ -397,13 +398,15 @@ export default async function HomePage() {
         </div>
         <div className="services-grid">
           {[
-            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'hai in showroom', ctaColor: 'rgb(30,30,30)', href: '/contact' },
-            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'solicita o reparatie', ctaColor: 'rgb(255,255,255)', href: '/contact' },
-            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'vezi acoperirea', ctaColor: 'rgb(255,255,255)', href: '/contact' },
+            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'hai in showroom', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
+            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'solicita o reparatie', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
+            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'vezi acoperirea', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
           ].map((s, i) => (
             <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
               <div className="service-card">
-                <div className="service-img" />
+                <div className="service-img">
+                  <Image src={s.img} alt={s.title} fill style={{ objectFit: 'cover', objectPosition: 'center top' }} sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
                 <div className="service-body" style={{ background: s.bg }}>
                   <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
                   <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
