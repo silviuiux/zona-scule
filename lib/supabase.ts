@@ -220,7 +220,7 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
 export type SubcategoryWithCount = Subcategory & { product_count: number }
 
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
-  // Get category id first
+  // Step 1: resolve category id
   const { data: cat } = await supabase
     .from('categories')
     .select('id')
@@ -229,14 +229,37 @@ export async function getSubcategoriesByCategoryName(categoryName: string): Prom
 
   if (!cat) return []
 
-  // Get subcategories with product counts in one shot via RPC
-  const { data, error } = await supabase.rpc('get_subcategories_with_count', {
+  // Step 2: get the authoritative subcategory list from the subcategories table.
+  // This is the source of truth — the RPC alone can return stale subcategory_text
+  // strings from products that are no longer associated with this category.
+  const { data: subs, error: subsErr } = await supabase
+    .from('subcategories')
+    .select('*')
+    .eq('parent_category_id', cat.id)
+    .order('sort_order', { ascending: true, nullsFirst: false })
+
+  if (subsErr || !subs || subs.length === 0) return []
+
+  // Step 3: get product counts via RPC (keyed by subcategory name so we can
+  // cross-reference, regardless of whether the RPC returns extra rows).
+  const { data: rpcData } = await supabase.rpc('get_subcategories_with_count', {
     cat_id: cat.id,
   })
 
-  if (error || !data) return []
+  const countByName: Record<string, number> = {}
+  if (rpcData) {
+    for (const row of rpcData as { name: string; product_count: number }[]) {
+      if (row.name) countByName[row.name.toLowerCase().trim()] = row.product_count
+    }
+  }
 
-  return (data as { id: string; name: string; slug: string | null; parent_category_id: string; description: string | null; icon_url: string | null; sort_order: number | null; product_count: number }[])
+  // Step 4: return only subcategories that exist in the table, with their counts.
+  // Any product subcategory_text that has no matching row in the table is ignored.
+  return (subs as Subcategory[])
+    .map(s => ({
+      ...s,
+      product_count: countByName[s.name.toLowerCase().trim()] ?? 0,
+    }))
     .filter(s => s.product_count > 0)
-    .sort((a, b) => (b.product_count - a.product_count))
+    .sort((a, b) => b.product_count - a.product_count)
 }
