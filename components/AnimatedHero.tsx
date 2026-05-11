@@ -5,7 +5,7 @@ import Link from 'next/link'
 const WORDS = [
   { text: 'SCULELE',       href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
   { text: 'ACCESORIILE',   href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
-  { text: 'ECHIPAMENTELE', href: '/produse?categorie=Echipament%20de%20protec%C8%9Bie' },
+  { text: 'APARATELE',     href: '/produse?categorie=Aparate%20de%20Masura' },
 ]
 
 type Brand = { name: string; product_count: number }
