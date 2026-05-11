@@ -145,11 +145,11 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         {topBrands.length > 0 ? topBrands.map(b => (
           <Link key={b.name} href={`/produse?brand=${encodeURIComponent(b.name)}`} className="brand-chip">
             {b.name.toUpperCase()}
-            <span className="brand-chip-count">{b.product_count.toLocaleString('ro')}</span>
           </Link>
         )) : ['KARCHER', 'MILWAUKEE', 'PFERD', 'FFGROUP'].map(n => (
           <Link key={n} href={`/produse?brand=${encodeURIComponent(n)}`} className="brand-chip">{n}</Link>
         ))}
+
       </div>
 
       {/* Headline */}

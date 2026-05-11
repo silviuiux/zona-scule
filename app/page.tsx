@@ -1,18 +1,31 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav'
-import { getCategoriesWithCount, getBrands } from '@/lib/supabase'
+import { getCategoriesWithCount, getBrands, getProducts } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
+import ProductCard from '@/components/ProductCard'
 
 export const dynamic = 'force-dynamic'
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
 export default async function HomePage() {
-  const [categories, brands] = await Promise.all([
+  const [categories, brands, { products: rawCarousel }] = await Promise.all([
     getCategoriesWithCount(),
     getBrands(),
+    getProducts({ pageSize: 16, categoryText: 'Scule electrice' }),
   ])
+
+  const carouselProducts = shuffle(rawCarousel)
 
   return (
     <>
@@ -22,11 +35,7 @@ export default async function HomePage() {
         .hero {
           padding-top: 280px;
           padding-bottom: 24px;
-          /* transparent so body dot pattern shows through */
           background: transparent;
-          /* Sized so the 4th cat card (col 3, offset 0, height 400px) is
-             cut off by exactly 5px at the bottom of the first fold.
-             Falls back to a sane minimum on short viewports. */
           min-height: max(320px, calc(100vh - 395px));
           display: flex; align-items: center;
           overflow: hidden;
@@ -37,10 +46,6 @@ export default async function HomePage() {
           width: 100%;
           display: flex; flex-direction: column;
           gap: 26px;
-          /* Foreground parallax: --hero-y is updated by <DotsParallax /> on
-             scroll. Content moves at 120% of page scroll speed (extra -0.2 *
-             scrollY on top of natural scroll). Layout stays centered when
-             scrollY = 0. */
           transform: translate3d(0, var(--hero-y, 0px), 0);
           will-change: transform;
         }
@@ -48,7 +53,7 @@ export default async function HomePage() {
           .hero-inner { transform: none; }
         }
 
-        /* ─── Hero entrance — slide-in from right + fade ── */
+        /* ─── Hero entrance ── */
         @keyframes hero-in {
           from { opacity: 0; transform: translateX(40px); }
           to   { opacity: 1; transform: translateX(0); }
@@ -72,35 +77,6 @@ export default async function HomePage() {
             animation: none; opacity: 1;
           }
         }
-        .authorized-row {
-          display: flex; align-items: center; gap: 10px;
-          flex-wrap: wrap;
-        }
-        .authorized-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.6);
-        }
-        .authorized-link {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500;
-          color: rgb(0,0,0);
-          text-decoration: underline; text-underline-offset: 3px;
-          letter-spacing: -0.01em;
-        }
-        .authorized-link:hover { color: rgb(217, 44, 43); }
-        .hero-headline-old {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(60px, 8vw, 120px);
-          line-height: 1;
-          letter-spacing: 0.01em;
-          color: rgb(0,0,0);
-          text-transform: lowercase;
-        }
-        .hero-headline-old .word-red {
-          color: rgb(217, 44, 43);
-          -webkit-text-stroke: 2px rgb(217, 44, 43);
-          -webkit-text-fill-color: transparent;
-        }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.5);
@@ -109,19 +85,7 @@ export default async function HomePage() {
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
           width: fit-content;
-          border-radius: 0px;
           overflow: hidden;
-        }
-        .hero-search-box {
-          display: flex; align-items: center; gap: 10px;
-          background: rgb(255,255,255);
-          padding: 0 16px; height: 36px; width: 353px;
-        }
-        .hero-search-box input {
-          border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.4);
-          width: 100%;
         }
         .hero-catalog-cta {
           display: flex; align-items: center; gap: 6px;
@@ -134,7 +98,7 @@ export default async function HomePage() {
         }
         .hero-catalog-cta:hover { background: rgb(190, 35, 34); }
 
-        /* ─── CATEGORIES (2-row grid, exact Framer layout) ── */
+        /* ─── CATEGORIES ── */
         .cats-section {
           background: transparent;
           max-width: 1440px; margin: 0 auto;
@@ -155,8 +119,7 @@ export default async function HomePage() {
              1. Stagger (scroll-driven, instant) — goes on transform via
                 --cat-offset, updated every rAF, NO transition (would lag scroll)
              2. Reveal (in-view-triggered) — goes on translate (separate CSS
-                property), has a 700ms transition so it eases in once. The two
-                properties compose visually but transition independently. */
+                property), has a 700ms transition so it eases in once. */
           transform: translate3d(0, var(--cat-offset, 0px), 0);
           opacity: 0;
           translate: 0 24px;
@@ -164,19 +127,12 @@ export default async function HomePage() {
                       translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
           will-change: transform, translate, opacity;
         }
-        .cat-card.in-view {
-          opacity: 1;
-          translate: 0 0;
-        }
+        .cat-card.in-view { opacity: 1; translate: 0 0; }
         @media (prefers-reduced-motion: reduce) {
-          .cat-card {
-            opacity: 1; translate: 0 0; transition: none;
-          }
+          .cat-card { opacity: 1; translate: 0 0; transition: none; }
         }
-        /* Image fills the card; default 110% scale, eases back to 100% on hover */
         .cat-card-img-wrap {
-          position: absolute; inset: 0;
-          overflow: hidden;
+          position: absolute; inset: 0; overflow: hidden;
           transform: scale(1.1);
           transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
           will-change: transform;
@@ -184,91 +140,64 @@ export default async function HomePage() {
         .cat-card-img {
           position: absolute; inset: 0;
           width: 100%; height: 100%;
-          object-fit: cover;
-          object-position: center;
-          display: block;
+          object-fit: cover; object-position: center; display: block;
         }
-        .cat-card:hover .cat-card-img-wrap {
-          transform: scale(1.0);
-        }
+        .cat-card:hover .cat-card-img-wrap { transform: scale(1.0); }
         @media (prefers-reduced-motion: reduce) {
           .cat-card-img-wrap { transition: none; }
         }
         .cat-card-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);
-          transition: opacity 300ms ease;
         }
-        /* Bottom content */
         .cat-card-bottom {
-          position: absolute; bottom: 0; left: 0; right: 0;
-          padding: 16px;
+          position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
         }
-        /* Count — always visible above title */
         .cat-card-count {
           font-family: 'Inter', sans-serif;
           font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
-          display: block;
-          margin-bottom: 5px;
+          text-transform: uppercase; color: rgba(255,255,255,0.55);
+          display: block; margin-bottom: 5px;
         }
         .cat-card-label {
           font-family: 'Recursive', sans-serif;
           font-size: 15px; font-weight: 500;
           color: rgb(255,255,255); letter-spacing: -0.01em;
-          line-height: 1.3;
-          display: block; margin-bottom: 0;
+          line-height: 1.3; display: block;
         }
-        /* Desc hidden by default, slides in on hover */
         .cat-card-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5;
-          display: block;
-          max-height: 0; overflow: hidden;
-          opacity: 0;
-          margin-top: 0;
+          display: block; max-height: 0; overflow: hidden;
+          opacity: 0; margin-top: 0;
           transition: max-height 300ms ease-in-out, opacity 250ms ease-in-out, margin-top 300ms ease;
         }
-        .cat-card:hover .cat-card-desc {
-          max-height: 80px;
-          opacity: 1;
-          margin-top: 6px;
-        }
+        .cat-card:hover .cat-card-desc { max-height: 80px; opacity: 1; margin-top: 6px; }
 
-        /* ─── SERVICES ────────────────────────── */
+        /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
           padding: 0 12px 96px;
           display: flex; flex-direction: column; gap: 64px;
         }
-        .services-header {
-          display: flex; flex-direction: column; gap: 8px;
-          align-items: flex-start; text-align: left;
-        }
+        .services-header { display: flex; flex-direction: column; gap: 8px; }
         .section-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(32px, 4vw, 56px);
-          color: rgb(0,0,0); line-height: 1;
-          text-transform: uppercase;
+          color: rgb(0,0,0); line-height: 1; text-transform: uppercase;
         }
         .section-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
-          font-weight: 500;
+          font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 500;
         }
         .services-grid {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
         }
         .service-card {
           border-radius: 4px; overflow: hidden;
-          display: flex; flex-direction: column;
-          height: 707px;
+          display: flex; flex-direction: column; height: 707px;
         }
-        .service-img {
-          flex: 1; position: relative; background: rgb(220,218,214);
-          overflow: hidden;
-        }
+        .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
         .service-body { padding: 24px; flex-shrink: 0; }
         .service-title {
           font-family: 'Bungee', sans-serif;
@@ -281,25 +210,98 @@ export default async function HomePage() {
         }
         .service-cta {
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; font-weight: 500;
-          letter-spacing: 0.04em; text-transform: lowercase;
+          font-size: 12px; font-weight: 600;
+          letter-spacing: 0.06em; text-transform: uppercase;
           text-decoration: none;
           display: inline-flex; align-items: center; gap: 5px;
           transition: gap 150ms;
         }
         .service-cta:hover { gap: 9px; }
 
-        /* ─── FOOTER ──────────────────────────── */
-        .footer { background: rgb(244, 244, 244); border-top: 1px solid rgba(0,0,0,0.08); }
+        /* ─── CAROUSEL ── */
+        .carousel-section {
+          background: rgb(18, 18, 18);
+          padding: 80px 0 64px;
+        }
+        .carousel-inner {
+          max-width: 1440px; margin: 0 auto; padding: 0 24px;
+        }
+        .carousel-header { margin-bottom: 40px; }
+        .carousel-title {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(28px, 4vw, 48px);
+          color: rgb(255,255,255); text-transform: uppercase;
+          line-height: 1; margin-bottom: 8px;
+        }
+        .carousel-sub {
+          font-family: 'Recursive', sans-serif;
+          font-size: 14px; color: rgba(255,255,255,0.35);
+        }
+        .carousel-track {
+          display: flex; gap: 12px;
+          overflow-x: auto; padding-bottom: 4px;
+          scrollbar-width: none; -ms-overflow-style: none;
+          /* Bleed slightly past the inner padding so cards are flush */
+          margin: 0 -24px; padding-left: 24px; padding-right: 24px;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-item { flex-shrink: 0; width: 216px; }
+
+        /* ─── CONTACT BANNER ── */
+        .contact-banner-wrap {
+          padding: 80px 12px;
+          max-width: 1440px; margin: 0 auto;
+        }
+        .contact-banner {
+          background: rgb(18, 18, 18);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+          background-size: 28px 28px;
+          border-radius: 10px;
+          padding: 52px 64px;
+          display: flex; align-items: center;
+          justify-content: space-between; gap: 40px;
+        }
+        .contact-banner-eyebrow {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(255,255,255,0.35);
+          margin-bottom: 14px; display: block;
+        }
+        .contact-banner-title {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(22px, 2.8vw, 38px);
+          color: rgb(255,255,255); text-transform: uppercase;
+          line-height: 1.1; margin-bottom: 10px;
+        }
+        .contact-banner-sub {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(255,255,255,0.35);
+        }
+        .contact-banner-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgb(217, 44, 43); color: rgb(255,255,255);
+          padding: 16px 36px; border-radius: 4px;
+          font-family: 'Inter', sans-serif;
+          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; text-decoration: none;
+          white-space: nowrap; flex-shrink: 0;
+          transition: background 150ms;
+        }
+        .contact-banner-btn:hover { background: rgb(190, 35, 34); }
+
+        /* ─── FOOTER ── */
+        .footer { background: rgb(255,255,255); border-top: 1px solid rgba(0,0,0,0.08); }
         .footer-social {
-          padding: 20px 12px; max-width: 1440px; margin: 0 auto;
-          display: flex; gap: 48px; justify-content: center;
+          padding: 28px 12px; max-width: 1440px; margin: 0 auto;
+          display: flex; align-items: center; gap: 0;
+          justify-content: space-around;
           border-bottom: 1px solid rgba(0,0,0,0.08);
         }
         .footer-social a {
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
+          color: rgba(0,0,0,0.45);
           text-decoration: none;
+          display: flex; align-items: center; justify-content: center;
+          padding: 8px;
+          transition: color 150ms;
         }
         .footer-social a:hover { color: rgb(0,0,0); }
         .footer-grid {
@@ -330,35 +332,37 @@ export default async function HomePage() {
         }
         .footer-bottom a { color: rgb(217, 44, 43); }
 
-        /* ══ RESPONSIVE ══════════════════════════════════════════════ */
-
+        /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          /* Hero */
           .hero { min-height: auto; padding-top: 72px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 16px; }
           .hero-cta-row { flex-direction: column; width: 100%; }
-          .hero-search-box { width: 100%; }
           .hero-catalog-cta { justify-content: center; }
 
-          /* Categories */
           .cats-section { padding: 0 16px 64px; }
           .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .cat-card { height: 260px; }
 
-          /* Services */
           .services-section { padding: 0 16px 64px; gap: 40px; }
           .services-grid { grid-template-columns: 1fr; }
           .service-card { height: auto; }
           .service-img { height: 260px; }
 
-          /* Footer */
-          .footer-social { gap: 24px; flex-wrap: wrap; }
+          .carousel-section { padding: 56px 0 48px; }
+          .carousel-inner { padding: 0 16px; }
+          .carousel-track { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+          .carousel-item { width: 180px; }
+
+          .contact-banner-wrap { padding: 48px 16px; }
+          .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
+          .contact-banner-btn { width: 100%; justify-content: center; }
+
+          .footer-social { gap: 0; }
           .footer-grid { grid-template-columns: 1fr; gap: 32px; padding: 36px 16px; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
         }
 
         @media (max-width: 480px) {
-          /* Single column categories on very small screens */
           .cats-row { grid-template-columns: 1fr; }
           .cat-card { height: 220px; }
         }
@@ -368,29 +372,23 @@ export default async function HomePage() {
       <section className="hero">
         <div className="hero-inner">
           <AnimatedHero brands={brands} />
-
-          {/* Subline */}
           <p className="hero-sub">
             Lider in furnizarea de scule electrice,<br />
             industriale si de constructii de peste 26 de ani
           </p>
-
-          {/* CTA row */}
           <div className="hero-cta-row">
             <HeroSearch />
-            <Link href="/produse" className="hero-catalog-cta">
-              CATALOG
-            </Link>
+            <Link href="/produse" className="hero-catalog-cta">CATALOG</Link>
           </div>
         </div>
       </section>
 
-      {/* ── CATEGORIES — staggered first row collapses on scroll ── */}
+      {/* ── CATEGORIES ── */}
       <section className="cats-section">
         <CategoryGrid categories={categories} />
       </section>
 
-      {/* ── SERVICES — exact Framer CardS1 colors ── */}
+      {/* ── SERVICES ── */}
       <section className="services-section">
         <div className="services-header">
           <h2 className="section-title">SERVICII COMPLETE</h2>
@@ -398,9 +396,9 @@ export default async function HomePage() {
         </div>
         <div className="services-grid">
           {[
-            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'hai in showroom', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
-            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'solicita o reparatie', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
-            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'vezi acoperirea', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
+            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
+            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
+            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
           ].map((s, i) => (
             <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
               <div className="service-card">
@@ -418,12 +416,53 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── CAROUSEL — Scule electrice ── */}
+      <section className="carousel-section">
+        <div className="carousel-inner">
+          <div className="carousel-header">
+            <h2 className="carousel-title">NOU IN CATALOG</h2>
+            <p className="carousel-sub">Ne improspatam mereu catalogul cu cele mai noi scule de la parteneri profesionali</p>
+          </div>
+          <div className="carousel-track">
+            {carouselProducts.map(p => (
+              <div key={p.id} className="carousel-item">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT BANNER ── */}
+      <div className="contact-banner-wrap">
+        <div className="contact-banner">
+          <div>
+            <span className="contact-banner-eyebrow">Hai sa vorbim</span>
+            <h2 className="contact-banner-title">RĂSPUNDEM RAPID.<br />LIVRĂM ÎN TOATĂ ȚARA.</h2>
+            <p className="contact-banner-sub">Consultanța specializata</p>
+          </div>
+          <Link href="/contact" className="contact-banner-btn">CONTACT ↗</Link>
+        </div>
+      </div>
+
       {/* ── FOOTER ── */}
       <footer className="footer">
         <div className="footer-social">
-          {['Facebook', 'Instagram', 'YouTube', 'Email', 'Telefon'].map(s => (
-            <a key={s} href="#">{s}</a>
-          ))}
+          <a href="https://facebook.com/zonascule" aria-label="Facebook">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+          </a>
+          <a href="https://instagram.com/zonascule" aria-label="Instagram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://youtube.com/@zonascule" aria-label="YouTube">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon fill="white" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+          </a>
+          <a href="mailto:contact@zonascule.ro" aria-label="Email">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="tel:0248222298" aria-label="Telefon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </a>
         </div>
         <div className="footer-grid">
           <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
@@ -431,14 +470,14 @@ export default async function HomePage() {
           </p>
           <div>
             <p className="footer-col-title">INFORMATII</p>
-            {['Termene si conditii','Politica de retur','Achizitii S.E.A.P.','ANPC SAL'].map(l => (
+            {['Termene si conditii', 'Politica de retur', 'Achizitii S.E.A.P.', 'ANPC SAL'].map(l => (
               <a key={l} href="#" className="footer-link">{l}</a>
             ))}
           </div>
           <div>
             <p className="footer-col-title">CONTACT</p>
-            <p className="footer-link">0248.222.298</p>
-            <p className="footer-link">contact@zonascule.ro</p>
+            <a href="tel:0248222298" className="footer-link">0248.222.298</a>
+            <a href="mailto:contact@zonascule.ro" className="footer-link">contact@zonascule.ro</a>
             <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
             <p style={{ fontFamily: 'Recursive, monospace', fontSize: '11px', color: 'rgba(0,0,0,0.3)' }}>CIF / VAT: RO 6796092</p>
           </div>
