@@ -19,7 +19,7 @@ export default async function HomePage() {
       <style>{`
         /* ─── HERO ─────────────────────────────── */
         .hero {
-          padding-top: 60px;
+          padding-top: 280px;
           padding-bottom: 24px;
           /* transparent so body dot pattern shows through */
           background: transparent;
@@ -36,6 +36,15 @@ export default async function HomePage() {
           width: 100%;
           display: flex; flex-direction: column;
           gap: 26px;
+          /* Foreground parallax: --hero-y is updated by <DotsParallax /> on
+             scroll. Content moves at 120% of page scroll speed (extra -0.2 *
+             scrollY on top of natural scroll). Layout stays centered when
+             scrollY = 0. */
+          transform: translate3d(0, var(--hero-y, 0px), 0);
+          will-change: transform;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-inner { transform: none; }
         }
 
         /* ─── Hero entrance — slide-in from right + fade ── */
