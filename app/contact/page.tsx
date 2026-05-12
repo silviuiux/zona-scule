@@ -52,7 +52,7 @@ export default function ContactPage({
           gap: 0;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
-          margin-bottom: 16px;
+          margin-bottom: 80px;
         }
         .info-card {
           padding: 28px 32px;

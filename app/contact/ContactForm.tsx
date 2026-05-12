@@ -71,8 +71,8 @@ export default function ContactForm({
           display: flex; flex-direction: column;
         }
         .cf-header {
-          padding: 48px 32px 40px;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          padding: 64px 32px 0;
+          border-bottom: none;
         }
         .cf-title {
           font-family: 'Bungee', sans-serif;
@@ -87,7 +87,7 @@ export default function ContactForm({
         }
 
         /* Fields */
-        .cf-fields { flex: 1; padding: 0 32px; }
+        .cf-fields { flex: 1; padding: 64px 32px 0; }
 
         .cf-field {
           display: flex; align-items: center;
@@ -128,7 +128,7 @@ export default function ContactForm({
         .cf-field.cf-prefilled input { color: rgb(217,44,43); }
 
         /* Footer / submit */
-        .cf-footer { padding: 32px 32px 40px; }
+        .cf-footer { padding: 64px 32px 32px; }
         .cf-submit {
           width: 100%; padding: 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
@@ -141,9 +141,9 @@ export default function ContactForm({
         .cf-submit:hover { background: rgb(217,44,43); }
 
         @media (max-width: 768px) {
-          .cf-header { padding: 32px 20px 28px; }
-          .cf-fields { padding: 0 20px; }
-          .cf-footer { padding: 24px 20px 32px; }
+          .cf-header { padding: 40px 20px 0; }
+          .cf-fields { padding: 40px 20px 0; }
+          .cf-footer { padding: 40px 20px 32px; }
         }
       `}</style>
 
