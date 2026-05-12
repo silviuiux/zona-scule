@@ -146,7 +146,7 @@ export default function ContactPage({
           <div className="contact-bottom">
             <ContactForm searchParams={searchParams} />
             <div className="contact-photo">
-              <img src="/contact-person.avif" alt="Zona Scule" />
+              <img src="/service-garantie.avif" alt="Zona Scule" />
             </div>
           </div>
 
