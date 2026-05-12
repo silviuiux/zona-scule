@@ -85,16 +85,43 @@ export default async function HomePage() {
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
           width: fit-content;
+          border: 1px solid rgba(0,0,0,0.12);
+          border-radius: 3px;
           overflow: hidden;
         }
+        /* ── Hero search input ── */
+        .hero-search-box {
+          display: flex; align-items: center; gap: 8px;
+          background: rgb(255,255,255);
+          padding: 0 12px;
+          min-width: 260px;
+          height: 44px;
+        }
+        .hero-search-box input {
+          flex: 1; min-width: 0;
+          border: none; outline: none;
+          background: transparent;
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgb(0,0,0);
+        }
+        .hero-search-box input::placeholder { color: rgba(0,0,0,0.35); }
+        .hero-search-box button {
+          background: none; border: none; cursor: pointer;
+          display: flex; align-items: center; padding: 2px;
+          color: rgba(0,0,0,0.3); flex-shrink: 0;
+          transition: color 150ms;
+        }
+        .hero-search-box button:hover { color: rgb(217,44,43); }
         .hero-catalog-cta {
           display: flex; align-items: center; gap: 6px;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 20px; height: 36px;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
+          padding: 0 24px; height: 44px;
+          font-family: 'Inter', sans-serif;
+          font-size: 12px; font-weight: 700;
+          letter-spacing: 0.08em; text-transform: uppercase;
           text-decoration: none; white-space: nowrap;
           transition: background 150ms;
+          border-left: 1px solid rgba(0,0,0,0.1);
         }
         .hero-catalog-cta:hover { background: rgb(190, 35, 34); }
 
@@ -336,8 +363,9 @@ export default async function HomePage() {
         @media (max-width: 768px) {
           .hero { min-height: auto; padding-top: 72px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 16px; }
-          .hero-cta-row { flex-direction: column; width: 100%; }
-          .hero-catalog-cta { justify-content: center; }
+          .hero-cta-row { flex-direction: column; width: 100%; border-radius: 3px; }
+          .hero-search-box { min-width: 0; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.08); }
+          .hero-catalog-cta { justify-content: center; border-left: none; border-top: 1px solid rgba(0,0,0,0.08); }
 
           .cats-section { padding: 0 16px 64px; }
           .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
