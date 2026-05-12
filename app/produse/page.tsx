@@ -201,7 +201,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <main className="products-main">
             <div className="products-header">
               <h1 className="page-title">{headerTitle}</h1>
-              <span className="products-count">{total.toLocaleString('ro')} produse</span>
             </div>
 
             <MobileFilterToggle />

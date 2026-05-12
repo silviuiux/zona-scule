@@ -61,7 +61,7 @@ export default function Nav() {
 
         /* Search — takes all remaining space */
         .nav-search-form {
-          flex: 1; min-width: 0;
+          flex: 1; min-width: 338px;
           display: flex; align-items: center;
           height: 100%;
           padding: 0 14px;
@@ -150,7 +150,7 @@ export default function Nav() {
             className="nav-search-input"
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Cauta orice"
+            placeholder="Cauta orice..."
           />
           <button className="nav-search-btn" type="submit">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
