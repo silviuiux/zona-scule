@@ -1,6 +1,6 @@
 import Nav from '@/components/Nav'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrands } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrands, getAllSubcategoriesWithCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -25,7 +25,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const pageSize = 100
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
-  const [{ products: rawProducts, total }, categories, brands] = await Promise.all([
+  // Fetch in parallel — all-subs only needed for unfiltered view
+  const [{ products: rawProducts, total }, categories, brands, allSubs] = await Promise.all([
     getProducts({
       page: 1,
       pageSize,
@@ -36,6 +37,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     }),
     getCategoriesWithCount(),
     getBrands(),
+    !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
   ])
 
   // Random order only for the unfiltered "all products" view
@@ -44,6 +46,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const activeCategory = sp.categorie
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
     : null
+
+  // For the all-products view: pick a random category hero, rotates each request
+  const heroCategories = categories.filter(c => c.hero_image_url)
+  const randomHero = !isFiltered && heroCategories.length > 0
+    ? heroCategories[Math.floor(Math.random() * heroCategories.length)]
+    : null
+
+  const heroImageUrl = activeCategory?.hero_image_url ?? randomHero?.hero_image_url ?? null
+  const heroAlt = activeCategory?.name ?? randomHero?.name ?? 'Zona Scule'
 
   const headerTitle = sp.categorie ?? sp.brand ?? sp.q ?? 'Toate produsele'
 
@@ -64,6 +75,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           overflow: hidden;
           position: relative;
           background: rgba(0,0,0,0.04);
+        }
+        /* All-products hero is 2x taller */
+        .cat-hero.cat-hero-all {
+          height: clamp(400px, 50vh, 640px);
         }
         .cat-hero-img {
           position: absolute;
@@ -153,6 +168,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           }
           .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .products-main { padding: 20px 12px 60px; }
+          .cat-hero.cat-hero-all { height: clamp(220px, 35vh, 380px); }
         }
 
         @media (max-width: 480px) {
@@ -161,12 +177,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       `}</style>
 
       <div className="catalog-page">
-        {/* Category hero banner — only when a category with an image is active */}
-        {activeCategory?.hero_image_url && (
-          <div className="cat-hero">
+        {/* Hero banner — category hero or random rotating hero for all-products view */}
+        {heroImageUrl && (
+          <div className={`cat-hero${!isFiltered ? ' cat-hero-all' : ''}`}>
             <img
-              src={activeCategory.hero_image_url}
-              alt={activeCategory.name}
+              src={heroImageUrl}
+              alt={heroAlt}
               className="cat-hero-img"
             />
           </div>
@@ -190,13 +206,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
             <MobileFilterToggle />
 
-            {sp.categorie && (
+            {/* Subcategory bar — category subs OR all subs in unfiltered view */}
+            {sp.categorie ? (
               <SubcategoryBar
                 categoryName={sp.categorie}
                 activeSub={sp.subcategorie}
                 total={activeCategory?.product_count}
               />
-            )}
+            ) : !isFiltered ? (
+              <SubcategoryBar
+                activeSub={sp.subcategorie}
+                total={total}
+                prefetchedSubs={allSubs}
+              />
+            ) : null}
 
             <div className="products-grid">
               {products.map(p => <ProductCard key={p.id} product={p} />)}

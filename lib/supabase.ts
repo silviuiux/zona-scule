@@ -219,6 +219,24 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
 
 export type SubcategoryWithCount = Subcategory & { product_count: number }
 
+export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCount[]> {
+  const [{ data: subs, error }, { data: counts }] = await Promise.all([
+    supabase.from('subcategories').select('*').order('name'),
+    supabase.rpc('count_products_by_subcategory'),
+  ])
+  if (error || !subs) return []
+
+  const countMap: Record<string, number> = {}
+  for (const row of (counts as { subcategory_text: string; cnt: number }[] ?? [])) {
+    if (row.subcategory_text) countMap[row.subcategory_text.toLowerCase().trim()] = row.cnt
+  }
+
+  return (subs as Subcategory[])
+    .map(s => ({ ...s, product_count: countMap[s.name.toLowerCase().trim()] ?? 0 }))
+    .filter(s => s.product_count > 0)
+    .sort((a, b) => b.product_count - a.product_count)
+}
+
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
   // Step 1: resolve category id
   const { data: cat } = await supabase

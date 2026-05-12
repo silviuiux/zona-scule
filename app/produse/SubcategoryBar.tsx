@@ -1,18 +1,30 @@
 import Link from 'next/link'
-import { getSubcategoriesByCategoryName } from '@/lib/supabase'
+import { getSubcategoriesByCategoryName, SubcategoryWithCount } from '@/lib/supabase'
 
 export default async function SubcategoryBar({
   categoryName,
   activeSub,
   total,
+  prefetchedSubs,
 }: {
-  categoryName: string
+  categoryName?: string
   activeSub?: string
-  /** Total products in this category. Shown inside the "Toate" pill. */
+  /** Total products shown in the "Toate" pill */
   total?: number
+  /** Pre-fetched subs — skips internal fetch when provided */
+  prefetchedSubs?: SubcategoryWithCount[]
 }) {
-  const subs = await getSubcategoriesByCategoryName(categoryName)
+  const subs = prefetchedSubs ?? (categoryName ? await getSubcategoriesByCategoryName(categoryName) : [])
   if (subs.length === 0) return null
+
+  const allHref = categoryName
+    ? `/produse?categorie=${encodeURIComponent(categoryName)}`
+    : '/produse'
+
+  const subHref = (subName: string) =>
+    categoryName
+      ? `/produse?categorie=${encodeURIComponent(categoryName)}&subcategorie=${encodeURIComponent(subName)}`
+      : `/produse?subcategorie=${encodeURIComponent(subName)}`
 
   return (
     <>
@@ -21,7 +33,6 @@ export default async function SubcategoryBar({
           position: sticky;
           top: 52px;
           z-index: 50;
-          /* align with product grid — no horizontal bleed */
           margin: -32px 0 32px;
           padding: 32px 0;
           background: rgb(244, 244, 244);
@@ -73,9 +84,8 @@ export default async function SubcategoryBar({
       `}</style>
 
       <div className="subcat-bar">
-        {/* Toate — first pill, active by default when no subcategory selected */}
         <Link
-          href={`/produse?categorie=${encodeURIComponent(categoryName)}`}
+          href={allHref}
           className={`subcat-pill${!activeSub ? ' active' : ''}`}
         >
           Toate
@@ -86,7 +96,7 @@ export default async function SubcategoryBar({
         {subs.map(s => (
           <Link
             key={s.id}
-            href={`/produse?categorie=${encodeURIComponent(categoryName)}&subcategorie=${encodeURIComponent(s.name)}`}
+            href={subHref(s.name)}
             className={`subcat-pill${activeSub === s.name ? ' active' : ''}`}
           >
             {s.name}
