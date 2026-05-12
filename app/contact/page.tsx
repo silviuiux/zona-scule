@@ -52,19 +52,20 @@ export default function ContactPage({
           gap: 0;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
-          margin-bottom: 80px;
+          margin-bottom: 96px;
         }
         .info-card {
-          padding: 28px 32px;
+          padding: 32px;
           border-right: 1px solid rgba(0,0,0,0.08);
-          display: flex; flex-direction: column; gap: 6px;
+          display: flex; flex-direction: column; gap: 8px;
           text-decoration: none;
         }
+        .info-card:nth-child(n+2) { padding-left: 16px; }
         .info-card:last-child { border-right: none; }
         .info-label {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Recursive', sans-serif;
           font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
+          letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(0,0,0,0.35);
         }
         .info-value {
