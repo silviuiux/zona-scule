@@ -8,54 +8,51 @@ type Cat = {
   hero_image_url: string | null
   description: string | null
   product_count: number
+  featured: boolean
 }
 
-// Per-column vertical offset (px). Reversed so col 0 sits lowest.
+// Per-column vertical offset for the scroll-stagger animation.
+// Col 0 = most staggered, col 3 = flush.
 const COL_OFFSETS = [270, 180, 90, 0]
 const FALL_DISTANCE = 520
+const GRID_COLS = 4
 
-// ── Layout config ─────────────────────────────────────────────────────────────
-// Each row is an array of category names in display order.
-// Categories in WIDE_CATS get grid-column: span 2.
-const WIDE_CATS = new Set(['Scule electrice', 'Consumabile', 'Scule de gradina'])
+// ── Greedy row builder ────────────────────────────────────────────────────────
+// Places categories left-to-right in a GRID_COLS-column grid.
+// featured categories span 2 columns; regular ones span 1.
+// Returns rows where each entry carries the cat + its starting column position.
+type Slot = { cat: Cat; colStart: number }
 
-// Row 1: [W=2] + [1] + [1] = 4 cols  (3 items)
-// Row 2: [W=2] + [1] + [1] = 4 cols  (3 items)
-// Row 3: [1] + [1] + [W=2] = 4 cols  (3 items)
-// Row 4: [1] + [1] + [1] + [1] = 4 cols  (4 items)
-const CAT_LAYOUT: string[][] = [
-  ['Scule electrice', 'Accesorii', 'Scule de mână'],
-  ['Consumabile', 'Curatenie', 'Constructii'],
-  ['Echipament de protectie', 'Depozitare & Organizare', 'Scule de gradina'],
-  ['Scule pneumatice', 'Fixare & Asamblare', 'Aparate de Masura', 'Energie & Iluminat'],
-]
+function buildRows(cats: Cat[]): Slot[][] {
+  const rows: Slot[][] = []
+  let row: Slot[] = []
+  let used = 0
 
-// Starting column position for stagger offset (wide cards use their left edge)
-const CAT_COL: Record<string, number> = {
-  // Row 1
-  'Scule electrice': 0,            // spans cols 0-1
-  'Accesorii': 2,
-  'Scule de mână': 3,
-  // Row 2
-  'Consumabile': 0,                // spans cols 0-1
-  'Curatenie': 2,
-  'Constructii': 3,
-  // Row 3
-  'Echipament de protectie': 0,
-  'Depozitare & Organizare': 1,
-  'Scule de gradina': 2,           // spans cols 2-3
-  // Row 4
-  'Scule pneumatice': 0,
-  'Fixare & Asamblare': 1,
-  'Aparate de Masura': 2,
-  'Energie & Iluminat': 3,
+  for (const cat of cats) {
+    const span = cat.featured ? 2 : 1
+    if (used + span > GRID_COLS) {
+      // Current row is full (or can't fit this card) — start a new one
+      if (row.length) rows.push(row)
+      row = []
+      used = 0
+    }
+    row.push({ cat, colStart: used })
+    used += span
+    if (used === GRID_COLS) {
+      rows.push(row)
+      row = []
+      used = 0
+    }
+  }
+  if (row.length) rows.push(row)
+  return rows
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
-  // ── Effect 1: scroll-driven stagger ──
+  // ── Effect 1: scroll-driven column stagger ──
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const isMobile = window.matchMedia?.('(max-width: 768px)').matches
@@ -91,7 +88,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     }
   }, [])
 
-  // ── Effect 2: in-view reveal ──
+  // ── Effect 2: in-view fade + translate reveal ──
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
@@ -103,104 +100,59 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     if (reduce) { allCards.forEach(el => el.classList.add('in-view')); return }
 
     const timeouts: number[] = []
-    const reveal = (cards: HTMLElement[], baseDelay: number) => {
-      cards.forEach((card, i) => {
+    const reveal = (cards: HTMLElement[], baseDelay: number) =>
+      cards.forEach((card, i) =>
         timeouts.push(window.setTimeout(() => card.classList.add('in-view'), baseDelay + i * 60))
-      })
-    }
+      )
 
-    const rows = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
-    if (rows[0]) reveal(Array.from(rows[0].querySelectorAll<HTMLElement>('.cat-card')), 600)
+    const rowEls = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
+    if (rowEls[0]) reveal(Array.from(rowEls[0].querySelectorAll<HTMLElement>('.cat-card')), 600)
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            reveal(Array.from(entry.target.querySelectorAll<HTMLElement>('.cat-card')), 0)
-            observer.unobserve(entry.target)
-          }
-        })
-      },
+      entries => entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        reveal(Array.from(entry.target.querySelectorAll<HTMLElement>('.cat-card')), 0)
+        observer.unobserve(entry.target)
+      }),
       { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
     )
-    rows.slice(1).forEach(row => observer.observe(row))
-
+    rowEls.slice(1).forEach(row => observer.observe(row))
     return () => { observer.disconnect(); timeouts.forEach(clearTimeout) }
   }, [])
 
-  // Build a lookup map by name for fast access
-  const catsByName = Object.fromEntries(categories.map(c => [c.name, c]))
-
-  // Collect names already placed in the fixed layout
-  const layoutNames = new Set(CAT_LAYOUT.flat())
-
-  // Any categories not in the layout fall into overflow rows of 4
-  const overflow = categories.filter(c => !layoutNames.has(c.name))
-  const overflowRows: Cat[][] = []
-  for (let i = 0; i < overflow.length; i += 4) overflowRows.push(overflow.slice(i, i + 4))
-
-  const renderCard = (name: string, rowIdx: number) => {
-    const cat = catsByName[name]
-    if (!cat) return null
-    const isWide = WIDE_CATS.has(name)
-    const colPos = CAT_COL[name] ?? 0
-    const initialStyle = ({
-      ['--cat-offset' as string]: `${COL_OFFSETS[colPos] ?? 0}px`,
-      ...(isWide ? { gridColumn: 'span 2' } : {}),
-    } as CSSProperties)
-
-    return (
-      <Link
-        key={cat.id}
-        href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-        className="cat-card"
-        style={initialStyle}
-        data-col={colPos}
-      >
-        <div className="cat-card-img-wrap">
-          {cat.hero_image_url ? (
-            <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
-          ) : (
-            <div style={{ position: 'absolute', inset: 0, background: `hsl(${(rowIdx * 90 + colPos * 22) % 360}, 6%, 74%)` }} />
-          )}
-        </div>
-        <div className="cat-card-overlay" />
-        <div className="cat-card-bottom">
-          <span className="cat-card-count">
-            {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
-          </span>
-          <span className="cat-card-label">{cat.name}</span>
-          {cat.description && <span className="cat-card-desc">{cat.description}</span>}
-        </div>
-      </Link>
-    )
-  }
+  const rows = buildRows(categories)
 
   return (
     <div ref={rootRef}>
-      {/* Fixed layout rows */}
-      {CAT_LAYOUT.map((rowNames, rowIdx) => (
+      {rows.map((row, rowIdx) => (
         <div key={rowIdx} className="cats-row">
-          {rowNames.map(name => renderCard(name, rowIdx))}
-        </div>
-      ))}
+          {row.map(({ cat, colStart }) => {
+            const isWide = cat.featured
+            const initialStyle = ({
+              ['--cat-offset' as string]: `${COL_OFFSETS[colStart] ?? 0}px`,
+              ...(isWide ? { gridColumn: 'span 2' } : {}),
+            } as CSSProperties)
 
-      {/* Overflow rows (any categories not in the fixed layout) */}
-      {overflowRows.map((row, idx) => (
-        <div key={`overflow-${idx}`} className="cats-row">
-          {row.map((cat, i) => {
-            const initialStyle = ({ ['--cat-offset' as string]: `${COL_OFFSETS[i] ?? 0}px` } as CSSProperties)
             return (
-              <Link key={cat.id} href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-                className="cat-card" style={initialStyle} data-col={i}>
+              <Link
+                key={cat.id}
+                href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
+                className="cat-card"
+                style={initialStyle}
+                data-col={colStart}
+              >
                 <div className="cat-card-img-wrap">
-                  {cat.hero_image_url
-                    ? <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
-                    : <div style={{ position: 'absolute', inset: 0, background: `hsl(${(idx * 90 + i * 22) % 360}, 6%, 74%)` }} />}
+                  {cat.hero_image_url ? (
+                    <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
+                  ) : (
+                    <div style={{ position: 'absolute', inset: 0, background: `hsl(${(rowIdx * 90 + colStart * 22) % 360}, 6%, 74%)` }} />
+                  )}
                 </div>
                 <div className="cat-card-overlay" />
                 <div className="cat-card-bottom">
-                  <span className="cat-card-count">{cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse</span>
+                  <span className="cat-card-count">
+                    {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
+                  </span>
                   <span className="cat-card-label">{cat.name}</span>
                   {cat.description && <span className="cat-card-desc">{cat.description}</span>}
                 </div>
