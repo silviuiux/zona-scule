@@ -8,7 +8,6 @@ export default function ContactForm({
 }) {
   const params = use(searchParams)
 
-  // Pre-fill "Produse de interes" from PDP oferta button
   const prefilledProduct = [params.brand, params.model, params.sku]
     .filter(Boolean).join(' — ')
 
@@ -19,127 +18,189 @@ export default function ContactForm({
     companie: '',
     produs: prefilledProduct,
     mesaj: prefilledProduct
-      ? `Bună ziua, doresc o ofertă pentru: ${prefilledProduct}.`
+      ? `Buna ziua, doresc o oferta pentru: ${prefilledProduct}.`
       : '',
   })
+  const [focused, setFocused] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm(f => ({ ...f, [k]: e.target.value }))
+  const set = (k: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm(f => ({ ...f, [k]: e.target.value }))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: wire to email service / Supabase
     setSent(true)
+  }
+
+  if (sent) {
+    return (
+      <>
+        <style>{`
+          .cf-success {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 64px 32px;
+            background: rgb(255,255,255);
+            border: 1px solid rgba(0,0,0,0.08);
+            text-align: center; gap: 12px;
+          }
+          .cf-success-title {
+            font-family: 'Bungee', sans-serif;
+            font-size: 32px; color: rgb(0,0,0);
+          }
+          .cf-success-sub {
+            font-family: 'Recursive', sans-serif;
+            font-size: 14px; color: rgba(0,0,0,0.5); line-height: 1.6;
+          }
+        `}</style>
+        <div className="cf-success">
+          <p className="cf-success-title">MESAJ TRIMIS!</p>
+          <p className="cf-success-sub">Va contactam in cel mai scurt timp.</p>
+        </div>
+      </>
+    )
   }
 
   return (
     <>
       <style>{`
-        .contact-form-wrap {
-          padding: 0;
-        }
-        .contact-form {
-          display: flex; flex-direction: column; gap: 16px;
-        }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5); font-weight: 500;
-        }
-        .form-input, .form-textarea {
+        .cf-wrap {
           background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 3px; padding: 10px 12px;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgb(0,0,0);
-          outline: none; transition: border-color 150ms;
-          width: 100%;
+          border: 1px solid rgba(0,0,0,0.08);
+          display: flex; flex-direction: column;
         }
-        .form-input::placeholder, .form-textarea::placeholder { color: rgba(0,0,0,0.3); }
-        .form-input:focus, .form-textarea:focus { border-color: rgb(0,0,0); }
-        .form-textarea { resize: vertical; min-height: 100px; }
-        /* Prefilled highlight */
-        .form-input.prefilled { border-color: rgba(217,44,43,0.3); background: rgba(217,44,43,0.02); }
-        .form-submit {
-          padding: 14px; background: rgb(0,0,0); color: rgb(255,255,255);
-          border: none; border-radius: 3px;
+        .cf-header {
+          padding: 48px 32px 40px;
+          border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .cf-title {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(28px, 3vw, 42px);
+          line-height: 1; color: rgb(0,0,0);
+          text-transform: uppercase; margin-bottom: 12px;
+        }
+        .cf-sub {
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(0,0,0,0.45);
+          line-height: 1.6; max-width: 360px;
+        }
+
+        /* Fields */
+        .cf-fields { flex: 1; padding: 0 32px; }
+
+        .cf-field {
+          display: flex; align-items: center;
+          border-bottom: 1px solid rgba(0,0,0,0.08);
+          position: relative;
+          transition: box-shadow 120ms;
+        }
+        .cf-field.cf-last { border-bottom: none; }
+        .cf-field.cf-focused {
+          box-shadow: inset 0 0 0 1px rgba(30,100,255,0.35);
+        }
+
+        .cf-field input,
+        .cf-field textarea {
+          flex: 1; min-width: 0;
+          border: none; outline: none; background: transparent;
+          font-family: 'Recursive', sans-serif;
+          font-size: 14px; color: rgb(0,0,0);
+          padding: 17px 0;
+          resize: none;
+        }
+        .cf-field textarea { min-height: 88px; padding-top: 18px; }
+
+        .cf-field input::placeholder,
+        .cf-field textarea::placeholder { color: rgba(0,0,0,0.28); }
+
+        /* Right label — only visible when field has a value */
+        .cf-label {
+          font-family: 'Recursive', sans-serif;
+          font-size: 11px; color: rgba(0,0,0,0.3);
+          white-space: nowrap; padding-left: 12px; flex-shrink: 0;
+          pointer-events: none; opacity: 0; transition: opacity 120ms;
+        }
+        .cf-field input:not(:placeholder-shown) ~ .cf-label,
+        .cf-field textarea:not(:placeholder-shown) ~ .cf-label { opacity: 1; }
+
+        /* Red prefilled value (from PDP "cere oferta") */
+        .cf-field.cf-prefilled input { color: rgb(217,44,43); }
+
+        /* Footer / submit */
+        .cf-footer { padding: 32px 32px 40px; }
+        .cf-submit {
+          width: 100%; padding: 18px;
+          background: rgb(0,0,0); color: rgb(255,255,255);
+          border: none;
           font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
           cursor: pointer; transition: background 150ms;
-          margin-top: 8px;
         }
-        .form-submit:hover { background: rgb(217,44,43); }
-        .form-success {
-          padding: 24px; background: rgba(34,197,94,0.08);
-          border: 1px solid rgba(34,197,94,0.3); border-radius: 4px;
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgb(22,163,74);
-        }
-        /* Prefilled notice */
-        .prefill-notice {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(217,44,43,0.8);
-          padding: 8px 12px;
-          background: rgba(217,44,43,0.05);
-          border: 1px solid rgba(217,44,43,0.15);
-          border-radius: 3px; margin-bottom: 4px;
+        .cf-submit:hover { background: rgb(217,44,43); }
+
+        @media (max-width: 768px) {
+          .cf-header { padding: 32px 20px 28px; }
+          .cf-fields { padding: 0 20px; }
+          .cf-footer { padding: 24px 20px 32px; }
         }
       `}</style>
 
-      <div className="contact-form-wrap">
-        {sent ? (
-          <div className="form-success">
-            Mesajul tău a fost trimis! Te contactăm în cel mai scurt timp.
+      <form className="cf-wrap" onSubmit={handleSubmit}>
+        <div className="cf-header">
+          <h2 className="cf-title">HAI SA VORBIM</h2>
+          <p className="cf-sub">
+            Completati formularul si va raspundem in cel mai scurt
+            timp cu o oferta personalizata nevoilor dumneavoastra.
+          </p>
+        </div>
+
+        <div className="cf-fields">
+          <div className={`cf-field${focused === 'nume' ? ' cf-focused' : ''}`}>
+            <input placeholder="nume" value={form.nume} onChange={set('nume')}
+              onFocus={() => setFocused('nume')} onBlur={() => setFocused(null)} />
+            <span className="cf-label">nume</span>
           </div>
-        ) : (
-          <form className="contact-form" onSubmit={handleSubmit}>
-            {prefilledProduct && (
-              <div className="prefill-notice">
-                Cerere ofertă pentru: <strong>{prefilledProduct}</strong>
-              </div>
-            )}
-            <div className="form-group">
-              <label className="form-label">Nume</label>
-              <input className="form-input" placeholder="Nae Protopopitoricescoviki"
-                value={form.nume} onChange={set('nume')} />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Email</label>
-                <input className="form-input" type="email" placeholder="nae.p@mail.com"
-                  value={form.email} onChange={set('email')} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Telefon</label>
-                <input className="form-input" type="tel" placeholder="0700 00 00 00"
-                  value={form.telefon} onChange={set('telefon')} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Companie</label>
-              <input className="form-input" placeholder="ProtoAuto"
-                value={form.companie} onChange={set('companie')} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Produse de interes</label>
-              <input
-                className={`form-input${prefilledProduct ? ' prefilled' : ''}`}
-                placeholder="Numele produsului sau categoria"
-                value={form.produs} onChange={set('produs')}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Mesajul tau</label>
-              <textarea className="form-textarea" placeholder="Descrie ce ai nevoie..."
-                value={form.mesaj} onChange={set('mesaj')} />
-            </div>
-            <button type="submit" className="form-submit">Trimite mesajul</button>
-          </form>
-        )}
-      </div>
+
+          <div className={`cf-field${focused === 'email' ? ' cf-focused' : ''}`}>
+            <input type="email" placeholder="email" value={form.email} onChange={set('email')}
+              onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} />
+            <span className="cf-label">email</span>
+          </div>
+
+          <div className={`cf-field${focused === 'telefon' ? ' cf-focused' : ''}`}>
+            <input type="tel" placeholder="telefon" value={form.telefon} onChange={set('telefon')}
+              onFocus={() => setFocused('telefon')} onBlur={() => setFocused(null)} />
+            <span className="cf-label">telefon</span>
+          </div>
+
+          <div className={`cf-field${focused === 'companie' ? ' cf-focused' : ''}`}>
+            <input placeholder="companie (optional)" value={form.companie} onChange={set('companie')}
+              onFocus={() => setFocused('companie')} onBlur={() => setFocused(null)} />
+            <span className="cf-label">companie</span>
+          </div>
+
+          <div className={`cf-field${focused === 'produs' ? ' cf-focused' : ''}${prefilledProduct ? ' cf-prefilled' : ''}`}>
+            <input placeholder="produse de interes" value={form.produs} onChange={set('produs')}
+              onFocus={() => setFocused('produs')} onBlur={() => setFocused(null)} />
+            <span className="cf-label">produse de interes</span>
+          </div>
+
+          <div className={`cf-field cf-last${focused === 'mesaj' ? ' cf-focused' : ''}`}>
+            <textarea
+              placeholder="Descrieti produsele care va intereseaza, cantitatile dorite sau orice alt mesaj."
+              value={form.mesaj} onChange={set('mesaj')}
+              onFocus={() => setFocused('mesaj')} onBlur={() => setFocused(null)}
+            />
+            <span className="cf-label">mesaj</span>
+          </div>
+        </div>
+
+        <div className="cf-footer">
+          <button type="submit" className="cf-submit">Trimite mesajul</button>
+        </div>
+      </form>
     </>
   )
 }
