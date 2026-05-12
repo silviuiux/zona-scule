@@ -10,17 +10,52 @@ type Cat = {
   product_count: number
 }
 
-// Per-column vertical offset (px). Applied to EVERY row identically so the
-// 16px row gap is preserved — cards in the same column move together.
-// Reversed so column 0 sits lowest ("barely visible") and column 3 stays put.
+// Per-column vertical offset (px). Reversed so col 0 sits lowest.
 const COL_OFFSETS = [270, 180, 90, 0]
-// Scroll distance (px) over which the cards converge from staggered → aligned.
 const FALL_DISTANCE = 520
+
+// ── Layout config ─────────────────────────────────────────────────────────────
+// Each row is an array of category names in display order.
+// Categories in WIDE_CATS get grid-column: span 2.
+const WIDE_CATS = new Set(['Scule electrice', 'Consumabile', 'Scule de gradina'])
+
+// Row 1: [W=2] + [1] + [1] = 4 cols  (3 items)
+// Row 2: [W=2] + [1] + [1] = 4 cols  (3 items)
+// Row 3: [1] + [1] + [W=2] = 4 cols  (3 items)
+// Row 4: [1] + [1] + [1] + [1] = 4 cols  (4 items)
+const CAT_LAYOUT: string[][] = [
+  ['Scule electrice', 'Accesorii', 'Scule de mână'],
+  ['Consumabile', 'Curatenie', 'Constructii'],
+  ['Echipament de protectie', 'Depozitare & Organizare', 'Scule de gradina'],
+  ['Scule pneumatice', 'Fixare & Asamblare', 'Aparate de Masura', 'Energie & Iluminat'],
+]
+
+// Starting column position for stagger offset (wide cards use their left edge)
+const CAT_COL: Record<string, number> = {
+  // Row 1
+  'Scule electrice': 0,            // spans cols 0-1
+  'Accesorii': 2,
+  'Scule de mână': 3,
+  // Row 2
+  'Consumabile': 0,                // spans cols 0-1
+  'Curatenie': 2,
+  'Constructii': 3,
+  // Row 3
+  'Echipament de protectie': 0,
+  'Depozitare & Organizare': 1,
+  'Scule de gradina': 2,           // spans cols 2-3
+  // Row 4
+  'Scule pneumatice': 0,
+  'Fixare & Asamblare': 1,
+  'Aparate de Masura': 2,
+  'Energie & Iluminat': 3,
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
-  // ── Effect 1: scroll-driven stagger (existing) ──
+  // ── Effect 1: scroll-driven stagger ──
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const isMobile = window.matchMedia?.('(max-width: 768px)').matches
@@ -30,7 +65,6 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
     if (allCards.length === 0) return
 
-    // On reduced-motion / mobile, snap to aligned (no stagger).
     if (reduce || isMobile) {
       allCards.forEach(el => el.style.setProperty('--cat-offset', '0px'))
       return
@@ -39,8 +73,6 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     let raf = 0
     const update = () => {
       raf = 0
-      // Progress is driven directly by scrollY: as soon as the user scrolls,
-      // the cards begin converging. By scrollY === FALL_DISTANCE they are aligned.
       const progress = Math.max(0, Math.min(1, window.scrollY / FALL_DISTANCE))
       allCards.forEach(el => {
         const col = Number(el.dataset.col ?? 0)
@@ -48,10 +80,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
         el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
       })
     }
-    const onScroll = () => {
-      if (raf) return
-      raf = requestAnimationFrame(update)
-    }
+    const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll, { passive: true })
@@ -62,12 +91,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     }
   }, [])
 
-  // ── Effect 2: in-view reveal (fade + translate up) ──
-  // Adds `.in-view` to each card to trigger the CSS transition on opacity
-  // and `translate`. The first row fires on page load after a 600ms delay;
-  // subsequent rows fire when they enter the viewport via IntersectionObserver.
-  // A small per-card stagger (60ms) within each row keeps the reveal feeling
-  // organic instead of all-at-once.
+  // ── Effect 2: in-view reveal ──
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
@@ -76,118 +100,115 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
     if (allCards.length === 0) return
 
-    // Reduced motion: snap everything to revealed state, no animation.
-    if (reduce) {
-      allCards.forEach(el => el.classList.add('in-view'))
-      return
-    }
+    if (reduce) { allCards.forEach(el => el.classList.add('in-view')); return }
 
     const timeouts: number[] = []
     const reveal = (cards: HTMLElement[], baseDelay: number) => {
       cards.forEach((card, i) => {
-        timeouts.push(
-          window.setTimeout(() => card.classList.add('in-view'), baseDelay + i * 60)
-        )
+        timeouts.push(window.setTimeout(() => card.classList.add('in-view'), baseDelay + i * 60))
       })
     }
 
     const rows = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
+    if (rows[0]) reveal(Array.from(rows[0].querySelectorAll<HTMLElement>('.cat-card')), 600)
 
-    // First row: fixed 600ms delay on load
-    if (rows[0]) {
-      const firstRowCards = Array.from(rows[0].querySelectorAll<HTMLElement>('.cat-card'))
-      reveal(firstRowCards, 600)
-    }
-
-    // Other rows: intersection-triggered, one-shot
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const rowCards = Array.from(
-              entry.target.querySelectorAll<HTMLElement>('.cat-card')
-            )
-            reveal(rowCards, 0)
+            reveal(Array.from(entry.target.querySelectorAll<HTMLElement>('.cat-card')), 0)
             observer.unobserve(entry.target)
           }
         })
       },
-      {
-        threshold: 0.15,             // 15% of the row in view triggers it
-        rootMargin: '0px 0px -40px 0px', // fire slightly before fully entering
-      }
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
     )
     rows.slice(1).forEach(row => observer.observe(row))
 
-    return () => {
-      observer.disconnect()
-      timeouts.forEach(clearTimeout)
-    }
+    return () => { observer.disconnect(); timeouts.forEach(clearTimeout) }
   }, [])
 
-  // Chunk categories into rows of 4
-  const rows: Cat[][] = []
-  for (let i = 0; i < categories.length; i += 4) {
-    rows.push(categories.slice(i, i + 4))
+  // Build a lookup map by name for fast access
+  const catsByName = Object.fromEntries(categories.map(c => [c.name, c]))
+
+  // Collect names already placed in the fixed layout
+  const layoutNames = new Set(CAT_LAYOUT.flat())
+
+  // Any categories not in the layout fall into overflow rows of 4
+  const overflow = categories.filter(c => !layoutNames.has(c.name))
+  const overflowRows: Cat[][] = []
+  for (let i = 0; i < overflow.length; i += 4) overflowRows.push(overflow.slice(i, i + 4))
+
+  const renderCard = (name: string, rowIdx: number) => {
+    const cat = catsByName[name]
+    if (!cat) return null
+    const isWide = WIDE_CATS.has(name)
+    const colPos = CAT_COL[name] ?? 0
+    const initialStyle = ({
+      ['--cat-offset' as string]: `${COL_OFFSETS[colPos] ?? 0}px`,
+      ...(isWide ? { gridColumn: 'span 2' } : {}),
+    } as CSSProperties)
+
+    return (
+      <Link
+        key={cat.id}
+        href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
+        className="cat-card"
+        style={initialStyle}
+        data-col={colPos}
+      >
+        <div className="cat-card-img-wrap">
+          {cat.hero_image_url ? (
+            <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
+          ) : (
+            <div style={{ position: 'absolute', inset: 0, background: `hsl(${(rowIdx * 90 + colPos * 22) % 360}, 6%, 74%)` }} />
+          )}
+        </div>
+        <div className="cat-card-overlay" />
+        <div className="cat-card-bottom">
+          <span className="cat-card-count">
+            {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
+          </span>
+          <span className="cat-card-label">{cat.name}</span>
+          {cat.description && <span className="cat-card-desc">{cat.description}</span>}
+        </div>
+      </Link>
+    )
   }
 
   return (
     <div ref={rootRef}>
-      {rows.map((row, rowIdx) =>
-        row.length > 0 ? (
-          <div key={rowIdx} className="cats-row">
-            {row.map((cat, i) => {
-              // Pre-set initial offset so SSR / first paint already shows the
-              // staggered state — no snap when JS hydrates.
-              const initialStyle = ({
-                ['--cat-offset' as string]: `${COL_OFFSETS[i] ?? 0}px`,
-              } as CSSProperties)
+      {/* Fixed layout rows */}
+      {CAT_LAYOUT.map((rowNames, rowIdx) => (
+        <div key={rowIdx} className="cats-row">
+          {rowNames.map(name => renderCard(name, rowIdx))}
+        </div>
+      ))}
 
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-                  className="cat-card"
-                  style={initialStyle}
-                  data-col={i}
-                >
-                  <div className="cat-card-img-wrap">
-                    {cat.hero_image_url ? (
-                      <img
-                        src={cat.hero_image_url}
-                        alt={cat.name}
-                        className="cat-card-img"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          background: `hsl(${(rowIdx * 90 + i * 22) % 360}, 6%, ${74 - i * 2}%)`,
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div className="cat-card-overlay" />
-                  <div className="cat-card-bottom">
-                    <span className="cat-card-count">
-                      {cat.product_count > 0
-                        ? cat.product_count.toLocaleString('ro')
-                        : '—'}{' '}
-                      produse
-                    </span>
-                    <span className="cat-card-label">{cat.name}</span>
-                    {cat.description && (
-                      <span className="cat-card-desc">{cat.description}</span>
-                    )}
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        ) : null
-      )}
+      {/* Overflow rows (any categories not in the fixed layout) */}
+      {overflowRows.map((row, idx) => (
+        <div key={`overflow-${idx}`} className="cats-row">
+          {row.map((cat, i) => {
+            const initialStyle = ({ ['--cat-offset' as string]: `${COL_OFFSETS[i] ?? 0}px` } as CSSProperties)
+            return (
+              <Link key={cat.id} href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
+                className="cat-card" style={initialStyle} data-col={i}>
+                <div className="cat-card-img-wrap">
+                  {cat.hero_image_url
+                    ? <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
+                    : <div style={{ position: 'absolute', inset: 0, background: `hsl(${(idx * 90 + i * 22) % 360}, 6%, 74%)` }} />}
+                </div>
+                <div className="cat-card-overlay" />
+                <div className="cat-card-bottom">
+                  <span className="cat-card-count">{cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse</span>
+                  <span className="cat-card-label">{cat.name}</span>
+                  {cat.description && <span className="cat-card-desc">{cat.description}</span>}
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      ))}
     </div>
   )
 }
