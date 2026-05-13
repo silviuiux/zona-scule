@@ -343,7 +343,7 @@ export default async function HomePage() {
           .services-grid::-webkit-scrollbar { display: none; }
           .services-grid > a { flex-shrink: 0; width: 75vw; }
           .service-card { height: auto; width: 100%; }
-          .service-img { height: 220px; }
+          .service-img { flex: none; height: 220px; }
 
           .carousel-section { padding: 56px 0 48px; }
           .carousel-inner { padding: 0 16px; }
