@@ -320,11 +320,23 @@ export default async function HomePage() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          .hero { min-height: auto; padding-top: 72px; padding-bottom: 48px; }
+          .hero { min-height: calc(100svh - 52px); padding-top: 48px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 16px; }
-          .hero-cta-row { flex-direction: column; width: 100%; border-radius: 3px; }
-          .hero-search-box { min-width: 0; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.08); }
-          .hero-catalog-cta { justify-content: center; border-left: none; border-top: 1px solid rgba(0,0,0,0.08); }
+          .hero-cta-row {
+            flex-direction: column; width: 100%;
+            border: none; border-radius: 0;
+            gap: 16px;
+          }
+          .hero-search-box {
+            min-width: 0; width: 100%;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 3px;
+          }
+          .hero-catalog-cta {
+            justify-content: center;
+            border-left: none; border-top: none;
+            border-radius: 3px;
+          }
 
           .cats-section { padding: 0 16px 64px; }
           .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -343,7 +355,7 @@ export default async function HomePage() {
           .services-grid::-webkit-scrollbar { display: none; }
           .services-grid > a { flex-shrink: 0; width: 75vw; }
           .service-card { height: auto; width: 100%; }
-          .service-img { flex: none; height: 220px; }
+          .service-img { flex: none; height: auto; aspect-ratio: 2/3; }
 
           .carousel-section { padding: 56px 0 48px; }
           .carousel-inner { padding: 0 16px; }

@@ -141,7 +141,6 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
 
       {/* Brand chips */}
       <div className="brand-chips">
-        <span className="brand-chips-label">Distribuitor autorizat:</span>
         {topBrands.length > 0 ? topBrands.map(b => (
           <Link key={b.name} href={`/produse?brand=${encodeURIComponent(b.name)}`} className="brand-chip">
             {b.name.toUpperCase()}
