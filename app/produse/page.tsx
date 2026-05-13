@@ -121,8 +121,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .products-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
         .products-header {
           margin-bottom: 24px;
-          display: flex; align-items: baseline;
-          justify-content: space-between;
+          display: flex; align-items: center; gap: 16px;
         }
         .products-count {
           font-family: 'Recursive', sans-serif;
@@ -136,7 +135,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
 
         /* ── MOBILE SIDEBAR DRAWER ── */
-        .sidebar-toggle { display: none; }
+        .sidebar-toggle {
+          display: none;
+          flex-shrink: 0;
+        }
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
@@ -161,14 +163,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           }
           .sidebar-backdrop.open { opacity: 1; pointer-events: all; }
           .sidebar-toggle {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            width: 44px; height: 44px;
             background: rgb(255,255,255);
             border: 1px solid rgba(0,0,0,0.12);
-            border-radius: 4px;
-            padding: 8px 14px;
-            font-family: 'Recursive', sans-serif;
-            font-size: 13px; font-weight: 500; color: rgb(0,0,0);
-            cursor: pointer; margin-bottom: 16px;
+            border-radius: 6px;
+            color: rgb(0,0,0);
+            cursor: pointer;
           }
           .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .products-main { padding: 20px 12px 60px; }
@@ -204,10 +206,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
           <main className="products-main">
             <div className="products-header">
+              <MobileFilterToggle />
               <h1 className="page-title">{headerTitle}</h1>
             </div>
-
-            <MobileFilterToggle />
 
             {/* Subcategory bar — category subs OR all subs in unfiltered view */}
             {sp.categorie ? (
