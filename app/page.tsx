@@ -2,31 +2,20 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getCategoriesWithCount, getBrands, getProducts } from '@/lib/supabase'
+import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
-import ProductCard from '@/components/ProductCard'
 
 export const dynamic = 'force-dynamic'
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
 
 export default async function HomePage() {
-  const [categories, brands, { products: rawCarousel }] = await Promise.all([
+  const [categories, brands, featuredSubs] = await Promise.all([
     getCategoriesWithCount(),
     getBrands(),
-    getProducts({ pageSize: 16, categoryText: 'Scule electrice' }),
+    getFeaturedSubcategoriesWithImage(),
   ])
-
-  const carouselProducts = shuffle(rawCarousel)
 
   return (
     <>
@@ -269,11 +258,47 @@ export default async function HomePage() {
           display: flex; gap: 12px;
           overflow-x: auto; padding-bottom: 4px;
           scrollbar-width: none; -ms-overflow-style: none;
-          /* Bleed slightly past the inner padding so cards are flush */
           margin: 0 -24px; padding-left: 24px; padding-right: 24px;
         }
         .carousel-track::-webkit-scrollbar { display: none; }
-        .carousel-item { flex-shrink: 0; width: 216px; }
+
+        /* ── Subcategory card ── */
+        .sub-card {
+          flex-shrink: 0;
+          width: 200px; height: 280px;
+          position: relative; overflow: hidden;
+          border-radius: 8px;
+          background: rgb(40,40,40);
+          text-decoration: none; display: block;
+          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .sub-card:hover { transform: scale(1.02); }
+        .sub-card-img {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          object-fit: cover; object-position: center;
+          display: block;
+          transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .sub-card:hover .sub-card-img { transform: scale(1.06); }
+        .sub-card-overlay {
+          position: absolute; inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.15) 50%, transparent 80%);
+        }
+        .sub-card-bottom {
+          position: absolute; bottom: 0; left: 0; right: 0; padding: 14px;
+        }
+        .sub-card-count {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+          text-transform: uppercase; color: rgba(255,255,255,0.5);
+          display: block; margin-bottom: 4px;
+        }
+        .sub-card-label {
+          font-family: 'Recursive', sans-serif;
+          font-size: 14px; font-weight: 500;
+          color: rgb(255,255,255); line-height: 1.3; display: block;
+        }
 
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
@@ -360,7 +385,7 @@ export default async function HomePage() {
           .carousel-section { padding: 56px 0 48px; }
           .carousel-inner { padding: 0 16px; }
           .carousel-track { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
-          .carousel-item { width: 180px; }
+          .sub-card { width: 160px; height: 224px; }
 
           .contact-banner-wrap { padding: 48px 16px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
@@ -422,22 +447,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CAROUSEL — Scule electrice ── */}
-      <section className="carousel-section">
-        <div className="carousel-inner">
-          <div className="carousel-header">
-            <h2 className="carousel-title">NOU IN CATALOG</h2>
-            <p className="carousel-sub">Ne improspatam mereu catalogul cu cele mai noi scule de la parteneri profesionali</p>
+      {/* ── CAROUSEL — Featured subcategories ── */}
+      {featuredSubs.length > 0 && (
+        <section className="carousel-section">
+          <div className="carousel-inner">
+            <div className="carousel-header">
+              <h2 className="carousel-title">EXPLOREAZA</h2>
+              <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
+            </div>
+            <div className="carousel-track">
+              {featuredSubs.map(s => (
+                <Link
+                  key={s.id}
+                  href={`/produse?subcategorie=${encodeURIComponent(s.name)}`}
+                  className="sub-card"
+                >
+                  {s.image_url && (
+                    <img src={s.image_url} alt={s.name} className="sub-card-img" loading="lazy" />
+                  )}
+                  <div className="sub-card-overlay" />
+                  <div className="sub-card-bottom">
+                    <span className="sub-card-count">{s.product_count.toLocaleString('ro')} produse</span>
+                    <span className="sub-card-label">{s.name}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="carousel-track">
-            {carouselProducts.map(p => (
-              <div key={p.id} className="carousel-item">
-                <ProductCard product={p} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── CONTACT BANNER ── */}
       <div className="contact-banner-wrap">

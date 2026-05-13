@@ -272,6 +272,21 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
     .sort((a, b) => b.product_count - a.product_count)
 }
 
+export type FeaturedSubcategoryWithImage = {
+  id: string
+  name: string
+  slug: string | null
+  parent_category_id: string | null
+  product_count: number
+  image_url: string | null
+}
+
+export async function getFeaturedSubcategoriesWithImage(): Promise<FeaturedSubcategoryWithImage[]> {
+  const { data, error } = await supabase.rpc('get_featured_subcategories_with_image')
+  if (error || !data) return []
+  return data as FeaturedSubcategoryWithImage[]
+}
+
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
   // Step 1: resolve category id
   const { data: cat } = await supabase
