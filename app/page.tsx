@@ -265,7 +265,7 @@ export default async function HomePage() {
         /* ── Subcategory card ── */
         .sub-card {
           flex-shrink: 0;
-          width: 200px; height: 280px;
+          width: 284px; height: 398px;
           position: relative; overflow: hidden;
           border-radius: 8px;
           background: rgb(40,40,40);
@@ -385,7 +385,7 @@ export default async function HomePage() {
           .carousel-section { padding: 56px 0 48px; }
           .carousel-inner { padding: 0 16px; }
           .carousel-track { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
-          .sub-card { width: 160px; height: 224px; }
+          .sub-card { width: 192px; height: 269px; }
 
           .contact-banner-wrap { padding: 48px 16px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
