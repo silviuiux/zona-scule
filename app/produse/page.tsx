@@ -1,4 +1,5 @@
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
@@ -239,6 +240,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </main>
         </div>
       </div>
+      <Footer />
     </>
   )
 }
