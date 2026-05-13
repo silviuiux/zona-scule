@@ -3,11 +3,13 @@ import { getSubcategoriesByCategoryName, SubcategoryWithCount } from '@/lib/supa
 
 export default async function SubcategoryBar({
   categoryName,
+  brandName,
   activeSub,
   total,
   prefetchedSubs,
 }: {
   categoryName?: string
+  brandName?: string
   activeSub?: string
   /** Total products shown in the "Toate" pill */
   total?: number
@@ -17,13 +19,19 @@ export default async function SubcategoryBar({
   const subs = prefetchedSubs ?? (categoryName ? await getSubcategoriesByCategoryName(categoryName) : [])
   if (subs.length === 0) return null
 
+  const brandParam = brandName ? `&brand=${encodeURIComponent(brandName)}` : ''
+
   const allHref = categoryName
-    ? `/produse?categorie=${encodeURIComponent(categoryName)}`
+    ? `/produse?categorie=${encodeURIComponent(categoryName)}${brandParam}`
+    : brandName
+    ? `/produse?brand=${encodeURIComponent(brandName)}`
     : '/produse'
 
   const subHref = (subName: string) =>
     categoryName
-      ? `/produse?categorie=${encodeURIComponent(categoryName)}&subcategorie=${encodeURIComponent(subName)}`
+      ? `/produse?categorie=${encodeURIComponent(categoryName)}&subcategorie=${encodeURIComponent(subName)}${brandParam}`
+      : brandName
+      ? `/produse?brand=${encodeURIComponent(brandName)}&subcategorie=${encodeURIComponent(subName)}`
       : `/produse?subcategorie=${encodeURIComponent(subName)}`
 
   return (

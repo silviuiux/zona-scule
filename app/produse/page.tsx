@@ -1,7 +1,7 @@
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -26,8 +26,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const pageSize = 100
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
-  // Fetch in parallel — all-subs only needed for unfiltered view
-  const [{ products: rawProducts, total }, categories, brands, allSubs] = await Promise.all([
+  // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
+  const [{ products: rawProducts, total }, categories, brands, allSubs, brandSubs] = await Promise.all([
     getProducts({
       page: 1,
       pageSize,
@@ -43,6 +43,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       search: sp.q,
     }),
     !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
+    sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
   ])
 
   // Random order only for the unfiltered "all products" view
@@ -222,12 +223,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               <h1 className="page-title">{headerTitle}</h1>
             </div>
 
-            {/* Subcategory bar — category subs OR all subs in unfiltered view */}
+            {/* Subcategory bar — category, brand, or all-products view */}
             {sp.categorie ? (
               <SubcategoryBar
                 categoryName={sp.categorie}
+                brandName={sp.brand}
                 activeSub={sp.subcategorie}
                 total={activeCategory?.product_count}
+              />
+            ) : sp.brand && brandSubs.length > 0 ? (
+              <SubcategoryBar
+                brandName={sp.brand}
+                activeSub={sp.subcategorie}
+                total={total}
+                prefetchedSubs={brandSubs}
               />
             ) : !isFiltered ? (
               <SubcategoryBar
