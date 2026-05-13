@@ -97,27 +97,47 @@ export default function EditableBreadcrumb({
         }
         .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
 
-        /* Editable pill — same style + dropdown chevron */
+        /* Split pill: [navigable text | ↓ trigger] */
         .ebc-wrap { position: relative; }
-        .ebc-pill {
-          display: inline-flex; align-items: center; gap: 5px;
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.6);
-          padding: 4px 10px 4px 12px;
+        .ebc-split {
+          display: inline-flex; align-items: stretch;
           border: 1px solid rgba(0,0,0,0.12);
           border-radius: 4px;
-          cursor: pointer;
-          background: none;
-          transition: border-color 150ms, color 150ms, background 150ms;
+          overflow: hidden;
+          transition: border-color 150ms;
+        }
+        .ebc-split:hover { border-color: rgba(0,0,0,0.45); }
+        .ebc-split.open { border-color: rgb(0,0,0); }
+
+        /* Left: navigable link */
+        .ebc-split-link {
+          font-family: 'Recursive', sans-serif;
+          font-size: 12px; color: rgba(0,0,0,0.6);
+          padding: 5px 10px 5px 12px;
+          text-decoration: none;
           white-space: nowrap;
+          display: flex; align-items: center;
+          transition: color 150ms, background 150ms;
         }
-        .ebc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); background: rgba(0,0,0,0.02); }
-        .ebc-pill.open { border-color: rgb(0,0,0); color: rgb(0,0,0); }
-        .ebc-chevron {
-          opacity: 0.4; flex-shrink: 0;
-          transition: transform 200ms;
+        .ebc-split-link:hover { color: rgb(0,0,0); background: rgba(0,0,0,0.03); }
+
+        /* Right: chevron trigger */
+        .ebc-split-trigger {
+          display: flex; align-items: center; justify-content: center;
+          width: 30px; flex-shrink: 0;
+          border: none;
+          border-left: 1px solid rgba(0,0,0,0.1);
+          background: none;
+          cursor: pointer;
+          color: rgba(0,0,0,0.35);
+          padding: 0;
+          transition: background 150ms, color 150ms, border-color 150ms;
         }
-        .ebc-pill.open .ebc-chevron { transform: rotate(180deg); opacity: 0.7; }
+        .ebc-split-trigger:hover { background: rgba(0,0,0,0.04); color: rgb(0,0,0); }
+        .ebc-split.open .ebc-split-trigger { background: rgba(0,0,0,0.04); color: rgb(0,0,0); border-left-color: rgba(0,0,0,0.25); }
+
+        .ebc-chevron { flex-shrink: 0; transition: transform 200ms; }
+        .ebc-split.open .ebc-chevron { transform: rotate(180deg); }
 
         /* Dropdown */
         .ebc-drop {
@@ -172,17 +192,25 @@ export default function EditableBreadcrumb({
         <Link href="/produse" className="bc-pill">Catalog</Link>
         <span className="bc-sep">/</span>
 
-        {/* Editable Category */}
+        {/* Editable Category — split: link navigates, chevron opens dropdown */}
         <div className="ebc-wrap" ref={catRef}>
-          <button
-            className={`ebc-pill${showCatDrop ? ' open' : ''}`}
-            onClick={() => { setShowCatDrop(v => !v); setShowSubDrop(false) }}
-          >
-            {activeCat || 'Fără categorie'}
-            <svg className="ebc-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
-          </button>
+          <div className={`ebc-split${showCatDrop ? ' open' : ''}`}>
+            <Link
+              href={activeCat ? `/produse?categorie=${encodeURIComponent(activeCat)}` : '/produse'}
+              className="ebc-split-link"
+            >
+              {activeCat || 'Fără categorie'}
+            </Link>
+            <button
+              className="ebc-split-trigger"
+              onClick={() => { setShowCatDrop(v => !v); setShowSubDrop(false) }}
+              aria-label="Schimbă categoria"
+            >
+              <svg className="ebc-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
           {showCatDrop && (
             <div className="ebc-drop">
               {cats.map(c => (
@@ -198,20 +226,28 @@ export default function EditableBreadcrumb({
           )}
         </div>
 
-        {/* Editable Subcategory */}
+        {/* Editable Subcategory — split: link navigates, chevron opens dropdown */}
         {activeCat && (
           <>
             <span className="bc-sep">/</span>
             <div className="ebc-wrap" ref={subRef}>
-              <button
-                className={`ebc-pill${showSubDrop ? ' open' : ''}`}
-                onClick={() => { setShowSubDrop(v => !v); setShowCatDrop(false) }}
-              >
-                {activeSub || 'Fără subcategorie'}
-                <svg className="ebc-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="m6 9 6 6 6-6"/>
-                </svg>
-              </button>
+              <div className={`ebc-split${showSubDrop ? ' open' : ''}`}>
+                <Link
+                  href={`/produse?categorie=${encodeURIComponent(activeCat)}${activeSub ? `&subcategorie=${encodeURIComponent(activeSub)}` : ''}`}
+                  className="ebc-split-link"
+                >
+                  {activeSub || 'Fără subcategorie'}
+                </Link>
+                <button
+                  className="ebc-split-trigger"
+                  onClick={() => { setShowSubDrop(v => !v); setShowCatDrop(false) }}
+                  aria-label="Schimbă subcategoria"
+                >
+                  <svg className="ebc-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </button>
+              </div>
               {showSubDrop && (
                 <div className="ebc-drop">
                   <button
