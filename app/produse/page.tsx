@@ -167,19 +167,30 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             width: 44px; height: 44px;
-            background: rgb(255,255,255);
-            border: 1px solid rgba(0,0,0,0.12);
-            border-radius: 6px;
+            background: none;
+            border: none;
+            padding: 0;
             color: rgb(0,0,0);
             cursor: pointer;
           }
-          .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .page-title { font-size: 24px; }
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+          /* Every 25th card spans 2 rows — bigger hero product */
+          .products-grid .pcard-link:nth-child(25n) {
+            grid-row: span 2;
+          }
+          .products-grid .pcard-link:nth-child(25n) .pcard {
+            height: 100%;
+          }
+          .products-grid .pcard-link:nth-child(25n) .pcard-img {
+            flex: 1;
+            aspect-ratio: auto;
+          }
           .products-main { padding: 20px 12px 60px; }
           .cat-hero.cat-hero-all { height: clamp(220px, 35vh, 380px); }
-        }
-
-        @media (max-width: 480px) {
-          .products-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 

@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
 
@@ -17,6 +18,11 @@ const SHOW_BRANDS = true
  * The count pill is rendered always but kept hidden via CSS so there's no
  * layout shift on hover (positioned absolutely against the row).
  */
+function closeSidebar() {
+  document.querySelector('.sidebar')?.classList.remove('open')
+  document.getElementById('sidebar-backdrop')?.classList.remove('open')
+}
+
 export default function Sidebar({
   categories,
   brands,
@@ -105,6 +111,7 @@ export default function Sidebar({
           <Link
             href="/produse"
             className={`side-item${allActive ? ' active' : ''}`}
+            onClick={closeSidebar}
           >
             <span className="side-chev" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -121,6 +128,7 @@ export default function Sidebar({
                 key={cat.id}
                 href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
                 className={`side-item${isActive ? ' active' : ''}`}
+                onClick={closeSidebar}
               >
                 <span className="side-chev" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -152,6 +160,7 @@ export default function Sidebar({
                   key={brand.id}
                   href={brandHref}
                   className={`side-item${isActive ? ' active' : ''}`}
+                  onClick={closeSidebar}
                 >
                   <span className="side-chev" aria-hidden="true">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
