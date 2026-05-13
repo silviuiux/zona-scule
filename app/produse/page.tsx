@@ -141,6 +141,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           display: none;
           flex-shrink: 0;
         }
+        /* Hero-embedded toggle always hidden on desktop */
+        .cat-hero .sidebar-toggle { display: none; }
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
@@ -164,11 +166,26 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             transition: opacity 300ms;
           }
           .sidebar-backdrop.open { opacity: 1; pointer-events: all; }
+          /* Products-header fallback toggle (no-hero pages, e.g. brand filter) */
           .sidebar-toggle {
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             width: 44px; height: 44px;
             background: none;
+            border: none;
+            padding: 0;
+            color: rgb(0,0,0);
+            cursor: pointer;
+          }
+          /* Hero-embedded toggle — white pill, absolute bottom-left */
+          .cat-hero .sidebar-toggle {
+            display: flex;
+            position: absolute;
+            bottom: 16px;
+            left: 12px;
+            z-index: 10;
+            background: rgb(255,255,255);
+            border-radius: 6px;
             border: none;
             padding: 0;
             color: rgb(0,0,0);
@@ -204,6 +221,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               alt={heroAlt}
               className="cat-hero-img"
             />
+            <MobileFilterToggle />
           </div>
         )}
 
@@ -219,7 +237,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
           <main className="products-main">
             <div className="products-header">
-              <MobileFilterToggle />
+              {!heroImageUrl && <MobileFilterToggle />}
               <h1 className="page-title">{headerTitle}</h1>
             </div>
 
