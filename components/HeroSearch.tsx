@@ -2,9 +2,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function HeroSearch() {
+export default function HeroSearch({ totalCount }: { totalCount?: number }) {
   const [q, setQ] = useState('')
   const router = useRouter()
+
+  const placeholder = totalCount
+    ? `Cauta in ${totalCount.toLocaleString('ro')} de scule, unelte sau accesorii`
+    : 'Cauta scule, branduri, accesorii'
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,7 +21,7 @@ export default function HeroSearch() {
       <input
         value={q}
         onChange={e => setQ(e.target.value)}
-        placeholder="Cauta scule, branduri, accesorii"
+        placeholder={placeholder}
       />
       <button type="submit" style={{
         background: 'none', border: 'none', cursor: 'pointer',

@@ -272,6 +272,15 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
     .sort((a, b) => b.product_count - a.product_count)
 }
 
+export async function getTotalProductCount(): Promise<number> {
+  const { count } = await supabase
+    .from('products')
+    .select('*', { count: 'estimated', head: true })
+    .not('slug', 'is', null)
+    .not('main_image_storage_url', 'is', null)
+  return count ?? 0
+}
+
 export async function getSubcategoriesByBrandName(brandName: string): Promise<SubcategoryWithCount[]> {
   const [{ data: subs, error }, { data: counts }] = await Promise.all([
     supabase.from('subcategories').select('*').order('name'),

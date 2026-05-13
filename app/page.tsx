@@ -2,19 +2,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage } from '@/lib/supabase'
+import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getTotalProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
+import SubcategoryCarousel from '@/components/SubcategoryCarousel'
 
 export const dynamic = 'force-dynamic'
 
 
 export default async function HomePage() {
-  const [categories, brands, featuredSubs] = await Promise.all([
+  const [categories, brands, featuredSubs, totalCount] = await Promise.all([
     getCategoriesWithCount(),
     getBrands(),
     getFeaturedSubcategoriesWithImage(),
+    getTotalProductCount(),
   ])
 
   return (
@@ -74,7 +76,8 @@ export default async function HomePage() {
         }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
-          width: fit-content;
+          width: 50%;
+          min-width: 320px;
           border: 1px solid rgba(0,0,0,0.12);
           border-radius: 3px;
           overflow: hidden;
@@ -84,7 +87,8 @@ export default async function HomePage() {
           display: flex; align-items: center; gap: 8px;
           background: rgb(255,255,255);
           padding: 0 12px;
-          min-width: 260px;
+          flex: 1;
+          min-width: 0;
           height: 44px;
         }
         .hero-search-box input {
@@ -254,52 +258,6 @@ export default async function HomePage() {
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(255,255,255,0.35);
         }
-        .carousel-track {
-          display: flex; gap: 12px;
-          overflow-x: auto; padding-bottom: 4px;
-          scrollbar-width: none; -ms-overflow-style: none;
-          margin: 0 -24px; padding-left: 24px; padding-right: 24px;
-        }
-        .carousel-track::-webkit-scrollbar { display: none; }
-
-        /* ── Subcategory card ── */
-        .sub-card {
-          flex-shrink: 0;
-          width: 284px; height: 398px;
-          position: relative; overflow: hidden;
-          border-radius: 8px;
-          background: rgb(40,40,40);
-          text-decoration: none; display: block;
-          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .sub-card:hover { transform: scale(1.02); }
-        .sub-card-img {
-          position: absolute; inset: 0;
-          width: 100%; height: 100%;
-          object-fit: cover; object-position: center;
-          display: block;
-          transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .sub-card:hover .sub-card-img { transform: scale(1.06); }
-        .sub-card-overlay {
-          position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.15) 50%, transparent 80%);
-        }
-        .sub-card-bottom {
-          position: absolute; bottom: 0; left: 0; right: 0; padding: 14px;
-        }
-        .sub-card-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: rgba(255,255,255,0.5);
-          display: block; margin-bottom: 4px;
-        }
-        .sub-card-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; font-weight: 500;
-          color: rgb(255,255,255); line-height: 1.3; display: block;
-        }
-
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
           padding: 80px 12px;
@@ -384,8 +342,6 @@ export default async function HomePage() {
 
           .carousel-section { padding: 56px 0 48px; }
           .carousel-inner { padding: 0 16px; }
-          .carousel-track { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
-          .sub-card { width: 192px; height: 269px; }
 
           .contact-banner-wrap { padding: 48px 16px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
@@ -408,7 +364,7 @@ export default async function HomePage() {
             industriale si de constructii de peste 26 de ani
           </p>
           <div className="hero-cta-row">
-            <HeroSearch />
+            <HeroSearch totalCount={totalCount} />
             <Link href="/produse" className="hero-catalog-cta">CATALOG</Link>
           </div>
         </div>
@@ -455,25 +411,8 @@ export default async function HomePage() {
               <h2 className="carousel-title">EXPLOREAZA</h2>
               <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
             </div>
-            <div className="carousel-track">
-              {featuredSubs.map(s => (
-                <Link
-                  key={s.id}
-                  href={`/produse?subcategorie=${encodeURIComponent(s.name)}`}
-                  className="sub-card"
-                >
-                  {s.image_url && (
-                    <img src={s.image_url} alt={s.name} className="sub-card-img" loading="lazy" />
-                  )}
-                  <div className="sub-card-overlay" />
-                  <div className="sub-card-bottom">
-                    <span className="sub-card-count">{s.product_count.toLocaleString('ro')} produse</span>
-                    <span className="sub-card-label">{s.name}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
           </div>
+          <SubcategoryCarousel subs={featuredSubs} />
         </section>
       )}
 
