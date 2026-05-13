@@ -1,12 +1,7 @@
 import Link from 'next/link'
 import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
 
-/**
- * Feature flag: brands block in the sidebar. Currently hidden — flip to `true`
- * to bring it back. The brands list itself is still passed in and rendered
- * conditionally, so this is a pure visibility toggle (no code removed).
- */
-const SHOW_BRANDS = false
+const SHOW_BRANDS = true
 
 /**
  * Sidebar for the /produse listing page.
@@ -141,16 +136,21 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* ── BRANDURI ── (hidden via SHOW_BRANDS flag) */}
+        {/* ── BRANDURI ── */}
         {SHOW_BRANDS && brands.length > 0 && (
           <div className="sidebar-block">
             <p className="sidebar-section-title">Branduri</p>
             {brands.map(brand => {
               const isActive = activeBrand === brand.name
+              // Preserve active category in the brand link so the user stays
+              // within the current category when filtering by brand.
+              const brandHref = activeCat
+                ? `/produse?categorie=${encodeURIComponent(activeCat)}&brand=${encodeURIComponent(brand.name)}`
+                : `/produse?brand=${encodeURIComponent(brand.name)}`
               return (
                 <Link
                   key={brand.id}
-                  href={`/produse?brand=${encodeURIComponent(brand.name)}`}
+                  href={brandHref}
                   className={`side-item${isActive ? ' active' : ''}`}
                 >
                   <span className="side-chev" aria-hidden="true">
@@ -159,9 +159,7 @@ export default function Sidebar({
                     </svg>
                   </span>
                   <span className="side-name">{brand.name}</span>
-                  {brand.product_count > 0 && (
-                    <span className="side-count">{brand.product_count.toLocaleString('ro')}</span>
-                  )}
+                  <span className="side-count">{brand.product_count.toLocaleString('ro')}</span>
                 </Link>
               )
             })}

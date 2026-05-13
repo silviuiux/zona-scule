@@ -162,6 +162,7 @@ export async function getCategories() {
 
 export type BrandWithCount = Brand & { product_count: number }
 
+/** Returns all brands with at least 1 product across the whole catalogue. */
 export async function getBrands(): Promise<BrandWithCount[]> {
   const [{ data: brands, error }, { data: counts, error: cErr }] = await Promise.all([
     supabase.from('brands').select('*').order('name'),
@@ -177,6 +178,40 @@ export async function getBrands(): Promise<BrandWithCount[]> {
   return (brands as Brand[])
     .map(b => ({ ...b, product_count: countMap[b.name] ?? 0 }))
     .filter(b => b.product_count > 0)
+    .sort((a, b) => b.product_count - a.product_count)
+}
+
+/**
+ * Returns brands that have ≥1 product matching the current listing filters.
+ * Used to populate the sidebar brands section with context-aware counts.
+ */
+export async function getBrandsByFilter({
+  categoryText,
+  subcategoryText,
+  search,
+}: {
+  categoryText?: string
+  subcategoryText?: string
+  search?: string
+} = {}): Promise<BrandWithCount[]> {
+  const [{ data: brands, error }, { data: counts }] = await Promise.all([
+    supabase.from('brands').select('*').order('name'),
+    supabase.rpc('get_brands_by_filter', {
+      p_category:    categoryText    ?? null,
+      p_subcategory: subcategoryText ?? null,
+      p_search:      search          ?? null,
+    }),
+  ])
+  if (error || !brands) return []
+
+  const countMap: Record<string, number> = {}
+  for (const row of (counts as { brand_name: string; cnt: number }[] ?? [])) {
+    if (row.brand_name) countMap[row.brand_name] = row.cnt
+  }
+
+  return (brands as Brand[])
+    .filter(b => (countMap[b.name] ?? 0) > 0)
+    .map(b => ({ ...b, product_count: countMap[b.name] }))
     .sort((a, b) => b.product_count - a.product_count)
 }
 
@@ -258,16 +293,16 @@ export async function getSubcategoriesByCategoryName(categoryName: string): Prom
 
   if (subsErr || !subs || subs.length === 0) return []
 
-  // Step 3: get product counts via RPC (keyed by subcategory name so we can
-  // cross-reference, regardless of whether the RPC returns extra rows).
-  const { data: rpcData } = await supabase.rpc('get_subcategories_with_count', {
-    cat_id: cat.id,
-  })
+  // Step 3: count products per subcategory_text using the global RPC.
+  // We key by subcategory name and intersect with the subcategories belonging
+  // to this category (step 2), so subcategory names don't need to be globally
+  // unique — only the ones for this category are used.
+  const { data: rpcData } = await supabase.rpc('count_products_by_subcategory')
 
   const countByName: Record<string, number> = {}
   if (rpcData) {
-    for (const row of rpcData as { name: string; product_count: number }[]) {
-      if (row.name) countByName[row.name.toLowerCase().trim()] = row.product_count
+    for (const row of rpcData as { subcategory_text: string; cnt: number }[]) {
+      if (row.subcategory_text) countByName[row.subcategory_text.toLowerCase().trim()] = row.cnt
     }
   }
 

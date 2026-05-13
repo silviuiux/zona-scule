@@ -1,6 +1,6 @@
 import Nav from '@/components/Nav'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrands, getAllSubcategoriesWithCount } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -36,7 +36,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       search: sp.q,
     }),
     getCategoriesWithCount(),
-    getBrands(),
+    getBrandsByFilter({
+      categoryText: sp.categorie,
+      subcategoryText: sp.subcategorie,
+      search: sp.q,
+    }),
     !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
   ])
 
