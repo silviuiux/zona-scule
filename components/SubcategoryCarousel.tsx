@@ -1,12 +1,102 @@
 'use client'
 import Link from 'next/link'
+import { useRef, useEffect } from 'react'
 import type { FeaturedSubcategoryWithImage } from '@/lib/supabase'
 
 export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategoryWithImage[] }) {
-  // Duplicate for seamless infinite loop.
-  // Each .sub-card has margin-right: 12px (instead of gap) so
-  // total set width = N × (card_width + 12px) → translateX(-50%) = exactly one set. ✓
   const doubled = [...subs, ...subs]
+  const trackRef = useRef<HTMLDivElement>(null)
+  const hasDragged = useRef(false)
+
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track || subs.length === 0) return
+
+    const SPEED = 0.7  // px per rAF tick ≈ 42 px/s @ 60 fps
+    let x = 0
+    let isDragging = false
+    let startClientX = 0
+    let startX = 0
+    let raf: number
+
+    const cardW = () => window.innerWidth <= 768 ? 192 + 12 : 284 + 12
+    const totalW = () => subs.length * cardW()
+
+    const tick = () => {
+      if (!isDragging) {
+        x -= SPEED
+        const tw = totalW()
+        if (x <= -tw) x += tw
+      }
+      track.style.transform = `translateX(${x}px)`
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+
+    // ── Mouse drag ──────────────────────────────────────────────────────────
+    const onMouseDown = (e: MouseEvent) => {
+      isDragging = true
+      hasDragged.current = false
+      startClientX = e.clientX
+      startX = x
+      track.style.cursor = 'grabbing'
+    }
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return
+      const delta = e.clientX - startClientX
+      if (Math.abs(delta) > 4) hasDragged.current = true
+      const tw = totalW()
+      x = startX + delta
+      if (x < -tw * 1.5) x += tw
+      if (x > tw * 0.5) x -= tw
+    }
+    const onMouseUp = () => {
+      isDragging = false
+      track.style.cursor = 'grab'
+    }
+
+    // ── Touch drag ───────────────────────────────────────────────────────────
+    const onTouchStart = (e: TouchEvent) => {
+      isDragging = true
+      hasDragged.current = false
+      startClientX = e.touches[0].clientX
+      startX = x
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return
+      const delta = e.touches[0].clientX - startClientX
+      if (Math.abs(delta) > 4) hasDragged.current = true
+      const tw = totalW()
+      x = startX + delta
+      if (x < -tw * 1.5) x += tw
+      if (x > tw * 0.5) x -= tw
+    }
+    const onTouchEnd = () => { isDragging = false }
+
+    // Block link navigation after a real drag
+    const onClickCapture = (e: MouseEvent) => {
+      if (hasDragged.current) { e.preventDefault(); e.stopPropagation() }
+    }
+
+    track.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    track.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchend', onTouchEnd)
+    track.addEventListener('click', onClickCapture, true)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      track.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      track.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
+      track.removeEventListener('click', onClickCapture, true)
+    }
+  }, [subs.length])
 
   return (
     <>
@@ -24,21 +114,18 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           display: flex;
           gap: 0;
           /* padding-left aligns first card with the header above */
-          padding-left: max(24px, calc(50vw - 720px + 24px));
-          animation: sub-carousel-scroll 55s linear infinite;
+          padding-left: max(32px, calc(50vw - 720px + 24px));
           will-change: transform;
+          cursor: grab;
+          user-select: none;
+          -webkit-user-select: none;
         }
-        .sub-carousel-track:hover { animation-play-state: paused; }
-
-        @keyframes sub-carousel-scroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
+        .sub-carousel-track:active { cursor: grabbing; }
 
         .sub-card {
           flex-shrink: 0;
           width: 284px; height: 398px;
-          margin-right: 12px; /* part of the unit width for seamless loop */
+          margin-right: 12px;
           position: relative; overflow: hidden;
           border-radius: 8px;
           background: rgb(40,40,40);
@@ -75,16 +162,13 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
         }
 
         @media (max-width: 768px) {
-          .sub-carousel-track {
-            padding-left: 16px;
-            animation-duration: 40s;
-          }
+          .sub-carousel-track { padding-left: 32px; }
           .sub-card { width: 192px; height: 269px; }
         }
       `}</style>
 
       <div className="sub-carousel-outer">
-        <div className="sub-carousel-track">
+        <div className="sub-carousel-track" ref={trackRef}>
           {doubled.map((s, i) => (
             <Link
               key={`${s.id}-${i}`}

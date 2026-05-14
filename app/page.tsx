@@ -219,7 +219,7 @@ export default async function HomePage() {
           display: flex; flex-direction: column; height: 707px;
         }
         .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
-        .service-body { padding: 24px; flex-shrink: 0; }
+        .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; }
         .service-title {
           font-family: 'Bungee', sans-serif;
           font-size: 28px; text-transform: uppercase;
@@ -227,7 +227,7 @@ export default async function HomePage() {
         }
         .service-desc {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; line-height: 1.65; margin-bottom: 20px;
+          font-size: 13px; line-height: 1.65; margin-bottom: 0;
         }
         .service-cta {
           font-family: 'Recursive', sans-serif;
@@ -236,6 +236,8 @@ export default async function HomePage() {
           text-decoration: none;
           display: inline-flex; align-items: center; gap: 5px;
           transition: gap 150ms;
+          margin-top: auto;
+          padding-top: 20px;
         }
         .service-cta:hover { gap: 9px; }
 
@@ -303,47 +305,49 @@ export default async function HomePage() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          .hero { min-height: calc(100svh - 52px); padding-top: 48px; padding-bottom: 48px; }
-          .hero-inner { gap: 20px; padding: 0 16px; }
+          .hero { min-height: 75vh; padding-top: 48px; padding-bottom: 48px; }
+          .hero-inner { gap: 20px; padding: 0 32px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
             border: none; border-radius: 0;
             gap: 16px;
           }
           .hero-search-box {
-            min-width: 0; width: 100%;
+            min-width: 0; width: 100%; height: 48px;
             border: 1px solid rgba(0,0,0,0.12);
             border-radius: 3px;
           }
           .hero-catalog-cta {
-            justify-content: center;
+            justify-content: center; height: 48px;
             border-left: none; border-top: none;
             border-radius: 3px;
           }
 
-          .cats-section { padding: 0 16px 64px; }
+          .cats-section { padding: 0 32px 64px; }
           .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .cat-card { height: 260px; }
 
           .services-section { padding: 0 0 64px; gap: 40px; }
-          .services-header { padding: 0 16px; }
+          .services-header { padding: 0 32px; }
           .services-grid {
             display: flex;
             overflow-x: auto;
             gap: 12px;
-            padding: 0 16px;
+            padding: 0 32px;
             margin: 0;
             scrollbar-width: none; -ms-overflow-style: none;
           }
           .services-grid::-webkit-scrollbar { display: none; }
-          .services-grid > a { flex-shrink: 0; width: 75vw; }
-          .service-card { height: auto; width: 100%; }
+          .services-grid > a { flex-shrink: 0; width: 75vw; align-self: stretch; }
+          .service-card { height: 100%; width: 100%; }
           .service-img { flex: none; height: auto; aspect-ratio: 2/3; }
+          .service-body { flex: 1; }
+          .service-desc { margin-bottom: 16px; }
 
           .carousel-section { padding: 56px 0 48px; }
-          .carousel-inner { padding: 0 16px; }
+          .carousel-inner { padding: 0 32px; }
 
-          .contact-banner-wrap { padding: 48px 16px; }
+          .contact-banner-wrap { padding: 48px 32px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
           .contact-banner-btn { width: 100%; justify-content: center; }
 
@@ -424,7 +428,7 @@ export default async function HomePage() {
             <h2 className="contact-banner-title">RĂSPUNDEM RAPID.<br />LIVRĂM ÎN TOATĂ ȚARA.</h2>
             <p className="contact-banner-sub">Consultanța specializata</p>
           </div>
-          <Link href="/contact" className="contact-banner-btn">CONTACT ↗</Link>
+          <Link href="/contact" className="contact-banner-btn">CONTACT</Link>
         </div>
       </div>
 
