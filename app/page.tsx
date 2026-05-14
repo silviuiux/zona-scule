@@ -313,12 +313,14 @@ export default async function HomePage() {
             gap: 16px;
           }
           .hero-search-box {
-            min-width: 0; width: 100%; height: 48px;
+            min-width: 0; width: 100%;
+            height: auto; padding: 8px 12px;
             border: 1px solid rgba(0,0,0,0.12);
             border-radius: 3px;
           }
           .hero-catalog-cta {
-            justify-content: center; height: 48px;
+            justify-content: center;
+            height: auto; padding: 8px 24px;
             border-left: none; border-top: none;
             border-radius: 3px;
           }
