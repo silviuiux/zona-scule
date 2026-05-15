@@ -7,6 +7,7 @@ import GallerySection from './GallerySection'
 import HeroImage from './HeroImage'
 import EditableBreadcrumb from './EditableBreadcrumb'
 import ProductNavArrows from './ProductNavArrows'
+import SkuCopyField from './SkuCopyField'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -100,7 +101,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           font-family: 'Recursive', sans-serif;
           font-weight: 500; font-size: 18px; color: rgb(0,0,0);
           margin-bottom: 4px; letter-spacing: -0.02em;
+          text-decoration: none; display: inline-block;
         }
+        .pdp-brand:hover { text-decoration: underline; }
         .pdp-sku {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(28px, 3.5vw, 44px);
@@ -111,21 +114,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.5);
           line-height: 1.65; margin-bottom: 28px;
-        }
-        .sku-field {
-          display: flex; align-items: center; justify-content: space-between;
-          background: rgb(244,244,244); border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 4px; padding: 10px 14px; margin-bottom: 12px;
-        }
-        .sku-field-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.35);
-          margin-right: 8px;
-        }
-        .sku-field-value {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500; color: rgb(0,0,0); flex: 1;
         }
         .cere-btn {
           display: block; width: 100%; padding: 14px;
@@ -308,20 +296,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 categoryText={product.category_text}
                 subcategoryText={product.subcategory_text}
               />
-              <p className="pdp-brand">{product.brand_name}</p>
+              <Link
+                href={`/produse?brand=${encodeURIComponent(product.brand_name ?? '')}`}
+                className="pdp-brand"
+              >
+                {product.brand_name}
+              </Link>
               <h1 className="pdp-sku">{product.model || product.sku || product.slug}</h1>
               {product.short_description && (
                 <p className="pdp-desc">{product.short_description}</p>
               )}
-              <div className="sku-field">
-                <span className="sku-field-label">SKU:</span>
-                <span className="sku-field-value">{product.sku ?? product.slug}</span>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(0,0,0,0.3)', padding: '2px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                  </svg>
-                </button>
-              </div>
+              <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
               <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cere-btn">CERE OFERTA</Link>
             </div>
 
