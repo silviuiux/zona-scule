@@ -30,6 +30,7 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
           overflow: hidden;
           border-radius: 4px;
           cursor: zoom-in;
+          view-transition-name: product-hero;
         }
         /* #5: subtle hover effect */
         .hero-img-wrap img {
