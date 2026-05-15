@@ -151,6 +151,39 @@ export async function getProductBySlug(slug: string) {
   return data as Product
 }
 
+export async function getAdjacentProducts(
+  currentSlug: string,
+  subcategoryText: string | null | undefined
+): Promise<{ prevSlug: string | null; nextSlug: string | null }> {
+  // Get current product's name for cursor-based ordering
+  const { data: cur } = await supabase
+    .from('products')
+    .select('name')
+    .eq('slug', currentSlug)
+    .single()
+  if (!cur) return { prevSlug: null, nextSlug: null }
+
+  const base = () => {
+    let q = supabase
+      .from('products')
+      .select('slug')
+      .not('slug', 'is', null)
+      .not('main_image_storage_url', 'is', null)
+    if (subcategoryText) q = q.eq('subcategory_text', subcategoryText)
+    return q
+  }
+
+  const [{ data: prevData }, { data: nextData }] = await Promise.all([
+    base().lt('name', cur.name).order('name', { ascending: false }).limit(1),
+    base().gt('name', cur.name).order('name', { ascending: true }).limit(1),
+  ])
+
+  return {
+    prevSlug: (prevData?.[0]?.slug as string) ?? null,
+    nextSlug: (nextData?.[0]?.slug as string) ?? null,
+  }
+}
+
 export async function getCategories() {
   const { data, error } = await supabase
     .from('categories')

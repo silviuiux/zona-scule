@@ -1,19 +1,24 @@
 import Nav from '@/components/Nav'
-import { getProductBySlug } from '@/lib/supabase'
+import { getProductBySlug, getAdjacentProducts } from '@/lib/supabase'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
 import HeroImage from './HeroImage'
 import EditableBreadcrumb from './EditableBreadcrumb'
+import ProductNavArrows from './ProductNavArrows'
 
 export const revalidate = 3600
 export const dynamicParams = true
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const product = await getProductBySlug(slug)
+  const [product, adjacent] = await Promise.all([
+    getProductBySlug(slug),
+    getAdjacentProducts(slug, undefined).catch(() => ({ prevSlug: null, nextSlug: null })),
+  ])
   if (!product) notFound()
+  const { prevSlug, nextSlug } = adjacent
 
   const mainImg = product.main_image_storage_url || product.main_image_url
 
@@ -287,6 +292,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           .footer-bottom { flex-direction: column; gap: 6px; }
         }
       `}</style>
+
+      <ProductNavArrows prevSlug={prevSlug} nextSlug={nextSlug} />
 
       <div className="pdp">
 
