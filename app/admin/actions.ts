@@ -37,6 +37,33 @@ export async function reassignSubcategory(subcatId: string, newCategoryId: strin
   revalidatePath('/produse')
 }
 
+export async function renameSubcategory(subcatId: string, newName: string) {
+  // 1. Get old name so we can update products
+  const { data: sub } = await supabase
+    .from('subcategories')
+    .select('name')
+    .eq('id', subcatId)
+    .single()
+  if (!sub) throw new Error('Subcategory not found')
+
+  // 2. Update subcategory name
+  const { error: subErr } = await supabase
+    .from('subcategories')
+    .update({ name: newName })
+    .eq('id', subcatId)
+  if (subErr) throw subErr
+
+  // 3. Update products that reference the old subcategory_text
+  const { error: prodErr } = await supabase
+    .from('products')
+    .update({ subcategory_text: newName })
+    .eq('subcategory_id', subcatId)
+  if (prodErr) throw prodErr
+
+  revalidatePath('/admin')
+  revalidatePath('/produse')
+}
+
 export async function bulkReassign(subcatIds: string[], newCategoryId: string) {
   // Get new category name once
   const { data: cat } = await supabase

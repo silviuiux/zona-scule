@@ -13,7 +13,7 @@ export default async function AdminPage() {
     supabase
       .from('subcategories')
       .select(`
-        id, name, parent_category_id,
+        id, name, slug, parent_category_id,
         categories!parent_category_id ( name )
       `)
       .order('name'),
@@ -24,19 +24,20 @@ export default async function AdminPage() {
   ])
 
   // Get product counts per subcategory
-  const { data: counts } = await supabase.rpc('get_all_subcategories_with_count')
+  const { data: counts } = await supabase.rpc('count_products_by_subcategory')
 
   const countMap: Record<string, number> = {}
-  for (const row of counts ?? []) {
-    countMap[row.id] = row.product_count
+  for (const row of (counts as { subcategory_text: string; cnt: number }[] ?? [])) {
+    if (row.subcategory_text) countMap[row.subcategory_text.toLowerCase().trim()] = row.cnt
   }
 
   const enriched = (subcats ?? []).map((s: any) => ({
     id: s.id,
     name: s.name,
+    slug: s.slug ?? null,
     parent_category_id: s.parent_category_id,
     category_name: s.categories?.name ?? '—',
-    product_count: countMap[s.id] ?? 0,
+    product_count: countMap[s.name.toLowerCase().trim()] ?? 0,
   }))
 
   return (

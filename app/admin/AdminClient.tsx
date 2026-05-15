@@ -1,10 +1,11 @@
 'use client'
-import { useState, useMemo, useTransition } from 'react'
-import { reassignSubcategory, bulkReassign } from './actions'
+import { useState, useMemo, useTransition, useRef, useCallback } from 'react'
+import { reassignSubcategory, bulkReassign, renameSubcategory } from './actions'
 
 type Sub = {
   id: string
   name: string
+  slug: string | null
   parent_category_id: string
   category_name: string
   product_count: number
@@ -26,16 +27,24 @@ export default function AdminClient({
   const [saving, setSaving] = useState<Set<string>>(new Set())
   const [saved, setSaved] = useState<Set<string>>(new Set())
   const [overrides, setOverrides] = useState<Record<string, string>>({})
+  const [nameOverrides, setNameOverrides] = useState<Record<string, string>>({})
   const [isPending, startTransition] = useTransition()
   const [notification, setNotification] = useState<{ msg: string; type: 'ok' | 'err' } | null>(null)
 
+  // Inline edit state: which row is being edited
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [renameSaving, setRenameSaving] = useState<Set<string>>(new Set())
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const filtered = useMemo(() => {
     return subcategories.filter(s => {
-      const matchText = s.name.toLowerCase().includes(filter.toLowerCase())
+      const currentName = nameOverrides[s.id] ?? s.name
+      const matchText = currentName.toLowerCase().includes(filter.toLowerCase())
       const matchCat = catFilter === 'all' || s.category_name === catFilter
       return matchText && matchCat
     })
-  }, [subcategories, filter, catFilter])
+  }, [subcategories, filter, catFilter, nameOverrides])
 
   const notify = (msg: string, type: 'ok' | 'err' = 'ok') => {
     setNotification({ msg, type })
@@ -73,6 +82,37 @@ export default function AdminClient({
     })
   }
 
+  const startEdit = useCallback((sub: Sub) => {
+    setEditingId(sub.id)
+    setEditValue(nameOverrides[sub.id] ?? sub.name)
+    setTimeout(() => inputRef.current?.select(), 30)
+  }, [nameOverrides])
+
+  const cancelEdit = useCallback(() => {
+    setEditingId(null)
+    setEditValue('')
+  }, [])
+
+  const commitEdit = useCallback(async (subId: string) => {
+    const trimmed = editValue.trim()
+    const originalName = nameOverrides[subId] ?? subcategories.find(s => s.id === subId)?.name ?? ''
+    if (!trimmed || trimmed === originalName) {
+      cancelEdit()
+      return
+    }
+    setEditingId(null)
+    setRenameSaving(prev => new Set(prev).add(subId))
+    try {
+      await renameSubcategory(subId, trimmed)
+      setNameOverrides(prev => ({ ...prev, [subId]: trimmed }))
+      notify(`Redenumit: "${trimmed}"`)
+    } catch {
+      notify('Eroare la redenumire', 'err')
+    } finally {
+      setRenameSaving(prev => { const n = new Set(prev); n.delete(subId); return n })
+    }
+  }, [editValue, nameOverrides, subcategories, cancelEdit])
+
   const toggleSelect = (id: string) => {
     setSelected(prev => {
       const n = new Set(prev)
@@ -98,6 +138,12 @@ export default function AdminClient({
     })
     return byCat
   }, [subcategories])
+
+  const catalogUrl = (sub: Sub) => {
+    const name = nameOverrides[sub.id] ?? sub.name
+    const cat = overrides[sub.id] ? getCatName(overrides[sub.id]) : sub.category_name
+    return `/produse?categorie=${encodeURIComponent(cat)}&subcategorie=${encodeURIComponent(name)}`
+  }
 
   return (
     <>
@@ -206,7 +252,7 @@ export default function AdminClient({
         }
         table {
           width: 100%; border-collapse: collapse;
-          font-size: 13px; min-width: 700px;
+          font-size: 13px; min-width: 800px;
         }
         thead th {
           text-align: left; padding: 10px 12px;
@@ -225,7 +271,70 @@ export default function AdminClient({
         tbody tr.selected-row { background: rgba(217,44,43,0.06); }
         td { padding: 9px 12px; vertical-align: middle; }
 
-        .sub-name { font-weight: 500; color: #e8e6e3; }
+        /* Subcategory name cell */
+        .name-cell {
+          display: flex; align-items: center; gap: 8px;
+        }
+        .sub-name-link {
+          font-weight: 500; color: #e8e6e3;
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 150ms, color 150ms;
+          cursor: pointer;
+        }
+        .sub-name-link:hover {
+          color: #fff;
+          border-bottom-color: rgba(255,255,255,0.3);
+        }
+        .edit-icon {
+          opacity: 0; transition: opacity 150ms;
+          cursor: pointer; color: rgba(255,255,255,0.35);
+          font-size: 11px; line-height: 1;
+          padding: 2px 5px;
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 3px;
+          background: rgba(255,255,255,0.04);
+          user-select: none;
+        }
+        .edit-icon:hover { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.25); }
+        tr:hover .edit-icon { opacity: 1; }
+
+        /* Inline edit input */
+        .name-edit-input {
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.3);
+          border-radius: 3px; padding: 4px 8px;
+          font-size: 13px; font-weight: 500;
+          color: #e8e6e3; outline: none;
+          font-family: inherit;
+          width: 220px;
+          transition: border-color 150ms;
+        }
+        .name-edit-input:focus { border-color: rgba(217,44,43,0.6); }
+        .edit-actions {
+          display: flex; gap: 4px;
+        }
+        .edit-confirm {
+          padding: 3px 8px; border: none; border-radius: 3px;
+          font-size: 11px; font-weight: 600; cursor: pointer;
+          background: rgba(217,44,43,0.8); color: #fff; font-family: inherit;
+        }
+        .edit-confirm:hover { background: rgb(217,44,43); }
+        .edit-cancel {
+          padding: 3px 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 3px;
+          font-size: 11px; cursor: pointer;
+          background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); font-family: inherit;
+        }
+        .edit-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Slug cell */
+        .slug-mono {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 11px; color: rgba(255,255,255,0.3);
+          max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .slug-mono.empty { color: rgba(255,255,255,0.12); font-style: italic; }
+
         .cat-badge {
           display: inline-block;
           font-size: 10px; padding: 2px 8px;
@@ -393,6 +502,7 @@ export default function AdminClient({
                   />
                 </th>
                 <th>Subcategorie</th>
+                <th>Slug</th>
                 <th>Categorie curentă</th>
                 <th>Produse</th>
                 <th>Mută în</th>
@@ -407,6 +517,9 @@ export default function AdminClient({
                 const isSaving = saving.has(sub.id)
                 const isSaved = saved.has(sub.id)
                 const isSelected = selected.has(sub.id)
+                const isEditing = editingId === sub.id
+                const isRenameSaving = renameSaving.has(sub.id)
+                const displayName = nameOverrides[sub.id] ?? sub.name
 
                 return (
                   <tr key={sub.id} className={isSelected ? 'selected-row' : ''}>
@@ -418,9 +531,56 @@ export default function AdminClient({
                         onChange={() => toggleSelect(sub.id)}
                       />
                     </td>
+
+                    {/* Subcategory name — click link to open page, edit icon to rename */}
                     <td>
-                      <span className="sub-name">{sub.name}</span>
+                      {isEditing ? (
+                        <div className="name-cell">
+                          <input
+                            ref={inputRef}
+                            className="name-edit-input"
+                            value={editValue}
+                            onChange={e => setEditValue(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') commitEdit(sub.id)
+                              if (e.key === 'Escape') cancelEdit()
+                            }}
+                            autoFocus
+                          />
+                          <div className="edit-actions">
+                            <button className="edit-confirm" onClick={() => commitEdit(sub.id)}>✓</button>
+                            <button className="edit-cancel" onClick={cancelEdit}>✕</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="name-cell">
+                          <a
+                            className="sub-name-link"
+                            href={catalogUrl(sub)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={`Deschide pagina: ${displayName}`}
+                          >
+                            {isRenameSaving ? <em style={{ opacity: 0.5 }}>{displayName}</em> : displayName}
+                          </a>
+                          <span
+                            className="edit-icon"
+                            title="Redenumește"
+                            onClick={() => startEdit({ ...sub, name: displayName })}
+                          >
+                            ✎
+                          </span>
+                        </div>
+                      )}
                     </td>
+
+                    {/* Slug */}
+                    <td>
+                      <span className={`slug-mono${!sub.slug ? ' empty' : ''}`}>
+                        {sub.slug ?? '—'}
+                      </span>
+                    </td>
+
                     <td>
                       <span className={`cat-badge${isChanged ? ' changed' : ''}`}>
                         {currentCatName}
@@ -450,6 +610,9 @@ export default function AdminClient({
                       {isSaved && (
                         <span className="save-btn saved">✓ Salvat</span>
                       )}
+                      {isRenameSaving && (
+                        <span className="save-btn saving">Redenumire...</span>
+                      )}
                     </td>
                   </tr>
                 )
@@ -464,9 +627,9 @@ export default function AdminClient({
             Afișând <strong>{filtered.length}</strong> din <strong>{subcategories.length}</strong> subcategorii
           </span>
           <span>
-            {Object.keys(overrides).length > 0 && (
+            {(Object.keys(overrides).length > 0 || Object.keys(nameOverrides).length > 0) && (
               <strong style={{ color: 'rgb(34,197,94)' }}>
-                {Object.keys(overrides).length} modificări în această sesiune
+                {Object.keys(overrides).length + Object.keys(nameOverrides).length} modificări în această sesiune
               </strong>
             )}
           </span>
