@@ -58,7 +58,22 @@ export default function ProductCard({ product }: { product: Product }) {
           overflow: hidden;
           display: flex; flex-direction: column;
           min-width: 0;
+          position: relative;
+          isolation: isolate;
           transition: box-shadow 200ms, transform 200ms;
+        }
+        /* Concrete grain on card surface */
+        .pcard::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 10;
+          pointer-events: none;
+          background-image: var(--noise-svg);
+          background-repeat: repeat;
+          background-size: 250px 250px;
+          opacity: 0.07;
+          mix-blend-mode: overlay;
         }
         .pcard-link:hover .pcard {
           box-shadow: 0 4px 20px rgba(0,0,0,0.12);

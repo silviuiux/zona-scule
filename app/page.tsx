@@ -219,7 +219,8 @@ export default async function HomePage() {
           display: flex; flex-direction: column; height: 707px;
         }
         .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
-        .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; }
+        .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
+        .service-body > * { position: relative; z-index: 2; }
         .service-title {
           font-family: 'Bungee', sans-serif;
           font-size: 28px; text-transform: uppercase;
@@ -398,7 +399,7 @@ export default async function HomePage() {
                 <div className="service-img">
                   <Image src={s.img} alt={s.title} fill style={{ objectFit: 'cover', objectPosition: 'center top' }} sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
-                <div className="service-body" style={{ background: s.bg }}>
+                <div className={`service-body noise-card`} style={{ background: s.bg }}>
                   <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
                   <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
                   <span className="service-cta" style={{ color: s.ctaColor }}>{s.cta} →</span>
@@ -411,7 +412,7 @@ export default async function HomePage() {
 
       {/* ── CAROUSEL — Featured subcategories ── */}
       {featuredSubs.length > 0 && (
-        <section className="carousel-section">
+        <section className="carousel-section noise-dark">
           <div className="carousel-inner">
             <div className="carousel-header">
               <h2 className="carousel-title">EXPLOREAZA</h2>
@@ -424,7 +425,7 @@ export default async function HomePage() {
 
       {/* ── CONTACT BANNER ── */}
       <div className="contact-banner-wrap">
-        <div className="contact-banner">
+        <div className="contact-banner noise-dark">
           <div>
             <span className="contact-banner-eyebrow">Hai sa vorbim</span>
             <h2 className="contact-banner-title">RĂSPUNDEM RAPID.<br />LIVRĂM ÎN TOATĂ ȚARA.</h2>

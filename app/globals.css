@@ -36,27 +36,82 @@ body::before {
   will-change: background-position;
 }
 
-/* Noise / grain texture — creates a concrete-roughness feel universally.
-   Uses SVG feTurbulence fractalNoise baked into a data URI.
-   Opacity tuned so it's felt rather than seen. */
+/* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
+   Concrete / roughness grain applied at multiple depth layers.
+   The SVG uses feTurbulence fractalNoise — fine grain (0.78 freq, 4 oct).
+   Same tile is reused at different opacities per layer to simulate depth.
+
+   Layer 0 — body::after  : page background, fixed, lowest z-level
+   Layer 1 — .noise-card  : white/colored card surfaces, sits above bg
+   Layer 2 — .noise-dark  : dark section surfaces (carousel, contact banner)
+
+   To dial back: reduce --noise-opacity. To kill: add display:none to body::after
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Layer 0 — global background grain */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: var(--noise-svg);
   background-repeat: repeat;
-  background-size: 300px 300px;
-  opacity: 0.048;
-  mix-blend-mode: multiply;
+  background-size: 250px 250px;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
 }
 
-/* All page content sits above the texture layers */
+/* All page content sits above the body grain */
 body > * {
   position: relative;
   z-index: 1;
 }
+
+/* Layer 1 — card-level noise (light surfaces: white, off-white, red) */
+.noise-card {
+  position: relative;
+  isolation: isolate;
+}
+.noise-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: var(--noise-svg);
+  background-repeat: repeat;
+  background-size: 250px 250px;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+}
+/* Children of noise-card must sit above the grain */
+.noise-card > * { position: relative; z-index: 2; }
+
+/* Layer 2 — dark section noise (carousel bg, contact banner, dark cards) */
+.noise-dark {
+  position: relative;
+  isolation: isolate;
+}
+.noise-dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: var(--noise-svg);
+  background-repeat: repeat;
+  background-size: 250px 250px;
+  opacity: 0.12;
+  mix-blend-mode: screen;
+  border-radius: inherit;
+}
+.noise-dark > * { position: relative; z-index: 2; }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
