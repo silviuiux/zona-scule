@@ -36,6 +36,7 @@ export default function Sidebar({
   activeBrand?: string
 }) {
   const allActive = !activeCat && !activeBrand
+  const totalCount = categories.reduce((sum, c) => sum + (c.product_count ?? 0), 0)
 
   return (
     <>
@@ -103,6 +104,21 @@ export default function Sidebar({
         }
         /* Show count on hover BUT only when not the active row */
         .side-item:not(.active):hover .side-count { opacity: 1; }
+
+        /* TOATE total count — always visible, transparent bg, plain black number */
+        .side-count-all {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          flex-shrink: 0;
+          font-family: 'Inter', sans-serif;
+          font-size: 13px; font-weight: 400;
+          color: rgb(0,0,0);
+          background: transparent;
+          pointer-events: none;
+          letter-spacing: 0.01em;
+        }
       `}</style>
 
       <aside className="sidebar">
@@ -118,7 +134,10 @@ export default function Sidebar({
                 <path d="m9 18 6-6-6-6"/>
               </svg>
             </span>
-            <span className="side-name">Toate sculele</span>
+            <span className="side-name">TOATE</span>
+            {totalCount > 0 && (
+              <span className="side-count-all">{totalCount.toLocaleString('ro')}</span>
+            )}
           </Link>
 
           {categories.map(cat => {
