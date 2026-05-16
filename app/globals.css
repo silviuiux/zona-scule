@@ -9,6 +9,9 @@
   --red-hover: rgb(190, 35, 34);
   --text-70: rgb(102, 102, 102);
   --border: rgba(0,0,0,0.08);
+
+  /* Coarse concrete grain — lower baseFrequency = bigger/chunkier speckles */
+  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.52' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,23 +40,16 @@ body::before {
 }
 
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
-   Concrete / roughness grain applied at multiple depth layers.
-   The SVG uses feTurbulence fractalNoise — fine grain (0.78 freq, 4 oct).
-   Same tile is reused at different opacities per layer to simulate depth.
+   Concrete / roughness grain at three depth layers.
+   baseFrequency 0.52 = coarse/chunky speckles matching Framer reference.
+   multiply on light, screen on dark — the only blend modes that actually work.
 
-   Layer 0 — body::after  : page background, fixed, lowest z-level
-   Layer 1 — .noise-card  : white/colored card surfaces, sits above bg
-   Layer 2 — .noise-dark  : dark section surfaces (carousel, contact banner)
-
-   To dial back: reduce --noise-opacity. To kill: add display:none to body::after
+   Layer 0 — body::after  : page background, fixed
+   Layer 1 — .noise-card  : white/colored card surfaces
+   Layer 2 — .noise-dark  : dark section surfaces
    ───────────────────────────────────────────────────────────────────────── */
 
-:root {
-  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Layer 0 — global background grain
-   multiply on #f4f4f4 creates visible dark speckles — the right mode for light surfaces */
+/* Layer 0 — page background */
 body::after {
   content: '';
   position: fixed;
@@ -62,8 +58,8 @@ body::after {
   pointer-events: none;
   background-image: var(--noise-svg);
   background-repeat: repeat;
-  background-size: 250px 250px;
-  opacity: 0.18;
+  background-size: 200px 200px;
+  opacity: 0.28;
   mix-blend-mode: multiply;
 }
 
@@ -73,8 +69,7 @@ body > * {
   z-index: 1;
 }
 
-/* Layer 1 — card-level noise (white / colored surfaces)
-   multiply on white = dark grain very clearly visible */
+/* Layer 1 — card surfaces (white or coloured) */
 .noise-card {
   position: relative;
   isolation: isolate;
@@ -87,15 +82,14 @@ body > * {
   pointer-events: none;
   background-image: var(--noise-svg);
   background-repeat: repeat;
-  background-size: 250px 250px;
-  opacity: 0.14;
+  background-size: 200px 200px;
+  opacity: 0.22;
   mix-blend-mode: multiply;
   border-radius: inherit;
 }
 .noise-card > * { position: relative; z-index: 2; }
 
-/* Layer 2 — dark section noise (carousel, contact banner)
-   screen on dark surfaces brightens grain into visibility */
+/* Layer 2 — dark sections */
 .noise-dark {
   position: relative;
   isolation: isolate;
@@ -108,12 +102,13 @@ body > * {
   pointer-events: none;
   background-image: var(--noise-svg);
   background-repeat: repeat;
-  background-size: 250px 250px;
-  opacity: 0.18;
+  background-size: 200px 200px;
+  opacity: 0.25;
   mix-blend-mode: screen;
   border-radius: inherit;
 }
 .noise-dark > * { position: relative; z-index: 2; }
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
