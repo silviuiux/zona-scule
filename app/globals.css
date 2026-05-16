@@ -10,8 +10,14 @@
   --text-70: rgb(102, 102, 102);
   --border: rgba(0,0,0,0.08);
 
-  /* Coarse concrete grain — lower baseFrequency = bigger/chunkier speckles */
-  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.52' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  /*
+    HIGH-CONTRAST noise — feComponentTransfer (slope=3 intercept=-1) converts
+    mid-gray fractalNoise into actual blacks + whites:
+      input < 0.33  →  black  (dark speckles, visible on light bg)
+      input > 0.67  →  white  (light speckles, visible on dark bg)
+    mix-blend-mode: overlay then applies each correctly per surface.
+  */
+  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.52' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3' intercept='-1'/%3E%3CfeFuncG type='linear' slope='3' intercept='-1'/%3E%3CfeFuncB type='linear' slope='3' intercept='-1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,16 +46,15 @@ body::before {
 }
 
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
-   Concrete / roughness grain at three depth layers.
-   baseFrequency 0.52 = coarse/chunky speckles matching Framer reference.
-   multiply on light, screen on dark — the only blend modes that actually work.
+   overlay blend mode: darkens light surfaces (black speckles visible),
+   lightens dark surfaces (white speckles visible) — one mode, all contexts.
 
    Layer 0 — body::after  : page background, fixed
-   Layer 1 — .noise-card  : white/colored card surfaces
-   Layer 2 — .noise-dark  : dark section surfaces
+   Layer 1 — .noise-card  : card surfaces (white, red, dark)
+   Layer 2 — .noise-dark  : dark sections — same overlay, slightly higher opacity
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Layer 0 — page background */
+/* Layer 0 — page background grain */
 body::after {
   content: '';
   position: fixed;
@@ -59,8 +64,8 @@ body::after {
   background-image: var(--noise-svg);
   background-repeat: repeat;
   background-size: 200px 200px;
-  opacity: 0.28;
-  mix-blend-mode: multiply;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
 }
 
 /* All page content sits above the body grain */
@@ -69,7 +74,7 @@ body > * {
   z-index: 1;
 }
 
-/* Layer 1 — card surfaces (white or coloured) */
+/* Layer 1 — card surfaces */
 .noise-card {
   position: relative;
   isolation: isolate;
@@ -83,13 +88,13 @@ body > * {
   background-image: var(--noise-svg);
   background-repeat: repeat;
   background-size: 200px 200px;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
+  opacity: 0.28;
+  mix-blend-mode: overlay;
   border-radius: inherit;
 }
 .noise-card > * { position: relative; z-index: 2; }
 
-/* Layer 2 — dark sections */
+/* Layer 2 — dark sections (slightly higher opacity since dark bg is harder to read) */
 .noise-dark {
   position: relative;
   isolation: isolate;
@@ -103,8 +108,8 @@ body > * {
   background-image: var(--noise-svg);
   background-repeat: repeat;
   background-size: 200px 200px;
-  opacity: 0.25;
-  mix-blend-mode: screen;
+  opacity: 0.38;
+  mix-blend-mode: overlay;
   border-radius: inherit;
 }
 .noise-dark > * { position: relative; z-index: 2; }

@@ -72,8 +72,8 @@ export default function ProductCard({ product }: { product: Product }) {
           background-image: var(--noise-svg);
           background-repeat: repeat;
           background-size: 200px 200px;
-          opacity: 0.22;
-          mix-blend-mode: multiply;
+          opacity: 0.28;
+          mix-blend-mode: overlay;
         }
         .pcard-link:hover .pcard {
           box-shadow: 0 4px 20px rgba(0,0,0,0.12);
