@@ -41,8 +41,8 @@ export default function Sidebar({
   return (
     <>
       <style>{`
-        .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar { scrollbar-width: none; }
 
         .sidebar-block { margin-bottom: 36px; }
         .sidebar-section-title {

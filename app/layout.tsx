@@ -22,8 +22,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
         <DotsParallax />
-        {/* Noise overlay — fixed above all page content, pointer-events: none */}
-        <div className="noise-global" aria-hidden="true" />
         {children}
       </body>
     </html>
