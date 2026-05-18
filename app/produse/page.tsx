@@ -92,7 +92,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
         /* ─── Sidebar + grid layout ─── */
         .catalog-layout {
-          display: flex; max-width: 1600px; margin: 0 auto;
+          display: flex; max-width: 1440px; margin: 0 auto; padding: 0 12px;
         }
         .page-title {
           font-family: 'Bungee', sans-serif;
@@ -120,7 +120,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
         .products-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 16px;
           margin-bottom: 40px;
         }

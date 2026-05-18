@@ -12,19 +12,27 @@ export default function ProductCard({ product }: { product: Product }) {
     { label: product.st2_label, value: product.st2_value },
   ].filter(s => s.label && s.value)
 
-  // Alt specs shown on hover (app_01 title + details)
-  const altSpec = (product.app_01_title && product.app_01_details)
-    ? { label: product.app_01_title, value: product.app_01_details }
+  // Collect all available app specs and pick one randomly
+  const availableAppSpecs = [
+    product.app_01_title && product.app_01_details
+      ? { label: product.app_01_title, value: product.app_01_details } : null,
+    product.app_02_title && product.app_02_details
+      ? { label: product.app_02_title, value: product.app_02_details } : null,
+    product.app_03_title && product.app_03_details
+      ? { label: product.app_03_title, value: product.app_03_details } : null,
+  ].filter((s): s is { label: string; value: string } => s !== null)
+
+  const altSpec = availableAppSpecs.length > 0
+    ? availableAppSpecs[Math.floor(Math.random() * availableAppSpecs.length)]
     : null
 
-  const hasHoverImg = !!hoverImg   // second image present → cross-fade on hover
-  const hasAltSpec = !!altSpec     // alt spec present → spec swap on hover
+  const hasHoverImg = !!hoverImg
+  const hasAltSpec  = !!altSpec
 
-  // CSS class flags
   const linkClass = [
     'pcard-link',
-    hasHoverImg ? 'has-img-alt' : 'no-img-alt',  // controls image behaviour
-    hasAltSpec  ? 'has-spec-alt' : '',            // controls spec behaviour
+    hasHoverImg ? 'has-img-alt' : 'no-img-alt',
+    hasAltSpec  ? 'has-spec-alt' : '',
   ].filter(Boolean).join(' ')
 
   return (
@@ -35,7 +43,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {img ? (
             <Image
               src={img} alt={product.name} fill
-              sizes="(max-width: 640px) 50vw, 280px"
+              sizes="(max-width: 640px) 50vw, 380px"
               style={{ objectFit: 'contain', padding: '16px' }}
               unoptimized
               className="pcard-img-main"
@@ -51,8 +59,8 @@ export default function ProductCard({ product }: { product: Product }) {
           {hoverImg && (
             <Image
               src={hoverImg} alt={product.name} fill
-              sizes="(max-width: 640px) 50vw, 280px"
-              style={{ objectFit: 'contain', padding: '16px' }}
+              sizes="(max-width: 640px) 50vw, 380px"
+              style={{ objectFit: 'cover' }}
               unoptimized
               className="pcard-img-alt"
             />
@@ -80,9 +88,9 @@ export default function ProductCard({ product }: { product: Product }) {
               )}
               {altSpec && (
                 <div className="pcard-specs pcard-specs-alt">
-                  <div className="pcard-spec">
+                  <div className="pcard-spec pcard-spec-wide">
                     <span className="pcard-spec-label">{altSpec.label}</span>
-                    <span className="pcard-spec-value">{altSpec.value}</span>
+                    <span className="pcard-spec-value pcard-spec-value-clamp">{altSpec.value}</span>
                   </div>
                 </div>
               )}
@@ -115,18 +123,18 @@ export default function ProductCard({ product }: { product: Product }) {
           overflow: clip;
         }
 
-        /* Main image: transitions for both opacity (swap) and scale (zoom) */
+        /* Main image: contain + padding for clean product shot */
         .pcard-img-main {
           transition: opacity 280ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* Alt image: hidden by default */
+        /* Alt image: cover, no padding — fills the whole card top */
         .pcard-img-alt {
           opacity: 0;
-          transition: opacity 280ms ease;
+          transition: opacity 320ms ease;
         }
 
-        /* Cards WITH a second image → cross-fade */
+        /* Cards WITH a second image → cross-fade to full-bleed cover */
         .pcard-link.has-img-alt:hover .pcard-img-main { opacity: 0; }
         .pcard-link.has-img-alt:hover .pcard-img-alt  { opacity: 1; }
 
@@ -163,7 +171,7 @@ export default function ProductCard({ product }: { product: Product }) {
         }
         .pcard-specs-alt {
           position: absolute;
-          top: 0; left: 0;
+          top: 0; left: 0; right: 0;
           opacity: 0;
           transition: opacity 220ms ease;
         }
@@ -174,6 +182,9 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
         .pcard-spec { display: flex; flex-direction: column; gap: 2px; }
+        /* Wide variant for app description — fills full card width */
+        .pcard-spec-wide { width: 100%; }
+
         .pcard-spec-label {
           font-family: 'Inter', sans-serif;
           font-size: 9px; font-weight: 600;
@@ -184,6 +195,13 @@ export default function ProductCard({ product }: { product: Product }) {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 500;
           color: rgb(0,0,0); letter-spacing: -0.02em;
+        }
+        /* App description: single line, truncated */
+        .pcard-spec-value-clamp {
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       `}</style>
     </Link>
