@@ -79,45 +79,62 @@ export default async function HomePage() {
         }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
-          line-height: 1.6; max-width: 380px;
+          font-weight: 400;
+          font-size: 18px; color: rgba(0,0,0,0.5);
+          line-height: 1.4;
+          max-width: 50%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
           width: 50%;
           min-width: 320px;
           border: 1px solid rgba(0,0,0,0.12);
-          border-radius: 3px;
+          border-radius: 4px;
           overflow: hidden;
         }
         /* ── Hero search input ── */
         .hero-search-box {
-          display: flex; align-items: center; gap: 8px;
+          display: flex; align-items: center; gap: 16px;
           background: rgb(255,255,255);
           padding: 0 12px;
           flex: 1;
           min-width: 0;
           height: 44px;
         }
-        .hero-search-box input {
-          flex: 1; min-width: 0;
-          border: none; outline: none;
-          background: transparent;
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgb(0,0,0);
-        }
-        .hero-search-box input::placeholder { color: rgba(0,0,0,0.35); }
-        .hero-search-box button {
+        .hero-search-icon {
           background: none; border: none; cursor: pointer;
-          display: flex; align-items: center; padding: 2px;
+          display: flex; align-items: center; padding: 0;
           color: rgba(0,0,0,0.3); flex-shrink: 0;
           transition: color 150ms;
         }
-        .hero-search-box button:hover { color: rgb(217,44,43); }
+        .hero-search-icon:hover { color: rgb(217,44,43); }
+        .hero-search-input-wrap {
+          position: relative; flex: 1; min-width: 0;
+          display: flex; align-items: center; height: 100%;
+        }
+        .hero-search-input-wrap input {
+          position: relative; z-index: 1;
+          width: 100%; border: none; outline: none;
+          background: transparent;
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgb(0,0,0);
+          text-align: left;
+        }
+        .hero-search-placeholder {
+          position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+          pointer-events: none; white-space: nowrap;
+          overflow: hidden; max-width: 100%;
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; color: rgba(0,0,0,0.35);
+        }
+        .hero-search-placeholder-count { color: rgb(0,0,0); }
         .hero-catalog-cta {
-          display: flex; align-items: center; gap: 6px;
+          display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 24px; height: 44px;
+          padding: 0 36px; height: 44px;
           font-family: 'Inter', sans-serif;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
@@ -131,7 +148,7 @@ export default async function HomePage() {
         .cats-section {
           background: transparent;
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px 96px;
+          padding: 0 12px 64px;
         }
         .cats-row {
           display: grid;
@@ -206,7 +223,7 @@ export default async function HomePage() {
         /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px 96px;
+          padding: 64px 12px 64px;
           display: flex; flex-direction: column; gap: 64px;
         }
         .services-header { display: flex; flex-direction: column; gap: 8px; }
@@ -269,8 +286,10 @@ export default async function HomePage() {
 
         /* ─── CAROUSEL ── */
         .carousel-section {
-          background: transparent;
-          padding: 80px 0 64px;
+          background-color: rgb(18, 18, 18);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+          background-size: 28px 28px;
+          padding: 64px 0 64px;
         }
         .carousel-inner {
           max-width: 1440px; margin: 0 auto; padding: 0 24px;
@@ -279,16 +298,16 @@ export default async function HomePage() {
         .carousel-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(28px, 4vw, 48px);
-          color: rgb(0,0,0); text-transform: uppercase;
+          color: rgb(255,255,255); text-transform: uppercase;
           line-height: 1; margin-bottom: 8px;
         }
         .carousel-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.45);
+          font-size: 14px; color: rgba(255,255,255,0.35);
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
-          padding: 80px 12px;
+          padding: 64px 12px;
           max-width: 1440px; margin: 0 auto;
         }
         .contact-banner {
@@ -355,7 +374,7 @@ export default async function HomePage() {
           .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .cat-card { height: 260px; }
 
-          .services-section { padding: 0 0 64px; gap: 40px; }
+          .services-section { padding: 64px 0 64px; gap: 40px; }
           .services-header { padding: 0 32px; }
           .services-grid {
             display: flex;
@@ -372,10 +391,10 @@ export default async function HomePage() {
           .service-body { flex: 1; }
           .service-desc { margin-bottom: 16px; }
 
-          .carousel-section { padding: 56px 0 48px; }
+          .carousel-section { padding: 64px 0 64px; }
           .carousel-inner { padding: 0 32px; }
 
-          .contact-banner-wrap { padding: 48px 32px; }
+          .contact-banner-wrap { padding: 64px 32px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
           .contact-banner-btn { width: 100%; justify-content: center; }
 
@@ -391,10 +410,7 @@ export default async function HomePage() {
       <section className="hero">
         <div className="hero-inner">
           <AnimatedHero brands={brands} />
-          <p className="hero-sub">
-            Lider in furnizarea de scule electrice,<br />
-            industriale si de constructii de peste 26 de ani
-          </p>
+          <p className="hero-sub">Lider in furnizarea de scule electrice, industriale si de constructii de peste 26 de ani</p>
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
             <Link href="/produse" className="hero-catalog-cta">CATALOG</Link>
@@ -409,7 +425,7 @@ export default async function HomePage() {
 
       {/* ── CAROUSEL — Featured subcategories (before services) ── */}
       {enrichedSubs.length > 0 && (
-        <section className="carousel-section">
+        <section className="carousel-section noise-dark">
           <div className="carousel-inner">
             <div className="carousel-header">
               <h2 className="carousel-title">EXPLOREAZA</h2>

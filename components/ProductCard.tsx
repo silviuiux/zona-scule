@@ -4,7 +4,7 @@ import type { Product } from '@/lib/supabase'
 
 export default function ProductCard({ product }: { product: Product }) {
   const img = product.main_image_storage_url || product.main_image_url
-  const hoverImg = product.gallery_url_1
+  const hoverImg = product.gallery_url_1 || null
 
   // Default specs (always shown, faded on hover when alt exists)
   const specs = [
@@ -17,10 +17,18 @@ export default function ProductCard({ product }: { product: Product }) {
     ? { label: product.app_01_title, value: product.app_01_details }
     : null
 
-  const hasAlt = !!(hoverImg || altSpec)
+  const hasHoverImg = !!hoverImg   // second image present → cross-fade on hover
+  const hasAltSpec = !!altSpec     // alt spec present → spec swap on hover
+
+  // CSS class flags
+  const linkClass = [
+    'pcard-link',
+    hasHoverImg ? 'has-img-alt' : 'no-img-alt',  // controls image behaviour
+    hasAltSpec  ? 'has-spec-alt' : '',            // controls spec behaviour
+  ].filter(Boolean).join(' ')
 
   return (
-    <Link href={`/produse/${product.slug}`} className={`pcard-link${hasAlt ? ' has-alt' : ''}`}>
+    <Link href={`/produse/${product.slug}`} className={linkClass}>
       <div className="pcard">
         {/* Image area */}
         <div className="pcard-img">
@@ -99,22 +107,31 @@ export default function ProductCard({ product }: { product: Product }) {
           transform: translateY(-2px);
         }
 
-        /* ── Image swap ── */
+        /* ── Image area ── */
         .pcard-img {
           position: relative;
           aspect-ratio: 1;
           background: rgb(255,255,255);
           overflow: clip;
         }
+
+        /* Main image: transitions for both opacity (swap) and scale (zoom) */
         .pcard-img-main {
-          transition: opacity 280ms ease;
+          transition: opacity 280ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
         }
+
+        /* Alt image: hidden by default */
         .pcard-img-alt {
           opacity: 0;
           transition: opacity 280ms ease;
         }
-        .pcard-link.has-alt:hover .pcard-img-main { opacity: 0; }
-        .pcard-link.has-alt:hover .pcard-img-alt  { opacity: 1; }
+
+        /* Cards WITH a second image → cross-fade */
+        .pcard-link.has-img-alt:hover .pcard-img-main { opacity: 0; }
+        .pcard-link.has-img-alt:hover .pcard-img-alt  { opacity: 1; }
+
+        /* Cards WITHOUT a second image → subtle zoom-in on main image */
+        .pcard-link.no-img-alt:hover .pcard-img-main { transform: scale(1.06); }
 
         /* ── Info ── */
         .pcard-info {
@@ -153,8 +170,8 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-specs-default.swappable {
           transition: opacity 220ms ease;
         }
-        .pcard-link.has-alt:hover .pcard-specs-default.swappable { opacity: 0; }
-        .pcard-link.has-alt:hover .pcard-specs-alt { opacity: 1; }
+        .pcard-link.has-spec-alt:hover .pcard-specs-default.swappable { opacity: 0; }
+        .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
         .pcard-spec { display: flex; flex-direction: column; gap: 2px; }
         .pcard-spec-label {
