@@ -66,7 +66,7 @@ export default function Nav() {
           height: 100%;
           padding: 0 14px;
           border-right: 1px solid rgba(0,0,0,0.1);
-          gap: 8px;
+          gap: 16px;
         }
         .nav-search-input {
           flex: 1; min-width: 0;
@@ -143,20 +143,20 @@ export default function Nav() {
 
         {/* #2: Catalog removed from nav */}
 
-        {/* Search — icon inside on right */}
+        {/* Search — icon on left */}
         <form className={`nav-search-form${searchOpen ? ' open' : ''}`} onSubmit={handleSearch}>
-          <input
-            ref={inputRef}
-            className="nav-search-input"
-            value={q}
-            onChange={e => setQ(e.target.value)}
-            placeholder="Cauta orice..."
-          />
           <button className="nav-search-btn" type="submit">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
           </button>
+          <input
+            ref={inputRef}
+            className="nav-search-input"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            placeholder="cauta orice..."
+          />
         </form>
 
         {/* Mobile search toggle */}
