@@ -172,7 +172,11 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           {doubled.map((s, i) => (
             <Link
               key={`${s.id}-${i}`}
-              href={`/produse?subcategorie=${encodeURIComponent(s.name)}`}
+              href={
+                s.category_name
+                  ? `/produse?categorie=${encodeURIComponent(s.category_name)}&subcategorie=${encodeURIComponent(s.name)}`
+                  : `/produse?subcategorie=${encodeURIComponent(s.name)}`
+              }
               className="sub-card"
             >
               {s.image_url && (

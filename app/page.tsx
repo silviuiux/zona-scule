@@ -19,6 +19,14 @@ export default async function HomePage() {
     getTotalProductCount(),
   ])
 
+  // Enrich subcategories with their parent category name for correct deep-link URLs
+  const enrichedSubs = featuredSubs.map(s => ({
+    ...s,
+    category_name: s.parent_category_id
+      ? (categories.find(c => c.id === s.parent_category_id)?.name ?? null)
+      : null,
+  }))
+
   return (
     <>
       <Nav />
@@ -230,21 +238,36 @@ export default async function HomePage() {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; line-height: 1.65; margin-bottom: 0;
         }
+        /* Service card hover */
+        .service-card { transition: box-shadow 400ms cubic-bezier(0.22,1,0.36,1); }
+        .services-grid a:hover .service-card {
+          box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+        }
+        .service-img img {
+          transition: transform 600ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .services-grid a:hover .service-img img { transform: scale(0.96); }
+
         .service-cta {
           font-family: 'Recursive', sans-serif;
           font-size: 12px; font-weight: 600;
           letter-spacing: 0.06em; text-transform: uppercase;
           text-decoration: none;
-          display: inline-flex; align-items: center; gap: 5px;
-          transition: gap 150ms;
+          display: flex; align-items: center; justify-content: space-between;
+          width: 100%;
           margin-top: auto;
           padding-top: 20px;
         }
-        .service-cta:hover { gap: 9px; }
+        .service-cta-arrow {
+          transition: transform 250ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .services-grid a:hover .service-cta-arrow { transform: translateX(5px); }
 
         /* ─── CAROUSEL ── */
         .carousel-section {
-          background: rgb(18, 18, 18);
+          background-color: rgb(18, 18, 18);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+          background-size: 28px 28px;
           padding: 80px 0 64px;
         }
         .carousel-inner {
@@ -382,6 +405,19 @@ export default async function HomePage() {
         <CategoryGrid categories={categories} />
       </section>
 
+      {/* ── CAROUSEL — Featured subcategories (before services) ── */}
+      {enrichedSubs.length > 0 && (
+        <section className="carousel-section noise-dark">
+          <div className="carousel-inner">
+            <div className="carousel-header">
+              <h2 className="carousel-title">EXPLOREAZA</h2>
+              <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
+            </div>
+          </div>
+          <SubcategoryCarousel subs={enrichedSubs} />
+        </section>
+      )}
+
       {/* ── SERVICES ── */}
       <section className="services-section">
         <div className="services-header">
@@ -402,26 +438,16 @@ export default async function HomePage() {
                 <div className={`service-body noise-card`} style={{ background: s.bg }}>
                   <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
                   <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
-                  <span className="service-cta" style={{ color: s.ctaColor }}>{s.cta} →</span>
+                  <span className="service-cta" style={{ color: s.ctaColor }}>
+                    <span>{s.cta}</span>
+                    <span className="service-cta-arrow">→</span>
+                  </span>
                 </div>
               </div>
             </Link>
           ))}
         </div>
       </section>
-
-      {/* ── CAROUSEL — Featured subcategories ── */}
-      {featuredSubs.length > 0 && (
-        <section className="carousel-section noise-dark">
-          <div className="carousel-inner">
-            <div className="carousel-header">
-              <h2 className="carousel-title">EXPLOREAZA</h2>
-              <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
-            </div>
-          </div>
-          <SubcategoryCarousel subs={featuredSubs} />
-        </section>
-      )}
 
       {/* ── CONTACT BANNER ── */}
       <div className="contact-banner-wrap">

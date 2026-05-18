@@ -337,6 +337,7 @@ export type FeaturedSubcategoryWithImage = {
   name: string
   slug: string | null
   parent_category_id: string | null
+  category_name?: string | null   // enriched in page.tsx from categories list
   product_count: number
   image_url: string | null
 }
