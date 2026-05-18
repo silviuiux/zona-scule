@@ -238,15 +238,19 @@ export default async function HomePage() {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; line-height: 1.65; margin-bottom: 0;
         }
-        /* Service card hover */
-        .service-card { transition: box-shadow 400ms cubic-bezier(0.22,1,0.36,1); }
+        /* Service card hover — whole card grows + image zooms in */
+        .service-card {
+          transition: transform 500ms cubic-bezier(0.22,1,0.36,1),
+                      box-shadow 500ms cubic-bezier(0.22,1,0.36,1);
+        }
         .services-grid a:hover .service-card {
-          box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+          transform: scale(1.025);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.18);
         }
         .service-img img {
           transition: transform 600ms cubic-bezier(0.22,1,0.36,1);
         }
-        .services-grid a:hover .service-img img { transform: scale(0.96); }
+        .services-grid a:hover .service-img img { transform: scale(1.07); }
 
         .service-cta {
           font-family: 'Recursive', sans-serif;
@@ -265,9 +269,7 @@ export default async function HomePage() {
 
         /* ─── CAROUSEL ── */
         .carousel-section {
-          background-color: rgb(18, 18, 18);
-          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-          background-size: 28px 28px;
+          background: transparent;
           padding: 80px 0 64px;
         }
         .carousel-inner {
@@ -277,12 +279,12 @@ export default async function HomePage() {
         .carousel-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(28px, 4vw, 48px);
-          color: rgb(255,255,255); text-transform: uppercase;
+          color: rgb(0,0,0); text-transform: uppercase;
           line-height: 1; margin-bottom: 8px;
         }
         .carousel-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(255,255,255,0.35);
+          font-size: 14px; color: rgba(0,0,0,0.45);
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
@@ -407,7 +409,7 @@ export default async function HomePage() {
 
       {/* ── CAROUSEL — Featured subcategories (before services) ── */}
       {enrichedSubs.length > 0 && (
-        <section className="carousel-section noise-dark">
+        <section className="carousel-section">
           <div className="carousel-inner">
             <div className="carousel-header">
               <h2 className="carousel-title">EXPLOREAZA</h2>

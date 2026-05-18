@@ -4,15 +4,25 @@ import type { Product } from '@/lib/supabase'
 
 export default function ProductCard({ product }: { product: Product }) {
   const img = product.main_image_storage_url || product.main_image_url
+  const hoverImg = product.gallery_url_1
+
+  // Default specs (always shown, faded on hover when alt exists)
   const specs = [
     { label: product.st1_label, value: product.st1_value },
     { label: product.st2_label, value: product.st2_value },
   ].filter(s => s.label && s.value)
 
+  // Alt specs shown on hover (app_01 title + details)
+  const altSpec = (product.app_01_title && product.app_01_details)
+    ? { label: product.app_01_title, value: product.app_01_details }
+    : null
+
+  const hasAlt = !!(hoverImg || altSpec)
+
   return (
-    <Link href={`/produse/${product.slug}`} className="pcard-link">
+    <Link href={`/produse/${product.slug}`} className={`pcard-link${hasAlt ? ' has-alt' : ''}`}>
       <div className="pcard">
-        {/* Image area — matches Framer: white bg, padding 16px, overflow clip */}
+        {/* Image area */}
         <div className="pcard-img">
           {img ? (
             <Image
@@ -20,6 +30,7 @@ export default function ProductCard({ product }: { product: Product }) {
               sizes="(max-width: 640px) 50vw, 280px"
               style={{ objectFit: 'contain', padding: '16px' }}
               unoptimized
+              className="pcard-img-main"
             />
           ) : (
             <span style={{
@@ -29,28 +40,49 @@ export default function ProductCard({ product }: { product: Product }) {
               fontFamily: 'Recursive, sans-serif',
             }}>NO IMG</span>
           )}
+          {hoverImg && (
+            <Image
+              src={hoverImg} alt={product.name} fill
+              sizes="(max-width: 640px) 50vw, 280px"
+              style={{ objectFit: 'contain', padding: '16px' }}
+              unoptimized
+              className="pcard-img-alt"
+            />
+          )}
         </div>
-        {/* Info — matches Framer: 16px padding, gap 8px */}
+
+        {/* Info */}
         <div className="pcard-info">
           {product.brand_name && (
             <p className="pcard-brand">{product.brand_name}</p>
           )}
           <p className="pcard-model">{product.model ?? product.short_description ?? product.name}</p>
-          {specs.length > 0 && (
-            <div className="pcard-specs">
-              {specs.map((s, i) => (
-                <div key={i} className="pcard-spec">
-                  <span className="pcard-spec-label">{s.label}</span>
-                  <span className="pcard-spec-value">{s.value}</span>
+
+          {(specs.length > 0 || altSpec) && (
+            <div className="pcard-specs-wrap">
+              {specs.length > 0 && (
+                <div className={`pcard-specs pcard-specs-default${altSpec ? ' swappable' : ''}`}>
+                  {specs.map((s, i) => (
+                    <div key={i} className="pcard-spec">
+                      <span className="pcard-spec-label">{s.label}</span>
+                      <span className="pcard-spec-value">{s.value}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {altSpec && (
+                <div className="pcard-specs pcard-specs-alt">
+                  <div className="pcard-spec">
+                    <span className="pcard-spec-label">{altSpec.label}</span>
+                    <span className="pcard-spec-value">{altSpec.value}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
       <style>{`
-        /* min-width: 0 prevents grid items from expanding past 1fr when an inner
-           element (e.g. .pcard-model with white-space: nowrap) has long content. */
         .pcard-link { text-decoration: none; display: block; min-width: 0; }
         .pcard {
           background: rgb(255, 255, 255);
@@ -66,12 +98,25 @@ export default function ProductCard({ product }: { product: Product }) {
           box-shadow: 0 4px 20px rgba(0,0,0,0.12);
           transform: translateY(-2px);
         }
+
+        /* ── Image swap ── */
         .pcard-img {
           position: relative;
           aspect-ratio: 1;
           background: rgb(255,255,255);
           overflow: clip;
         }
+        .pcard-img-main {
+          transition: opacity 280ms ease;
+        }
+        .pcard-img-alt {
+          opacity: 0;
+          transition: opacity 280ms ease;
+        }
+        .pcard-link.has-alt:hover .pcard-img-main { opacity: 0; }
+        .pcard-link.has-alt:hover .pcard-img-alt  { opacity: 1; }
+
+        /* ── Info ── */
         .pcard-info {
           padding: 16px;
           display: flex; flex-direction: column; gap: 8px;
@@ -90,10 +135,27 @@ export default function ProductCard({ product }: { product: Product }) {
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        .pcard-specs {
-          display: flex; flex-wrap: wrap; gap: 12px;
+
+        /* ── Spec swap ── */
+        .pcard-specs-wrap {
+          position: relative;
           margin-top: 4px;
         }
+        .pcard-specs {
+          display: flex; flex-wrap: wrap; gap: 12px;
+        }
+        .pcard-specs-alt {
+          position: absolute;
+          top: 0; left: 0;
+          opacity: 0;
+          transition: opacity 220ms ease;
+        }
+        .pcard-specs-default.swappable {
+          transition: opacity 220ms ease;
+        }
+        .pcard-link.has-alt:hover .pcard-specs-default.swappable { opacity: 0; }
+        .pcard-link.has-alt:hover .pcard-specs-alt { opacity: 1; }
+
         .pcard-spec { display: flex; flex-direction: column; gap: 2px; }
         .pcard-spec-label {
           font-family: 'Inter', sans-serif;

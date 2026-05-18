@@ -66,9 +66,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           position: relative;
           isolation: isolate;
         }
-        /* Noise on the gray background only — z-index -1 sits behind the
-           white card surfaces which visually cover it, so grain appears
-           only in the gaps between/around cards. Half the previous density. */
+        /* Noise behind cards — 1/3 density, parallax at 90% scroll speed.
+           background-position shifts -10% of scrollY via --noise-y so the
+           tiled pattern drifts slightly slower than the foreground. */
         .catalog-page::before {
           content: '';
           position: absolute;
@@ -78,7 +78,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           background-image: var(--noise-svg);
           background-repeat: repeat;
           background-size: 200px 200px;
-          opacity: 0.25;
+          background-position: 0 var(--noise-y, 0px);
+          opacity: 0.08;
           mix-blend-mode: multiply;
         }
 

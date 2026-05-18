@@ -32,6 +32,9 @@ export default function DotsParallax() {
       root.style.setProperty('--dot-y', `${-y * 0.8}px`)
       root.style.setProperty('--hero-y', `${-y * 0.2}px`)
       root.style.setProperty('--cat-banner-y', `${y * 0.6}px`)
+      // Noise layer moves at 90% of scroll speed: shift background-position
+      // by -10% of scrollY so the absolute element's net speed = 90%.
+      root.style.setProperty('--noise-y', `${-y * 0.1}px`)
     }
     const onScroll = () => {
       if (raf) return
