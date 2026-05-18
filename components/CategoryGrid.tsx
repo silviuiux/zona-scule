@@ -14,8 +14,11 @@ type Cat = {
 // Per-column vertical offset for the scroll-stagger animation.
 // Col 0 = most staggered, col 3 = flush.
 const COL_OFFSETS = [270, 180, 90, 0]
-const FALL_DISTANCE = 520
 const GRID_COLS = 4
+// Height of one card row including gap (400px card + 16px gap).
+// Progress reaches 1.0 after this many row-heights of viewport travel —
+// i.e. alignment completes when rows 2–3 are roughly centred in the viewport.
+const ALIGN_ROWS = 2.2
 
 // ── Greedy row builder ────────────────────────────────────────────────────────
 // Places categories left-to-right in a GRID_COLS-column grid.
@@ -70,7 +73,19 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     let raf = 0
     const update = () => {
       raf = 0
-      const progress = Math.max(0, Math.min(1, window.scrollY / FALL_DISTANCE))
+      // Drive progress off the grid's own viewport position, not raw scrollY.
+      // This makes alignment viewport-size agnostic and ties it to when
+      // the grid rows are actually visible.
+      const rect = root.getBoundingClientRect()
+      const viewH = window.innerHeight
+      // "scrolledPast" = how far the grid top has travelled above the bottom
+      // of the viewport (0 = grid just entering, positive = grid scrolling up).
+      const scrolledPast = viewH - rect.top
+      // One card row ≈ 416px (400px height + 16px gap).
+      // We travel ALIGN_ROWS rows before reaching full alignment.
+      const rowH = 416
+      const totalRange = rowH * ALIGN_ROWS
+      const progress = Math.max(0, Math.min(1, scrolledPast / totalRange))
       allCards.forEach(el => {
         const col = Number(el.dataset.col ?? 0)
         const base = COL_OFFSETS[col] ?? 0
