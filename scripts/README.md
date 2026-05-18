@@ -57,3 +57,80 @@ Scriptul poate fi adaptat pentru Milwaukee, PFERD, Krause:
 - Milwaukee: https://www.milwaukeetool.eu/products/{sku}
 - PFERD: https://www.pferd.com/ro/products/search?q={sku}
 - Krause: https://www.krause-systems.ro/produse/{sku}
+
+---
+
+## verify-products.mjs
+
+Auditează și verifică corectitudinea datelor față de site-ul producătorului.
+Detectează cross-contamination (specs de la alt produs), URL-uri de search eșuate,
+specificații lipsă. Generează rapoarte detaliate și o listă de SKU-uri de re-îmbogățit.
+
+### Clasificare automată (fără apeluri web)
+
+| Categorie | Semnificație |
+|---|---|
+| `REAL_WITH_DATA` | URL real + specs → de verificat cu Claude |
+| `REAL_NO_SPECS` | URL real dar fără specificații → extracție parțială |
+| `SEARCH_URL` | URL de search (`cautare-rezultate`) → niciodată îmbogățit corect |
+| `NO_DATA` | Fără URL și fără descriere → complet neîmbogățit |
+
+### Comenzi
+
+```bash
+# Audit rapid Karcher (fără fetch pagini, doar clasificare)
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --audit-only
+
+# Eșantion rapid de 50 produse (estimare rată erori)
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --sample 50
+
+# Verificare completă primele 200 produse
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --limit 200
+
+# Verificare completă toate produsele Karcher (~2h)
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher
+
+# Un singur SKU
+node --env-file=.env.local scripts/verify-products.mjs --sku "1.528-133.0"
+
+# Verificare + reset automat pentru produsele greșite (le pregătește pt re-îmbogățire)
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --reset-wrong
+
+# Toate brandurile
+node --env-file=.env.local scripts/verify-products.mjs
+```
+
+### Output (în folderul `logs/`)
+
+- `verify-report-<brand>-<timestamp>.json` — raport complet cu toate detaliile
+- `to-fix-<brand>-<timestamp>.csv` — lista SKU-urilor de re-îmbogățit
+- `verify-summary-<brand>-<timestamp>.txt` — sumar text cu comenzile de urmărit
+
+### Flux recomandat
+
+```bash
+# 1. Audit rapid pentru a vedea câte produse sunt în fiecare categorie
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --audit-only
+
+# 2. Eșantion de 100 produse pentru a estima rata de erori
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --sample 100
+
+# 3. Dacă rata de erori e mare (>20%), run complet cu reset
+node --env-file=.env.local scripts/verify-products.mjs --brand Karcher --reset-wrong
+
+# 4. Re-îmbogățire pentru toate produsele resetate/fără date
+node --env-file=.env.local scripts/enrich-karcher.mjs --resume
+```
+
+### Rate și timpi estimativi
+
+- Audit-only: instant (fără fetch)
+- Verificare completă: ~1.5s/produs
+  - 100 produse ≈ 3 minute
+  - 500 produse ≈ 13 minute
+  - 3000 produse (tot Kärcher) ≈ 75 minute
+
+### Model Claude folosit
+
+Folosește `claude-haiku-4-5-20251001` (rapid și ieftin) pentru verificare.
+Schimbă în `claude-sonnet-4-6` în cod dacă vrei mai multă precizie.

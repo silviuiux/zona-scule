@@ -1,0 +1,29 @@
+Verificare produse — Karcher — 2026-05-18T10-17-18
+==================================================
+
+Total produse:         2639
+Timp de procesare:     445.2s
+
+CLASIFICARE AUTOMATĂ:
+  ✓ URL real + specs:  2520
+  ⚠ URL real, fără sp: 35
+  ✗ URL de search:     0
+  — Fără date:         84
+
+VERIFICARE COMPLETĂ:
+  ✅ OK:               89
+  ❌ WRONG:            1
+  🟡 UNCERTAIN:        9
+  ⚠ Pagina negăsită:  0
+  Erori:               1
+
+Rata de erori estimată: 1.0%
+
+DE RE-ÎMBOGĂȚIT (total): 120
+
+Urmărire comenzi:
+  # Re-îmbogățire pentru SEARCH_URL și NO_DATA:
+  node --env-file=.env.local scripts/enrich-karcher.mjs --resume
+
+  # Sau pt SKU-uri specifice din CSV:
+  # node --env-file=.env.local scripts/enrich-karcher.mjs --sku "X.XXX-XXX.X"

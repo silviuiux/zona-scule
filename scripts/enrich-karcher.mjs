@@ -39,10 +39,12 @@ const anthropic = new Anthropic({ apiKey: ANTHROPIC_KEY })
 // ── CLI args ──────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2)
-const limitArg = args.includes('--limit') ? parseInt(args[args.indexOf('--limit') + 1]) : null
-const skuArg = args.includes('--sku') ? args[args.indexOf('--sku') + 1] : null
-const resumeMode = args.includes('--resume')
-const dryRun = args.includes('--dry-run')
+const limitArg  = args.includes('--limit')    ? parseInt(args[args.indexOf('--limit') + 1])  : null
+const skuArg    = args.includes('--sku')      ? args[args.indexOf('--sku') + 1]              : null
+const resumeMode = args.includes('--resume')   // skip produse cu manufacturer_url deja setat
+const dryRun     = args.includes('--dry-run')
+// --from-csv <file>: procesează doar SKU-urile dintr-un CSV generat de verify-products.mjs
+const fromCsvArg = args.includes('--from-csv') ? args[args.indexOf('--from-csv') + 1]        : null
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -307,13 +309,46 @@ ${cleaned}`
   return JSON.parse(jsonMatch[0])
 }
 
+// ── SKU validation ────────────────────────────────────────────────────────────
+
+/**
+ * Verifică că pagina găsită este chiar pentru produsul cu SKU-ul dat.
+ * Previne cross-contamination: situația în care search-ul Kärcher returnează
+ * un produs greșit (ex: "Flashing beacon" pentru SKU-ul unui bin liner holder).
+ *
+ * Logica în ordine de prioritate:
+ *  1. URL-ul paginii conține slug-ul numeric → cert corect
+ *  2. Slug-ul numeric apare ca număr standalone în textul paginii → probabil corect
+ *  3. SKU-ul original (cu puncte) apare în text → corect
+ *  Altfel → pagina e pentru alt produs, respingem
+ */
+function validateSkuOnPage(sku, pageUrl, pageHtml) {
+  const numericSlug = skuToKarcherSlug(sku) // ex: "4.039-269.0" → "40392690"
+
+  // 1. SKU în URL — cel mai sigur semn
+  if (pageUrl.includes(numericSlug)) return { valid: true, reason: 'sku_in_url' }
+
+  // Curățăm HTML-ul o singură dată
+  const text = pageHtml.replace(/<[^>]+>/g, ' ')
+
+  // 2. Slug-ul numeric ca număr standalone (nu ca parte dintr-un alt număr)
+  //    Evităm false positives de tipul "140392690" sau "403926900"
+  const standaloneRe = new RegExp(`(?<![0-9])${numericSlug}(?![0-9])`)
+  if (standaloneRe.test(text)) return { valid: true, reason: 'sku_in_text' }
+
+  // 3. SKU-ul original cu puncte (ex: "4.039-269.0")
+  if (text.includes(sku)) return { valid: true, reason: 'sku_original_in_text' }
+
+  return { valid: false, reason: 'sku_not_found_on_page' }
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function processProduct(product) {
   const { id, sku, name } = product
-  
+
   console.log(`\n[${sku}] ${name}`)
-  
+
   // 1. Fetch Kärcher page
   const page = await fetchKarcherPage(sku, name)
   if (!page) {
@@ -321,7 +356,17 @@ async function processProduct(product) {
     return { id, status: 'not_found' }
   }
   console.log(`  ✓ Found: ${page.url}`)
-  
+
+  // 1b. Validare SKU — verificăm că pagina e chiar pentru acest produs
+  //     Previne situația în care search-ul returnează un produs greșit
+  const skuCheck = validateSkuOnPage(sku, page.url, page.html)
+  if (!skuCheck.valid) {
+    console.log(`  ✗ SKU ${sku} NOT on page ${page.url} — posibil produs greșit, skip`)
+    console.log(`    (Cauza: ${skuCheck.reason})`)
+    return { id, status: 'sku_not_on_page' }
+  }
+  console.log(`  ✓ SKU validat pe pagină (${skuCheck.reason})`)
+
   // 2. Extract with Claude
   let data
   try {
@@ -378,62 +423,97 @@ async function processProduct(product) {
 
 async function main() {
   console.log('🔧 Kärcher Product Enrichment Script')
-  console.log(`Mode: ${dryRun ? 'DRY RUN' : 'LIVE'} | Resume: ${resumeMode}`)
-  
-  // Build query
-  let query = supabase
-    .from('products')
-    .select('id, sku, name, short_description, manufacturer_url')
-    .not('sku', 'is', null)
+  console.log(`Mode: ${dryRun ? 'DRY RUN' : 'LIVE'} | Resume: ${resumeMode} | From-CSV: ${fromCsvArg || 'no'}`)
 
-  // Single SKU mode — most specific, goes first
-  if (skuArg) {
-    query = query.eq('sku', skuArg)
+  let products
+
+  // --from-csv: procesează doar SKU-urile din fișierul to-fix generat de verify-products.mjs
+  if (fromCsvArg) {
+    const { readFileSync } = await import('fs')
+    const lines = readFileSync(fromCsvArg, 'utf8').split('\n').slice(1) // skip header
+    const skus = lines
+      .map(l => l.match(/^"([^"]+)"/)?.[1])
+      .filter(Boolean)
+    console.log(`\n📋 SKU-uri din CSV: ${skus.length}`)
+    if (skus.length === 0) process.exit(0)
+
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, sku, name, short_description, manufacturer_url')
+      .in('sku', skus)
+    if (error) throw error
+    products = data
+
   } else {
-    // Only filter by brand when not in single-SKU mode
-    query = query.eq('brand_name', 'Karcher')
-    // In resume mode, skip products already enriched
-    if (resumeMode) {
-      query = query.is('manufacturer_url', null)
-    }
-    if (limitArg) {
-      query = query.limit(limitArg)
+    // Build query normal
+    let query = supabase
+      .from('products')
+      .select('id, sku, name, short_description, manufacturer_url')
+      .not('sku', 'is', null)
+
+    // Single SKU mode — most specific, goes first
+    if (skuArg) {
+      query = query.eq('sku', skuArg)
     } else {
-      query = query.limit(2639) // explicit cap
+      // Only filter by brand when not in single-SKU mode
+      query = query.eq('brand_name', 'Karcher')
+      // In resume mode, skip products already enriched
+      if (resumeMode) {
+        query = query.is('manufacturer_url', null)
+      }
+      if (limitArg) {
+        query = query.limit(limitArg)
+      } else {
+        query = query.limit(2639) // explicit cap
+      }
     }
+
+    const { data, error } = await query
+    if (error) throw error
+    products = data
   }
-  
-  const { data: products, error } = await query
-  if (error) throw error
+
+  if (!products) throw new Error('Nu s-au putut citi produsele')
   
   console.log(`\nFound ${products.length} products to process\n`)
   if (products.length === 0) process.exit(0)
   
   // Process with delay to avoid rate limiting
-  const results = { success: 0, not_found: 0, failed: 0 }
-  
+  const results = { success: 0, not_found: 0, sku_mismatch: 0, failed: 0 }
+  const skuMismatchList = [] // produse unde pagina găsită era greșită
+
   for (let i = 0; i < products.length; i++) {
     const product = products[i]
     process.stdout.write(`[${i + 1}/${products.length}] `)
-    
+
     const result = await processProduct(product)
-    
+
     if (result.status === 'success') results.success++
     else if (result.status === 'not_found') results.not_found++
     else if (result.status === 'dry_run') results.success++
+    else if (result.status === 'sku_not_on_page') {
+      results.sku_mismatch++
+      skuMismatchList.push(product.sku)
+    }
     else results.failed++
-    
+
     // Rate limit: 1 request per 2 seconds (Claude API) + Kärcher fetch
     if (i < products.length - 1) {
       await new Promise(r => setTimeout(r, 2000))
     }
   }
-  
+
   console.log('\n\n── Summary ──────────────────────────────')
-  console.log(`✓ Success:   ${results.success}`)
-  console.log(`⚠ Not found: ${results.not_found}`)
-  console.log(`✗ Failed:    ${results.failed}`)
-  console.log(`Total:       ${products.length}`)
+  console.log(`✓ Success:        ${results.success}`)
+  console.log(`⚠ Not found:      ${results.not_found}`)
+  console.log(`✗ SKU mismatch:   ${results.sku_mismatch}  ← pagini găsite dar pentru alt produs`)
+  console.log(`✗ Failed:         ${results.failed}`)
+  console.log(`Total:            ${products.length}`)
+
+  if (skuMismatchList.length > 0) {
+    console.log('\nSKU-uri cu pagini greșite (de investigat manual sau via Playwright):')
+    skuMismatchList.forEach(s => console.log(`  • ${s}`))
+  }
 }
 
 main().catch(console.error)

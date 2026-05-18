@@ -11,13 +11,14 @@
   --border: rgba(0,0,0,0.08);
 
   /*
-    HIGH-CONTRAST noise — feComponentTransfer (slope=3 intercept=-1) converts
-    mid-gray fractalNoise into actual blacks + whites:
-      input < 0.33  →  black  (dark speckles, visible on light bg)
-      input > 0.67  →  white  (light speckles, visible on dark bg)
-    mix-blend-mode: overlay then applies each correctly per surface.
+    Noise texture — matches Figma Noise plugin settings:
+      Noise size X:2 Y:2  → baseFrequency 0.5 (1/size)
+      Density 16%         → feComponentTransfer maps mid-grays to near-black/white speckles
+      Black 32%, White 15% → overlay blend: dark speckles slightly more prominent
+    feComponentTransfer slope=4 intercept=-1.5 clips mid-tones, leaving
+    crisp black/white specks that read on both light and dark surfaces.
   */
-  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.52' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3' intercept='-1'/%3E%3CfeFuncG type='linear' slope='3' intercept='-1'/%3E%3CfeFuncB type='linear' slope='3' intercept='-1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncG type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncB type='linear' slope='4' intercept='-1.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,32 +47,25 @@ body::before {
 }
 
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
-   overlay blend mode: darkens light surfaces (black speckles visible),
-   lightens dark surfaces (white speckles visible) — one mode, all contexts.
-
-   Layer 0 — body::after  : page background, fixed
-   Layer 1 — .noise-card  : card surfaces (white, red, dark)
-   Layer 2 — .noise-dark  : dark sections — same overlay, slightly higher opacity
+   .noise-global  : full-page fixed overlay, always on top (z-index 9999)
+                    pointer-events: none so clicks pass through
+                    mix-blend-mode: overlay — dark speckles on light bg,
+                    light speckles on dark bg, single rule for all surfaces.
+   .noise-card    : card-level grain (white, red, dark cards)
+   .noise-dark    : dark sections — slightly higher opacity
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Layer 0 — page background grain */
-body::after {
-  content: '';
+/* Global noise overlay — floats above all page content */
+.noise-global {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 9999;
   pointer-events: none;
   background-image: var(--noise-svg);
   background-repeat: repeat;
   background-size: 200px 200px;
-  opacity: 0.35;
+  opacity: 0.45;
   mix-blend-mode: overlay;
-}
-
-/* All page content sits above the body grain */
-body > * {
-  position: relative;
-  z-index: 1;
 }
 
 /* Layer 1 — card surfaces */

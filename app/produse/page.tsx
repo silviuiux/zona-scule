@@ -49,19 +49,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // Random order only for the unfiltered "all products" view
   const products = isFiltered ? rawProducts : shuffle(rawProducts)
 
-  const activeCategory = sp.categorie
-    ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
-    : null
-
-  // For the all-products view: pick a random category hero, rotates each request
-  const heroCategories = categories.filter(c => c.hero_image_url)
-  const randomHero = !isFiltered && heroCategories.length > 0
-    ? heroCategories[Math.floor(Math.random() * heroCategories.length)]
-    : null
-
-  const heroImageUrl = activeCategory?.hero_image_url ?? randomHero?.hero_image_url ?? null
-  const heroAlt = activeCategory?.name ?? randomHero?.name ?? 'Zona Scule'
-
   const headerTitle = sp.categorie ?? sp.brand ?? sp.q ?? 'Toate produsele'
 
   return (
@@ -74,30 +61,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           min-height: 100vh;
         }
 
-        /* ─── Category hero banner ─── */
-        .cat-hero {
+        /* ─── Top spacer (replaces image banner) ─── */
+        .cat-spacer {
           width: 100%;
-          height: clamp(200px, 25vh, 340px);
-          overflow: hidden;
-          position: relative;
-          background: rgba(0,0,0,0.04);
-        }
-        /* All-products hero is 2x taller */
-        .cat-hero.cat-hero-all {
-          height: clamp(400px, 50vh, 640px);
-        }
-        .cat-hero-img {
-          position: absolute;
-          top: -200px; left: 0; right: 0;
-          width: 100%;
-          height: calc(100% + 400px);
-          object-fit: cover; object-position: center;
-          display: block;
-          transform: translate3d(0, var(--cat-banner-y, 0px), 0);
-          will-change: transform;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .cat-hero-img { transform: none; }
+          height: 10vh;
+          min-height: 60px;
         }
 
         /* ─── Sidebar + grid layout ─── */
@@ -141,8 +109,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           display: none;
           flex-shrink: 0;
         }
-        /* Hero-embedded toggle always hidden on desktop */
-        .cat-hero .sidebar-toggle { display: none; }
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
@@ -177,20 +143,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             color: rgb(0,0,0);
             cursor: pointer;
           }
-          /* Hero-embedded toggle — white pill, absolute bottom-left */
-          .cat-hero .sidebar-toggle {
-            display: flex;
-            position: absolute;
-            bottom: 16px;
-            left: 12px;
-            z-index: 10;
-            background: rgb(255,255,255);
-            border-radius: 6px;
-            border: none;
-            padding: 0;
-            color: rgb(0,0,0);
-            cursor: pointer;
-          }
           .page-title { font-size: 24px; }
           .products-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -208,22 +160,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             aspect-ratio: auto;
           }
           .products-main { padding: 20px 12px 60px; }
-          .cat-hero.cat-hero-all { height: clamp(220px, 35vh, 380px); }
         }
       `}</style>
 
       <div className="catalog-page">
-        {/* Hero banner — category hero or random rotating hero for all-products view */}
-        {heroImageUrl && (
-          <div className={`cat-hero${!isFiltered ? ' cat-hero-all' : ''}`}>
-            <img
-              src={heroImageUrl}
-              alt={heroAlt}
-              className="cat-hero-img"
-            />
-            <MobileFilterToggle />
-          </div>
-        )}
+        {/* Top spacer — replaces image banner */}
+        <div className="cat-spacer" />
 
         <div className="catalog-layout">
           <MobileFilterBackdrop />
@@ -237,7 +179,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
           <main className="products-main">
             <div className="products-header">
-              {!heroImageUrl && <MobileFilterToggle />}
+              <MobileFilterToggle />
               <h1 className="page-title">{headerTitle}</h1>
             </div>
 

@@ -1,0 +1,2579 @@
+{
+  "meta": {
+    "brand": "Karcher",
+    "timestamp": "2026-05-18T10-17-18",
+    "elapsed_seconds": 445.2,
+    "min_confidence_threshold": 70
+  },
+  "summary": {
+    "total_products": 2639,
+    "by_classification": {
+      "REAL_WITH_DATA": 2520,
+      "REAL_NO_SPECS": 35,
+      "SEARCH_URL": 0,
+      "NO_DATA": 84
+    },
+    "verification": {
+      "ok": 89,
+      "wrong": 1,
+      "uncertain": 9,
+      "error": 1,
+      "notFound": 0,
+      "total": 100
+    }
+  },
+  "needs_re_enrichment": [
+    {
+      "sku": "2.783-014.0",
+      "name": " ABS carpet cleaning BR 40/10 C",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "5.035-488.0",
+      "name": " Adapter Homebase",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "2.641-718.0",
+      "name": " Add-on kit",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "2.642-802.0",
+      "name": " Add-on kit additional weight BDS",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "2.783-005.0",
+      "name": " Add-on kit carpet cleaning BR 30/4 C",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "2.644-228.0",
+      "name": " Add-on kit deflector roll stackable",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "2.644-225.0",
+      "name": " Add-on kit deflector roll stackable",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.008-056.0",
+      "name": " BRC 45/45 C",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/brc-45-45-c-10080560.html"
+    },
+    {
+      "sku": "1.174-900.0",
+      "name": " HDS 8/18-4 C *EU-I",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/hds-8-18-4-c-11749000.html"
+    },
+    {
+      "sku": "1.428-114.0",
+      "name": " NT 27/1 Me Adv *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/nt-27-1-me-adv-14281140.html"
+    },
+    {
+      "sku": "1.527-150.0",
+      "name": " T 10/1 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.527-154.0",
+      "name": " T 10/1 Adv *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.527-157.0",
+      "name": " T 10/1 Adv *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.527-419.0",
+      "name": " T 10/1 Adv HEPA *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-100.0",
+      "name": " T 12/1 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-148.0",
+      "name": " T 12/1 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-135.0",
+      "name": " T 12/1 eco!efficiency *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-133.0",
+      "name": " T 12/1 Edition *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-134.0",
+      "name": " T 12/1*EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-228.0",
+      "name": " T 15/1",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-250.0",
+      "name": " T 15/1 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-235.0",
+      "name": " T 15/1 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.355-200.0",
+      "name": " T 15/1 EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.527-145.0",
+      "name": " T 7/1 eco!efficiency *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.527-188.0",
+      "name": " T 8/1 L *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/t-8-1-l-15271880.html"
+    },
+    {
+      "sku": "1.528-133.0",
+      "name": " T 9/1 Bp",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/sfaturi-de-curatenie.html"
+    },
+    {
+      "sku": "1.056-310.0",
+      "name": "EWM 2 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/ewm-2-10563100.html"
+    },
+    {
+      "sku": "1.107-390.0",
+      "name": "G 7.180",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/g-7-180-11073900.html"
+    },
+    {
+      "sku": "1.445-320.0",
+      "name": "GSH 4-4 Plus *INT",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/gsh-4-4-plus-14453200.html"
+    },
+    {
+      "sku": "1.445-321.0",
+      "name": "GSH 4-4 Plus Battery Set *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/gsh-4-4-plus-battery-set-14453210.html"
+    },
+    {
+      "sku": "1.444-250.0",
+      "name": "HGE 36-60 Battery *INT",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/hge-36-60-battery-14442500.html"
+    },
+    {
+      "sku": "1.269-660.0",
+      "name": "RCF 3 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/rcf-3-12696600.html"
+    },
+    {
+      "sku": "1.269-620.0",
+      "name": "RCV 3 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/rcv-3-12696200.html"
+    },
+    {
+      "sku": "1.269-640.0",
+      "name": "RCV 5 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/rcv-5-12696400.html"
+    },
+    {
+      "sku": "1.628-127.0",
+      "name": "WD 3 V-17/4/20 *EU",
+      "reason": "REAL_NO_SPECS",
+      "manufacturer_url": "https://www.kaercher.com/ro/aparate-iesite-din-gama/wd-3-v-17-4-20-16281270.html"
+    },
+    {
+      "sku": "2.851-028.0",
+      "name": " ABS steering rollers",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.111-036.0",
+      "name": " Adapter 8 TR20IG-M18AG",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.642-532.0",
+      "name": " Add-on kit dirt trap",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.637-008.0",
+      "name": " Add-on kit frame Cage schmal",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.039-269.0",
+      "name": " Add-on kit liner holder",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.641-244.0",
+      "name": " Add-on kit water refilling tank",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.161-434.0",
+      "name": " B 110 R Classic Bp +R75",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.654-434.0",
+      "name": " BC offb 24V/50A 230V/50-60Hz",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.127-001.0",
+      "name": " BD 50/50 C Bp Classic",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.273-290.0",
+      "name": " BLADES FOR TEXTURED FLOORS",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.368-093.0",
+      "name": " Brush iSolar 400  (1100-1300 l/h)",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.233-017.0",
+      "name": " C-Profile 30",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.889-160.0",
+      "name": " Crevice nozzle wet and dry packaged NW40",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.763-988.0",
+      "name": " Dirt blaster",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.905-016.0",
+      "name": " Disc brush cpl. soft nature 300 mm",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.962-239.0",
+      "name": " Driving carriage DE 4002",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.889-155.0",
+      "name": " Filter bags-fleece 5x NT",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.904-367.0",
+      "name": " Flat-pleated filter only for replacement",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.030-500.0",
+      "name": " HG 43 *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.392-632.0",
+      "name": " Hose assembly M22 pipe cleaning DN6 14MP",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.280-103.0",
+      "name": " KM 100/100 R Bp",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.280-105.0",
+      "name": " KM 100/100 R G",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.114-009.0",
+      "name": " Micro-fibre roll complete BR 45/40",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.637-903.0",
+      "name": " Nozzle pack",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.111-020.0",
+      "name": " Nozzle pack 0110",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.667-288.0",
+      "name": " NT 75/2 Tact² Me *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.994-124.0",
+      "name": " Pad beige 170",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.371-154.0",
+      "name": " Pad green",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.369-733.0",
+      "name": " Pad green with sleeve",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.371-020.0",
+      "name": " Pad Set 2x D 330 Melamin",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.904-312.0",
+      "name": " Paper filtering bag 10x T",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.760-843.0",
+      "name": " Pistol Classic M 155°C",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.883-829.0",
+      "name": " Power nozzle 25043",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.113-002.0",
+      "name": " Power nozzle TR 15033",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.113-009.0",
+      "name": " Power nozzle TR 25047",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.113-028.0",
+      "name": " Power nozzle TR 25070",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.113-017.0",
+      "name": " Power nozzle TR 25100",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.113-057.0",
+      "name": " Power nozzle TR 40080",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.112-045.0",
+      "name": " PowerControl jet pipe 25034",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.401-458.0",
+      "name": " Quick-fitting pipe union complete",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-561.0",
+      "name": " RM 33** 200l smoking resin removing agen",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-424.0",
+      "name": " RM 39** 200l part cleaning agent",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.296-049.0",
+      "name": " RM 69** 10l industrial cleaner",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-156.0",
+      "name": " RM 746** 10l wipe care",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-540.0",
+      "name": " RM 750** 200l intensive deep cleaner",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-854.0",
+      "name": " RM 764 OA** 10l purifier",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-545.0",
+      "name": " RM 776** 10 L tyre and friction marks re",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.295-583.0",
+      "name": " RM 821 Classic** 2,5l spray wax",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.775-800.0",
+      "name": " Rotary controller food 416L",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.273-014.0",
+      "name": " Rubber lip set anti stripe oil resistant",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "5.411-061.0",
+      "name": " Screw plug",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.130-011.0",
+      "name": " Set carpet nozzle complete 350mm",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.250-167.0",
+      "name": " Set side strip",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.035-515.0",
+      "name": " Set spray nozzle",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.092-019.0",
+      "name": " SGV 8/5 Classic *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.643-693.0",
+      "name": " Side scrubbing deck with lifting arm rig",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.116-000.0",
+      "name": " Steam nozzle flat TR",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.412-389.0",
+      "name": " Stop cock Gas",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.440-616.0",
+      "name": " Suction hose cone NT DN50 4m EC",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.527-213.0",
+      "name": " T 11/1 ClassicAdv Re!Plast *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.527-181.0",
+      "name": " T 7/1 Classic *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.656-079.0",
+      "name": " Take-off chimney 76x157 D199",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.042-027.0",
+      "name": " Trimmer line 2,4mm, 44m",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "6.900-698.0",
+      "name": " Waste bag 10STK",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.643-950.0",
+      "name": "Adapter M",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.443-002.0",
+      "name": "Battery Power 4/25 *INT",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.863-316.0",
+      "name": "Car nozzle",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.863-307.0",
+      "name": "Crevice nozzle extra long AD",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.443-060.0",
+      "name": "Fast charger Duo Battery Power 4 V*EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.860-229.0",
+      "name": "Filter /Hepa SV",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.863-332.0",
+      "name": "Garment Steamer",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.645-143.0",
+      "name": "Hose PrimoFlex 3/4\" -50m",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.645-365.0",
+      "name": "Hose trolley HT 4",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.324-400.0",
+      "name": "K 5 WCM *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.644-492.0",
+      "name": "PC 15",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.644-491.0",
+      "name": "PC 7.5",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.445-330.0",
+      "name": "PGS 4-18 *INT",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.863-379.0",
+      "name": "Re!Fibe universal floor cloth set EF",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.766-460.0",
+      "name": "S 6 Twin",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.445-064.0",
+      "name": "Starter kit Battery Power 36/25 *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "2.633-927.0",
+      "name": "Tile cloths",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.628-600.0",
+      "name": "WD 4-18 Dual V-20/22 *INT",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.628-625.0",
+      "name": "WD 4-18 S Dual V-20/22 *INT",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "1.628-314.0",
+      "name": "WD 5 P V-25/8/35 Car (YYY) *EU",
+      "reason": "NO_DATA",
+      "manufacturer_url": null
+    },
+    {
+      "sku": "4.762-433.0",
+      "name": " Roll pad BR 65",
+      "reason": "WRONG_DATA",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/suport-cilindric-638-mm-638-mm-47624330.html",
+      "confidence": 45,
+      "issues": [
+        "Descrierea din DB menționează 'compatibil cu capul de perie R 65', dar pagina spune 'Ideal pentru capul de perie R 56'",
+        "Titlul din DB: 'Roll pad BR 65', dar pagina nu menționează 'BR 65' explicit",
+        "Pagina folosește termenul 'Suport cilindric' în timp ce DB spune 'Ax cilindric căptușit'",
+        "Incompatibilitate majoră: R 65 vs R 56 - posibil greșeală în DB sau pagină"
+      ]
+    }
+  ],
+  "verification_details": [
+    {
+      "sku": "1.161-405.0",
+      "name": " B 110 R Bp+D75",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-spalat-pardoseli/masini-de-spalat-pardoseli-cu-post-de-conducere-step-on/b-110-r-bp-d75-11614050.html",
+      "category": "Curatenie",
+      "subcategory": "Mașini de spălat-uscat",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": false,
+      "issues": [
+        "st2 (Randament practic: 3150 m²/h) - NU apare în pagina producătorului",
+        "st3 (Durata baterie: max. 4h) - NU apare în pagina producătorului (nu e clar dacă e model pe baterie)",
+        "Pagina menționează 'lățimea de lucru de 75 de centimetri' dar nu specifică numeric 750mm",
+        "SKU din pagină apare ca '11614050' (fără puncte), în DB este '1.161-405.0'"
+      ],
+      "reasoning": "Produsul corect identificat, descriere și caracteristici majore match. Dar 2 din 3 specificații tehnice lipsesc din pagina producătorului - nu se pot valida complet.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.680-002.0",
+      "name": " Nozzle light",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/lampa-de-lucru-26800020.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Denumire produs inconsistentă: DB='Nozzle light' vs Pagină='Lampă de lucru'",
+        "SKU în pagină apare ca '26800020' (fără puncte) vs DB '2.680-002.0' (cu puncte)",
+        "Unități lipsă în st1 și st2: 'lumeni' și 'ore' nu sunt specificate în DB"
+      ],
+      "reasoning": "SKU-ul corespunde (formatare diferită dar același produs). Specificații (170 lumeni, 5 ore, 0,2kg) și descriere lungă sunt identice. Doar formatări minore.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.907-154.0",
+      "name": " Disc brush very soft white 385 mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-disc-alba-foarte-moale-alb-385-mm-69071540.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69071540 găsit în pagină. Toate specificațiile tehnice coincid: diametru 385mm, alb, foarte moale, greutate 2.3kg. Descrierea și caracteristicile sunt corecte și corespund cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.676-353.0",
+      "name": "K 3 Car *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/home-garden/aparate-de-spalat-cu-presiune/k-3-car-16763530.html",
+      "category": "Curatenie",
+      "subcategory": "Apă rece",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 95,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 16763530 confirmat în pagină. Descrierea, specificațiile și caracteristicile din DB se aliniază perfect cu conținutul paginii producătorului. Toate datele sunt corecte și complete.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-642.0",
+      "name": " RM 81 Eco ** 2,5l Active Cleaner, alkali",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/agent-pentru-curatare-pressurepro-active-alcalin-rm-81-eco-efficiency-62956420.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 62956420 (varianta 6.295-642.0) confirmat în pagină. Descriere, specificații tehnice și caracteristici corespund perfect cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.273-214.0",
+      "name": " Rubber lip set standard",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/lamele-de-aspirat-960-mm-albastru-cauciuc-natural-960-mm-62732140.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 62732140 identificat în pagină. Descriere, specificații tehnice și caracteristici corespund perfect cu datele din DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.884-526.0",
+      "name": " Power nozzle 40075",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-40-075-28845260.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare în pagină ca '28845260' (fără puncte) în loc de '2.884-526.0'",
+        "Lipsește specificația 'Jet tip evantai' din secțiunea tehnica a paginii",
+        "Caracteristici c2 și c3 nu sunt explicitute în pagina (doar implicite în descriere)"
+      ],
+      "reasoning": "Produsul corect identificat. Descrierea și specs tehnice principale se potrivesc. Formatarea SKU diferă dar se referea la același produs (2.884-526.0 ≡ 28845260).",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-628.0",
+      "name": " RM 111 *DE,AT,CH,FR 1L Advance 2",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/intretinere-sistem-avansat-2-intretinere-pompe-protectie-impotriva-apei-negre-rm-111-asf-62956280.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Formatul SKU pe pagină este '62956280' (fără puncte), în DB este '6.295-628.0' - aceeași valoare numerică",
+        "Denumirea produsului în DB conține '*DE,AT,CH,FR' și 'Advance 2', pagina confirmă 'RM 111 ASF' și 'advance 2'"
+      ],
+      "reasoning": "SKU se potrivește (format diferit dar valoare identică). Descrierea, specificațiile (pH 12, 1L, 1.3kg) și caracteristicile sunt confirmate pe pagină.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-001.0",
+      "name": " Power nozzle TR 0040",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-0-040-21130010.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare în pagină ca '21130010' (fără puncte), dar în DB este '2.113-001.0' (cu puncte) - format diferit",
+        "st3 (Unghi jet: 0°) nu apare explicit în secțiunea 'Date tehnice' a paginii, doar în titlu și descriere"
+      ],
+      "reasoning": "SKU și descrierea se potrivesc. Specificațiile (dimensiune 040, EASY!Lock, culoare argintiu) sunt prezente și corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.883-390.0",
+      "name": " Power nozzle 15055-1",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-15-055-28833900.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare în pagină ca '28833900' (fără puncte) în loc de '2.883-390.0'",
+        "Lipsește din pagină specificația 'c1', 'c2', 'c3' (caracteristici suplimentare din DB)",
+        "Pagina nu menționează explicit filetul M22 x 1,5 în descriere, doar în specificații tehnice"
+      ],
+      "reasoning": "SKU-ul se potrivește (format diferit dar același produs). Descrierea scurtă și specificațiile tehnice (unghi 15°, dimensiune 055, filet M22x1,5) sunt identice. Culoarea argintiu confirmată.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-652.0",
+      "name": " RM 69 Eco** 20l basic cleaner",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/podea/agenti-pentru-curatarea-de-baza/detergent-floorpro-rm-69-eco-efficiency-62956520.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 62956520, din DB este 6.295-652.0 - formatare diferită dar același produs",
+        "Spații suplimentare la începutul numelui produsului din DB"
+      ],
+      "reasoning": "SKU match (formatare diferită dar identic), descriere identică, specificații tehnice prezente și corecte (20l, pH 12, 21.6kg). Date coerente cu pagina.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-048.0",
+      "name": " Power nozzle TR 15060",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-15-060-21130480.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare ca '21130480' în pagina (fără puncte), nu exact '2.113-048.0' din DB",
+        "Lipsă informație despre unghi de pulverizare 15° în secțiunea de specificații tehnice din pagină"
+      ],
+      "reasoning": "Pagina corespunde SKU-ului (variație formatare). Descrierea, dimensiunea duză (060), filetul EASY!Lock și culoarea argintiu sunt confirmați. Datele DB sunt corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.401-459.0",
+      "name": " Plug nipple",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/niplu-de-prindere-64014590.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '64014590' (fără puncte), în DB este '6.401-459.0' (cu puncte)",
+        "Pagina spune '6.401-458' în descriere, dar produsul verificat este '6.401-459.0'",
+        "Greutate cu ambalaj (0,2 kg) nu este inclusă în DB"
+      ],
+      "reasoning": "SKU și specs tehnice se potrivesc. Ușoară discrepanță în formatare SKU și o mică greșeală de tipar în pagină ('458' vs '459'), dar datele de bază sunt corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.783-467.0",
+      "name": " BR 35/12 C Bp Pack *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-spalat-pardoseli/masini-de-spalat-pardoseli-compacte/br-35-12-c-bp-pack-eu-17834670.html",
+      "category": "Curatenie",
+      "subcategory": "Mașini de frecat & monodisc",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": false,
+      "issues": [
+        "st1 (Lățime de lucru 350mm/450mm) nu apare explicit în pagină",
+        "st2 (Autonomie baterie max 1,5 ore) nu este specificată, pagina menționează doar 'autonomie mare' și reîncărcare rapidă",
+        "st3 (Performanță suprafață 1050 m²/h) nu apare în pagină",
+        "SKU din pagină este '17834670' dar în DB este '1.783-467.0' (formatare diferită, dar pare același)",
+        "Pagina este incompletă (se termină brusc la secțiunea baterie)"
+      ],
+      "reasoning": "SKU coincide (cu variație de formatare), descrierea și caracteristicile generale se potrivesc, dar 3 din 3 specificații tehnice lipsesc din pagina. Pagina pare trunchiată.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.762-484.0",
+      "name": " Brush roll complete orange 300 mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-rola-portocalie-300-cu-peri-inegali-portocaliu-300-mm-47624840.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 47624840 (format fără puncte) confirmat. Toate specificațiile tehnice și descrierea se potrivesc perfect cu pagina producătorului.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-049.0",
+      "name": " Power nozzle TR 15070",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-15-070-21130490.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '21130490' (fără puncte) vs '2.113-049.0' din DB - format diferit dar echivalent",
+        "Titlul paginii: 'Duza de putere 15°, 070' vs DB 'Power nozzle TR 15070' - variație de limbă/format acceptabilă"
+      ],
+      "reasoning": "SKU corespunde (2.113-049.0 = 21130490), descriere identică, toate spec tehnice prezente și corecte: unghi 15°, dimensiune 070, filet EASY!Lock.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-046.0",
+      "name": " Power nozzle TR 15045",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-15-045-21130460.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '21130460' (fără puncte) vs '2.113-046.0' în DB - format diferit dar același produs",
+        "Culoarea 'argintiu' menționată în pagină nu apare în DB"
+      ],
+      "reasoning": "SKU se corelează (21130460 = 2.113-046.0). Descrierea, unghiul 15°, dimensiunea 045 și EASY!Lock se confirmă în pagina producătorului. Date corecte și complete.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.883-400.0",
+      "name": " Power nozzle 25052",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-25-052-28834000.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '28834000' (fără puncte), diferit de '2.883-400.0' din DB - posibil acelaşi produs, format diferit",
+        "Lipsă specificație st1 din pagină: unghiul de pulverizare (25°) nu e listat explicit în secțiunea 'Date tehnice', doar în titlu",
+        "Name din DB are spațiu la început: ' Power nozzle 25052' - corectare necesară"
+      ],
+      "reasoning": "Pagina corespunde produsului: descriere identică, unghiul 25° și dimensiunea 052 confirmate, filetul M22x1,5 verificat. SKU-ul e acelaşi, doar formatul diferit.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.840-039.0",
+      "name": " Crevice nozzle packaged NW35",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-pentru-rosturi-packaged-nw35-28400390.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 28400390 prezent în pagină. Descrierea și toate specificațiile tehnice (diametru 35mm, lungime 195mm, culoare negru) sunt corecte și corespund cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.906-977.0",
+      "name": " Roller brush white - BR 55",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/stavilar-cilindric-moale-532-mm-moale-alb-532-mm-69069770.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69069770 identificat în pagină. Toate specificațiile tehnice (culoare alb, lungime 532mm, grad duritate moale, greutate 1.9kg) se potrivesc perfect cu datele din DB. Descrierea și compatibilitatea cu R 55 sunt corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.092-104.0",
+      "name": " SG 4/4 *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/aparate-de-curatat-cu-abur-si-aspiratoare-cu-abur/aparate-de-curatat-cu-abur/sg-4-4-10921040.html",
+      "category": "Curatenie",
+      "subcategory": "Aparate cu abur",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Capacitate totală în DB: 4.4 (unitate lipsă) - pagina spune 'peste 4 litri', probabil 4.4 litri",
+        "Putere în DB: 2300 (unitate lipsă - probabil W) - nu apare explicit pe pagină"
+      ],
+      "reasoning": "SKU 10921040 (format 1.092-104.0) găsit pe pagină. Descriere și caracteristici corespund perfect: 4 bari, două rezervoare, VapoHydro, dezinfectare certificată.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-325.0",
+      "name": " RM 110*AUT 1l Machine protector Advance1",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-pentru-protejarea-masinii-advance-1-rm-110-asf-62953250.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 62953250 (fără puncte), în DB este 6.295-325.0 (cu puncte) - probabil același produs cu formatare diferită",
+        "Lipsă informație despre greutate cu ambalaj în DB (pagina arată 1,1 kg)"
+      ],
+      "reasoning": "SKU coincide (formatare diferită), descriere și specificații se potrivesc (pH 9, capacitate 1l, greutate 1kg). Datele sunt corecte și complete.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.644-139.0",
+      "name": " Add-on kit emergency stop B100/B75",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/atasament-oprire-de-urgenta-b100-b75-26441390.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii & piese",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 26441390 (format fără puncte) confirmat pe pagină. Descrierea, specificațiile și compatibilitatea se potrivesc exact cu BD seria.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.373-071.0",
+      "name": " Carrying rack",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/cadru-de-transport-63730710.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "st3 este null în DB, dar pagina nu conține o a treia specificație tehnică - consistent"
+      ],
+      "reasoning": "SKU 63730710 (6.373-071.0) confirmat în pagină. Descriere scurtă identică. Specificații st1 și st2 corecte și prezente (M22 x 1,5; 6,4 kg).",
+      "reset_done": false
+    },
+    {
+      "sku": "4.762-415.0",
+      "name": " Roll Pad BR55",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/stavilar-cilindric-flansa-br55-550-mm-47624150.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '47624150' (fără puncte), DB are '4.762-415.0' (cu puncte) - formatări diferite ale aceluiași cod",
+        "Descrierea din DB menționează 'mașinile de curățat Kärcher seria BR55 și B50', pagina confirmă compatibilitate cu BR55 și B50, dar și alte modele (B 50 W, BR 50, etc.)",
+        "Naming inconsistență: DB zice 'Roll Pad BR55', pagina zice 'Stavilar cilindric flansa BR55' - termeni diferiti pentru același produs"
+      ],
+      "reasoning": "SKU-ul corespunde (diferență doar în format). Specificații tehnice identice: 550mm, 1.7kg, 1 buc. Descrierea și compatibilitate se aliniază. Date corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-038.0",
+      "name": " Power nozzle TR 0080",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-0-080-21130380.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 21130380 (2.113-038.0) confirmat. Descrierea, specificațiile tehnice și caracteristicile se potrivesc perfect cu pagina producătorului.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.273-252.0",
+      "name": " Rubber lip set",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/lamele-de-aspirat-1-420-mm-transparent-rezistent-la-ulei-ondulat-1210-mm-62732520.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Pagina conține text de navigație și titluri multiple care distorsionează conținutul (text brut nestructurat)"
+      ],
+      "reasoning": "SKU 62732520 identificat. Lungime 1210mm, Cantitate 2, Greutate 1.3kg confirmate. Material poliuretan, rezistent ulei, design ondulat transparent se potrivesc descrierii DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.642-430.0",
+      "name": " Nozzle pack 035",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/kit-de-duze-pentru-frv-035-26424300.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 26424300 din pagină corespunde cu 2.642-430.0 din DB. Descrierea, specificațiile tehnice și caracteristicile sunt identice și corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.130-010.0",
+      "name": " Crevice nozzle complete packaged",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-pentru-rosturi-41300100.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 41300100 identificat. Descriere și specificații tehnice (253mm lungime, 32mm diametru, 0,1kg) se potrivesc perfect cu pagina producătorului.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-852.0",
+      "name": " RM 762** 5l waterproofing",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/covor/protector-rm-762-5l-62958520.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 62958520 (fără puncte), în DB este 6.295-852.0 (cu puncte) - format diferit, aceeași valoare",
+        "Numele produsului în DB are spații suplimentare la început: ' RM 762** 5l waterproofing'"
+      ],
+      "reasoning": "SKU-ul se potrivește (aceeași valoare, format diferit). Descrierea și specificațiile tehnice sunt corecte și prezente în pagină.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.037-140.0",
+      "name": " Rubber lip set oil resistant 1230mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/set-lamele-de-aspirare-rezistente-la-ulei-1230mm-rezistent-la-ulei-ondulat-1230-mm-40371400.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 40371400 confirmat pe pagină. Descriere, lungime 1230mm, cantitate 2, material poliuretan rezistent la ulei, profil ondulat - toate match perfect cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.415-084.0",
+      "name": " Nozzle round D6,0",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-borcarbid-pentru-aparate-pana-la-1000-l-h-64150840.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '64150840' (fără puncte) vs DB '6.415-084.0' (cu puncte) - format diferit dar același produs",
+        "Descrierea din DB menționează 'diametru duză: 6,0' dar pagina nu specifică explicit diametrul în secțiunea Specificații tehnice"
+      ],
+      "reasoning": "SKU corespunde (doar format diferit), descriere și specs tehnice verificate. Material carbură de bor, filet M22x1,5 și greutate 0,2kg coincid perfect.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.783-494.0",
+      "name": " BR 35/12 C Bp Back Go!Further",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-spalat-pardoseli/masini-de-spalat-pardoseli-compacte/br-35-12-c-bp-pack-go-further-17834940.html",
+      "category": "Curatenie",
+      "subcategory": "Mașini de frecat & monodisc",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "st1 'Greutate: 35% mai ușoară' - pagina nu menționează explicit procentajul, doar 'greutate redusă'",
+        "st3 'Autonomie baterie: Până la 50% mai lungă' - pagina menționează 'autonomie extinsă' și 'trei ori mai mare durată de viață', nu explicit 50%"
+      ],
+      "reasoning": "SKU 1.783-494.0 (17834940) găsit pe pagină. Descriere generală corespunde: plastic reciclat 38%, baterie Li-Ion, KART, eco!efficiency, spații mici. Specificații tehnice prezente parțial cu mici discrepanțe în formulare.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.852-491.0",
+      "name": " Add-on kit ram protection KM 100/120 R",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/protectie-la-impact-28524910.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii & piese",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 28524910 găsit în pagină. Toate specificațiile tehnice (greutate, dimensiuni, greutate ambalaj) și compatibilitatea KM 100/120 R se potrivesc. Descrierea corespunde.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.527-308.0",
+      "name": " T 10/1 Adv",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/aspiratoare/aspiratoare-uscate/aspiratoare-uscate/t-10-1-adv-15273080.html",
+      "category": "Curatenie",
+      "subcategory": "Aspiratoare uscate (T)",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 95,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 15273080 apare în pagină. Toate specificațiile (52 dB, 10 litri, 45% reciclat) și descrierea sunt corecte și corespund cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.760-877.0",
+      "name": " Nozzle pack 1/8\" 040 FR Classic",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/nozzle-m-040-with-package-47608770.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Pagina producătorului nu conține descrierea scurtă din DB (text detaliat despre debit și aplicații)",
+        "st3 din DB este null - nu se poate verifica",
+        "Caracteristicile (c1, c2, c3) nu sunt prezente explicit pe pagina scrapată",
+        "Conținutul paginii este parțial (navigation, meniu, footer) - lipsesc detaliile produsului"
+      ],
+      "reasoning": "SKU 47608770 apare pe pagină și specificațiile tehnice (debit 500-700 l/h, duză 40mm) se potrivesc. Însă scraping incomplet impiedică verificarea completă a descrierii și caracteristicilor.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.889-221.0",
+      "name": " Suction brush packaged NW 35",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-de-aspirare-ambalata-nw-35-28892210.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 28892210 (format fără puncte) identificat în pagină. Descriere, specificații tehnice și caracteristici corespund perfect cu baza de date.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.118-007.0",
+      "name": " Rotary controller TR 270L",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/servo-control-750-l-h-41180070.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '41180070' (fără puncte) în loc de '4.118-007.0' - formatare diferită dar același produs",
+        "Culoarea 'Galben' din pagină nu este menționată în datele DB"
+      ],
+      "reasoning": "Produsul este corect identificat. Descrierea și specificațiile tehnice (debit 750 l/h, filet EASY!Lock, greutate 0,3 kg) corespund perfect. Doar formatarea SKU diferă.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.889-007.0",
+      "name": " Rubber strip 300mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/banda-de-cauciuc-300mm-28890070.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 28890070 prezent în pagină. Descriere, dimensiuni (295x35x35mm), greutate (0,1kg) și culoare (negru) corespund perfect cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-260.0",
+      "name": " Diamond pad white set 5x Ø508",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-diamant-lavete-alb-508-mm-grosier-alb-508-mm-5-bucata-63712600.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 63712600 apare în pagină. Descrierea, specificațiile tehnice (diametru 508mm, grosier, alb, 5 bucăți) și caracteristicile coincid perfect cu datele din DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.273-354.0",
+      "name": " Rubber lip set oil resistant",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/set-de-margini-de-cauciuc-rezistente-la-ulei-rezistent-la-ulei-ondulat-790-mm-62733540.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 62733540 apare în pagină. Descrierea și specificațiile tehnice (790mm, 2 bucăți, poliuretan transparent, rezistent la ulei) se potrivesc exact cu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-236.0",
+      "name": " Diamond pad green set 5x Ø381",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-diamant-lavete-verde-385-mm-fin-verde-385-mm-5-bucata-63712360.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Nome produsului în DB: 'Diamond pad green set 5x Ø381' vs pagină: 'Ø385' - diametrul în titlu DB este eronat",
+        "c3 ('Seteconomicos') pare text malformat - lipsește spațiu/sunt greșeli de formatare"
+      ],
+      "reasoning": "SKU 63712360 confirmat. Specs 100% corecte (385mm, fin, verde, 5 buc). Descriere funcționalități potrivită. Discrepanță minoră: DB arată Ø381 în titlu, pagina 385.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.680-336.0",
+      "name": " Brush side broom very hard RH or LH",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/matura-laterala-stanga-dreapta-66803360.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 66803360 identificat în pagină. Descriere și specs (dur, 350mm, 4kg) sunt în concordanță cu DB. Material PPL+oțel confirmat.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.181-010.0",
+      "name": " Rubber lip set 1180 Linatex",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/set-lamele-de-aspirare-1180-linatex-linatex-r-1210-mm-41810100.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 41810100 confirmed. Descriere și specifici tehnici corespund perfect: Lungime 1210mm, Cantitate 2 bucăți, Greutate 0,9kg, Material Linatex®, culoare roșu.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.902-095.0",
+      "name": " Connecting sleeve",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/mufa-de-legatura-unelte-electrice-infiletabil-69020950.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69020950 confirmat pe pagină. Descrierea și specificațiile tehnice corespund integral: adaptor 2 căi, DN 35, diametru interior 28mm, exterior 34/38.8mm, compatibil NT.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-354.0",
+      "name": " Pad set 2x D 170  Melamin",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/pad-din-melamina-170-mm-2-bucata-63713540.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Descrierea din DB conține spații inutile la început (\" Pad set 2x D 170\")",
+        "DB menționează explicitic compatibilitate BD 17/5 C, pagina o confirmă dar în secțiune separată"
+      ],
+      "reasoning": "SKU 63713540 (6.371-354.0) apare în pagină. Toate spec tehnice match: Ø170mm, 2 buc, 0.1kg, material melamină, compatibil BD 17/5 C. Descrierea corespunde.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.181-008.0",
+      "name": " Rubber lip set 1400 Linatex",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/set-lamele-de-aspirare-1400-linatex-linatex-r-1542-mm-41810080.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 95,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 41810080 apare în pagină. Descrierea, lungimea (1542mm), cantitatea (2 bucăți), greutatea (1,1kg) și materialul Linatex® corespund perfect cu datele din DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-584.0",
+      "name": " RM 31** 2,5l oil and grease cleaner Extr",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-de-curatare-a-uleiului-si-grasimii-extra-rm-31-asf-62955840.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "ERROR",
+      "confidence": -1,
+      "issues": [
+        "Eroare Claude: Expected ',' or ']' after array element in JSON at position 153 (line 7 column 51)"
+      ],
+      "reasoning": "Verificarea a eșuat",
+      "reset_done": false
+    },
+    {
+      "sku": "4.760-880.0",
+      "name": " Nozzle pack 1/8\" 080 FR Classic",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/nozzle-m-080-with-package-47608800.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Pagina producătorului nu conține descrierea detaliată din DB (mention 'înaltă presiune', 'aplicații industriale')",
+        "Lipsesc caracteristicile (c1, c2, c3) din pagina producătorului",
+        "Pagina este o pagină de navigație/meniu, nu o pagină de produs complet cu detalii"
+      ],
+      "reasoning": "SKU și specs tehnice sunt prezente și corecte, dar pagina pare incompletă sau nu s-a încărcat corect. Descrierea DB nu se găsește pe pagină.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.209-798.0",
+      "name": " Cable harness add-on kit HD-ST",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/cutie-de-legatura-pentru-telecomanda-22097980.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare în pagină ca '22097980' (fără puncte) vs '2.209-798.0' în DB - format diferit dar același produs",
+        "st2 și st3 sunt null în DB, dar pagina nu conține alte specificații tehnice decât greutatea"
+      ],
+      "reasoning": "Pagina corespunde SKU-ului (format diferit dar același ID produs). Descrierea și greutatea se potrivesc. Date consistente.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.113-071.0",
+      "name": " Power nozzle TR 25032",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-25-032-21130710.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 21130710 (fără puncte) vs 2.113-071.0 în DB - formatare diferită dar același produs",
+        "Pagina nu menționează explicit unghiul de pulverizare 25° în secțiunea specificații tehnice (doar în titlu)",
+        "Lipsă informații despre caracteristici (c1, c2, c3 din DB) pe pagina producătorului"
+      ],
+      "reasoning": "SKU-ul corespunde, descrierea și specs tehnice se regăsesc în pagina producătorului. Formatarea SKU diferă dar referă același produs. Datele din DB sunt valide și corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.641-811.0",
+      "name": " Metering station DS 3",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/ds3-rm-statie-de-dozare-26418110.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii & piese",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 26418110 (format 2.641-811.0) identificat. Descrierea și toate spec tehnice (presiune 2-6 bar, greutate 3,9kg, dimensiuni 390x390x150mm) sunt corecte și prezente pe pagina DS3 RM.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.428-100.0",
+      "name": " NT 27/1 Me *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/aspiratoare/aspiratoare-umed-uscate/clasa-standard/nt-27-1-me-14281000.html",
+      "category": "Curatenie",
+      "subcategory": "Aspiratoare umed-uscat (NT)",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": false,
+      "issues": [
+        "SKU în pagină apare ca '14281000' (fără puncte), nu '1.428-100.0'",
+        "Specificația st1 (Putere motor: 1380W) - NU apare în pagina producătorului",
+        "Specificația st3 (Vacuum: 249 mbar) - NU apare în pagina producătorului",
+        "Pagina nu conține specificații tehnice numerice detaliate pentru putere și vacuum"
+      ],
+      "reasoning": "SKU corect (variație format), descriere matches, dar specificații tehnice lipsesc din pagina oficială. Nu putem valida st1/st3.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.906-500.0",
+      "name": " Suction hose NT DN35 4m EC",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/furtun-de-aspirare-c-35-4-m-conductor-electric-69065000.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69065000 (echivalent 6.906-500.0) găsit în pagină. Toate specificațiile coincid: lungime 4m, DN35, greutate 0,9kg, conductibilitate electrică, racord C35 și adaptor știț.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.112-032.0",
+      "name": " Subsoil jet pipe TR only for replacement",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/lance-caroserie-41120320.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 41120320, dar în DB este 4.112-032.0 (formatare diferită, dar același produs)",
+        "Pagina conține text duplicat în descriere: 'Tija din otel inoxidabil...' care pare copiat greșit"
+      ],
+      "reasoning": "SKU și specificații corespund (700mm, EASY!Lock, 1kg). Descrieri identice. Text duplicat minor nu afectează corectitudinea datelor principale.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.903-887.0",
+      "name": " Suction brush DN32",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/pensula-de-aspirare-diametru32-69038870.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69038870 confirmat pe pagină. Descrierea, specificațiile tehnice (DN32, 115x70x43mm, 0.1kg) și compatibilitatea (BV, T) se potrivesc perfect.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.386-269.0",
+      "name": " Screw connector T16-S-ST-A3K  DIN 2353",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/infiletare-tip-t-otel-zincat-ermeto-63862690.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU apare parțial în pagină ca '63862690' (fără separatorul cu punct)",
+        "Titlul din DB include 'DIN 2353' care nu apare explicit în titlul paginii",
+        "st3 (Tip conexiune: T (90º)) nu este explicit enumerat în secțiunea 'Date tehnice' din pagină"
+      ],
+      "reasoning": "Pagina este pentru produsul corect (T-connector, oțel zincat, 16mm, Ermeto). Descrierea și specs coincid. SKU identificabil chiar fără punct.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.420-006.0",
+      "name": " Pipelines kit",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/kit-tevi-de-inalta-presiune-24200060.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '24200060' (fără puncte) în loc de '2.420-006.0' (cu puncte)",
+        "Titlul paginii: 'Kit țevi de înaltă presiune' vs DB: 'Pipelines kit' - traducere inconsistentă"
+      ],
+      "reasoning": "Datele tehnice coincid complet (3m, Ø16x2mm, ID12, 2.8kg, inox, accesorii). SKU mapează corect (24200060 = 2.420-006.0). Descrieri identice.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-421.0",
+      "name": " RM 25** 200l active cleaner, acidic",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-de-curatare-acida-rm-25-asf-62954210.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '62954210' (fără puncte), în DB este '6.295-421.0' (cu puncte) - formatul diferit dar același produs",
+        "Numele produsului în DB conține '**' care pare caracter escape neintențional",
+        "Descrierea din DB spune 'active cleaner' dar pagina nu menționează explicit acest termen"
+      ],
+      "reasoning": "SKU corespunde (doar format diferit), descrierea și specs sunt identice cu pagina. Toate datele tehnice (200l, 1 bucată, 225kg) se potrivesc perfect.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-913.0",
+      "name": " RM 756** 1l Multi Cleaner",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/podea/detergent-pentru-curatarea-de-intretinere/floorpro-multi-reiniger-rm-756-62959130.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Numele din DB are spații suplimentare la început: ' RM 756** 1l Multi Cleaner' (ar trebui fără asteriscuri și spații)"
+      ],
+      "reasoning": "SKU 62959130 confirmat în pagină. Toate specificațiile tehnice se potrivesc: 1l, pH 9, 1.1kg. Descrierea și categoria sunt corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "9.770-638.0",
+      "name": " Crevice nozzle",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-pentru-rosturi-97706380.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": false,
+      "issues": [
+        "Discrepanță lungime: DB spune 340 mm, pagina menționează în text descriptiv 250 mm, dar în specificații tehnice apare 340 mm",
+        "SKU-ul din pagină este formatat diferit: 97706380 vs 9.770-638.0 din DB (probabil același produs cu formatare diferită)",
+        "Descrierea din DB spune '340 mm' explicit, dar în textul paginii apare '250 mm' în fraza descriptivă"
+      ],
+      "reasoning": "SKU-ul corespunde (variație formatare). Descriere OK. Lungime: 340mm în specs tehnice vs 250mm în text descriptiv pagină = neclaritate. Necesită verificare clarificare lungime reale.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.369-473.0",
+      "name": " Pad black",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/paduri-432-mm-negru-dur-negru-432-mm-5-bucata-63694730.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 63694730 găsit pe pagină. Toate specificațiile tehnice (Diametru 432mm, Grad duritate dur, Cantitate 5, Culoare negru) se potrivesc perfect. Descrierea din DB corespunde cu pagina.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.906-642.0",
+      "name": " Roller brush red",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-rola-69066420.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '69066420' (fără puncte) vs '6.906-642.0' în DB - format diferit dar același produs",
+        "Titlu pagină: 'Perie rolă 69066420' vs DB 'Roller brush red' - inconsistență limbă/format"
+      ],
+      "reasoning": "SKU identical (variație format), descriere și specs tehnice (duritate, greutate 0,2kg, dimensiuni 275x65x65mm, culoare roșie) corespund perfect. Date corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-488.0",
+      "name": " RM 110** 20l Machine protector",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-pentru-protejarea-masinii-rm-110-asf-62954880.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '62954880' (fără puncte), în DB este '6.295-488.0' (cu puncte) - format diferit dar aceeași valoare",
+        "Nume produs în DB are spații suplimentare la început: ' RM 110** 20l' vs pagina 'RM 110 ASF, 20l'",
+        "Greutate cu ambalaj (21,6 kg) din pagină nu apare în DB"
+      ],
+      "reasoning": "SKU și specificații tehnice se potrivesc. Descrierea scurtă corespunde cu conținutul paginii. Mici diferențe de formatare nu afectează corectitudinea datelor.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.906-643.0",
+      "name": " Roller brush black",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-rola-pentru-aspiratoare-verticale-cv-38-1-negru-69066430.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69066430 prezent în pagină. Descrierea, specificațiile tehnice (grad duritate mediu dur, dimensiuni 356x61x61mm, greutate 0,2kg) și compatibilitatea CV 38/1 se potrivesc perfect cu baza de date.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.118-008.0",
+      "name": " Rotary controller TR 416L",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/servo-control-750-l-h-1100-l-h-41180080.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Nume produs în DB: 'Rotary controller TR 416L' vs pagină: 'Servo Control' - dezacord în denumire",
+        "SKU în pagină apare ca '41180080' (fără puncte) vs DB '4.118-008.0' (cu puncte) - format diferit dar aceeași valoare"
+      ],
+      "reasoning": "SKU confirmat (41180080 = 4.118-008.0), specificații tehnice corecte (debit 750-1100 l/h, EASY!Lock, 0.3kg), descriere corespunde. Divergență doar în denumire produs.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.037-138.0",
+      "name": " Rubber lip set standard 1230mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/lamele-de-aspirare-rezistente-la-ulei-1230mm-cauciuc-natural-1230-mm-40371380.html",
+      "category": "Curatenie",
+      "subcategory": "Lamele & raclete",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Culoarea specificată pe pagină (albastru) nu apare în descrierea din DB",
+        "Greutatea cu ambalaj (1,1 kg) nu este documentată în DB",
+        "st3 din DB menționează '2 bucăți' dar pagina zice 'lamele frontale și posterioare' - ambiguu dacă sunt într-adevăr 2 bucăți sau doar descriere"
+      ],
+      "reasoning": "SKU 40371380 (4.037-138.0) găsit în pagină. Descrierea, lungimea (1230mm), materialul (cauciuc natural), și destinația (pardoseli standard) se corelează corect.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.517-123.0",
+      "name": " KM 70/20 C 2SB Go!Further",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-maturat/masini-de-maturat-conduse-manual/km-70-20-c-2sb-go-further-15171230.html",
+      "category": "Curatenie",
+      "subcategory": "Măturătoare",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": false,
+      "issues": [
+        "st1 (Capacitate maximă de suprafață: 3920) - NU apare în pagina producătorului",
+        "st2 (Lățime de lucru cu 2 perii laterale: 980) - NU apare în pagina producătorului",
+        "st3 (Volum rezervor: 45 / 20) - NU apare în pagina producătorului",
+        "SKU în pagina: 15171230 vs DB: 1.517-123.0 (format diferit, dar reprezentează același produs)"
+      ],
+      "reasoning": "SKU și descrierea coincid, dar specificațiile tehnice lipsesc din pagina producătorului. Datele din DB nu pot fi verificate pe pagina accesibilă.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-258.0",
+      "name": " Diamond pad white set 5x Ø457",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-diamant-lavete-alb-457-mm-grosier-alb-457-mm-5-bucata-63712580.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 63712580 identificat corect. Descrierea și specificațiile (diametru 457mm, grosier, alb, cantitate 5) coincid perfect cu pagina producătorului.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.905-817.0",
+      "name": " Crevice nozzle DN40",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-pentru-rosturi-diametru40-69058170.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69058170 (format 6.905-817.0) identificat în pagină. Toate specificațiile tehnice coincid: DN40, lungime 400mm, greutate 0.4kg, construcție metal. Descrierea corespunde.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.885-225.0",
+      "name": " Power nozzle 15036 - nur fuer Ersatz",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-putere-15036-15-036-28852250.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 28852250, în DB este 2.885-225.0 - formatare diferită dar același produs",
+        "Pagina lipsește unghiul de pulverizare (15°) în secțiunea 'Date tehnice'",
+        "Lipsă caracteristici (c1, c2, c3) din pagina producătorului"
+      ],
+      "reasoning": "SKU corespunde (format diferit), descriere și specs tehnice valide, dar unghiul 15° nu apare explicit în secțiunea tech specs a paginii.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.127-019.0",
+      "name": " BD 70/75 W Classic Bp Pack 170Ah",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-spalat-pardoseli/masini-de-spalat-pardoseli-conduse-manual/bd-70-75-w-bp-pack-classic-eu-11270190.html",
+      "category": "Curatenie",
+      "subcategory": "Mașini de spălat-uscat",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 11270190 (format 1.127-019.0) confirmat în pagină. Descriere, specificații tehnice și caracteristici corespund perfect cu DB. Toate datele sunt corecte și prezente.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.889-010.0",
+      "name": " Rubber strip 150mm",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/banda-de-cauciuc-150mm-28890100.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '28890100' (fără puncte) vs DB '2.889-010.0' (cu puncte) - format diferit dar același produs",
+        "Descrierea din DB menționează 'duza manuală 2.889-008.0' și 'seria SGV' - pagina confirmă doar compatibilitate SGV fără detalii complete",
+        "st3: dimensiuni 'Î' (înălțime) nu este explicitat ca fiind în mm pe pagina, dar valoarea numerică e aceeași"
+      ],
+      "reasoning": "SKU corespunde (variație format), descrierea și specs tehnice sunt corecte și complete pe pagină. Date consistente între DB și sursă producător.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-648.0",
+      "name": " RM 31 Eco** 20l oil and grease cleaner E",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/agent-pentru-curatare-pressurepro-extra-rm-31-eco-efficiency-pentru-uleiuri-si-grasimi-62956480.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Nome în DB are spații suplimentari la început: ' RM 31 Eco** 20l oil and grease cleaner E'",
+        "Asteriscuri (** și *) în nume DB nu se regăsesc pe pagină - posibil artifact de formatare"
+      ],
+      "reasoning": "SKU 62956480 identificat corect. Descriere și specificații (pH 14, 20L, 24,1kg) corespund perfect paginii. Mici probleme cosmetice doar în formatare numului.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.762-628.0",
+      "name": " Roll pad - R85 + R90",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/roll-pad-r85-800-mm-47626280.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Pagina producătorului listează doar 'Roll pad - R85' în titlu, nu menționează R90 cum apare în DB",
+        "Descrierea din DB menționează 'R85 + R90' dar pagina confirmă doar compatibilitatea cu R85"
+      ],
+      "reasoning": "SKU 47626280 și specificațiile tehnice (800mm, 2.9kg, 1 bucată) sunt confirm corecte. Mică neconcordanță cu R90 în titlu DB.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.287-016.0",
+      "name": " Descaler ** 25 kg",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/vehicule/softening-salt-62870160.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți casnici",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Numele produsului din DB conține caractere speciale '**' care nu apar pe pagină",
+        "st2 din DB listează doar 2 dimensiuni (600 x 400), pagina include și înălțimea (600 x 400 mm fără înălțime specifică în st2)"
+      ],
+      "reasoning": "SKU 62870160 (echivalent 6.287-016.0) identificat corect. Descriere și specificații principale coincid. Greutate 25kg, ambalaj 1 buc, dimensiuni corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.440-907.0",
+      "name": " Suction hose elbow T DN32 2.5m AS",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/furtun-de-aspirare-cu-cot-antistatic-44409070.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '44409070' (fără puncte), în DB este '4.440-907.0' (cu puncte) - format diferit, dar referă același produs",
+        "Pagina menționează compatibilitate cu T 7/1 și T 9/1 Bp în secțiunea 'Produse compatibile', dar nu sunt listați în descrierea scurtă din DB"
+      ],
+      "reasoning": "SKU-ul se potrivește (44409070 = 4.440-907.0), specificații tehnice corecte (2,5m, DN32, 0,5kg), descriere conformă. Mici discrepanțe în format SKU și compatibilități suplimentare.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-847.0",
+      "name": " RM 760 OA 10kg cleaner iCapsol, powder *",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/covor/detergent-pentru-curatarea-covoarelor-pudra-rm-760-62958470.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '62958470' (fără puncte) vs '6.295-847.0' în DB - format diferit dar același produs",
+        "st1 'Dimensiune ambalaj: 10' lipsit unitate de măsură (kg) - pagina confiră 10kg"
+      ],
+      "reasoning": "SKU și produs identical. Descrierea scurtă corespunde perfect. Specs confirmate: 10kg, pH 9. Doar formatting minor al SKU și unitate lipsă în st1.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.321-001.0",
+      "name": " D handle Spray/suction tube Puzzi DN32",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/maner-tip-d-43210010.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '43210010' (fără puncte) vs '4.321-001.0' în DB - format diferit dar același produs",
+        "Pagina nu menționează explicit 'DN32' din titlul DB, deși este compatible cu seria Puzzi"
+      ],
+      "reasoning": "SKU corespunde, specificațiile tehnice (0.4kg, 190x145x120mm, Antracit) sunt identice. Descrierea și compatibilitatea se potrivesc cu seria Puzzi.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.960-133.0",
+      "name": " Brush rigid hard",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-rigida-tare-69601330.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină apare ca '69601330' (fără puncte) vs '6.960-133.0' din DB - formatare diferită",
+        "st1 din DB lipsa unitate de măsură (°C), dar pagina confirmă 40°C",
+        "st3 'Greutate cu ambalaj: 1.2' lipsește unitate (kg) în DB, pagina confirmă 1,2 kg"
+      ],
+      "reasoning": "Pagina corespunde SKU-ului. Descrierea și toate specificațiile tehnice sunt corecte și prezente. Doar formatarea SKU și unitățile de măsură în DB sunt incomplete, dar datele factice sunt valide.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-305.0",
+      "name": " RM 110** 200l Machine protector",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-pentru-protejarea-masinii-rm-110-asf-62953050.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '62953050' (fără puncte), în DB este '6.295-305.0' - format diferit dar același produs",
+        "Greutate cu ambalaj lipsă din DB (218,6 kg prezent în pagină)",
+        "Dimensiuni ambalaj lipsă din DB (580 x 580 x 970 mm prezent în pagină)"
+      ],
+      "reasoning": "Produsul este corect identificat. Descrierea și specificațiile majore (volum 200l, pH 9, greutate 203,4kg) se potrivesc perfect. SKU-ul este același, doar format diferit.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-240.0",
+      "name": " Diamond pad green set 5x Ø508",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/perie-diamant-lavete-verde-508-mm-fin-verde-508-mm-5-bucata-63712400.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină afișat ca '63712400' în loc de '6.371-240.0' (format diferit dar echivalent)",
+        "Titlu pagină spune 'Perie diamant' în loc de 'Diamond pad' - inconsistență terminologie"
+      ],
+      "reasoning": "Pagina corespunde corect produsului. Descrierea, specificațiile (508mm, fin, verde, 5 buc) și utilizările sunt identice. SKU-ul este același, doar format diferit.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-411.0",
+      "name": " RM 55** 20l active cleaner, neutral",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/presiune-inalta/solutie-de-curatare-activa-neutra-rm-55-asf-62954110.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 62954110 (6.295-411.0) confirmat. Descriere și specs tehnice se potrivesc perfect: 20l, pH 10, greutate 20.1kg. Toate datele corecte.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.907-770.0",
+      "name": " Roller brush white - R65",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/roller-brush-white-r65-moale-alb-608-mm-69077700.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 69077700 (format 6.907-770.0) apare în pagină. Toate specificațiile tehnice coincid: lungime 608mm, grad moale, alb, 2,3kg. Descrierea corespunde.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.889-139.0",
+      "name": " Suction hose NT DN40 2.5m",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/furtun-ambalat-nw35-2-5m-28891390.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "UNCERTAIN",
+      "confidence": 75,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Diametrul nominal în pagină apare ca 'NW35' în titlu, dar în specificații apare corect 'ID 40'",
+        "SKU în pagină este '28891390' (fără puncte), în DB este '2.889-139.0' (cu puncte și altă formatare)",
+        "Titlul DB spune 'DN40' iar pagina folosește 'NW35' în titlu (incoerență de notație)"
+      ],
+      "reasoning": "SKU și specificații tehnice se corelează (2,5m, greutate 0,7kg, ID40), descrierea se potrivește, dar notația diametrului (NW35 vs DN40/ID40) și formatarea SKU creează ambiguitate.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.186-145.0",
+      "name": " KM 170/600 R D Classic",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-maturat/masini-de-maturat-industriale/km-170-600-r-d-classic-11861450.html",
+      "category": "Curatenie",
+      "subcategory": "Măturătoare",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Lățime de lucru din DB: până la 2000 mm - în pagină apare corect cu 2 perii laterale (2000 mm)",
+        "Toate specificațiile tehnice din DB sunt verificate și corecte în pagina producătorului"
+      ],
+      "reasoning": "SKU 11861450 identificat în pagină. Descrierea și toate specificațiile (18,5 kW, 23800 m²/h, 600 l) sunt corecte și corespund paginei producătorului.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.193-120.0",
+      "name": " Puzzi 10/2 Adv *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/aspiratoare-cu-spalare-profesionale/aspiratoare-cu-spalare-prin-pulverizare-extractie/puzzi-10-2-adv-11931200.html",
+      "category": "Curatenie",
+      "subcategory": "Aspiratoare industriale",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU din pagină este 11931200 (fără puncte), în DB este 1.193-120.0 - aceași produs, doar format diferit",
+        "st2 (Putere turbină: 1250) nu apare explicit în pagină - nu se menționează wați/putere"
+      ],
+      "reasoning": "Pagina corespunde produsului corect. Descrierea scurtă și caracteristicile majore (presiune 2 bari, capacitate 10/9, dozare anti-spumant) sunt confirmate. SKU-ul se potrivește. Lipsă doar putere turbină în detalii.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.386-466.0",
+      "name": " Screw connector W16-S-1.4571 DIN 2353",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/infiletare-cotita-inox-ermeto-63864660.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '63864660' (fără puncte) vs DB '6.386-466.0' (cu puncte) - format diferit dar numeric identic",
+        "Lipsește din pagină: material specific '1.4571', unghi '90°', fiting 'Ermeto' sunt menționate dar nu în secțiunea de spec tehnice formalizate"
+      ],
+      "reasoning": "Pagina și DB descriu același produs. SKU coincide numeric, descrierea scurtă și greutatea sunt identice. Specificațiile tehnice sunt prezente dar incomplete în format.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.904-420.0",
+      "name": " Safety filter bag 5 Stck.",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/punga-de-siguranta-pentru-filtru-5-bucata-nt-75-1-69044200.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare doar ca '69044200' (fără puncte), nu exact '6.904-420.0' - posibil format diferit",
+        "Pagina conține mult HTML/nav clutter, dar datele produsului sunt corecte"
+      ],
+      "reasoning": "Datele DB se potrivesc cu pagina producătorului. Specificații (5 buc, 1.5kg, 350x300x90mm) și descriere sunt identice. SKU-ul corespunde (format diferit dar acelasi numar).",
+      "reset_done": false
+    },
+    {
+      "sku": "2.114-010.0",
+      "name": " Steam nozzle TR 40090",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/duza-de-pulverizare-cu-abur-40-090-21140100.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '21140100' (fără puncte) vs '2.114-010.0' în DB - format diferit dar echivalent",
+        "Specificația 'Unghi de pulverizare: 40°' lipsește din pagină (doar în titlu)",
+        "Caracteristica 'c1' (EASY!Lock), 'c2' și 'c3' nu sunt vizibile în pagină"
+      ],
+      "reasoning": "SKU-ul se potrivește (formatare diferită dar corecti). Dimensiunea (090) și filetul EASY!Lock sunt confirmate. Descrierea și unghiul 40° se regăsesc în titlu. Date compatibile.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.760-881.0",
+      "name": " Nozzle pack 1/8\" 036 FR Classic",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/nozzle-m-036-with-package-47608810.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Pagina producătorului nu conține descrierea completă a pachetului (lipsește menționarea compatibilității și constructiei durabile)",
+        "Lipsește specificația dimensiunii racordului (1/8\") pe pagina producătorului"
+      ],
+      "reasoning": "SKU 47608810 prezent pe pagina (format 4.760-881.0). Specificațiile tehnice st1 și st2 coincid perfect. Descrierea DB corespunde domeniului produsului.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.378-627.0",
+      "name": " NT 22/1 Ap L Go!Further *EU",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/aspiratoare/aspiratoare-umed-uscate/clasa-ap/nt-22-1-ap-l-go-further-13786270.html",
+      "category": "Curatenie",
+      "subcategory": "Aspiratoare umed-uscat (NT)",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": null,
+      "issues": [
+        "Specificațiile tehnice (putere motor, debit aer, capacitate) nu sunt prezente în conținutul paginii disponibil",
+        "SKU-ul apare în format diferit: '13786270' vs '1.378-627.0' (formatare)"
+      ],
+      "reasoning": "Pagina corespunde produsului SKU. Descrierea scurtă se aliniază cu conținutul paginii (50% plastic reciclat, curățare semi-automată Ap, 22l). Specificații tehnice nu sunt disponibile în extrasul paginii.",
+      "reset_done": false
+    },
+    {
+      "sku": "2.644-053.0",
+      "name": " Add-on kit Transport eyelets",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/set-de-fixare-si-transport-26440530.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 26440530 prezent pe pagină. Descrierea și specificațiile tehnice se potrivesc perfect cu baza de date. Greutate 0,4 kg confirmată.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-261.0",
+      "name": " RM PC Bio 20** 20l part cleaning agent",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/piese-de-schimb/solutie-pentru-curatarea-pieselor-pc-bio-20-62952610.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU afișat pe pagină ca '62952610' (fără puncte), în DB este '6.295-261.0' (cu puncte) - format diferit dar același produs",
+        "st1 din DB incomplet: scrie 'Dimensiune ambalaj: 20' fără unitate, pagina specifică '20l' și '20kg'"
+      ],
+      "reasoning": "SKU validat (aceeași produs, format diferit). Descriere scurtă identică. Specificații tehnice corecte: ambalaj 20l, pH 9, greutate 20kg. Date în DB sunt valide.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.762-433.0",
+      "name": " Roll pad BR 65",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/suport-cilindric-638-mm-638-mm-47624330.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "WRONG",
+      "confidence": 45,
+      "sku_match": true,
+      "description_ok": false,
+      "specs_ok": true,
+      "issues": [
+        "Descrierea din DB menționează 'compatibil cu capul de perie R 65', dar pagina spune 'Ideal pentru capul de perie R 56'",
+        "Titlul din DB: 'Roll pad BR 65', dar pagina nu menționează 'BR 65' explicit",
+        "Pagina folosește termenul 'Suport cilindric' în timp ce DB spune 'Ax cilindric căptușit'",
+        "Incompatibilitate majoră: R 65 vs R 56 - posibil greșeală în DB sau pagină"
+      ],
+      "reasoning": "Compatibilitate contradictorie: DB spune R 65, pagina spune R 56. SKU se potrivește, dar descrierea produsului nu coincide cu pagina.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.351-127.0",
+      "name": " KM 85/50 R Bp Pack",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-maturat/masini-de-maturat-cu-post-de-conducere/km-85-50-r-bp-pack-13511270.html",
+      "category": "Curatenie",
+      "subcategory": "Măturătoare",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Descrierea din pagină este incompletă (tăiată la sfârşit, lipsă detalii despre filtrul plat)",
+        "Specificaţia st3 'Filtru plat din poliester' este parţial confirmată (pagina menţionează 'Filtru curat plat din poliest' dar textul e incomplet)"
+      ],
+      "reasoning": "SKU 13511270 (echivalent 1.351-127.0) găsit în pagină. Descrierea scurtă din DB corespunde cu conţinutul paginii. Specificaţiile tehnice sunt corecte și confirmate.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.295-587.0",
+      "name": " RM 753** 2,5l Fine stoneware cleaner",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/produse-pentru-curatare-si-ingrijire/professional/podea/detergent-pentru-curatarea-de-intretinere/solutie-de-curatare-pentru-gresie-ceramica-fina-rm-753-asf-62955870.html",
+      "category": "Curatenie",
+      "subcategory": "Detergenți industriali",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '62955870' (fără puncte) vs '6.295-587.0' în DB - format diferit dar același produs",
+        "Spațiu inițial suplimentar în name din DB: ' RM 753**' (ar trebui 'RM 753')"
+      ],
+      "reasoning": "SKU corespunde (format diferit dar același produs), descrierea și toate specificațiile tehnice sunt identice și corecte în pagină.",
+      "reset_done": false
+    },
+    {
+      "sku": "1.047-312.0",
+      "name": " KM 90/60 R Bp Pack",
+      "manufacturer_url": "https://www.kaercher.com/ro/professional/masini-de-maturat/masini-de-maturat-cu-post-de-conducere/km-90-60-r-bp-pack-10473120.html",
+      "category": "Curatenie",
+      "subcategory": "Măturătoare",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "Lățime de lucru (st2: 615-1150 mm) nu este confirmată explicit în pagină",
+        "Conținutul paginii este trunchiat la final, nu se vede secțiunea completă de specificații tehnice"
+      ],
+      "reasoning": "SKU 10473120 apare în pagină. Descrierea și majoritatea specificațiilor (5400 m²/h, 180 Ah, filtru automat, EASY Operation) sunt confirmate. Doar lățime de lucru nu e vizibilă și conținut incomplet.",
+      "reset_done": false
+    },
+    {
+      "sku": "4.440-264.0",
+      "name": " Suction hose cone NT DN50 4m",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/furtun-de-aspirare-dn-61-4m-complet-44402640.html",
+      "category": "Curatenie",
+      "subcategory": "Accesorii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 85,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [
+        "SKU în pagină apare ca '44402640' (fără puncte) vs DB '4.440-264.0' (cu puncte) - formatul diferit",
+        "st2 din DB spune 'DN 50' dar pagina și titlul menționează 'DN 61' la racorduri - ambiguitate asupra diametrului nominal"
+      ],
+      "reasoning": "Produs corect identificat. Descriere și specificații principale corespund (4m, 1.8kg). Discrepanța DN50 vs DN61 se explică: DN50 este diametrul interior (ID), DN61 sunt racordurile.",
+      "reset_done": false
+    },
+    {
+      "sku": "6.371-248.0",
+      "name": " Diamond pad white set 5x Ø306",
+      "manufacturer_url": "https://www.kaercher.com/ro/accesorii/pad-diamant-grosier-alb-306-mm-5-bucata-63712480.html",
+      "category": "Curatenie",
+      "subcategory": "Discuri, paduri & perii",
+      "classification": "REAL_WITH_DATA",
+      "verdict": "OK",
+      "confidence": 92,
+      "sku_match": true,
+      "description_ok": true,
+      "specs_ok": true,
+      "issues": [],
+      "reasoning": "SKU 63712480 (6.371-248.0) apare în pagină. Toate specificațiile coincid: diametru 306mm, grad grosier, culoare albă, cantitate 5 bucăți. Descrierea corespunde cu produsul din DB.",
+      "reset_done": false
+    }
+  ]
+}
