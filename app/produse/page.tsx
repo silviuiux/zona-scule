@@ -49,6 +49,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // Random order only for the unfiltered "all products" view
   const products = isFiltered ? rawProducts : shuffle(rawProducts)
 
+  const activeCategory = sp.categorie
+    ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
+    : null
+
   const headerTitle = sp.categorie ?? sp.brand ?? sp.q ?? 'Toate produsele'
 
   return (
