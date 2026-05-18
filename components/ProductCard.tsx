@@ -62,20 +62,6 @@ export default function ProductCard({ product }: { product: Product }) {
           isolation: isolate;
           transition: box-shadow 200ms, transform 200ms;
         }
-        /* Concrete grain on card surface — multiply makes dark speckles
-           visible on white: white × dark = dark. overlay on white = invisible. */
-        .pcard::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          z-index: 10;
-          pointer-events: none;
-          background-image: var(--noise-svg);
-          background-repeat: repeat;
-          background-size: 200px 200px;
-          opacity: 0.55;
-          mix-blend-mode: multiply;
-        }
         .pcard-link:hover .pcard {
           box-shadow: 0 4px 20px rgba(0,0,0,0.12);
           transform: translateY(-2px);

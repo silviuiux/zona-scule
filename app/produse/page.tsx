@@ -63,6 +63,23 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           padding-top: 52px;
           background: rgb(244, 244, 244);
           min-height: 100vh;
+          position: relative;
+          isolation: isolate;
+        }
+        /* Noise on the gray background only — z-index -1 sits behind the
+           white card surfaces which visually cover it, so grain appears
+           only in the gaps between/around cards. Half the previous density. */
+        .catalog-page::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          pointer-events: none;
+          background-image: var(--noise-svg);
+          background-repeat: repeat;
+          background-size: 200px 200px;
+          opacity: 0.25;
+          mix-blend-mode: multiply;
         }
 
         /* ─── Top spacer (replaces image banner) ─── */
@@ -87,7 +104,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar {
           width: 280px; flex-shrink: 0;
           padding: 32px 16px 40px 24px;
-          border-right: 1px solid rgba(0,0,0,0.08);
           position: sticky; top: 52px;
           height: calc(100vh - 52px);
           overflow-y: auto;
