@@ -90,11 +90,11 @@ export default function Nav() {
           padding-left: 12px;
         }
 
-        /* Catalog — ghost, black text */
+        /* Catalog — ghost, gray text */
         .nav-catalog-link {
           flex-shrink: 0;
           padding: 8px 18px;
-          background: transparent; color: rgb(0,0,0);
+          background: transparent; color: rgba(0,0,0,0.45);
           border-radius: 2px;
           font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600;

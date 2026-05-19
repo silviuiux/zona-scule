@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     pageSize,
     brandName: sp.get('brand') ?? undefined,
     categoryText: sp.get('categorie') ?? undefined,
+    subcategoryText: sp.get('subcategorie') ?? undefined,
     search: sp.get('q') ?? undefined,
   })
 

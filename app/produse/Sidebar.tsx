@@ -169,11 +169,13 @@ export default function Sidebar({
             <p className="sidebar-section-title">Branduri</p>
             {brands.map(brand => {
               const isActive = activeBrand === brand.name
-              // Preserve active category in the brand link so the user stays
-              // within the current category when filtering by brand.
-              const brandHref = activeCat
-                ? `/produse?categorie=${encodeURIComponent(activeCat)}&brand=${encodeURIComponent(brand.name)}`
-                : `/produse?brand=${encodeURIComponent(brand.name)}`
+              // Active brand → clicking deselects (back to category-only or all)
+              // Inactive brand → adds brand filter, preserving category
+              const brandHref = isActive
+                ? (activeCat ? `/produse?categorie=${encodeURIComponent(activeCat)}` : '/produse')
+                : (activeCat
+                    ? `/produse?categorie=${encodeURIComponent(activeCat)}&brand=${encodeURIComponent(brand.name)}`
+                    : `/produse?brand=${encodeURIComponent(brand.name)}`)
               return (
                 <Link
                   key={brand.id}

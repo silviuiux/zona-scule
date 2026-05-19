@@ -46,8 +46,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
   ])
 
-  // Random order only for the unfiltered "all products" view
-  const products = isFiltered ? rawProducts : shuffle(rawProducts)
+  // Shuffle on "Toate" views (no specific subcategory or search query).
+  // Preserves DB order when drilling into a subcategory or searching.
+  const products = (sp.subcategorie || sp.q) ? rawProducts : shuffle(rawProducts)
 
   const activeCategory = sp.categorie
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
@@ -235,7 +236,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               <LoadMore
                 initialCount={products.length}
                 total={total}
-                filters={{ brand: sp.brand, categorie: sp.categorie, q: sp.q }}
+                filters={{ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q }}
               />
             )}
           </main>
