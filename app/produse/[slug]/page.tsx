@@ -343,7 +343,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
             <div className="info-section">
               <p className="info-section-label">Caracteristici</p>
-              <div className="info-grid">
+              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(caracteristici.length, 3)}, 1fr)` }}>
                 {caracteristici.map((c, i) => (
                   <div key={i} className="info-card">
                     <span className="info-num">0{i + 1}</span>
@@ -361,7 +361,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
             <div className="info-section">
               <p className="info-section-label">Aplicatii recomandate</p>
-              <div className="info-grid">
+              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(aplicatii.length, 3)}, 1fr)` }}>
                 {aplicatii.map((a, i) => (
                   <div key={i} className="info-card">
                     <span className="info-num">0{i + 1}</span>
