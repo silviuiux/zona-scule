@@ -264,7 +264,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           transition:
             opacity  660ms cubic-bezier(0.16, 1, 0.3, 1),
             transform 660ms cubic-bezier(0.16, 1, 0.3, 1);
-          transition-delay: var(--reveal-delay, 0ms);
         }
         .reveal.in-view {
           opacity: 1;
@@ -272,13 +271,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
 
         /* Fade + lift + subtle scale-up (cards) */
+        /* transition-delay is set per-element via JS (el.style.transitionDelay) */
         .reveal-scale {
           opacity: 0;
           transform: translateY(26px) scale(0.965);
           transition:
             opacity  580ms cubic-bezier(0.16, 1, 0.3, 1),
             transform 580ms cubic-bezier(0.16, 1, 0.3, 1);
-          transition-delay: var(--reveal-delay, 0ms);
         }
         .reveal-scale.in-view {
           opacity: 1;
@@ -337,7 +336,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             {/* LEFT — staggered reveals on each text block */}
             <div>
-              <div className="reveal" style={{ '--reveal-delay': '0ms' } as React.CSSProperties}>
+              <div className="reveal" style={{ transitionDelay: '0ms' }}>
                 <EditableBreadcrumb
                   productId={product.id}
                   categoryText={product.category_text}
@@ -347,34 +346,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <Link
                 href={`/produse?brand=${encodeURIComponent(product.brand_name ?? '')}`}
                 className="pdp-brand reveal"
-                style={{ '--reveal-delay': '80ms' } as React.CSSProperties}
+                style={{ transitionDelay: '80ms' }}
               >
                 {product.brand_name}
               </Link>
               <h1
                 className="pdp-sku reveal"
-                style={{ '--reveal-delay': '150ms' } as React.CSSProperties}
+                style={{ transitionDelay: '150ms' }}
               >
                 {product.model || product.sku || product.slug}
               </h1>
               {product.short_description && (
                 <p
                   className="pdp-desc reveal"
-                  style={{ '--reveal-delay': '210ms' } as React.CSSProperties}
+                  style={{ transitionDelay: '210ms' }}
                 >
                   {product.short_description}
                 </p>
               )}
-              <div
-                className="reveal"
-                style={{ '--reveal-delay': '270ms' } as React.CSSProperties}
-              >
+              <div className="reveal" style={{ transitionDelay: '270ms' }}>
                 <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
               </div>
               <Link
                 href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`}
                 className="cere-btn reveal"
-                style={{ '--reveal-delay': '330ms' } as React.CSSProperties}
+                style={{ transitionDelay: '330ms' }}
               >
                 CERE OFERTA
               </Link>

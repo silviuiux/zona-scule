@@ -22,7 +22,7 @@ export default function ScrollAnimations() {
     // ── 1. Stagger delays ──────────────────────────────────────────────────
     const stagger = (selector: string, base = 0, step = 90) => {
       document.querySelectorAll<HTMLElement>(selector).forEach((el, i) => {
-        el.style.setProperty('--reveal-delay', `${base + i * step}ms`)
+        el.style.transitionDelay = `${base + i * step}ms`
       })
     }
     stagger('.spec-card', 0, 100)
