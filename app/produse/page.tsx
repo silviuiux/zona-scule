@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -54,22 +55,138 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
     : null
 
-  const headerTitle = sp.categorie ?? sp.brand ?? sp.q ?? 'Toate produsele'
-
   return (
     <>
       <Nav />
       <style>{`
+        /* ── Hero section (white) ── */
+        .cat-hero {
+          background: rgb(255, 255, 255);
+          padding-top: 52px; /* nav height */
+          min-height: 62vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+        .cat-hero-inner {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 40px 12px 56px;
+          width: 100%;
+        }
+
+        /* Breadcrumb */
+        .cat-breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 32px;
+          flex-wrap: wrap;
+        }
+        .cat-bc-pill {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(0,0,0,0.45);
+          text-decoration: none;
+          border: 1px solid rgba(0,0,0,0.18);
+          border-radius: 999px;
+          padding: 5px 14px;
+          transition: color 150ms, border-color 150ms;
+          white-space: nowrap;
+        }
+        .cat-bc-pill:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.4); }
+        .cat-bc-sep {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px;
+          color: rgba(0,0,0,0.25);
+        }
+        .cat-bc-current {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(0,0,0,0.45);
+          white-space: nowrap;
+        }
+
+        /* Title */
+        .cat-hero-title {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          margin-bottom: 20px;
+          line-height: 1;
+        }
+        .cat-hero-zona {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(48px, 7vw, 96px);
+          color: rgb(217, 44, 43);
+          text-transform: uppercase;
+          letter-spacing: 0.005em;
+          line-height: 1;
+        }
+        .cat-hero-name {
+          font-family: 'Bungee', sans-serif;
+          font-size: clamp(48px, 7vw, 96px);
+          color: rgb(0, 0, 0);
+          text-transform: uppercase;
+          letter-spacing: 0.005em;
+          line-height: 1;
+        }
+
+        /* Description */
+        .cat-hero-desc {
+          font-family: 'Recursive', sans-serif;
+          font-size: 15px;
+          color: rgba(0,0,0,0.5);
+          line-height: 1.6;
+          max-width: 560px;
+          margin: 0 0 28px;
+        }
+
+        /* Stats */
+        .cat-hero-stats {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+        .cat-hero-stat {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+        .cat-hero-stat-num {
+          font-family: 'Bungee', sans-serif;
+          font-size: 22px;
+          color: rgb(0,0,0);
+          letter-spacing: 0.02em;
+        }
+        .cat-hero-stat-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(0,0,0,0.35);
+        }
+        .cat-hero-stat-div {
+          width: 1px;
+          height: 20px;
+          background: rgba(0,0,0,0.12);
+        }
+
+        /* ── Listing section (gray) ── */
         .catalog-page {
-          padding-top: 52px;
           background: rgb(244, 244, 244);
-          min-height: 100vh;
+          min-height: 60vh;
           position: relative;
           isolation: isolate;
         }
-        /* Noise behind cards — 1/3 density, parallax at 90% scroll speed.
-           background-position shifts -10% of scrollY via --noise-y so the
-           tiled pattern drifts slightly slower than the foreground. */
         .catalog-page::before {
           content: '';
           position: absolute;
@@ -84,23 +201,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           mix-blend-mode: multiply;
         }
 
-        /* ─── Top spacer (replaces image banner) ─── */
-        .cat-spacer {
-          width: 100%;
-          height: 64px;
-        }
-
         /* ─── Sidebar + grid layout ─── */
         .catalog-layout {
           display: flex; max-width: 1440px; margin: 0 auto; padding: 0 12px;
-        }
-        .page-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(40px, 5vw, 72px);
-          line-height: 1; color: rgb(0,0,0);
-          text-transform: uppercase;
-          letter-spacing: 0.005em;
-          margin: 0;
         }
         .sidebar {
           width: 280px; flex-shrink: 0;
@@ -113,10 +216,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .products-header {
           margin-bottom: 24px;
           display: flex; align-items: center; gap: 16px;
-        }
-        .products-count {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.4);
         }
         .products-grid {
           display: grid;
@@ -133,6 +232,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
+          .cat-hero { min-height: auto; }
+          .cat-hero-inner { padding: 24px 12px 40px; }
+          .cat-hero-zona, .cat-hero-name { font-size: 40px; }
+          .cat-breadcrumb { margin-bottom: 20px; }
+
           .catalog-layout { flex-direction: column; }
           .sidebar {
             position: fixed; top: 0; left: 0; bottom: 0;
@@ -153,7 +257,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             transition: opacity 300ms;
           }
           .sidebar-backdrop.open { opacity: 1; pointer-events: all; }
-          /* Products-header fallback toggle (no-hero pages, e.g. brand filter) */
           .sidebar-toggle {
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
@@ -164,7 +267,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             color: rgb(0,0,0);
             cursor: pointer;
           }
-          .page-title { font-size: 24px; }
           .products-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
@@ -184,10 +286,100 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
       `}</style>
 
-      <div className="catalog-page">
-        {/* Top spacer — replaces image banner */}
-        <div className="cat-spacer" />
+      {/* ── White hero section ── */}
+      <div className="cat-hero">
+        <div className="cat-hero-inner">
+          {/* Breadcrumb */}
+          <nav className="cat-breadcrumb">
+            <Link href="/produse" className="cat-bc-pill">Catalog</Link>
+            {sp.categorie && (
+              <>
+                <span className="cat-bc-sep">/</span>
+                {sp.subcategorie ? (
+                  <Link
+                    href={`/produse?categorie=${encodeURIComponent(sp.categorie)}`}
+                    className="cat-bc-pill"
+                  >
+                    {sp.categorie}
+                  </Link>
+                ) : (
+                  <span className="cat-bc-current">{sp.categorie}</span>
+                )}
+              </>
+            )}
+            {sp.subcategorie && (
+              <>
+                <span className="cat-bc-sep">/</span>
+                <span className="cat-bc-current">{sp.subcategorie}</span>
+              </>
+            )}
+            {sp.brand && !sp.categorie && (
+              <>
+                <span className="cat-bc-sep">/</span>
+                <span className="cat-bc-current">{sp.brand}</span>
+              </>
+            )}
+            {sp.q && (
+              <>
+                <span className="cat-bc-sep">/</span>
+                <span className="cat-bc-current">Căutare</span>
+              </>
+            )}
+          </nav>
 
+          {/* Title */}
+          <div className="cat-hero-title">
+            {sp.categorie ? (
+              <>
+                <span className="cat-hero-zona">ZONA</span>
+                <span className="cat-hero-name">{sp.categorie}</span>
+              </>
+            ) : sp.brand ? (
+              <>
+                <span className="cat-hero-zona">ZONA</span>
+                <span className="cat-hero-name">{sp.brand}</span>
+              </>
+            ) : sp.q ? (
+              <>
+                <span className="cat-hero-zona">CĂUTARE</span>
+                <span className="cat-hero-name" style={{ fontSize: 'clamp(28px, 4vw, 56px)' }}>
+                  &ldquo;{sp.q}&rdquo;
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="cat-hero-zona">ZONA</span>
+                <span className="cat-hero-name">SCULE</span>
+              </>
+            )}
+          </div>
+
+          {/* Description */}
+          {activeCategory?.description && (
+            <p className="cat-hero-desc">{activeCategory.description}</p>
+          )}
+
+          {/* Stats */}
+          <div className="cat-hero-stats">
+            <div className="cat-hero-stat">
+              <span className="cat-hero-stat-num">{total.toLocaleString('ro')}</span>
+              <span className="cat-hero-stat-label">Produse</span>
+            </div>
+            {brands.length > 0 && (
+              <>
+                <div className="cat-hero-stat-div" />
+                <div className="cat-hero-stat">
+                  <span className="cat-hero-stat-num">{brands.length}</span>
+                  <span className="cat-hero-stat-label">Branduri</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Gray listing section ── */}
+      <div className="catalog-page">
         <div className="catalog-layout">
           <MobileFilterBackdrop />
           <Sidebar
@@ -201,7 +393,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <main className="products-main">
             <div className="products-header">
               <MobileFilterToggle />
-              <h1 className="page-title">{headerTitle}</h1>
             </div>
 
             {/* Subcategory bar — category, brand, or all-products view */}
