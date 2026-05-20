@@ -128,7 +128,7 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           margin-right: 12px;
           position: relative; overflow: hidden;
           border-radius: 8px;
-          background: rgb(40,40,40);
+          background: rgb(255,255,255);
           text-decoration: none; display: block;
           transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
         }

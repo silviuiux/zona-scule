@@ -134,30 +134,77 @@ export default function LoadMore({
 
   return (
     <>
+      <style>{`
+        @keyframes lm-shimmer {
+          0%   { background-position: -600px 0; }
+          100% { background-position:  600px 0; }
+        }
+        .lm-skel {
+          background: linear-gradient(
+            90deg,
+            rgb(232,232,232) 25%,
+            rgb(244,244,244) 50%,
+            rgb(232,232,232) 75%
+          );
+          background-size: 600px 100%;
+          animation: lm-shimmer 1.5s ease-in-out infinite;
+          border-radius: 3px;
+        }
+        .lm-skel-card {
+          background: rgb(255,255,255);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .lm-skel-img { aspect-ratio: 1; width: 100%; }
+        .lm-skel-body {
+          padding: 16px;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+      `}</style>
+
+      {/* Previously loaded (persisted) products */}
       {products.length > 0 && (
         <div className="products-grid">
           {products.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
 
-      {hasMore && (
+      {/* Skeleton grid shown while the next batch is fetching */}
+      {loading && (
+        <div className="products-grid">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="lm-skel-card">
+              <div className="lm-skel lm-skel-img" />
+              <div className="lm-skel-body">
+                <div className="lm-skel" style={{ height: 13, width: '38%' }} />
+                <div className="lm-skel" style={{ height: 13, width: '72%' }} />
+                <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+                  <div className="lm-skel" style={{ height: 12, width: '28%' }} />
+                  <div className="lm-skel" style={{ height: 12, width: '22%' }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasMore && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={handleLoadMore}
-            disabled={loading}
             style={{
               padding: '12px 40px',
-              background: loading ? 'rgba(0,0,0,0.1)' : 'rgb(0,0,0)',
-              color: loading ? 'rgba(0,0,0,0.4)' : 'rgb(255,255,255)',
+              background: 'rgb(0,0,0)',
+              color: 'rgb(255,255,255)',
               border: 'none', borderRadius: '2px',
               fontFamily: 'Inter, sans-serif',
               fontSize: '12px', fontWeight: 600,
               letterSpacing: '0.07em', textTransform: 'uppercase',
-              cursor: loading ? 'default' : 'pointer',
+              cursor: 'pointer',
               transition: 'background 150ms',
             }}
           >
-            {loading ? 'SE INCARCA...' : 'INCARCA MAI MULTE'}
+            INCARCA MAI MULTE
           </button>
           <span style={{
             fontFamily: 'Recursive, sans-serif',
