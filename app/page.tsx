@@ -292,7 +292,7 @@ export default async function HomePage() {
           padding: 64px 0 64px;
         }
         .carousel-inner {
-          max-width: 1440px; margin: 0 auto; padding: 0 24px;
+          max-width: 1440px; margin: 0 auto; padding: 0 12px;
         }
         .carousel-header { margin-bottom: 40px; }
         .carousel-title {

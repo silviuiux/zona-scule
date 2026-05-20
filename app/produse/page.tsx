@@ -87,8 +87,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         /* ─── Top spacer (replaces image banner) ─── */
         .cat-spacer {
           width: 100%;
-          height: 10vh;
-          min-height: 60px;
+          height: 64px;
         }
 
         /* ─── Sidebar + grid layout ─── */

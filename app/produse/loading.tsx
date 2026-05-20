@@ -33,7 +33,7 @@ export default function Loading() {
           background: rgb(244, 244, 244);
           min-height: 100vh;
         }
-        .skel-spacer { width: 100%; height: 10vh; min-height: 60px; }
+        .skel-spacer { width: 100%; height: 64px; }
 
         /* ── Layout (matches catalog-layout) ── */
         .skel-layout {
