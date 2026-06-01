@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
+import SmoothScroll from '@/components/SmoothScroll'
 
 export const metadata: Metadata = {
   title: 'Zona Scule — Scule și Echipamente Profesionale',
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
+        <SmoothScroll />
         <DotsParallax />
         {children}
       </body>
