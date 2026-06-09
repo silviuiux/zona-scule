@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 images-backup/
+
+# data / pipeline artifacts — keep out of the website repo
+logs/
+*.csv
