@@ -1,52 +1,46 @@
-# Zona Scule — Next.js + Supabase
+# Zona Scule — zonascule.online
+
+Catalog de scule profesionale (31k+ produse). **Next.js 16 (App Router) + Supabase**, deploy pe Vercel. Supabase este singura baza de date (Airtable a fost retras).
 
 ## Quick start
 
 ```bash
 npm install
-npm run dev
-# → http://localhost:3000
+npm run dev   # http://localhost:3000
 ```
 
-## Deploy to Vercel
+## Env vars (`.env.local` local, Settings → Environment Variables pe Vercel)
 
-```bash
-npx vercel
+| Var | Rol |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL proiect Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | cheie publica (doar citire — vezi `supabase/setup.sql`) |
+| `SUPABASE_SERVICE_KEY` | cheie service-role, doar server (admin + formular contact) |
+| `ADMIN_USER` / `ADMIN_PASS` | Basic Auth pentru `/admin` si editorul de categorii din PDP |
+| `ANTHROPIC_API_KEY` | doar pentru scripturile de enrichment din `scripts/` (nu e necesar la runtime) |
+
+## Prima instalare: securizare Supabase
+
+Ruleaza `supabase/setup.sql` in Supabase SQL Editor. Activeaza RLS (public = read-only) si creeaza tabela `contact_messages` pentru formularul de contact.
+
+## Pagini
+
+| Ruta | Descriere |
+|---|---|
+| `/` | Homepage (ISR 10 min) |
+| `/produse` | Catalog + filtre (categorie, subcategorie, brand, cautare) |
+| `/produse/[slug]` | Pagina produs (ISR 1h) |
+| `/contact` | Formular oferta → `contact_messages` |
+| `/admin` | Gestionare subcategorii (Basic Auth) |
+| `/termeni`, `/retur` | Pagini legale (placeholder — de completat) |
+
+## Structura
+
 ```
-
-Set these env vars in Vercel dashboard (or they're already in .env.local):
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-## Pages
-
-| Route | Description |
-|-------|-------------|
-| `/` | Homepage with categories + sample products |
-| `/produse` | Catalog with sidebar filters (brand, categorie) |
-| `/produse?categorie=Perii` | Filtered by category |
-| `/produse?brand=Milwaukee` | Filtered by brand |
-| `/produse?p=2` | Pagination |
-| `/produse/[slug]` | Product detail page |
-
-## Structure
-
+app/            pagini + API routes
+components/     Nav, Footer, ProductCard, hero, carusele
+lib/            clienti Supabase (anon + service), auth admin
+scripts/        enrichment Kärcher, verificari, snapshot DB (offline)
+supabase/       setup.sql — RLS + contact_messages
+proxy.ts        Basic Auth /admin (Next 16 "proxy", fost middleware)
 ```
-app/
-  page.tsx              ← Homepage
-  produse/
-    page.tsx            ← Catalog listing
-    [slug]/page.tsx     ← Product detail
-components/
-  Nav.tsx               ← Sticky navbar
-  ProductCard.tsx       ← Product card
-lib/
-  supabase.ts           ← Client + types + query helpers
-```
-
-## Data
-
-- 31,167 products in Supabase
-- 28 brands, 38 categories, 80 subcategories
-- Images mostly in Supabase Storage (main_image_storage_url)
-- RLS: public anon SELECT enabled on all tables

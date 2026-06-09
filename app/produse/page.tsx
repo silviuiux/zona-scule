@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, CARD_COLUMNS } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -10,11 +10,23 @@ import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
 export const dynamic = 'force-dynamic'
 
-/** Fisher-Yates shuffle — server-side, runs fresh each request */
+/** Deterministic daily shuffle: same order all day (stable for users
+ *  navigating back/forward and for crawlers), fresh variety tomorrow. */
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
 function shuffle<T>(arr: T[]): T[] {
+  const today = new Date()
+  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()
+  const rand = mulberry32(seed)
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
+    const j = Math.floor(rand() * (i + 1))
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
@@ -36,6 +48,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       categoryText: sp.categorie,
       subcategoryText: sp.subcategorie,
       search: sp.q,
+      columns: CARD_COLUMNS,
     }),
     getCategoriesWithCount(),
     getBrandsByFilter({
@@ -90,7 +103,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           font-weight: 600;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.45);
+          color: rgba(0,0,0,0.6);
           text-decoration: none;
           border: 1px solid rgba(0,0,0,0.18);
           border-radius: 999px;
@@ -110,7 +123,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           font-weight: 600;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.45);
+          color: rgba(0,0,0,0.6);
           white-space: nowrap;
         }
 
@@ -143,7 +156,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-desc {
           font-family: var(--font-recursive), sans-serif;
           font-size: 15px;
-          color: rgba(0,0,0,0.5);
+          color: rgba(0,0,0,0.62);
           line-height: 1.6;
           max-width: 560px;
           margin: 0 0 28px;
@@ -172,7 +185,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           font-weight: 600;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          color: rgba(0,0,0,0.55);
         }
         .cat-hero-stat-div {
           width: 1px;
@@ -290,7 +303,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <div className="cat-hero">
         <div className="cat-hero-inner">
           {/* Breadcrumb */}
-          <nav className="cat-breadcrumb">
+          <nav className="cat-breadcrumb" aria-label="Navigare catalog">
             <Link href="/produse" className="cat-bc-pill">Catalog</Link>
             {sp.categorie && (
               <>
@@ -328,7 +341,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </nav>
 
           {/* Title */}
-          <div className="cat-hero-title">
+          <h1 className="cat-hero-title">
             {sp.categorie ? (
               <>
                 <span className="cat-hero-zona">ZONA</span>
@@ -352,7 +365,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 <span className="cat-hero-name">SCULE</span>
               </>
             )}
-          </div>
+          </h1>
 
           {/* Description */}
           {activeCategory?.description && (
@@ -390,7 +403,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             activeBrand={sp.brand}
           />
 
-          <main className="products-main">
+          <main className="products-main" id="continut">
             <div className="products-header">
               <MobileFilterToggle />
             </div>

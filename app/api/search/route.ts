@@ -3,14 +3,16 @@ import { getProducts } from '@/lib/supabase'
 
 /**
  * GET /api/search?q=...
- * Lightweight typeahead endpoint — returns up to 8 products with only the
- * fields needed for the suggestion card (image, brand, model, slug, category).
+ * Lightweight typeahead — up to 8 slim suggestion records.
  */
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get('q')?.trim() ?? ''
+  const q = req.nextUrl.searchParams.get('q')?.trim().slice(0, 80) ?? ''
   if (q.length < 2) return NextResponse.json({ products: [] })
 
-  const { products } = await getProducts({ page: 1, pageSize: 8, search: q })
+  const { products } = await getProducts({
+    page: 1, pageSize: 8, search: q,
+    columns: 'slug,brand_name,model,sku,name,category_text,main_image_storage_url,main_image_url',
+  })
 
   const slim = products.map(p => ({
     slug: p.slug,
@@ -21,6 +23,6 @@ export async function GET(req: NextRequest) {
   }))
 
   return NextResponse.json({ products: slim }, {
-    headers: { 'Cache-Control': 'no-store' },
+    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
   })
 }

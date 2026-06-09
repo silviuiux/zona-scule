@@ -8,7 +8,9 @@ import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
 
-export const dynamic = 'force-dynamic'
+// ISR: counts/categories change rarely — re-render at most every 10 min.
+// (was force-dynamic: every visitor paid a full server render + 4 DB queries)
+export const revalidate = 600
 
 
 export default async function HomePage() {
@@ -80,12 +82,12 @@ export default async function HomePage() {
         .hero-sub {
           font-family: var(--font-recursive), sans-serif;
           font-weight: 400;
-          font-size: 18px; color: rgba(0,0,0,0.5);
+          font-size: 18px; color: rgba(0,0,0,0.62);
           line-height: 1.4;
-          max-width: 50%;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          max-width: 56%;
+        }
+        @media (max-width: 768px) {
+          .hero-sub { max-width: 100%; }
         }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
@@ -202,7 +204,7 @@ export default async function HomePage() {
         .cat-card-count {
           font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: rgba(255,255,255,0.55);
+          text-transform: uppercase; color: rgba(255,255,255,0.75);
           display: block; margin-bottom: 5px;
         }
         .cat-card-label {
@@ -234,7 +236,7 @@ export default async function HomePage() {
         }
         .section-sub {
           font-family: var(--font-recursive), sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 500;
+          font-size: 14px; color: rgba(0,0,0,0.62); font-weight: 500;
         }
         .services-grid {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
@@ -303,7 +305,7 @@ export default async function HomePage() {
         }
         .carousel-sub {
           font-family: var(--font-recursive), sans-serif;
-          font-size: 14px; color: rgba(255,255,255,0.35);
+          font-size: 14px; color: rgba(255,255,255,0.6);
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
@@ -321,7 +323,7 @@ export default async function HomePage() {
         }
         .contact-banner-eyebrow {
           font-family: var(--font-recursive), sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
+          font-size: 13px; color: rgba(255,255,255,0.6);
           margin-bottom: 14px; display: block;
         }
         .contact-banner-title {
@@ -332,7 +334,7 @@ export default async function HomePage() {
         }
         .contact-banner-sub {
           font-family: var(--font-recursive), sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
+          font-size: 13px; color: rgba(255,255,255,0.6);
         }
         .contact-banner-btn {
           display: inline-flex; align-items: center; gap: 8px;
@@ -406,6 +408,7 @@ export default async function HomePage() {
         }
       `}</style>
 
+      <main id="continut">
       {/* ── HERO ── */}
       <section className="hero">
         <div className="hero-inner">
@@ -479,6 +482,7 @@ export default async function HomePage() {
         </div>
       </div>
 
+      </main>
       <Footer />
     </>
   )

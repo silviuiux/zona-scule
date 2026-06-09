@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 import ContactForm from './ContactForm'
+
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: 'Contacteaza Zona Scule: 0248.222.298, office@zonascule.ro. Raspundem rapid cu oferte personalizate.',
+}
 
 export default function ContactPage({
   searchParams,
@@ -25,7 +32,7 @@ export default function ContactPage({
           font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
+          color: rgba(0,0,0,0.55);
           margin-bottom: 16px;
         }
         .contact-title {
@@ -110,7 +117,7 @@ export default function ContactPage({
         }
       `}</style>
 
-      <div className="contact-page">
+      <main className="contact-page" id="continut">
         <div className="contact-inner">
 
           {/* Header */}
@@ -147,12 +154,13 @@ export default function ContactPage({
           <div className="contact-bottom">
             <ContactForm searchParams={searchParams} />
             <div className="contact-photo">
-              <img src="/service-garantie.avif" alt="Zona Scule" />
+              <img src="/service-garantie.avif" alt="Echipa Zona Scule in service" loading="lazy" />
             </div>
           </div>
 
         </div>
-      </div>
+      </main>
+      <Footer />
     </>
   )
 }

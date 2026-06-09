@@ -1,5 +1,6 @@
 'use client'
 import { useState, use } from 'react'
+import { submitContact } from './actions'
 
 export default function ContactForm({
   searchParams,
@@ -23,14 +24,34 @@ export default function ContactForm({
   })
   const [focused, setFocused] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [honeypot, setHoneypot] = useState('')
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Previously this form only flipped a "sent" flag — messages were never
+  // delivered anywhere. Now it persists to Supabase (contact_messages).
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSent(true)
+    if (sending) return
+    setError(null)
+    setSending(true)
+    try {
+      const res = await submitContact({
+        ...form,
+        website: honeypot,
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+      })
+      if (res.ok) setSent(true)
+      else setError(res.error)
+    } catch {
+      setError('Nu am putut trimite mesajul. Va rugam sunati la 0248.222.298.')
+    } finally {
+      setSending(false)
+    }
   }
 
   if (sent) {
@@ -54,7 +75,7 @@ export default function ContactForm({
             font-size: 14px; color: rgba(0,0,0,0.5); line-height: 1.6;
           }
         `}</style>
-        <div className="cf-success">
+        <div className="cf-success" role="status">
           <p className="cf-success-title">MESAJ TRIMIS!</p>
           <p className="cf-success-sub">Va contactam in cel mai scurt timp.</p>
         </div>
@@ -158,37 +179,39 @@ export default function ContactForm({
 
         <div className="cf-fields">
           <div className={`cf-field${focused === 'nume' ? ' cf-focused' : ''}`}>
-            <input placeholder="nume" value={form.nume} onChange={set('nume')}
+            <input placeholder="nume" aria-label="Nume" required value={form.nume} onChange={set('nume')}
               onFocus={() => setFocused('nume')} onBlur={() => setFocused(null)} />
             <span className="cf-label">nume</span>
           </div>
 
           <div className={`cf-field${focused === 'email' ? ' cf-focused' : ''}`}>
-            <input type="email" placeholder="email" value={form.email} onChange={set('email')}
+            <input type="email" placeholder="email" aria-label="Email" required value={form.email} onChange={set('email')}
               onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} />
             <span className="cf-label">email</span>
           </div>
 
           <div className={`cf-field${focused === 'telefon' ? ' cf-focused' : ''}`}>
-            <input type="tel" placeholder="telefon" value={form.telefon} onChange={set('telefon')}
+            <input type="tel" placeholder="telefon" aria-label="Telefon" value={form.telefon} onChange={set('telefon')}
               onFocus={() => setFocused('telefon')} onBlur={() => setFocused(null)} />
             <span className="cf-label">telefon</span>
           </div>
 
           <div className={`cf-field${focused === 'companie' ? ' cf-focused' : ''}`}>
-            <input placeholder="companie (optional)" value={form.companie} onChange={set('companie')}
+            <input placeholder="companie (optional)" aria-label="Companie (optional)" value={form.companie} onChange={set('companie')}
               onFocus={() => setFocused('companie')} onBlur={() => setFocused(null)} />
             <span className="cf-label">companie</span>
           </div>
 
           <div className={`cf-field${focused === 'produs' ? ' cf-focused' : ''}${prefilledProduct ? ' cf-prefilled' : ''}`}>
-            <input placeholder="produse de interes" value={form.produs} onChange={set('produs')}
+            <input placeholder="produse de interes" aria-label="Produse de interes" value={form.produs} onChange={set('produs')}
               onFocus={() => setFocused('produs')} onBlur={() => setFocused(null)} />
             <span className="cf-label">produse de interes</span>
           </div>
 
           <div className={`cf-field cf-last${focused === 'mesaj' ? ' cf-focused' : ''}`}>
             <textarea
+              aria-label="Mesaj"
+              required
               placeholder="Descrieti produsele care va intereseaza, cantitatile dorite sau orice alt mesaj."
               value={form.mesaj} onChange={set('mesaj')}
               onFocus={() => setFocused('mesaj')} onBlur={() => setFocused(null)}
@@ -198,7 +221,26 @@ export default function ContactForm({
         </div>
 
         <div className="cf-footer">
-          <button type="submit" className="cf-submit">Trimite mesajul</button>
+          {/* honeypot — hidden from real users, bots fill it */}
+          <input
+            type="text"
+            name="website"
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+          />
+          {error && (
+            <p role="alert" style={{
+              fontFamily: 'var(--font-recursive), sans-serif', fontSize: 13,
+              color: 'rgb(217,44,43)', marginBottom: 12,
+            }}>{error}</p>
+          )}
+          <button type="submit" className="cf-submit" disabled={sending}>
+            {sending ? 'Se trimite...' : 'Trimite mesajul'}
+          </button>
         </div>
       </form>
     </>

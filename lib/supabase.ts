@@ -97,6 +97,16 @@ export type Subcategory = {
 
 // ─── Query helpers ─────────────────────────────────────────────────────────────
 
+/** Only the fields ProductCard renders — the listing previously shipped all
+ *  ~50 columns × 100 products per page (multi-MB JSON + sessionStorage). */
+export const CARD_COLUMNS = [
+  'id', 'slug', 'name', 'sku', 'brand_name', 'model', 'short_description',
+  'main_image_storage_url', 'main_image_url', 'gallery_url_1',
+  'st1_label', 'st1_value', 'st2_label', 'st2_value',
+  'app_01_title', 'app_01_details', 'app_02_title', 'app_02_details',
+  'app_03_title', 'app_03_details',
+].join(',')
+
 export async function getProducts({
   page = 1,
   pageSize = 24,
@@ -105,6 +115,7 @@ export async function getProducts({
   subcategoryText,
   search,
   featured,
+  columns = '*',
 }: {
   page?: number
   pageSize?: number
@@ -113,10 +124,12 @@ export async function getProducts({
   subcategoryText?: string
   search?: string
   featured?: boolean
+  /** e.g. CARD_COLUMNS for listings; defaults to all columns */
+  columns?: string
 } = {}) {
   let query = supabase
     .from('products')
-    .select('*', { count: 'estimated' })
+    .select(columns, { count: 'estimated' })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)
     .order('name')
@@ -144,7 +157,7 @@ export async function getProducts({
 
   const { data, error, count } = await query
   if (error) throw error
-  return { products: data as Product[], total: count ?? 0 }
+  return { products: data as unknown as Product[], total: count ?? 0 }
 }
 
 export async function getProductBySlug(slug: string) {
