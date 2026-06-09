@@ -7,19 +7,16 @@ export default function SkuCopyField({ sku }: { sku: string }) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(sku)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
     } catch {
-      // fallback for older browsers
       const el = document.createElement('textarea')
       el.value = sku
       document.body.appendChild(el)
       el.select()
       document.execCommand('copy')
       document.body.removeChild(el)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
     }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -37,33 +34,24 @@ export default function SkuCopyField({ sku }: { sku: string }) {
           cursor: pointer;
           transition: background 150ms, border-color 150ms;
           user-select: none;
+          font: inherit;
         }
-        .sku-field:hover {
-          background: rgb(235,235,235);
-          border-color: rgba(0,0,0,0.15);
-        }
-        .sku-field.copied {
-          background: rgb(230,245,235);
-          border-color: rgba(34,197,94,0.3);
-        }
+        .sku-field:hover { background: rgb(235,235,235); border-color: rgba(0,0,0,0.15); }
+        .sku-field.copied { background: rgb(230,245,235); border-color: rgba(34,197,94,0.3); }
         .sku-field-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          font-family: var(--font-inter), sans-serif;
+          font-size: 10px; font-weight: 600;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: rgba(0,0,0,0.55);
         }
         .sku-field-value {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
+          font-family: var(--font-recursive), sans-serif;
+          font-size: 13px; font-weight: 500;
           color: rgb(0,0,0);
         }
         .sku-field-icon {
-          display: flex;
-          align-items: center;
-          color: rgba(0,0,0,0.3);
+          display: flex; align-items: center;
+          color: rgba(0,0,0,0.4);
           transition: color 150ms;
           flex-shrink: 0;
         }
@@ -71,14 +59,15 @@ export default function SkuCopyField({ sku }: { sku: string }) {
         .sku-field.copied .sku-field-icon { color: rgb(34,197,94); }
       `}</style>
 
-      <div
+      <button
+        type="button"
         className={`sku-field${copied ? ' copied' : ''}`}
         onClick={handleCopy}
-        title={copied ? 'Copiat!' : 'Click pentru a copia SKU'}
+        aria-label={`Copiaza SKU ${sku}`}
       >
         <span className="sku-field-label">SKU:</span>
-        <span className="sku-field-value">{copied ? 'Copiat!' : sku}</span>
-        <span className="sku-field-icon">
+        <span className="sku-field-value" aria-live="polite">{copied ? 'Copiat!' : sku}</span>
+        <span className="sku-field-icon" aria-hidden="true">
           {copied ? (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="20 6 9 17 4 12" />
@@ -90,7 +79,7 @@ export default function SkuCopyField({ sku }: { sku: string }) {
             </svg>
           )}
         </span>
-      </div>
+      </button>
     </>
   )
 }

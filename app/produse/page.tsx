@@ -85,7 +85,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           flex-wrap: wrap;
         }
         .cat-bc-pill {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 0.08em;
@@ -100,12 +100,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
         .cat-bc-pill:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.4); }
         .cat-bc-sep {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px;
           color: rgba(0,0,0,0.25);
         }
         .cat-bc-current {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 0.08em;
@@ -123,7 +123,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           line-height: 1;
         }
         .cat-hero-zona {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(48px, 7vw, 96px);
           color: rgb(217, 44, 43);
           text-transform: uppercase;
@@ -131,7 +131,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           line-height: 1;
         }
         .cat-hero-name {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(48px, 7vw, 96px);
           color: rgb(0, 0, 0);
           text-transform: uppercase;
@@ -141,7 +141,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
         /* Description */
         .cat-hero-desc {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 15px;
           color: rgba(0,0,0,0.5);
           line-height: 1.6;
@@ -161,13 +161,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           gap: 8px;
         }
         .cat-hero-stat-num {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: 22px;
           color: rgb(0,0,0);
           letter-spacing: 0.02em;
         }
         .cat-hero-stat-label {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.1em;

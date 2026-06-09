@@ -1,27 +1,43 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Bungee, Bungee_Inline, Recursive, Inter } from 'next/font/google'
 import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
 import SmoothScroll from '@/components/SmoothScroll'
 
+// Self-hosted via next/font: no render-blocking Google Fonts CSS,
+// no third-party request, automatic fallback metrics (less CLS).
+const bungee = Bungee({ weight: '400', subsets: ['latin', 'latin-ext'], variable: '--font-bungee', display: 'swap' })
+const bungeeInline = Bungee_Inline({ weight: '400', subsets: ['latin', 'latin-ext'], variable: '--font-bungee-inline', display: 'swap' })
+const recursive = Recursive({ weight: ['400', '500'], subsets: ['latin', 'latin-ext'], variable: '--font-recursive', display: 'swap' })
+const inter = Inter({ weight: ['400', '500', '600', '700'], subsets: ['latin', 'latin-ext'], variable: '--font-inter', display: 'swap' })
+
 export const metadata: Metadata = {
-  title: 'Zona Scule — Scule și Echipamente Profesionale',
+  metadataBase: new URL('https://www.zonascule.online'),
+  title: {
+    default: 'Zona Scule — Scule și Echipamente Profesionale',
+    template: '%s — Zona Scule',
+  },
   description: 'Distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.',
+  openGraph: {
+    siteName: 'Zona Scule',
+    locale: 'ro_RO',
+    type: 'website',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro">
+    <html lang="ro" className={`${bungee.variable} ${bungeeInline.variable} ${recursive.variable} ${inter.variable}`}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Exact fonts from Framer: Bungee (headlines), Recursive (body/labels), Inter (UI) */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Inline&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://dfbhgnbqwoinujnzfxsl.supabase.co" />
       </head>
-      <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
+      <body>
+        <a href="#continut" className="skip-link">Sari la continut</a>
         <SmoothScroll />
         <DotsParallax />
         {children}

@@ -78,7 +78,7 @@ export default async function HomePage() {
           }
         }
         .hero-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-weight: 400;
           font-size: 18px; color: rgba(0,0,0,0.5);
           line-height: 1.4;
@@ -119,7 +119,7 @@ export default async function HomePage() {
           position: relative; z-index: 1;
           width: 100%; border: none; outline: none;
           background: transparent;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; color: rgb(0,0,0);
           text-align: left;
         }
@@ -127,7 +127,7 @@ export default async function HomePage() {
           position: absolute; left: 0; top: 50%; transform: translateY(-50%);
           pointer-events: none; white-space: nowrap;
           overflow: hidden; max-width: 100%;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.35);
         }
         .hero-search-placeholder-count { color: rgb(0,0,0); }
@@ -135,7 +135,7 @@ export default async function HomePage() {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
           padding: 0 36px; height: 44px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
           text-decoration: none; white-space: nowrap;
@@ -200,19 +200,19 @@ export default async function HomePage() {
           position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
         }
         .cat-card-count {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
           text-transform: uppercase; color: rgba(255,255,255,0.55);
           display: block; margin-bottom: 5px;
         }
         .cat-card-label {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 15px; font-weight: 500;
           color: rgb(255,255,255); letter-spacing: -0.01em;
           line-height: 1.3; display: block;
         }
         .cat-card-desc {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5;
           display: block; max-height: 0; overflow: hidden;
           opacity: 0; margin-top: 0;
@@ -228,12 +228,12 @@ export default async function HomePage() {
         }
         .services-header { display: flex; flex-direction: column; gap: 8px; }
         .section-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(32px, 4vw, 56px);
           color: rgb(0,0,0); line-height: 1; text-transform: uppercase;
         }
         .section-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 500;
         }
         .services-grid {
@@ -247,12 +247,12 @@ export default async function HomePage() {
         .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
         .service-body > * { position: relative; z-index: 2; }
         .service-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: 28px; text-transform: uppercase;
           line-height: 1; margin-bottom: 12px;
         }
         .service-desc {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; line-height: 1.65; margin-bottom: 0;
         }
         /* Service card hover — whole card grows + image zooms in */
@@ -270,7 +270,7 @@ export default async function HomePage() {
         .services-grid a:hover .service-img img { transform: scale(1.07); }
 
         .service-cta {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; font-weight: 600;
           letter-spacing: 0.06em; text-transform: uppercase;
           text-decoration: none;
@@ -296,13 +296,13 @@ export default async function HomePage() {
         }
         .carousel-header { margin-bottom: 40px; }
         .carousel-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(28px, 4vw, 48px);
           color: rgb(255,255,255); text-transform: uppercase;
           line-height: 1; margin-bottom: 8px;
         }
         .carousel-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; color: rgba(255,255,255,0.35);
         }
         /* ─── CONTACT BANNER ── */
@@ -320,25 +320,25 @@ export default async function HomePage() {
           justify-content: space-between; gap: 40px;
         }
         .contact-banner-eyebrow {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; color: rgba(255,255,255,0.35);
           margin-bottom: 14px; display: block;
         }
         .contact-banner-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(22px, 2.8vw, 38px);
           color: rgb(255,255,255); text-transform: uppercase;
           line-height: 1.1; margin-bottom: 10px;
         }
         .contact-banner-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; color: rgba(255,255,255,0.35);
         }
         .contact-banner-btn {
           display: inline-flex; align-items: center; gap: 8px;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
           padding: 16px 36px; border-radius: 4px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
           text-transform: uppercase; text-decoration: none;
           white-space: nowrap; flex-shrink: 0;

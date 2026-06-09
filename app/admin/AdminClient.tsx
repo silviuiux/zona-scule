@@ -149,7 +149,7 @@ export default function AdminClient({
     <>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0f0f11; color: #e8e6e3; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: #0f0f11; color: #e8e6e3; font-family: var(--font-inter), system-ui, sans-serif; }
 
         .admin { min-height: 100vh; background: #0f0f11; }
 

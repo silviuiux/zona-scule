@@ -150,7 +150,7 @@ export default function Nav() {
         .nav-search-input {
           flex: 1; min-width: 0;
           border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; color: rgb(0,0,0);
         }
         .nav-search-input::placeholder { color: rgba(0,0,0,0.35); }
@@ -202,7 +202,7 @@ export default function Nav() {
           width: 100%; height: 100%;
           display: flex; align-items: center; justify-content: center;
           color: rgba(0,0,0,0.15); font-size: 10px;
-          font-family: Recursive, sans-serif;
+          font-family: var(--font-recursive), sans-serif;
         }
 
         /* Text */
@@ -211,19 +211,19 @@ export default function Nav() {
           display: flex; flex-direction: column; gap: 2px;
         }
         .nav-sug-brand {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 9px; font-weight: 700;
           letter-spacing: 0.09em; text-transform: uppercase;
           color: rgba(0,0,0,0.38);
         }
         .nav-sug-model {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; font-weight: 500;
           color: rgb(0,0,0); letter-spacing: -0.01em;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .nav-sug-cat {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 11px; color: rgba(0,0,0,0.35);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
@@ -251,14 +251,14 @@ export default function Nav() {
         }
         .nav-sug-footer:hover { background: rgb(244,244,244); }
         .nav-sug-footer-label {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.5);
         }
         .nav-sug-footer-label strong {
           color: rgb(0,0,0); font-weight: 600;
         }
         .nav-sug-footer-action {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.07em; text-transform: uppercase;
           color: rgb(217,44,43);
@@ -284,7 +284,7 @@ export default function Nav() {
         .nav-catalog-link {
           flex-shrink: 0; padding: 8px 18px;
           background: transparent; color: rgba(0,0,0,0.45);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
+          border-radius: 2px; font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none; transition: color 150ms; white-space: nowrap;
@@ -293,7 +293,7 @@ export default function Nav() {
         .nav-contact {
           flex-shrink: 0; padding: 8px 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
+          border-radius: 2px; font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none; transition: background 150ms; white-space: nowrap;
@@ -330,8 +330,8 @@ export default function Nav() {
       <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-inner">
           {/* Logo */}
-          <Link href="/" className="nav-logo">
-            <svg width="120" height="23" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <Link href="/" className="nav-logo" aria-label="Zona Scule — acasa">
+            <svg width="120" height="23" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M18.213 12.0338L30.8793 0.5C24.2231 0.503334 17.8019 3.0075 12.8326 7.53234L0 19.2162H13.7136L1.32144 30.5C7.62846 30.5 13.7038 28.0759 18.3403 23.7111L23.1138 19.2162L31 12.0338H18.213Z" fill="#D92C2B"/>
               <path d="M0 12.4575V0.506836H12.4901L0 12.4575Z" fill="#D92C2B"/>
               <path d="M17.1201 30.5H31.0001V18.4727L17.1201 30.5Z" fill="#D92C2B"/>
@@ -357,23 +357,31 @@ export default function Nav() {
                 placeholder="cauta orice..."
                 autoComplete="off"
                 spellCheck={false}
+                role="combobox"
+                aria-label="Cauta produse"
+                aria-autocomplete="list"
+                aria-expanded={dropOpen}
+                aria-controls="nav-sug-list"
+                aria-activedescendant={activeIdx >= 0 ? `nav-sug-${activeIdx}` : undefined}
               />
             </form>
 
             {/* Dropdown */}
             {dropOpen && (
-              <div className="nav-suggestions" role="listbox">
+              <div className="nav-suggestions" role="listbox" id="nav-sug-list" aria-label="Sugestii de produse">
                 {fetching && <div className="nav-sug-loading" />}
 
                 {suggestions.map((s, i) => (
-                  <div
+                  <Link
                     key={s.slug}
+                    href={`/produse/${s.slug}`}
+                    id={`nav-sug-${i}`}
                     className={`nav-sug-item${i === activeIdx ? ' active' : ''}`}
                     role="option"
                     aria-selected={i === activeIdx}
                     onMouseEnter={() => setActiveIdx(i)}
                     onMouseLeave={() => setActiveIdx(-1)}
-                    onClick={() => navigateTo(s.slug)}
+                    onClick={() => { setDropOpen(false); setQ(''); setActiveIdx(-1) }}
                   >
                     {/* Image */}
                     <div className="nav-sug-img">
@@ -399,10 +407,10 @@ export default function Nav() {
                     </div>
 
                     {/* Arrow */}
-                    <svg className="nav-sug-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <svg className="nav-sug-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                       <path d="M7 17L17 7M17 7H7M17 7v10"/>
                     </svg>
-                  </div>
+                  </Link>
                 ))}
 
                 {/* Footer — full results link */}
@@ -425,6 +433,7 @@ export default function Nav() {
             className="nav-search-toggle"
             onClick={() => { setSearchOpen(v => !v); setTimeout(() => inputRef.current?.focus(), 50) }}
             aria-label="Cauta"
+            aria-expanded={searchOpen}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>

@@ -86,7 +86,7 @@ export default function EditableBreadcrumb({
         .ebc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; align-items: center; }
 
         .bc-pill {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.5);
           padding: 4px 12px;
           border: 1px solid rgba(0,0,0,0.1);
@@ -111,7 +111,7 @@ export default function EditableBreadcrumb({
 
         /* Left: navigable link */
         .ebc-split-link {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.6);
           padding: 5px 10px 5px 12px;
           text-decoration: none;
@@ -157,7 +157,7 @@ export default function EditableBreadcrumb({
         .ebc-option {
           display: block; width: 100%; text-align: left;
           padding: 7px 10px;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.7);
           background: none; border: none; cursor: pointer;
           border-radius: 4px;
@@ -169,7 +169,7 @@ export default function EditableBreadcrumb({
 
         /* Saved indicator */
         .ebc-saved {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 600;
           color: rgb(34,197,94);
           padding: 2px 6px;
@@ -178,7 +178,7 @@ export default function EditableBreadcrumb({
           animation: fadeIn 200ms ease;
         }
         .ebc-saving {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; color: rgba(0,0,0,0.3);
         }
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }

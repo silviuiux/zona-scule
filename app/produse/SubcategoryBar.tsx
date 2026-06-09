@@ -55,7 +55,7 @@ export default async function SubcategoryBar({
           display: inline-flex; align-items: center; gap: 8px;
           padding: 9px 16px; flex-shrink: 0;
           border-radius: 999px;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; font-weight: 400;
           color: rgba(0,0,0,0.7);
           text-decoration: none;
@@ -75,9 +75,9 @@ export default async function SubcategoryBar({
         }
 
         .subcat-count {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 500;
-          color: rgba(0,0,0,0.4);
+          color: rgba(0,0,0,0.55);
           letter-spacing: 0.02em;
         }
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
@@ -91,10 +91,11 @@ export default async function SubcategoryBar({
         }
       `}</style>
 
-      <div className="subcat-bar">
+      <nav className="subcat-bar" aria-label="Subcategorii">
         <Link
           href={allHref}
           className={`subcat-pill${!activeSub ? ' active' : ''}`}
+          aria-current={!activeSub ? 'page' : undefined}
         >
           Toate
           {typeof total === 'number' && total > 0 && (
@@ -106,12 +107,13 @@ export default async function SubcategoryBar({
             key={s.id}
             href={subHref(s.name)}
             className={`subcat-pill${activeSub === s.name ? ' active' : ''}`}
+            aria-current={activeSub === s.name ? 'page' : undefined}
           >
             {s.name}
             <span className="subcat-count">{s.product_count.toLocaleString('ro')}</span>
           </Link>
         ))}
-      </div>
+      </nav>
     </>
   )
 }

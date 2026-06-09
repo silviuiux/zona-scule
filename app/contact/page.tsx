@@ -22,25 +22,25 @@ export default function ContactPage({
 
         /* ── Header ── */
         .contact-location {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(0,0,0,0.4);
           margin-bottom: 16px;
         }
         .contact-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(52px, 7vw, 96px);
           line-height: 0.92;
           text-transform: uppercase;
           margin-bottom: 20px;
         }
         .contact-title .red {
-          font-family: 'Bungee Inline', sans-serif;
+          font-family: var(--font-bungee-inline), sans-serif;
           color: rgb(217,44,43);
         }
         .contact-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.5);
           line-height: 1.6; max-width: 420px;
           margin-bottom: 64px;
@@ -63,20 +63,20 @@ export default function ContactPage({
         .info-card:nth-child(n+2) { padding-left: 16px; }
         .info-card:last-child { border-right: none; }
         .info-label {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(0,0,0,0.35);
         }
         .info-value {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(20px, 2.2vw, 32px);
           line-height: 1; color: rgb(0,0,0);
           text-decoration: none;
         }
         .info-value.red { color: rgb(217,44,43); }
         .info-note {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.4);
         }
 

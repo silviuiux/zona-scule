@@ -10,14 +10,7 @@
   --text-70: rgb(102, 102, 102);
   --border: rgba(0,0,0,0.08);
 
-  /*
-    Noise texture — matches Figma Noise plugin settings:
-      Noise size X:2 Y:2  → baseFrequency 0.5 (1/size)
-      Density 16%         → feComponentTransfer maps mid-grays to near-black/white speckles
-      Black 32%, White 15% → overlay blend: dark speckles slightly more prominent
-    feComponentTransfer slope=4 intercept=-1.5 clips mid-tones, leaving
-    crisp black/white specks that read on both light and dark surfaces.
-  */
+  /* Noise texture — Figma Noise plugin equivalent (see git history for params) */
   --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncG type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncB type='linear' slope='4' intercept='-1.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -36,53 +29,37 @@ html.lenis, html.lenis body { height: auto; }
 body {
   background-color: rgb(244, 244, 244);
   color: var(--black);
-  font-family: 'Recursive', system-ui, sans-serif;
+  font-family: var(--font-recursive), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
 }
 
-/* Dot pattern — kept but hidden. --dot-y is updated by <DotsParallax /> on scroll.
-   To re-enable: remove the `display: none` line. */
-body::before {
-  display: none; /* hidden — replaced by noise texture */
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-  background-size: 16px 16px;
-  background-position: 0 var(--dot-y, 0px);
-  will-change: background-position;
+/* ── Accessibility: skip link + visible keyboard focus ─────────────────── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 10000;
+  background: var(--black);
+  color: var(--white);
+  padding: 10px 18px;
+  border-radius: 0 0 4px 0;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 13px;
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+}
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
-   .noise-global  : full-page fixed overlay, always on top (z-index 9999)
-                    pointer-events: none so clicks pass through
-                    mix-blend-mode: overlay — dark speckles on light bg,
-                    light speckles on dark bg, single rule for all surfaces.
-   .noise-card    : card-level grain (white, red, dark cards)
-   .noise-dark    : dark sections — slightly higher opacity
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* Global noise overlay — floats above all page content */
-.noise-global {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  background-image: var(--noise-svg);
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.45;
-  mix-blend-mode: overlay;
-}
-
-/* Layer 1 — card surfaces */
-.noise-card {
-  position: relative;
-  isolation: isolate;
-}
+   .noise-card : card-level grain   .noise-dark : dark sections          */
+.noise-card { position: relative; isolation: isolate; }
 .noise-card::after {
   content: '';
   position: absolute;
@@ -98,11 +75,7 @@ body::before {
 }
 .noise-card > * { position: relative; z-index: 2; }
 
-/* Layer 2 — dark sections (slightly higher opacity since dark bg is harder to read) */
-.noise-dark {
-  position: relative;
-  isolation: isolate;
-}
+.noise-dark { position: relative; isolation: isolate; }
 .noise-dark::after {
   content: '';
   position: absolute;
@@ -121,3 +94,93 @@ body::before {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* ─── PRODUCT CARD ────────────────────────────────────────────────────────
+   Hoisted from ProductCard.tsx: previously this whole block was inlined
+   inside EVERY card — ~100 duplicate <style> tags per listing page.      */
+.pcard-link { text-decoration: none; display: block; min-width: 0; }
+.pcard {
+  background: rgb(255, 255, 255);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  min-width: 0;
+  position: relative;
+  isolation: isolate;
+  transition: box-shadow 200ms, transform 200ms;
+}
+.pcard-link:hover .pcard,
+.pcard-link:focus-visible .pcard {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+.pcard-img {
+  position: relative;
+  aspect-ratio: 1;
+  background: rgb(255,255,255);
+  overflow: clip;
+}
+.pcard-img-main {
+  transition: opacity 280ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pcard-img-alt { opacity: 0; transition: opacity 320ms ease; }
+.pcard-link.has-img-alt:hover .pcard-img-main { opacity: 0; }
+.pcard-link.has-img-alt:hover .pcard-img-alt  { opacity: 1; }
+.pcard-link.no-img-alt:hover .pcard-img-main { transform: scale(1.06); }
+@media (prefers-reduced-motion: reduce) {
+  .pcard, .pcard-img-main, .pcard-img-alt { transition: none; }
+  .pcard-link:hover .pcard { transform: none; }
+}
+.pcard-info {
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  min-width: 0;
+}
+.pcard-brand {
+  font-family: var(--font-recursive), sans-serif;
+  font-weight: 500; font-size: 13px;
+  color: rgb(0,0,0); letter-spacing: -0.02em;
+}
+.pcard-model {
+  font-family: var(--font-recursive), sans-serif;
+  font-size: 13px; color: rgba(0,0,0,0.6);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pcard-specs-wrap { position: relative; margin-top: 4px; }
+.pcard-specs { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcard-specs-alt {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.pcard-specs-default.swappable { transition: opacity 220ms ease; }
+.pcard-link.has-spec-alt:hover .pcard-specs-default.swappable { opacity: 0; }
+.pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
+.pcard-spec {
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgb(244, 244, 244);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+.pcard-spec-wide { width: 100%; }
+.pcard-spec-label {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(0,0,0,0.55);
+}
+.pcard-spec-value {
+  font-family: var(--font-recursive), sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: rgb(0,0,0); letter-spacing: -0.02em;
+}
+.pcard-spec-value-clamp {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

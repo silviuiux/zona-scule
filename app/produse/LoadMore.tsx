@@ -197,7 +197,7 @@ export default function LoadMore({
               background: 'rgb(0,0,0)',
               color: 'rgb(255,255,255)',
               border: 'none', borderRadius: '2px',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-inter), sans-serif',
               fontSize: '12px', fontWeight: 600,
               letterSpacing: '0.07em', textTransform: 'uppercase',
               cursor: 'pointer',
@@ -207,7 +207,7 @@ export default function LoadMore({
             INCARCA MAI MULTE
           </button>
           <span style={{
-            fontFamily: 'Recursive, sans-serif',
+            fontFamily: 'var(--font-recursive), sans-serif',
             fontSize: '12px',
             color: 'rgba(0,0,0,0.35)',
           }}>

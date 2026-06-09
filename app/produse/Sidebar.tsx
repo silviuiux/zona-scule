@@ -46,7 +46,7 @@ export default function Sidebar({
 
         .sidebar-block { margin-bottom: 36px; }
         .sidebar-section-title {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(0,0,0,0.32);
@@ -59,9 +59,9 @@ export default function Sidebar({
           position: relative;
           display: flex; align-items: center; gap: 8px;
           padding: 10px 8px 10px 0;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 15px; font-weight: 400;
-          color: rgba(0,0,0,0.5);
+          color: rgba(0,0,0,0.62);
           text-decoration: none;
           transition: color 150ms, font-weight 150ms;
         }
@@ -92,7 +92,7 @@ export default function Sidebar({
           top: 50%;
           transform: translateY(-50%);
           flex-shrink: 0;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 500;
           padding: 4px 11px;
           border-radius: 999px;
@@ -112,7 +112,7 @@ export default function Sidebar({
           top: 50%;
           transform: translateY(-50%);
           flex-shrink: 0;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 13px; font-weight: 400;
           color: rgb(0,0,0);
           background: transparent;
@@ -121,12 +121,13 @@ export default function Sidebar({
         }
       `}</style>
 
-      <aside className="sidebar">
+      <aside className="sidebar" aria-label="Filtre catalog">
         {/* ── CATEGORII ── */}
         <div className="sidebar-block">
           <Link
             href="/produse"
             className={`side-item${allActive ? ' active' : ''}`}
+            aria-current={allActive ? 'page' : undefined}
             onClick={closeSidebar}
           >
             <span className="side-chev" aria-hidden="true">
@@ -147,6 +148,7 @@ export default function Sidebar({
                 key={cat.id}
                 href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
                 className={`side-item${isActive ? ' active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={closeSidebar}
               >
                 <span className="side-chev" aria-hidden="true">
@@ -181,6 +183,7 @@ export default function Sidebar({
                   key={brand.id}
                   href={brandHref}
                   className={`side-item${isActive ? ' active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={closeSidebar}
                 >
                   <span className="side-chev" aria-hidden="true">

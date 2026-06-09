@@ -46,11 +46,11 @@ export default function ContactForm({
             text-align: center; gap: 12px;
           }
           .cf-success-title {
-            font-family: 'Bungee', sans-serif;
+            font-family: var(--font-bungee), sans-serif;
             font-size: 32px; color: rgb(0,0,0);
           }
           .cf-success-sub {
-            font-family: 'Recursive', sans-serif;
+            font-family: var(--font-recursive), sans-serif;
             font-size: 14px; color: rgba(0,0,0,0.5); line-height: 1.6;
           }
         `}</style>
@@ -75,13 +75,13 @@ export default function ContactForm({
           border-bottom: none;
         }
         .cf-title {
-          font-family: 'Bungee', sans-serif;
+          font-family: var(--font-bungee), sans-serif;
           font-size: clamp(28px, 3vw, 42px);
           line-height: 1; color: rgb(0,0,0);
           text-transform: uppercase; margin-bottom: 12px;
         }
         .cf-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.45);
           line-height: 1.6; max-width: 360px;
         }
@@ -104,7 +104,7 @@ export default function ContactForm({
         .cf-field textarea {
           flex: 1; min-width: 0;
           border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; color: rgb(0,0,0);
           padding: 17px 0;
           resize: none;
@@ -116,7 +116,7 @@ export default function ContactForm({
 
         /* Right label — only visible when field has a value */
         .cf-label {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 11px; color: rgba(0,0,0,0.3);
           white-space: nowrap; padding-left: 12px; flex-shrink: 0;
           pointer-events: none; opacity: 0; transition: opacity 120ms;
@@ -133,7 +133,7 @@ export default function ContactForm({
           width: 100%; padding: 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
           border: none;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 11px; font-weight: 700;
           letter-spacing: 0.1em; text-transform: uppercase;
           cursor: pointer; transition: background 150ms;

@@ -6,15 +6,21 @@ import type { FeaturedSubcategoryWithImage } from '@/lib/supabase'
 export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategoryWithImage[] }) {
   const doubled = [...subs, ...subs]
   const trackRef = useRef<HTMLDivElement>(null)
+  const outerRef = useRef<HTMLDivElement>(null)
   const hasDragged = useRef(false)
 
   useEffect(() => {
     const track = trackRef.current
-    if (!track || subs.length === 0) return
+    const outer = outerRef.current
+    if (!track || !outer || subs.length === 0) return
 
-    const SPEED = 0.7  // px per rAF tick ≈ 42 px/s @ 60 fps
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+    const SPEED = 0.7
     let x = 0
     let isDragging = false
+    let inView = true
+    let focusWithin = false
     let startClientX = 0
     let startX = 0
     let raf: number
@@ -22,18 +28,32 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
     const cardW = () => window.innerWidth <= 768 ? 192 + 12 : 284 + 12
     const totalW = () => subs.length * cardW()
 
+    // Pause the auto-scroll while offscreen — no wasted main-thread work.
+    const io = new IntersectionObserver(
+      entries => { inView = entries[0]?.isIntersecting ?? true },
+      { threshold: 0 }
+    )
+    io.observe(outer)
+
     const tick = () => {
-      if (!isDragging) {
+      if (!isDragging && !reduce && inView && !focusWithin && !document.hidden) {
         x -= SPEED
         const tw = totalW()
         if (x <= -tw) x += tw
+        track.style.transform = `translateX(${x}px)`
+      } else if (isDragging) {
+        track.style.transform = `translateX(${x}px)`
       }
-      track.style.transform = `translateX(${x}px)`
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
 
-    // ── Mouse drag ──────────────────────────────────────────────────────────
+    // Keyboard users: stop the belt while focus is inside, so links don't run away.
+    const onFocusIn = () => { focusWithin = true }
+    const onFocusOut = () => { focusWithin = false }
+    outer.addEventListener('focusin', onFocusIn)
+    outer.addEventListener('focusout', onFocusOut)
+
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true
       hasDragged.current = false
@@ -55,7 +75,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       track.style.cursor = 'grab'
     }
 
-    // ── Touch drag ───────────────────────────────────────────────────────────
     const onTouchStart = (e: TouchEvent) => {
       isDragging = true
       hasDragged.current = false
@@ -73,7 +92,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
     }
     const onTouchEnd = () => { isDragging = false }
 
-    // Block link navigation after a real drag
     const onClickCapture = (e: MouseEvent) => {
       if (hasDragged.current) { e.preventDefault(); e.stopPropagation() }
     }
@@ -88,6 +106,9 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
 
     return () => {
       cancelAnimationFrame(raf)
+      io.disconnect()
+      outer.removeEventListener('focusin', onFocusIn)
+      outer.removeEventListener('focusout', onFocusOut)
       track.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
@@ -101,7 +122,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
   return (
     <>
       <style>{`
-        /* Full-width breakout from the max-width container */
         .sub-carousel-outer {
           position: relative;
           left: 50%;
@@ -109,11 +129,9 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           width: 100vw;
           overflow: hidden;
         }
-
         .sub-carousel-track {
           display: flex;
           gap: 0;
-          /* padding-left aligns first card with the header above */
           padding-left: max(32px, calc(50vw - 720px + 24px));
           will-change: transform;
           cursor: grab;
@@ -121,7 +139,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           -webkit-user-select: none;
         }
         .sub-carousel-track:active { cursor: grabbing; }
-
         .sub-card {
           flex-shrink: 0;
           width: 284px; height: 398px;
@@ -150,24 +167,27 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           position: absolute; bottom: 0; left: 0; right: 0; padding: 14px;
         }
         .sub-card-count {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-inter), sans-serif;
           font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: rgba(255,255,255,0.5);
+          text-transform: uppercase; color: rgba(255,255,255,0.7);
           display: block; margin-bottom: 4px;
         }
         .sub-card-label {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--font-recursive), sans-serif;
           font-size: 14px; font-weight: 500;
           color: rgb(255,255,255); line-height: 1.3; display: block;
         }
-
+        @media (prefers-reduced-motion: reduce) {
+          .sub-carousel-outer { overflow-x: auto; }
+          .sub-card, .sub-card-img { transition: none; }
+        }
         @media (max-width: 768px) {
           .sub-carousel-track { padding-left: 32px; }
           .sub-card { width: 192px; height: 269px; }
         }
       `}</style>
 
-      <div className="sub-carousel-outer">
+      <div className="sub-carousel-outer" ref={outerRef}>
         <div className="sub-carousel-track" ref={trackRef}>
           {doubled.map((s, i) => (
             <Link
@@ -178,9 +198,11 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
                   : `/produse?subcategorie=${encodeURIComponent(s.name)}`
               }
               className="sub-card"
+              tabIndex={i >= subs.length ? -1 : undefined}
+              aria-hidden={i >= subs.length ? true : undefined}
             >
               {s.image_url && (
-                <img src={s.image_url} alt={s.name} className="sub-card-img" loading="lazy" />
+                <img src={s.image_url} alt="" className="sub-card-img" loading="lazy" />
               )}
               <div className="sub-card-overlay" />
               <div className="sub-card-bottom">

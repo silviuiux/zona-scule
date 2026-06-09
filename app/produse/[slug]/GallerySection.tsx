@@ -1,12 +1,28 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
-export default function GallerySection({ images, productName }: { images: string[]; productName: string }) {
-  const [lightbox, setLightbox] = useState<string | null>(null)
+const OPTIMIZED_HOST = '.supabase.co'
 
-  // Distribute images into 1-3 columns based on count
+export default function GallerySection({ images, productName }: { images: string[]; productName: string }) {
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+
   const cols = Math.min(images.length, 3)
+  const open = lightboxIdx !== null
+
+  // Keyboard: Escape closes, arrows navigate.
+  useEffect(() => {
+    if (!open) return
+    closeRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIdx(null)
+      if (e.key === 'ArrowLeft')  setLightboxIdx(i => (i !== null && i > 0 ? i - 1 : i))
+      if (e.key === 'ArrowRight') setLightboxIdx(i => (i !== null && i < images.length - 1 ? i + 1 : i))
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, images.length])
 
   return (
     <>
@@ -23,6 +39,7 @@ export default function GallerySection({ images, productName }: { images: string
           overflow: hidden;
           cursor: zoom-in;
           background: rgb(220,218,214);
+          border: none; padding: 0; display: block;
         }
         .gallery-col:hover::after {
           content: '';
@@ -31,21 +48,17 @@ export default function GallerySection({ images, productName }: { images: string
           background: rgba(0,0,0,0.08);
           pointer-events: none;
         }
-        /* Lightbox */
         .lightbox-backdrop {
           position: fixed; inset: 0; z-index: 1000;
           background: rgba(0,0,0,0.92);
           display: flex; align-items: center; justify-content: center;
           cursor: zoom-out;
         }
-        .lightbox-img {
-          max-width: 90vw; max-height: 90vh;
-          position: relative;
-        }
+        .lightbox-img { max-width: 90vw; max-height: 90vh; position: relative; }
         .lightbox-close {
           position: fixed; top: 20px; right: 24px;
           background: none; border: none; cursor: pointer;
-          color: rgba(255,255,255,0.7); font-size: 32px; line-height: 1;
+          color: rgba(255,255,255,0.8); font-size: 32px; line-height: 1;
           transition: color 150ms;
         }
         .lightbox-close:hover { color: rgb(255,255,255); }
@@ -61,41 +74,39 @@ export default function GallerySection({ images, productName }: { images: string
         .lightbox-nav.next { right: 16px; }
       `}</style>
 
-      {/* Gallery: split into vertical columns */}
       <div
         className="gallery-section"
         style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
       >
         {images.slice(0, cols).map((img, i) => (
-          <div
+          <button
             key={i}
             className="gallery-col"
-            onClick={() => setLightbox(img)}
+            onClick={() => setLightboxIdx(i)}
+            aria-label={`Mareste imaginea ${i + 2} pentru ${productName}`}
           >
             <Image
               src={img}
-              alt={`${productName} ${i + 2}`}
+              alt={`${productName} — imagine ${i + 2}`}
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               style={{ objectFit: 'cover' }}
-              unoptimized
+              unoptimized={!img.includes(OPTIMIZED_HOST)}
             />
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Lightbox */}
-      {lightbox && (
-        <div className="lightbox-backdrop" onClick={() => setLightbox(null)}>
-          <button className="lightbox-close" onClick={() => setLightbox(null)}>×</button>
+      {open && (
+        <div className="lightbox-backdrop" onClick={() => setLightboxIdx(null)} role="dialog" aria-modal="true" aria-label={`Galerie ${productName}`}>
+          <button ref={closeRef} className="lightbox-close" onClick={() => setLightboxIdx(null)} aria-label="Inchide galeria">×</button>
 
-          {/* Prev */}
-          {images.indexOf(lightbox) > 0 && (
+          {lightboxIdx! > 0 && (
             <button
               className="lightbox-nav prev"
-              onClick={e => { e.stopPropagation(); setLightbox(images[images.indexOf(lightbox!) - 1]) }}
-            >
-              ‹
-            </button>
+              onClick={e => { e.stopPropagation(); setLightboxIdx(i => i! - 1) }}
+              aria-label="Imaginea anterioara"
+            >‹</button>
           )}
 
           <div
@@ -104,22 +115,21 @@ export default function GallerySection({ images, productName }: { images: string
             style={{ width: 'min(90vw, 1200px)', height: 'min(90vh, 800px)', position: 'relative' }}
           >
             <Image
-              src={lightbox}
-              alt={productName}
+              src={images[lightboxIdx!]}
+              alt={`${productName} — imagine marita`}
               fill
+              sizes="90vw"
               style={{ objectFit: 'contain' }}
-              unoptimized
+              unoptimized={!images[lightboxIdx!].includes(OPTIMIZED_HOST)}
             />
           </div>
 
-          {/* Next */}
-          {images.indexOf(lightbox) < images.length - 1 && (
+          {lightboxIdx! < images.length - 1 && (
             <button
               className="lightbox-nav next"
-              onClick={e => { e.stopPropagation(); setLightbox(images[images.indexOf(lightbox!) + 1]) }}
-            >
-              ›
-            </button>
+              onClick={e => { e.stopPropagation(); setLightboxIdx(i => i! + 1) }}
+              aria-label="Imaginea urmatoare"
+            >›</button>
           )}
         </div>
       )}
