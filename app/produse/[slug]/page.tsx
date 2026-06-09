@@ -8,6 +8,8 @@ import HeroImage from './HeroImage'
 import EditableBreadcrumb from './EditableBreadcrumb'
 import ProductNavArrows from './ProductNavArrows'
 import SkuCopyField from './SkuCopyField'
+import ScrollAnimations from './ScrollAnimations'
+import VariationPills from './VariationPills'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -254,6 +256,90 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .footer-bottom span, .footer-bottom a { font-family: 'Recursive', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); text-decoration: none; }
         .footer-bottom a { color: rgb(217,44,43); }
 
+        /* ── VARIATION PILLS ──────────────────────────────────────── */
+        .var-pills-wrap { margin-bottom: 24px; }
+        .var-pills-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(0,0,0,0.35); margin-bottom: 10px;
+        }
+        .var-pills-row {
+          display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        /* Base pill */
+        .var-pill {
+          display: inline-flex; align-items: center;
+          padding: 6px 16px; border-radius: 999px;
+          font-family: 'Recursive', sans-serif;
+          font-size: 13px; white-space: nowrap;
+          transition: border-color 150ms, color 150ms, background 150ms;
+          text-decoration: none;
+        }
+        /* Currently selected variant */
+        .var-pill-active {
+          background: rgb(0,0,0); color: rgb(255,255,255);
+          border: 1px solid rgb(0,0,0);
+          font-weight: 600; cursor: default;
+        }
+        /* Link to another variant */
+        .var-pill-link {
+          background: transparent; color: rgba(0,0,0,0.6);
+          border: 1px solid rgba(0,0,0,0.18); font-weight: 400;
+        }
+        .var-pill-link:hover {
+          border-color: rgb(0,0,0); color: rgb(0,0,0);
+        }
+        /* Variant exists upstream but not yet in our catalog */
+        .var-pill-disabled {
+          background: transparent; color: rgba(0,0,0,0.25);
+          border: 1px solid rgba(0,0,0,0.08); font-weight: 400;
+          cursor: not-allowed;
+        }
+
+        /* ══ SCROLL ANIMATIONS ══════════════════════════════════════ */
+
+        /* Fade + lift */
+        .reveal {
+          opacity: 0;
+          transform: translateY(20px);
+          transition:
+            opacity  660ms cubic-bezier(0.16, 1, 0.3, 1),
+            transform 660ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.in-view {
+          opacity: 1;
+          transform: none;
+        }
+
+        /* Fade + lift + subtle scale-up (cards) */
+        /* transition-delay is set per-element via JS (el.style.transitionDelay) */
+        .reveal-scale {
+          opacity: 0;
+          transform: translateY(26px) scale(0.965);
+          transition:
+            opacity  580ms cubic-bezier(0.16, 1, 0.3, 1),
+            transform 580ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-scale.in-view {
+          opacity: 1;
+          transform: none;
+        }
+
+        /* Hero image column — clip overflow from parallax translateY */
+        .pdp-img-col {
+          overflow: hidden;
+          will-change: transform;
+          /* Slightly taller clip area so bottom of image isn't cropped */
+          margin-bottom: -30px;
+          padding-bottom: 30px;
+        }
+
+        /* Disable will-change after in-view to free GPU layer */
+        .reveal.in-view, .reveal-scale.in-view {
+          will-change: auto;
+        }
+
         /* ══ RESPONSIVE ═════════════════════════════════════════════ */
         @media (max-width: 768px) {
           .pdp-top-inner {
@@ -282,6 +368,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       `}</style>
 
       <ProductNavArrows prevSlug={prevSlug} nextSlug={nextSlug} />
+      <ScrollAnimations />
 
       <div className="pdp">
 
@@ -289,29 +376,58 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="pdp-top">
           <div className="pdp-top-inner">
 
-            {/* LEFT — #6: vertically centered via align-items:center on grid */}
+            {/* LEFT — staggered reveals on each text block */}
             <div>
-              <EditableBreadcrumb
-                productId={product.id}
-                categoryText={product.category_text}
-                subcategoryText={product.subcategory_text}
-              />
+              <div className="reveal" style={{ transitionDelay: '0ms' }}>
+                <EditableBreadcrumb
+                  productId={product.id}
+                  categoryText={product.category_text}
+                  subcategoryText={product.subcategory_text}
+                />
+              </div>
               <Link
                 href={`/produse?brand=${encodeURIComponent(product.brand_name ?? '')}`}
-                className="pdp-brand"
+                className="pdp-brand reveal"
+                style={{ transitionDelay: '80ms' }}
               >
                 {product.brand_name}
               </Link>
-              <h1 className="pdp-sku">{product.model || product.sku || product.slug}</h1>
+              <h1
+                className="pdp-sku reveal"
+                style={{ transitionDelay: '150ms' }}
+              >
+                {product.model || product.sku || product.slug}
+              </h1>
+              <div className="reveal" style={{ transitionDelay: '210ms' }}>
+                <VariationPills
+                  variationsJson={product.variations_json}
+                  currentSku={product.sku}
+                />
+              </div>
               {product.short_description && (
-                <p className="pdp-desc">{product.short_description}</p>
+                <p
+                  className="pdp-desc reveal"
+                  style={{ transitionDelay: '270ms' }}
+                >
+                  {product.short_description}
+                </p>
               )}
-              <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
-              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cere-btn">CERE OFERTA</Link>
+              <div className="reveal" style={{ transitionDelay: '330ms' }}>
+                <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
+              </div>
+              <Link
+                href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`}
+                className="cere-btn reveal"
+                style={{ transitionDelay: '390ms' }}
+              >
+                CERE OFERTA
+              </Link>
             </div>
 
-            {/* RIGHT: #4 no border/box, pure white bg, #5 hover + lightbox */}
-            <HeroImage src={mainImg} alt={product.name} />
+            {/* RIGHT: parallax column — overflow clipped, image drifts at 0.14× scroll speed */}
+            <div className="pdp-img-col">
+              <HeroImage src={mainImg} alt={product.name} />
+            </div>
           </div>
         </div>
 
@@ -319,10 +435,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         {specs.length > 0 && (
           <div className="pdp-specs">
             <div className="pdp-specs-inner">
-              <p className="specs-label">Specificatii tehnice</p>
+              <p className="specs-label reveal">{`Specificatii tehnice`}</p>
               <div className="specs-grid" style={{ gridTemplateColumns: `repeat(${Math.min(specs.length, 3)}, 1fr)` }}>
                 {specs.map((s, i) => (
-                  <div key={i} className="spec-card">
+                  <div key={i} className="spec-card reveal-scale">
                     <p className="spec-card-label">{s.label}</p>
                     <p className="spec-card-value">{s.value}</p>
                     {s.detail && <p className="spec-card-detail">{s.detail}</p>}
@@ -335,17 +451,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* ── GALLERY: 80vh split columns — after specs ── */}
         {galleryImgs.length > 0 && (
-          <GallerySection images={galleryImgs} productName={product.name} />
+          <div className="reveal">
+            <GallerySection images={galleryImgs} productName={product.name} />
+          </div>
         )}
 
         {/* ── CARACTERISTICI ── */}
         {caracteristici.length > 0 && (
-          <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="pdp-char-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
             <div className="info-section">
-              <p className="info-section-label">Caracteristici</p>
-              <div className="info-grid">
+              <p className="info-section-label reveal">Caracteristici</p>
+              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(caracteristici.length, 3)}, 1fr)` }}>
                 {caracteristici.map((c, i) => (
-                  <div key={i} className="info-card">
+                  <div key={i} className="info-card reveal-scale">
                     <span className="info-num">0{i + 1}</span>
                     <span className="info-title">{c.title}</span>
                     {c.detail && <span className="info-body">{c.detail}</span>}
@@ -358,12 +476,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* ── APLICATII ── */}
         {aplicatii.length > 0 && (
-          <div style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="pdp-app-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
             <div className="info-section">
-              <p className="info-section-label">Aplicatii recomandate</p>
-              <div className="info-grid">
+              <p className="info-section-label reveal">Aplicatii recomandate</p>
+              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(aplicatii.length, 3)}, 1fr)` }}>
                 {aplicatii.map((a, i) => (
-                  <div key={i} className="info-card">
+                  <div key={i} className="info-card reveal-scale">
                     <span className="info-num">0{i + 1}</span>
                     <span className="info-title">{a.title}</span>
                     {a.detail && <span className="info-body">{a.detail}</span>}
@@ -376,7 +494,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* ── CTA BANNER ── */}
         <div className="cta-banner">
-          <div className="cta-banner-inner">
+          <div className="cta-banner-inner reveal-scale">
             <div>
               <p className="cta-banner-eyebrow">Cere o oferta personalizata</p>
               <p className="cta-banner-title">{product.brand_name} {product.sku ?? product.slug}</p>

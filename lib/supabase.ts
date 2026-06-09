@@ -56,6 +56,12 @@ export type Product = {
   images_migrated: boolean
   manufacturer_url: string | null
   created_at: string | null
+  /**
+   * JSON array of sibling variants scraped from the manufacturer's dropdown.
+   * Shape: Array<{ label: string; sku: string; manufacturer_url: string }>
+   * Used by VariationPills to render the diameter carousel on the product page.
+   */
+  variations_json: string | null
 }
 
 export type Brand = {

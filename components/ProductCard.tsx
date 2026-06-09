@@ -22,12 +22,8 @@ export default function ProductCard({ product }: { product: Product }) {
       ? { label: product.app_03_title, value: product.app_03_details } : null,
   ].filter((s): s is { label: string; value: string } => s !== null)
 
-  const specIndex = availableAppSpecs.length > 0
-    ? Array.from(product.id || '').reduce((acc, char) => acc + char.charCodeAt(0), 0) % availableAppSpecs.length
-    : 0
-
   const altSpec = availableAppSpecs.length > 0
-    ? availableAppSpecs[specIndex]
+    ? availableAppSpecs[Math.floor(Math.random() * availableAppSpecs.length)]
     : null
 
   const hasHoverImg = !!hoverImg
@@ -103,13 +99,12 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
       <style>{`
-        .pcard-link { text-decoration: none; display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .pcard-link { text-decoration: none; display: block; min-width: 0; }
         .pcard {
           background: rgb(255, 255, 255);
-          border-radius: 4px;
+          border-radius: 8px;
           overflow: hidden;
           display: flex; flex-direction: column;
-          flex: 1;
           min-width: 0;
           position: relative;
           isolation: isolate;
@@ -150,7 +145,6 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-info {
           padding: 16px;
           display: flex; flex-direction: column; gap: 8px;
-          flex: 1;
           min-width: 0;
         }
         .pcard-brand {
@@ -170,11 +164,10 @@ export default function ProductCard({ product }: { product: Product }) {
         /* ── Spec swap ── */
         .pcard-specs-wrap {
           position: relative;
-          margin-top: auto;
-          padding-top: 4px;
+          margin-top: 4px;
         }
         .pcard-specs {
-          display: flex; flex-wrap: wrap; gap: 12px;
+          display: flex; flex-wrap: wrap; gap: 6px;
         }
         .pcard-specs-alt {
           position: absolute;
@@ -188,7 +181,12 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-link.has-spec-alt:hover .pcard-specs-default.swappable { opacity: 0; }
         .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
-        .pcard-spec { display: flex; flex-direction: column; gap: 2px; }
+        .pcard-spec {
+          display: flex; flex-direction: column; gap: 2px;
+          background: rgb(244, 244, 244);
+          border-radius: 4px;
+          padding: 8px 10px;
+        }
         /* Wide variant for app description — fills full card width */
         .pcard-spec-wide { width: 100%; }
 

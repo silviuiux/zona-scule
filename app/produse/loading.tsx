@@ -1,7 +1,7 @@
 /**
  * Skeleton loading UI for /produse.
  * Next.js App Router shows this automatically while page.tsx is fetching data.
- * Mirrors the exact layout (sidebar + 3-col grid) so there's no layout shift.
+ * Mirrors the new layout: white hero section + gray sidebar/grid section.
  */
 export default function Loading() {
   const SIDEBAR_ROWS = 14
@@ -27,15 +27,67 @@ export default function Loading() {
           border-radius: 3px;
         }
 
-        /* ── Page shell (matches catalog-page) ── */
-        .skel-page {
+        /* ── Hero section (white) ── */
+        .skel-hero {
+          background: rgb(255, 255, 255);
           padding-top: 52px;
-          background: rgb(244, 244, 244);
-          min-height: 100vh;
+          min-height: 62vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          border-bottom: 1px solid rgba(0,0,0,0.07);
         }
-        .skel-spacer { width: 100%; height: 64px; }
+        .skel-hero-inner {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 40px 12px 56px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
 
-        /* ── Layout (matches catalog-layout) ── */
+        /* Breadcrumb pills */
+        .skel-breadcrumb {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 32px;
+          align-items: center;
+        }
+
+        /* Title block */
+        .skel-title {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          margin-bottom: 20px;
+        }
+
+        /* Description lines */
+        .skel-desc {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          margin-bottom: 28px;
+        }
+
+        /* Stats row */
+        .skel-stats {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+        .skel-stat {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+
+        /* ── Gray listing section ── */
+        .skel-page {
+          background: rgb(244, 244, 244);
+          min-height: 60vh;
+        }
         .skel-layout {
           display: flex;
           max-width: 1440px;
@@ -55,7 +107,6 @@ export default function Loading() {
 
         /* ── Main ── */
         .skel-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
-        .skel-header { margin-bottom: 24px; }
 
         /* Subcategory pill bar placeholder */
         .skel-pills {
@@ -73,7 +124,7 @@ export default function Loading() {
         }
         .skel-card {
           background: rgb(255,255,255);
-          border-radius: 4px;
+          border-radius: 8px;
           overflow: hidden;
         }
         .skel-card-img {
@@ -84,25 +135,72 @@ export default function Loading() {
           padding: 16px;
           display: flex; flex-direction: column; gap: 8px;
         }
+        .skel-card-specs {
+          display: flex; gap: 6px; margin-top: 4px;
+        }
+        .skel-card-spec {
+          background: rgb(238,238,238);
+          border-radius: 4px;
+          padding: 8px 10px;
+          display: flex; flex-direction: column; gap: 4px;
+        }
 
         @media (max-width: 768px) {
+          .skel-hero { min-height: auto; }
+          .skel-hero-inner { padding: 24px 12px 40px; }
           .skel-sidebar { display: none; }
           .skel-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .skel-main { padding: 20px 12px 60px; }
         }
       `}</style>
 
-      <div className="skel-page">
-        <div className="skel-spacer" />
+      {/* ── White hero skeleton ── */}
+      <div className="skel-hero">
+        <div className="skel-hero-inner">
+          {/* Breadcrumb */}
+          <div className="skel-breadcrumb">
+            {[70, 8, 120].map((w, i) =>
+              i === 1
+                ? <div key={i} style={{ width: 8, height: 12, color: 'rgba(0,0,0,0.2)', fontSize: 12, fontFamily: 'sans-serif', display: 'flex', alignItems: 'center' }}>/</div>
+                : <div key={i} className="skel" style={{ height: 26, width: w, borderRadius: 999 }} />
+            )}
+          </div>
 
+          {/* Title — two Bungee lines */}
+          <div className="skel-title">
+            <div className="skel" style={{ height: 72, width: '15%', borderRadius: 4 }} />
+            <div className="skel" style={{ height: 72, width: '48%', borderRadius: 4 }} />
+          </div>
+
+          {/* Description lines */}
+          <div className="skel-desc">
+            <div className="skel" style={{ height: 14, width: '44%' }} />
+            <div className="skel" style={{ height: 14, width: '32%' }} />
+          </div>
+
+          {/* Stats */}
+          <div className="skel-stats">
+            <div className="skel-stat">
+              <div className="skel" style={{ height: 24, width: 60, borderRadius: 3 }} />
+              <div className="skel" style={{ height: 10, width: 52, borderRadius: 2 }} />
+            </div>
+            <div style={{ width: 1, height: 20, background: 'rgba(0,0,0,0.1)' }} />
+            <div className="skel-stat">
+              <div className="skel" style={{ height: 24, width: 36, borderRadius: 3 }} />
+              <div className="skel" style={{ height: 10, width: 60, borderRadius: 2 }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Gray listing skeleton ── */}
+      <div className="skel-page">
         <div className="skel-layout">
           {/* ── Sidebar skeleton ── */}
           <aside className="skel-sidebar">
             {Array.from({ length: SIDEBAR_ROWS }).map((_, i) => (
               <div key={i} className="skel-sidebar-row">
-                {/* Chevron placeholder */}
                 <div className="skel" style={{ width: 14, height: 14, flexShrink: 0 }} />
-                {/* Label placeholder — vary widths to look natural */}
                 <div
                   className="skel"
                   style={{ height: 14, width: `${55 + (i * 17) % 35}%` }}
@@ -113,11 +211,6 @@ export default function Loading() {
 
           {/* ── Main content skeleton ── */}
           <main className="skel-main">
-            {/* Page title */}
-            <div className="skel-header">
-              <div className="skel" style={{ height: 56, width: '45%', borderRadius: 4 }} />
-            </div>
-
             {/* Subcategory pills */}
             <div className="skel-pills">
               {[88, 140, 120, 100, 130].map((w, i) => (
@@ -137,9 +230,15 @@ export default function Loading() {
                   <div className="skel-card-body">
                     <div className="skel" style={{ height: 13, width: '38%' }} />
                     <div className="skel" style={{ height: 13, width: '72%' }} />
-                    <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                      <div className="skel" style={{ height: 12, width: '28%' }} />
-                      <div className="skel" style={{ height: 12, width: '22%' }} />
+                    <div className="skel-card-specs">
+                      <div className="skel-card-spec">
+                        <div className="skel" style={{ height: 9, width: 44 }} />
+                        <div className="skel" style={{ height: 13, width: 56 }} />
+                      </div>
+                      <div className="skel-card-spec">
+                        <div className="skel" style={{ height: 9, width: 36 }} />
+                        <div className="skel" style={{ height: 13, width: 48 }} />
+                      </div>
                     </div>
                   </div>
                 </div>
