@@ -1,26 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { isAdmin } from '@/lib/adminAuth'
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 
-// Uses service key for writes
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
+/**
+ * POST /api/update-product-category
+ * Admin-only: re-categorizes a product. Auth = zs_admin cookie set after
+ * Basic Auth on /admin (see proxy.ts). Returns 401 for the public.
+ */
 export async function POST(req: NextRequest) {
-  const { productId, categoryText, subcategoryText } = await req.json()
-  if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 })
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
+  }
 
-  // Get category id
-  let categoryId = null
+  let body: { productId?: string; categoryText?: string; subcategoryText?: string }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'JSON invalid' }, { status: 400 })
+  }
+
+  const { productId, categoryText, subcategoryText } = body
+  if (!productId || typeof productId !== 'string') {
+    return NextResponse.json({ error: 'Missing productId' }, { status: 400 })
+  }
+
+  const supabase = getSupabaseAdmin()
+
+  let categoryId: string | null = null
   if (categoryText) {
     const { data: cat } = await supabase
       .from('categories').select('id').eq('name', categoryText).single()
     categoryId = cat?.id ?? null
   }
 
-  // Get subcategory id
-  let subcategoryId = null
+  let subcategoryId: string | null = null
   if (subcategoryText && categoryId) {
     const { data: sub } = await supabase
       .from('subcategories').select('id')
