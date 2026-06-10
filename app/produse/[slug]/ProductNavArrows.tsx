@@ -6,7 +6,6 @@ function navigate(router: ReturnType<typeof useRouter>, url: string, dir: 'prev'
   document.documentElement.dataset.navDir = dir
 
   if ('startViewTransition' in document) {
-    // @ts-ignore — View Transitions API
     document.startViewTransition(() => router.push(url))
   } else {
     router.push(url)

@@ -44,18 +44,22 @@ export default function LoadMore({
   useEffect(() => {
     if (didRestore.current) return
     didRestore.current = true
-    try {
-      const raw = sessionStorage.getItem(storeKey)
-      if (!raw) return
-      const saved: SavedState = JSON.parse(raw)
-      if (saved.products?.length) {
-        setProducts(saved.products)
-        setPage(saved.page ?? 2)
-        scrollTarget.current = saved.lastSlug ?? null
+    // Deferred so the restore doesn't trigger a cascading sync render.
+    const raf = requestAnimationFrame(() => {
+      try {
+        const raw = sessionStorage.getItem(storeKey)
+        if (!raw) return
+        const saved: SavedState = JSON.parse(raw)
+        if (saved.products?.length) {
+          setProducts(saved.products)
+          setPage(saved.page ?? 2)
+          scrollTarget.current = saved.lastSlug ?? null
+        }
+      } catch {
+        // sessionStorage unavailable or corrupt — start fresh
       }
-    } catch {
-      // sessionStorage unavailable or corrupt — start fresh
-    }
+    })
+    return () => cancelAnimationFrame(raf)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // intentionally empty: runs once on mount
 

@@ -31,14 +31,20 @@ export default async function AdminPage() {
     if (row.subcategory_text) countMap[row.subcategory_text.toLowerCase().trim()] = row.cnt
   }
 
-  const enriched = (subcats ?? []).map((s: any) => ({
+  type SubRow = {
+    id: string; name: string; slug: string | null; parent_category_id: string
+    categories: { name: string } | { name: string }[] | null
+  }
+  const enriched = ((subcats ?? []) as SubRow[]).map(s => {
+    const cat = Array.isArray(s.categories) ? s.categories[0] : s.categories
+    return ({
     id: s.id,
     name: s.name,
     slug: s.slug ?? null,
     parent_category_id: s.parent_category_id,
-    category_name: s.categories?.name ?? '—',
+    category_name: cat?.name ?? '—',
     product_count: countMap[s.name.toLowerCase().trim()] ?? 0,
-  }))
+  })})
 
   return (
     <AdminClient

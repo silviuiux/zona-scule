@@ -47,13 +47,13 @@ export default function Nav() {
   // ── debounced typeahead ────────────────────────────────────────────────────
   useEffect(() => {
     const trimmed = q.trim()
-    if (trimmed.length < 2) {
-      setSuggestions([])
-      setDropOpen(false)
-      setActiveIdx(-1)
-      return
-    }
     const t = setTimeout(async () => {
+      if (trimmed.length < 2) {
+        setSuggestions([])
+        setDropOpen(false)
+        setActiveIdx(-1)
+        return
+      }
       setFetching(true)
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`)
@@ -68,7 +68,7 @@ export default function Nav() {
       } finally {
         setFetching(false)
       }
-    }, 250)
+    }, trimmed.length < 2 ? 0 : 250)
     return () => clearTimeout(t)
   }, [q])
 

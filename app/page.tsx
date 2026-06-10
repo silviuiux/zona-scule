@@ -14,11 +14,13 @@ export const revalidate = 600
 
 
 export default async function HomePage() {
+  // Graceful degradation: if Supabase is unreachable (build sandbox, outage),
+  // render the shell with empty data instead of failing the whole build.
   const [categories, brands, featuredSubs, totalCount] = await Promise.all([
-    getCategoriesWithCount(),
-    getBrands(),
-    getFeaturedSubcategoriesWithImage(),
-    getTotalProductCount(),
+    getCategoriesWithCount().catch(() => []),
+    getBrands().catch(() => []),
+    getFeaturedSubcategoriesWithImage().catch(() => []),
+    getTotalProductCount().catch(() => 0),
   ])
 
   // Enrich subcategories with their parent category name for correct deep-link URLs

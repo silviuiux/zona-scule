@@ -1,15 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Bungee, Bungee_Inline, Recursive, Inter } from 'next/font/google'
 import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
 import SmoothScroll from '@/components/SmoothScroll'
 
-// Self-hosted via next/font: no render-blocking Google Fonts CSS,
-// no third-party request, automatic fallback metrics (less CLS).
-const bungee = Bungee({ weight: '400', subsets: ['latin', 'latin-ext'], variable: '--font-bungee', display: 'swap' })
-const bungeeInline = Bungee_Inline({ weight: '400', subsets: ['latin', 'latin-ext'], variable: '--font-bungee-inline', display: 'swap' })
-const recursive = Recursive({ weight: ['400', '500'], subsets: ['latin', 'latin-ext'], variable: '--font-recursive', display: 'swap' })
-const inter = Inter({ weight: ['400', '500', '600', '700'], subsets: ['latin', 'latin-ext'], variable: '--font-inter', display: 'swap' })
+// NOTE: fonts load via Google Fonts <link> below (same as before).
+// All components reference var(--font-*) (set in globals.css), so a future
+// switch to next/font/google self-hosting is a 2-file change — the build
+// sandbox used for this branch could not reach fonts.gstatic.com.
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.zonascule.online'),
@@ -32,9 +29,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro" className={`${bungee.variable} ${bungeeInline.variable} ${recursive.variable} ${inter.variable}`}>
+    <html lang="ro">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://dfbhgnbqwoinujnzfxsl.supabase.co" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Inline&family=Recursive:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
         <a href="#continut" className="skip-link">Sari la continut</a>

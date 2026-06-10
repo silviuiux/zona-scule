@@ -34,11 +34,17 @@ export default function EditableBreadcrumb({
 
   // Load subcategories when category changes
   useEffect(() => {
-    if (!activeCat) { setSubs([]); return }
+    if (!activeCat) return
+    let alive = true
     fetch(`/api/subcategories?categorie=${encodeURIComponent(activeCat)}`)
       .then(r => r.json())
-      .then(setSubs)
+      .then(data => { if (alive) setSubs(data) })
+      .catch(() => {})
+    return () => { alive = false }
   }, [activeCat])
+
+  // Render-time guard instead of clearing state synchronously in the effect
+  const visibleSubs = activeCat ? subs : []
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -256,7 +262,7 @@ export default function EditableBreadcrumb({
                   >
                     — Fără subcategorie
                   </button>
-                  {subs.map((s: any) => (
+                  {visibleSubs.map((s: Sub) => (
                     <button
                       key={s.name}
                       className={`ebc-option${s.name === activeSub ? ' active' : ''}`}

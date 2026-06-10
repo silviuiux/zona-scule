@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  /* Font variables — currently aliases to Google Fonts families loaded in
+     layout.tsx; swap to next/font/google variables when building on Vercel. */
+  --font-bungee: 'Bungee';
+  --font-bungee-inline: 'Bungee Inline';
+  --font-recursive: 'Recursive';
+  --font-inter: 'Inter';
+
   --surface: rgb(244, 244, 244);
   --white: rgb(255, 255, 255);
   --black: rgb(0, 0, 0);

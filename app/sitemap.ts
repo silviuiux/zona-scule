@@ -12,16 +12,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact`, changeFrequency: 'monthly', priority: 0.5 },
   ]
 
-  const [{ data: cats }, { data: products }] = await Promise.all([
-    supabase.from('categories').select('name'),
-    supabase
-      .from('products')
-      .select('slug, created_at')
-      .not('slug', 'is', null)
-      .not('main_image_storage_url', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(10000),
-  ])
+  let cats: { name: string }[] | null = null
+  let products: { slug: string }[] | null = null
+  try {
+    const [c, p] = await Promise.all([
+      supabase.from('categories').select('name'),
+      supabase
+        .from('products')
+        .select('slug, created_at')
+        .not('slug', 'is', null)
+        .not('main_image_storage_url', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(10000),
+    ])
+    cats = c.data
+    products = p.data as { slug: string }[] | null
+  } catch {
+    // DB unreachable — ship the static routes only.
+  }
 
   const catRoutes: MetadataRoute.Sitemap = (cats ?? []).map(c => ({
     url: `${base}/produse?categorie=${encodeURIComponent(c.name)}`,
