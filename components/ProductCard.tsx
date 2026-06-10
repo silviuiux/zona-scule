@@ -38,7 +38,7 @@ export default function ProductCard({ product }: { product: Product }) {
     altSpec ? 'has-spec-alt' : '',
   ].filter(Boolean).join(' ')
 
-  const displayName = [product.brand_name, product.model ?? product.short_description ?? product.name]
+  const displayName = [product.brand_name, product.name || product.model || product.short_description]
     .filter(Boolean).join(' ')
 
   return (
@@ -76,7 +76,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.brand_name && (
             <p className="pcard-brand">{product.brand_name}</p>
           )}
-          <p className="pcard-model">{product.model ?? product.short_description ?? product.name}</p>
+          <p className="pcard-model">{product.name || product.model || product.short_description}</p>
 
           {(specs.length > 0 || altSpec) && (
             <div className="pcard-specs-wrap">
