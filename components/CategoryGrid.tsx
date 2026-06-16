@@ -11,10 +11,15 @@ type Cat = {
   featured: boolean
 }
 
-// Per-column vertical offset for the scroll-stagger animation.
-// Col 0 = most staggered, col 3 = flush. Large values so the diagonal
-// drop between columns is very pronounced while scrolling.
-const COL_OFFSETS = [600, 400, 200, 0]
+// Per-column starting vertical offset (px) for the scroll-stagger animation.
+// Kept moderate so a slice of EVERY first-row card is visible on first view.
+// col2 is the deepest so the wide "Scule electrice" card sinks furthest and the
+// row-1 card below it (Constructii, later in the DOM) rides over it mid-scroll.
+const COL_OFFSETS = [280, 180, 300, 150]
+// Per-column "looseness": >1 makes a column hang back and rush up late, so
+// columns drift apart and overlap instead of sliding as one rigid diagonal.
+// col3 (Constructii) is the loosest so it floats up last.
+const COL_LAG = [1.0, 1.2, 1.4, 1.7]
 const GRID_COLS = 4
 // The columns finish lining up only once the LAST row of cards has scrolled
 // into view, so the alignment is spread across the grid's full scroll span.
@@ -97,7 +102,13 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       allCards.forEach(el => {
         const col = Number(el.dataset.col ?? 0)
         const base = COL_OFFSETS[col] ?? 0
-        el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
+        const lag = COL_LAG[col] ?? 1
+        // Per-column lagged progress — higher lag hangs back then rushes up,
+        // giving the looser, overlapping drift. All columns still reach 0 at
+        // progress 1, so every card lands aligned (Constructii & Consumabile
+        // share the same Y at rest).
+        const lp = Math.pow(progress, lag)
+        el.style.setProperty('--cat-offset', `${base * (1 - lp)}px`)
       })
     }
     const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
