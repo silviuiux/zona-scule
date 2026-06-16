@@ -12,13 +12,19 @@ type Cat = {
 }
 
 // Per-column vertical offset for the scroll-stagger animation.
-// Col 0 = most staggered, col 3 = flush.
-const COL_OFFSETS = [270, 180, 90, 0]
+// Col 0 = most staggered, col 3 = flush. Large values so the diagonal
+// drop between columns is very pronounced while scrolling.
+const COL_OFFSETS = [600, 400, 200, 0]
 const GRID_COLS = 4
-// Height of one card row including gap (400px card + 16px gap).
-// Progress reaches 1.0 after this many row-heights of viewport travel —
-// i.e. alignment completes when rows 2–3 are roughly centred in the viewport.
-const ALIGN_ROWS = 2.2
+// The columns finish lining up only once the LAST row of cards has scrolled
+// into view, so the alignment is spread across the grid's full scroll span.
+// This fraction of the viewport is shaved off the end so the line-up settles
+// while the last row is comfortably visible rather than at the very bottom.
+const ALIGN_END_BIAS = 0.15
+
+// easeInOutCubic — accelerate into the line-up, settle gently out of it.
+const easeInOut = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 // ── Greedy row builder ────────────────────────────────────────────────────────
 // Places categories left-to-right in a GRID_COLS-column grid.
@@ -79,13 +85,15 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       const rect = root.getBoundingClientRect()
       const viewH = window.innerHeight
       // "scrolledPast" = how far the grid top has travelled above the bottom
-      // of the viewport (0 = grid just entering, positive = grid scrolling up).
+      // of the viewport (0 = grid top just entering at viewport bottom).
       const scrolledPast = viewH - rect.top
-      // One card row ≈ 416px (400px height + 16px gap).
-      // We travel ALIGN_ROWS rows before reaching full alignment.
-      const rowH = 416
-      const totalRange = rowH * ALIGN_ROWS
-      const progress = Math.max(0, Math.min(1, scrolledPast / totalRange))
+      // Run progress across the grid's ENTIRE height: 0 when the grid top
+      // reaches the viewport bottom, 1 only once the grid bottom (the last
+      // row) is comfortably in view. This makes the line-up long and ties its
+      // completion to the last row appearing — instead of a fixed row count.
+      const totalRange = Math.max(rect.height - viewH * ALIGN_END_BIAS, 1)
+      const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
+      const progress = easeInOut(linear)
       allCards.forEach(el => {
         const col = Number(el.dataset.col ?? 0)
         const base = COL_OFFSETS[col] ?? 0
