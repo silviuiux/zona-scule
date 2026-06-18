@@ -1,5 +1,5 @@
 import Nav from '@/components/Nav'
-import { getProductBySlug, getAdjacentProducts } from '@/lib/supabase'
+import { getProductBySlug, getAdjacentProducts, getProductVariants } from '@/lib/supabase'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -9,6 +9,7 @@ import EditableBreadcrumb from './EditableBreadcrumb'
 import ProductNavArrows from './ProductNavArrows'
 import SkuCopyField from './SkuCopyField'
 import ScrollAnimations from './ScrollAnimations'
+import VariantSelector from './VariantSelector'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -21,6 +22,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ])
   if (!product) notFound()
   const { prevSlug, nextSlug } = adjacent
+
+  // sibling variants in the same family (empty if no family / single variant)
+  const variants = product.family_id
+    ? await getProductVariants(product.family_id)
+    : []
 
   const mainImg = product.main_image_storage_url || product.main_image_url
 
@@ -366,6 +372,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               )}
               <div className="reveal" style={{ transitionDelay: '270ms' }}>
                 <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
+              </div>
+
+              {/* Variant dropdown — only renders when the family has >1 variant */}
+              <div className="reveal" style={{ transitionDelay: '300ms' }}>
+                <VariantSelector variants={variants} currentSlug={product.slug} />
               </div>
               <Link
                 href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`}

@@ -56,6 +56,20 @@ export type Product = {
   images_migrated: boolean
   manufacturer_url: string | null
   created_at: string | null
+  // ── PFERD variants (additive migration) ──
+  family_id: string | null
+  family_name: string | null
+  variant_label: string | null
+  variant_count?: number          // present on product_listing rows
+  ean: string | null
+  long_description: string | null
+  special_features: string | null
+  applications: string | null
+  datasheet_url_1: string | null
+  datasheet_url_2: string | null
+  specs: Record<string, string> | null
+  axes: Record<string, string> | null
+  enriched: boolean
 }
 
 export type Brand = {
@@ -108,9 +122,12 @@ export async function getProducts({
   search?: string
   featured?: boolean
 } = {}) {
+  // product_listing = one row per family (representative variant); products with
+  // no family fall back to themselves, so nothing is hidden. 'exact' because
+  // estimated counts are unreliable on a view.
   let query = supabase
-    .from('products')
-    .select('*', { count: 'estimated' })
+    .from('product_listing')
+    .select('*', { count: 'exact' })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)
     .order('name')
@@ -151,6 +168,25 @@ export async function getProductBySlug(slug: string) {
   return data as Product
 }
 
+export type VariantOption = {
+  slug: string
+  sku: string | null
+  name: string | null
+  variant_label: string | null
+  specs: Record<string, string> | null
+  ean: string | null
+}
+
+/** Sibling variants in the same family (for the PDP variant dropdown). */
+export async function getProductVariants(familyId: string): Promise<VariantOption[]> {
+  const { data } = await supabase
+    .from('products')
+    .select('slug, sku, name, variant_label, specs, ean')
+    .eq('family_id', familyId)
+    .order('variant_label', { nullsFirst: false })
+  return (data ?? []) as VariantOption[]
+}
+
 export async function getAdjacentProducts(
   currentSlug: string,
   subcategoryText: string | null | undefined
@@ -165,7 +201,7 @@ export async function getAdjacentProducts(
 
   const base = () => {
     let q = supabase
-      .from('products')
+      .from('product_listing')   // family-level: prev/next skips sibling variants
       .select('slug')
       .not('slug', 'is', null)
       .not('main_image_storage_url', 'is', null)
@@ -307,8 +343,8 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
 
 export async function getTotalProductCount(): Promise<number> {
   const { count } = await supabase
-    .from('products')
-    .select('*', { count: 'estimated', head: true })
+    .from('product_listing')   // family-level total (one per family)
+    .select('*', { count: 'exact', head: true })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)
   return count ?? 0
