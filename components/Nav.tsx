@@ -434,6 +434,7 @@ export default function Nav() {
           {/* Right links */}
           <div className="nav-links">
             <Link href="/produse" className="nav-catalog-link">Catalog</Link>
+            <Link href="/zona-solutii" className="nav-catalog-link">Zona Soluții</Link>
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>
         </div>
