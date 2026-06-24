@@ -1,0 +1,7 @@
+# Zona Scule ETL pipeline. Standalone — NOT a dependency of the Next.js app.
+pandas>=2.0
+openpyxl>=3.1        # xlsx feeds
+python-dotenv>=1.0   # reads the app's .env.local
+anthropic>=0.40      # enrichment (only needed when enrichment is on)
+supabase>=2.4        # load stage (only needed for a real, non-dry run)
+requests>=2.31       # resolver stage (live-site scrape, e.g. NOVALIA)

@@ -1,21 +1,19 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: path.resolve(__dirname),
-  },
   images: {
+    // Product/category/brand imagery lives in Supabase Storage (public
+    // bucket). We deliberately don't allow arbitrary remote hosts (e.g. raw
+    // manufacturer image URLs) so next/image optimization stays on — no
+    // `unoptimized` flag, per the fix called out in REBUILD.md §3.7. Assets
+    // that haven't been migrated to Storage yet fall back to a placeholder
+    // instead of hotlinking an unknown third-party domain.
     remotePatterns: [
-      { protocol: 'https', hostname: 'dfbhgnbqwoinujnzfxsl.supabase.co' },
-      { protocol: 'https', hostname: 'milwaukee-media-images.s3.amazonaws.com' },
-      { protocol: 'https', hostname: 'assets.pferd.com' },
-      { protocol: 'https', hostname: 'res.cloudinary.com' },
-      { protocol: 'https', hostname: 'novaliaromania.ro' },
-      { protocol: 'https', hostname: 'www.novaliaromania.ro' },
-      { protocol: 'https', hostname: 'www.krause-systems.co.uk' },
-      { protocol: 'https', hostname: '*.s3.amazonaws.com' },
-      { protocol: 'https', hostname: '**' },
+      {
+        protocol: "https",
+        hostname: "dfbhgnbqwoinujnzfxsl.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };

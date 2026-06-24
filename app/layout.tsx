@@ -1,31 +1,39 @@
-import type { Metadata } from 'next'
-import './globals.css'
-import DotsParallax from '@/components/DotsParallax'
-import SmoothScroll from '@/components/SmoothScroll'
+import type { Metadata } from "next";
+import { Big_Shoulders, Inter } from "next/font/google";
+import SmoothScroll from "@/components/SmoothScroll";
+import "./globals.css";
+
+const display = Big_Shoulders({
+  variable: "--font-display",
+  subsets: ["latin", "latin-ext"],
+  weight: ["600", "700", "800"],
+});
+
+const body = Inter({
+  variable: "--font-body",
+  subsets: ["latin", "latin-ext"],
+});
 
 export const metadata: Metadata = {
-  title: 'Zona Scule — Scule și Echipamente Profesionale',
-  description: 'Distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.',
-}
+  title: {
+    default: "Zona Scule — Unelte și consumabile industriale",
+    template: "%s — Zona Scule",
+  },
+  description:
+    "Catalog de unelte, scule și consumabile industriale: căutare rapidă, filtrare după brand, categorie și subcategorie.",
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="ro">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Exact fonts from Framer: Bungee (headlines), Recursive (body/labels), Inter (UI) */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Inline&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
+    <html lang="ro" className={`${display.variable} ${body.variable} h-full`}>
+      <body className="min-h-full flex flex-col bg-white text-ink antialiased">
         <SmoothScroll />
-        <DotsParallax />
         {children}
       </body>
     </html>
-  )
+  );
 }

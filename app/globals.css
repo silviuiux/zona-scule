@@ -1,123 +1,153 @@
 @import "tailwindcss";
 
+/*
+  Design direction: "industrial spec sheet" — white/light throughout, brand
+  red used sparingly (CTAs, active states, the rare full-bleed accent block),
+  hairline rules instead of card shadows, condensed uppercase display type
+  for headlines paired with a quiet grotesk for everything else. Think a
+  tool catalog crossed with a technical datasheet, not a generic SaaS site.
+*/
+
 :root {
-  --surface: rgb(244, 244, 244);
-  --white: rgb(255, 255, 255);
-  --black: rgb(0, 0, 0);
-  --light-black: rgb(30, 30, 30);
-  --red: rgb(217, 44, 43);
-  --red-hover: rgb(190, 35, 34);
-  --text-70: rgb(102, 102, 102);
-  --border: rgba(0,0,0,0.08);
-
-  /*
-    Noise texture — matches Figma Noise plugin settings:
-      Noise size X:2 Y:2  → baseFrequency 0.5 (1/size)
-      Density 16%         → feComponentTransfer maps mid-grays to near-black/white speckles
-      Black 32%, White 15% → overlay blend: dark speckles slightly more prominent
-    feComponentTransfer slope=4 intercept=-1.5 clips mid-tones, leaving
-    crisp black/white specks that read on both light and dark surfaces.
-  */
-  --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncG type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncB type='linear' slope='4' intercept='-1.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  --surface: #f4f4f4;
+  --white: #ffffff;
+  --ink: #0a0a0a;
+  --ink-soft: #1e1e1e;
+  --red: #d92c2b;
+  --red-hover: #be2322;
+  --text-muted: #666666;
+  --text-faint: #9a9a9a;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-/* Lenis drives smooth scrolling in JS; native scroll-behavior must stay auto to
-   avoid conflicting with it. The reduced-motion fallback restores smooth anchors. */
-html { scroll-behavior: auto; }
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-smooth iframe { pointer-events: none; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: smooth; }
+@theme inline {
+  --color-surface: var(--surface);
+  --color-white: var(--white);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-red: var(--red);
+  --color-red-hover: var(--red-hover);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--white);
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background-color: rgb(244, 244, 244);
-  color: var(--black);
-  font-family: 'Recursive', system-ui, sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+/* Headline type — condensed, uppercase, tight tracking by default. Apply
+   .font-display and override tracking/size per use. */
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.label {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hairline {
+  border-color: var(--border);
+}
+
+/* Subtle paper-grain texture, low opacity, overlay blend — a nice-to-carry
+   detail from the previous build, kept because it reads as "physical
+   material" rather than flat digital, which suits a tools brand. */
+.noise {
   position: relative;
 }
-
-/* Dot pattern — kept but hidden. --dot-y is updated by <DotsParallax /> on scroll.
-   To re-enable: remove the `display: none` line. */
-body::before {
-  display: none; /* hidden — replaced by noise texture */
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-  background-size: 16px 16px;
-  background-position: 0 var(--dot-y, 0px);
-  will-change: background-position;
-}
-
-/* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
-   .noise-global  : full-page fixed overlay, always on top (z-index 9999)
-                    pointer-events: none so clicks pass through
-                    mix-blend-mode: overlay — dark speckles on light bg,
-                    light speckles on dark bg, single rule for all surfaces.
-   .noise-card    : card-level grain (white, red, dark cards)
-   .noise-dark    : dark sections — slightly higher opacity
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* Global noise overlay — floats above all page content */
-.noise-global {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  background-image: var(--noise-svg);
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.45;
-  mix-blend-mode: overlay;
-}
-
-/* Layer 1 — card surfaces */
-.noise-card {
-  position: relative;
-  isolation: isolate;
-}
-.noise-card::after {
-  content: '';
+.noise::after {
+  content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
   pointer-events: none;
-  background-image: var(--noise-svg);
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.28;
-  mix-blend-mode: overlay;
-  border-radius: inherit;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIyIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI24pIi8+PC9zdmc+");
+  background-size: 180px 180px;
 }
-.noise-card > * { position: relative; z-index: 2; }
 
-/* Layer 2 — dark sections (slightly higher opacity since dark bg is harder to read) */
-.noise-dark {
-  position: relative;
-  isolation: isolate;
+::selection {
+  background: var(--red);
+  color: var(--white);
 }
-.noise-dark::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background-image: var(--noise-svg);
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  opacity: 0.38;
-  mix-blend-mode: overlay;
-  border-radius: inherit;
-}
-.noise-dark > * { position: relative; z-index: 2; }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+/* Zona Soluții article body (`articles.body_html`) — hand-authored prose,
+   not user-generated, so dangerouslySetInnerHTML is safe. Minimal styling
+   instead of pulling in @tailwindcss/typography for one content type. */
+.prose-zs h2 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.prose-zs h3 {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-zs p {
+  margin-bottom: 1.25rem;
+}
+.prose-zs ul,
+.prose-zs ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+}
+.prose-zs ul {
+  list-style: disc;
+}
+.prose-zs ol {
+  list-style: decimal;
+}
+.prose-zs li {
+  margin-bottom: 0.5rem;
+}
+.prose-zs a {
+  color: var(--red);
+  text-decoration: underline;
+}
+.prose-zs strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Scrollbar kept minimal/neutral — no themed scrollbars, avoids gimmick. */
