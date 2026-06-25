@@ -126,7 +126,7 @@ export async function getProducts({
   // no family fall back to themselves, so nothing is hidden. 'exact' because
   // estimated counts are unreliable on a view.
   let query = supabase
-    .from('product_listing')
+    .from('product_listing_mv')
     .select('*', { count: 'exact' })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)
@@ -201,7 +201,7 @@ export async function getAdjacentProducts(
 
   const base = () => {
     let q = supabase
-      .from('product_listing')   // family-level: prev/next skips sibling variants
+      .from('product_listing_mv')   // family-level: prev/next skips sibling variants
       .select('slug')
       .not('slug', 'is', null)
       .not('main_image_storage_url', 'is', null)
@@ -343,7 +343,7 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
 
 export async function getTotalProductCount(): Promise<number> {
   const { count } = await supabase
-    .from('product_listing')   // family-level total (one per family)
+    .from('product_listing_mv')   // family-level total (one per family)
     .select('*', { count: 'exact', head: true })
     .not('slug', 'is', null)
     .not('main_image_storage_url', 'is', null)

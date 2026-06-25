@@ -46,6 +46,9 @@ export async function reassignSubcategory(subcatId: string, newCategoryId: strin
     .eq('subcategory_id', subcatId)
   if (prodErr) throw prodErr
 
+  // Product/category data changed — refresh the materialized catalog rollup
+  // so /produse reflects the edit (matview is a precomputed snapshot).
+  await supabase.rpc('refresh_product_listing')
   revalidatePath('/admin')
   revalidatePath('/produse')
 }
@@ -74,6 +77,9 @@ export async function renameSubcategory(subcatId: string, newName: string) {
     .eq('subcategory_id', subcatId)
   if (prodErr) throw prodErr
 
+  // Product/category data changed — refresh the materialized catalog rollup
+  // so /produse reflects the edit (matview is a precomputed snapshot).
+  await supabase.rpc('refresh_product_listing')
   revalidatePath('/admin')
   revalidatePath('/produse')
 }
@@ -105,6 +111,9 @@ export async function bulkReassign(subcatIds: string[], newCategoryId: string) {
     .in('subcategory_id', subcatIds)
   if (prodErr) throw prodErr
 
+  // Product/category data changed — refresh the materialized catalog rollup
+  // so /produse reflects the edit (matview is a precomputed snapshot).
+  await supabase.rpc('refresh_product_listing')
   revalidatePath('/admin')
   revalidatePath('/produse')
 }
