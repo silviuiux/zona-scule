@@ -76,7 +76,7 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
 
       {/* Hero image — click opens lightbox */}
       <div className="hero-img-wrap" onClick={() => setLightbox(true)}>
-        <Image src={src} alt={alt} fill unoptimized priority />
+        <Image src={src} alt={alt} fill priority sizes="(max-width: 768px) 100vw, 50vw" />
       </div>
 
       {/* #5: Lightbox */}
@@ -84,7 +84,7 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
         <div className="lightbox-overlay" onClick={() => setLightbox(false)}>
           <div className="lightbox-inner" onClick={e => e.stopPropagation()}>
             <button className="lightbox-close" onClick={() => setLightbox(false)}>✕</button>
-            <Image src={src} alt={alt} fill unoptimized style={{ objectFit: 'contain', padding: '24px' }} />
+            <Image src={src} alt={alt} fill sizes="90vw" style={{ objectFit: 'contain', padding: '24px' }} />
           </div>
         </div>
       )}

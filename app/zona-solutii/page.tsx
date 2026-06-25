@@ -3,7 +3,9 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { ARTICLES, PROFESSIONS, getArticles } from './articles'
 
-export const dynamic = 'force-dynamic'
+// Articles are static content (articles.ts) — no per-request DB hit needed.
+// ISR instead of force-dynamic (REBUILD.md §6).
+export const revalidate = 3600
 
 type SP = { profesie?: string }
 

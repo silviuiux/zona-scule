@@ -76,8 +76,8 @@ export default function GallerySection({ images, productName }: { images: string
               src={img}
               alt={`${productName} ${i + 2}`}
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               style={{ objectFit: 'cover' }}
-              unoptimized
             />
           </div>
         ))}
@@ -107,8 +107,8 @@ export default function GallerySection({ images, productName }: { images: string
               src={lightbox}
               alt={productName}
               fill
+              sizes="90vw"
               style={{ objectFit: 'contain' }}
-              unoptimized
             />
           </div>
 

@@ -24,7 +24,10 @@ type SP = { brand?: string; categorie?: string; subcategorie?: string; q?: strin
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams
-  const pageSize = 100
+  // Initial server-rendered batch. Kept small (was 100) so /produse ships a
+  // light first payload — the rest streams in via LoadMore. MUST match the
+  // pageSize LoadMore requests, or offset pagination skips/dupes products.
+  const pageSize = 24
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active

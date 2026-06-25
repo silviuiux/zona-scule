@@ -1,5 +1,6 @@
 'use client'
 import { useState, use } from 'react'
+import { submitContactMessage } from './actions'
 
 export default function ContactForm({
   searchParams,
@@ -23,14 +24,29 @@ export default function ContactForm({
   })
   const [focused, setFocused] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSent(true)
+    if (sending) return
+    setSending(true)
+    setError(null)
+    const res = await submitContactMessage({
+      nume: form.nume,
+      email: form.email,
+      telefon: form.telefon,
+      companie: form.companie,
+      produs: form.produs,
+      mesaj: form.mesaj,
+    })
+    setSending(false)
+    if (res.ok) setSent(true)
+    else setError(res.error ?? 'A apărut o eroare. Încercați din nou.')
   }
 
   if (sent) {
@@ -198,7 +214,18 @@ export default function ContactForm({
         </div>
 
         <div className="cf-footer">
-          <button type="submit" className="cf-submit">Trimite mesajul</button>
+          {error && (
+            <p style={{
+              fontFamily: 'Recursive, sans-serif',
+              fontSize: '13px',
+              color: 'rgb(217,44,43)',
+              marginBottom: '14px',
+              lineHeight: 1.5,
+            }}>{error}</p>
+          )}
+          <button type="submit" className="cf-submit" disabled={sending} style={sending ? { opacity: 0.55, cursor: 'default' } : undefined}>
+            {sending ? 'Se trimite…' : 'Trimite mesajul'}
+          </button>
         </div>
       </form>
     </>

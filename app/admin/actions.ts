@@ -1,13 +1,26 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { hasValidAdminSession } from '@/lib/auth'
 
+// Service-role client: these are authenticated admin writes (gated by
+// assertAdmin below), so they legitimately bypass RLS to update products/
+// subcategories. Falls back to anon only if the service key is absent.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+// Server actions are independently POST-able, so each write re-checks the
+// session — proxy.ts and the page guard are not the only gate (§3.6).
+async function assertAdmin() {
+  if (!(await hasValidAdminSession())) {
+    throw new Error('Unauthorized')
+  }
+}
+
 export async function reassignSubcategory(subcatId: string, newCategoryId: string) {
+  await assertAdmin()
   // 1. Update subcategory's parent
   const { error: subErr } = await supabase
     .from('subcategories')
@@ -38,6 +51,7 @@ export async function reassignSubcategory(subcatId: string, newCategoryId: strin
 }
 
 export async function renameSubcategory(subcatId: string, newName: string) {
+  await assertAdmin()
   // 1. Get old name so we can update products
   const { data: sub } = await supabase
     .from('subcategories')
@@ -65,6 +79,7 @@ export async function renameSubcategory(subcatId: string, newName: string) {
 }
 
 export async function bulkReassign(subcatIds: string[], newCategoryId: string) {
+  await assertAdmin()
   // Get new category name once
   const { data: cat } = await supabase
     .from('categories')

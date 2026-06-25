@@ -4,7 +4,7 @@ import { getProducts } from '@/lib/supabase'
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams
   const page = parseInt(sp.get('page') ?? '1', 10)
-  const pageSize = parseInt(sp.get('pageSize') ?? '100', 10)
+  const pageSize = parseInt(sp.get('pageSize') ?? '24', 10)
 
   const result = await getProducts({
     page,

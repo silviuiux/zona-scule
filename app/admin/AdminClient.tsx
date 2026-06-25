@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useTransition, useRef, useCallback } from 'react'
 import { reassignSubcategory, bulkReassign, renameSubcategory } from './actions'
+import { logoutAction } from '@/lib/auth-actions'
 
 type Sub = {
   id: string
@@ -426,7 +427,12 @@ export default function AdminClient({
           <div className="admin-logo">
             <span>ZONA SCULE</span> / Admin
           </div>
-          <span className="admin-badge">Category Audit</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span className="admin-badge">Category Audit</span>
+            <form action={logoutAction} style={{ margin: 0 }}>
+              <button type="submit" className="btn btn-ghost">Ieșire</button>
+            </form>
+          </div>
         </div>
 
         {/* Stats chips — click to filter by category */}

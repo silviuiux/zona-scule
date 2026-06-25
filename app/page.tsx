@@ -8,7 +8,11 @@ import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
 
-export const dynamic = 'force-dynamic'
+// Homepage data (categories, brands, featured subcategories, total count)
+// changes rarely and never depends on the request — ISR instead of a fresh
+// DB hit on every load (REBUILD.md §3.5/§6). Revalidates hourly; admin edits
+// also call revalidatePath('/') for instant refresh.
+export const revalidate = 3600
 
 
 export default async function HomePage() {

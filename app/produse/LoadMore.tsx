@@ -117,7 +117,8 @@ export default function LoadMore({
   const handleLoadMore = async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ page: String(page), pageSize: '100' })
+      // Must match the initial pageSize in app/produse/page.tsx (offset paging).
+      const params = new URLSearchParams({ page: String(page), pageSize: '24' })
       if (filters.brand)       params.set('brand',       filters.brand)
       if (filters.categorie)   params.set('categorie',   filters.categorie)
       if (filters.subcategorie) params.set('subcategorie', filters.subcategorie)

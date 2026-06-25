@@ -48,9 +48,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <Image
               src={img} alt={product.name} fill
               sizes="(max-width: 640px) 50vw, 380px"
-              style={{ objectFit: 'contain', padding: '16px' }}
-              unoptimized
-              className="pcard-img-main"
+              style={{ objectFit: 'contain', padding: '16px' }}              className="pcard-img-main"
             />
           ) : (
             <span style={{
@@ -64,9 +62,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <Image
               src={hoverImg} alt={product.name} fill
               sizes="(max-width: 640px) 50vw, 380px"
-              style={{ objectFit: 'cover' }}
-              unoptimized
-              className="pcard-img-alt"
+              style={{ objectFit: 'cover' }}              className="pcard-img-alt"
             />
           )}
         </div>

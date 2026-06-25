@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { hasValidAdminSession } from '@/lib/auth'
 
 // Uses service key for writes
 const supabase = createClient(
@@ -8,6 +9,12 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  // Authoritative gate (not just proxy.ts) — this route writes to products
+  // with the service key and had no auth on `main` (REBUILD.md §3.7).
+  if (!(await hasValidAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const { productId, categoryText, subcategoryText } = await req.json()
   if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 })
 

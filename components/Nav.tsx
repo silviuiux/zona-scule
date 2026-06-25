@@ -383,7 +383,6 @@ export default function Nav() {
                           alt={s.model ?? ''}
                           fill
                           sizes="52px"
-                          unoptimized
                           style={{ objectFit: 'contain', padding: '6px' }}
                         />
                       ) : (

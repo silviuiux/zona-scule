@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import { redirect } from 'next/navigation'
+import { hasValidAdminSession } from '@/lib/auth'
 import AdminClient from './AdminClient'
 
 const supabase = createClient(
@@ -9,6 +11,10 @@ const supabase = createClient(
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
+  // Authoritative gate (not just proxy.ts) — per REBUILD.md §3.6 /admin had
+  // no auth on `main`. Reading cookies here keeps the route dynamic anyway.
+  if (!(await hasValidAdminSession())) redirect('/admin/login')
+
   const [{ data: subcats }, { data: categories }] = await Promise.all([
     supabase
       .from('subcategories')
