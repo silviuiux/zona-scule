@@ -148,7 +148,7 @@ export async function getProducts({
       .filter(t => t.length > 2) // drop empty after sanitizing
       .join(' & ')
     if (tsq) {
-      query = query.textSearch('search_vector', tsq, { config: 'simple' })
+      query = query.textSearch('search_vector', tsq, { config: 'ro_unaccent' })
     }
   }
   if (featured) query = query.eq('featured', true)
