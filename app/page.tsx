@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getTotalProductCount } from '@/lib/supabase'
@@ -7,6 +6,7 @@ import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
+import ServicesGrid from '@/components/ServicesGrid'
 
 // Homepage data (categories, brands, featured subcategories, total count)
 // changes rarely and never depends on the request — ISR instead of a fresh
@@ -246,6 +246,11 @@ export default async function HomePage() {
         .service-card {
           border-radius: 4px; overflow: hidden;
           display: flex; flex-direction: column; height: 707px;
+          /* Scroll-stagger (continuous, no transition — would lag the scroll)
+             lives on transform/--svc-offset. Hover lift lives on the separate
+             scale property below, so the two never fight over transform. */
+          transform: translate3d(0, var(--svc-offset, 0px), 0);
+          will-change: transform;
         }
         .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
         .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
@@ -259,14 +264,19 @@ export default async function HomePage() {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; line-height: 1.65; margin-bottom: 0;
         }
-        /* Service card hover — whole card grows + image zooms in */
+        /* Service card hover — whole card grows + image zooms in.
+           Uses the standalone scale property (not transform) so it can
+           have its own transition without animating the scroll-stagger. */
         .service-card {
-          transition: transform 500ms cubic-bezier(0.22,1,0.36,1),
+          transition: scale 500ms cubic-bezier(0.22,1,0.36,1),
                       box-shadow 500ms cubic-bezier(0.22,1,0.36,1);
         }
         .services-grid a:hover .service-card {
-          transform: scale(1.025);
+          scale: 1.025;
           box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .service-card { transform: none; }
         }
         .service-img img {
           transition: transform 600ms cubic-bezier(0.22,1,0.36,1);
@@ -446,29 +456,13 @@ export default async function HomePage() {
           <h2 className="section-title">SERVICII COMPLETE</h2>
           <p className="section-sub">Scule profesionale, consultanta, achizitii, garantie si service</p>
         </div>
-        <div className="services-grid">
-          {[
+        <ServicesGrid
+          items={[
             { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
             { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
             { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
-          ].map((s, i) => (
-            <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
-              <div className="service-card">
-                <div className="service-img">
-                  <Image src={s.img} alt={s.title} fill style={{ objectFit: 'cover', objectPosition: 'center top' }} sizes="(max-width: 768px) 100vw, 33vw" />
-                </div>
-                <div className={`service-body noise-card`} style={{ background: s.bg }}>
-                  <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
-                  <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
-                  <span className="service-cta" style={{ color: s.ctaColor }}>
-                    <span>{s.cta}</span>
-                    <span className="service-cta-arrow">→</span>
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+          ]}
+        />
       </section>
 
       {/* ── CONTACT BANNER ── */}

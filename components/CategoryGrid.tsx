@@ -17,11 +17,14 @@ type Cat = {
 // columns rise together to a flush grid as you scroll.
 const COL_OFFSETS = [420, 280, 140, 0]
 const GRID_COLS = 4
-// The columns finish lining up only once the LAST row of cards has scrolled
-// into view, so the alignment is spread across the grid's full scroll span.
-// This fraction of the viewport is shaved off the end so the line-up settles
-// while the last row is comfortably visible rather than at the very bottom.
-const ALIGN_END_BIAS = 0.15
+// Each row settles within a window sized off its OWN height, not the whole
+// grid's. Multiplied up a bit past 1× so the line-up still feels gradual
+// rather than snapping shut the instant the row appears. Keeping this
+// per-row (rather than one shared progress for the entire multi-row grid)
+// is what guarantees an earlier row is always fully settled — back at
+// --cat-offset: 0, no more droop — well before the next row scrolls into
+// view, so a still-settling row can never visually overlap the row below it.
+const ROW_SETTLE_RANGE = 1.15
 
 // easeInOutCubic — accelerate into the line-up, settle gently out of it.
 const easeInOut = (t: number) =>
@@ -69,38 +72,36 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     const root = rootRef.current
     if (!root) return
 
-    const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
-    if (allCards.length === 0) return
+    const rowEls = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
+    if (rowEls.length === 0) return
 
     if (reduce || isMobile) {
-      allCards.forEach(el => el.style.setProperty('--cat-offset', '0px'))
+      root.querySelectorAll<HTMLElement>('.cat-card').forEach(el => el.style.setProperty('--cat-offset', '0px'))
       return
     }
 
     let raf = 0
     const update = () => {
       raf = 0
-      // Drive progress off the grid's own viewport position, not raw scrollY.
-      // This makes alignment viewport-size agnostic and ties it to when
-      // the grid rows are actually visible.
-      const rect = root.getBoundingClientRect()
       const viewH = window.innerHeight
-      // "scrolledPast" = how far the grid top has travelled above the bottom
-      // of the viewport (0 = grid top just entering at viewport bottom).
-      const scrolledPast = viewH - rect.top
-      // Run progress across the grid's ENTIRE height: 0 when the grid top
-      // reaches the viewport bottom, 1 only once the grid bottom (the last
-      // row) is comfortably in view. This makes the line-up long and ties its
-      // completion to the last row appearing — instead of a fixed row count.
-      const totalRange = Math.max(rect.height - viewH * ALIGN_END_BIAS, 1)
-      const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
-      const progress = easeInOut(linear)
-      allCards.forEach(el => {
-        const col = Number(el.dataset.col ?? 0)
-        const base = COL_OFFSETS[col] ?? 0
-        // Single shared progress — every column rises in lockstep, keeping the
-        // staircase rigid as it eases up to a flush grid.
-        el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
+      // Each row computes its OWN progress off its OWN viewport position —
+      // not the whole grid's. "scrolledPast" = how far this row's top has
+      // travelled above the bottom of the viewport (0 = row top just
+      // entering at viewport bottom, 1 = row fully settled).
+      rowEls.forEach(row => {
+        const rect = row.getBoundingClientRect()
+        const scrolledPast = viewH - rect.top
+        const totalRange = Math.max(rect.height * ROW_SETTLE_RANGE, 1)
+        const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
+        const progress = easeInOut(linear)
+        row.querySelectorAll<HTMLElement>('.cat-card').forEach(el => {
+          const col = Number(el.dataset.col ?? 0)
+          const base = COL_OFFSETS[col] ?? 0
+          // Shared progress within the row — every column in THIS row rises
+          // in lockstep, keeping the staircase rigid as it eases up to a
+          // flush row, independently of every other row.
+          el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
+        })
       })
     }
     const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
