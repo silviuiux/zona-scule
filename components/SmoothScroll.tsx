@@ -19,9 +19,16 @@ export default function SmoothScroll() {
     if (reduce) return
 
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      // Longer duration = the page keeps gliding noticeably after you stop
+      // scrolling — this is the main lever for how "visible" the smoothing feels.
+      duration: 2.2,
+      // Soft, long-tailed deceleration (easeOutQuart) reads as more fluid than
+      // the previous sharp expo curve, which snapped to rest quickly.
+      easing: (t: number) => 1 - Math.pow(1 - t, 4),
       smoothWheel: true,
+      // Slightly below 1 so the longer duration doesn't feel like it's racing
+      // ahead of fast wheel flicks.
+      wheelMultiplier: 0.9,
       touchMultiplier: 1.5,
     })
 
