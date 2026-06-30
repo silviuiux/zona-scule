@@ -159,6 +159,10 @@ export default async function HomePage() {
           grid-template-columns: repeat(4, 1fr);
           gap: 16px;
           margin-bottom: 16px;
+          /* Clips any still-settling (offset) card to this row's own box,
+             so it crops to a peek instead of spilling into the row below —
+             see the long settle range in CategoryGrid.tsx. */
+          overflow: hidden;
         }
         .cat-card {
           position: relative; overflow: hidden;
@@ -242,6 +246,10 @@ export default async function HomePage() {
         }
         .services-grid {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+          /* Clips any still-settling (offset) card to the grid's own box,
+             so it crops to a peek instead of spilling into the carousel
+             section below — see the long settle range in ServicesGrid.tsx. */
+          overflow: hidden;
         }
         .service-card {
           border-radius: 4px; overflow: hidden;

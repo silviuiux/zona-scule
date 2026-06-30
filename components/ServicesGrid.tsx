@@ -18,8 +18,13 @@ type ServiceItem = {
 // COL_OFFSETS, but mirrored: left card starts nearly in place (first to
 // settle), center a bit deeper, right deepest — they all rise to a flush
 // row once the section scrolls into view.
-const OFFSETS = [0, 140, 280]
-const ROW_SETTLE_RANGE = 1.15
+//
+// `.services-grid` clips overflow (see page.tsx), so an unsettled card is
+// cropped to the grid's own box rather than bleeding into the carousel
+// section below — same safety net as CategoryGrid's rows, which is what
+// lets the settle window below be long enough to actually be visible.
+const OFFSETS = [0, 220, 420]
+const ROW_SETTLE_RANGE = 2.2
 
 // easeInOutCubic — same curve used for the category grid stagger.
 const easeInOut = (t: number) =>

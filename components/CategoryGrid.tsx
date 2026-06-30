@@ -12,19 +12,22 @@ type Cat = {
 }
 
 // Per-column starting vertical offset (px) for the scroll-stagger animation.
-// A clean staircase that DECREASES left→right: col0 starts deepest (only its
-// top edge peeks), col1 shows more, col2 (the wide card) shows most. All
-// columns rise together to a flush grid as you scroll.
-const COL_OFFSETS = [420, 280, 140, 0]
+// A clean staircase that DECREASES left→right: col0 starts deepest (only
+// ~10% of its top edge peeks above the row's clipped box), col1 shows more,
+// col2 shows most, col3 (or the wide card) is already flush. All columns
+// rise together to a flush row as you scroll.
+const COL_OFFSETS = [360, 240, 120, 0]
 const GRID_COLS = 4
 // Each row settles within a window sized off its OWN height, not the whole
-// grid's. Multiplied up a bit past 1× so the line-up still feels gradual
-// rather than snapping shut the instant the row appears. Keeping this
-// per-row (rather than one shared progress for the entire multi-row grid)
-// is what guarantees an earlier row is always fully settled — back at
-// --cat-offset: 0, no more droop — well before the next row scrolls into
-// view, so a still-settling row can never visually overlap the row below it.
-const ROW_SETTLE_RANGE = 1.15
+// grid's — keeping this per-row (rather than one shared progress for the
+// entire multi-row grid) means an earlier row is always settling on its own
+// timeline, independent of later rows.
+//
+// `.cats-row` clips overflow (see page.tsx), so a still-offset card is
+// simply cropped to its row's box rather than spilling into the row below —
+// that's what makes it safe to use a long, deliberate settle range here
+// instead of having to keep it short purely to dodge overlap.
+const ROW_SETTLE_RANGE = 2.2
 
 // easeInOutCubic — accelerate into the line-up, settle gently out of it.
 const easeInOut = (t: number) =>
@@ -87,7 +90,9 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       // Each row computes its OWN progress off its OWN viewport position —
       // not the whole grid's. "scrolledPast" = how far this row's top has
       // travelled above the bottom of the viewport (0 = row top just
-      // entering at viewport bottom, 1 = row fully settled).
+      // entering at viewport bottom, 1 = row fully settled). The row's own
+      // overflow:hidden means an unsettled card is just cropped to the row's
+      // box rather than bleeding into the row below, however long this takes.
       rowEls.forEach(row => {
         const rect = row.getBoundingClientRect()
         const scrolledPast = viewH - rect.top
