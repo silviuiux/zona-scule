@@ -43,8 +43,8 @@ export default async function SubcategoryBar({
           z-index: 50;
           margin: -32px 0 32px;
           padding: 32px 0;
-          background: rgb(244, 244, 244);
-          border-bottom: 1px solid rgba(0,0,0,0.07);
+          background: var(--surface-2);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
           display: flex; gap: 10px;
           overflow-x: auto;
           scrollbar-width: none; -ms-overflow-style: none;
@@ -57,30 +57,30 @@ export default async function SubcategoryBar({
           border-radius: 999px;
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 400;
-          color: rgba(0,0,0,0.7);
+          color: rgba(240,237,231,0.6);
           text-decoration: none;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
           transition: background 150ms, border-color 150ms, color 150ms;
           white-space: nowrap;
         }
         .subcat-pill:hover {
-          border-color: rgba(0,0,0,0.25);
-          color: rgb(0,0,0);
+          border-color: rgba(255,255,255,0.25);
+          color: var(--white);
         }
         .subcat-pill.active {
-          background: rgb(0,0,0);
-          border-color: rgb(0,0,0);
+          background: rgb(217,44,43);
+          border-color: rgb(217,44,43);
           color: rgb(255,255,255);
         }
 
         .subcat-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 500;
-          color: rgba(0,0,0,0.4);
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 500;
+          color: rgba(240,237,231,0.4);
           letter-spacing: 0.02em;
         }
-        .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
+        .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.7); }
 
         @media (max-width: 768px) {
           .subcat-bar {

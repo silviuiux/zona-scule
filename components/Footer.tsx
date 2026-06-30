@@ -2,52 +2,53 @@ export default function Footer() {
   return (
     <>
       <style>{`
-        .footer { background: rgb(255,255,255); border-top: 1px solid rgba(0,0,0,0.08); }
+        .footer { background: var(--surface-2); border-top: 1px solid rgba(255,255,255,0.07); }
         .footer-social {
           padding: 28px 12px; max-width: 1440px; margin: 0 auto;
           display: flex; align-items: center; gap: 0;
           justify-content: space-around;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .footer-social a {
-          color: rgba(0,0,0,0.45);
+          color: rgba(240,237,231,0.45);
           text-decoration: none;
           display: flex; align-items: center; justify-content: center;
           padding: 8px;
           transition: color 150ms;
         }
-        .footer-social a:hover { color: rgb(0,0,0); }
+        .footer-social a:hover { color: rgb(217,44,43); }
         .footer-grid {
           max-width: 1440px; margin: 0 auto;
-          padding: 48px 12px;
+          padding: 80px 12px;
           display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
         }
         .footer-col-title {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgb(0,0,0); margin-bottom: 14px;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(240,237,231,0.4); margin-bottom: 14px;
         }
         .footer-link {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5);
+          font-size: 13px; color: rgba(240,237,231,0.55);
           text-decoration: none; display: block; margin-bottom: 8px;
+          transition: color 150ms;
         }
-        .footer-link:hover { color: rgb(0,0,0); }
+        .footer-link:hover { color: var(--white); }
         .footer-bottom {
-          border-top: 1px solid rgba(0,0,0,0.08); padding: 14px 12px;
+          border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 12px;
           max-width: 1440px; margin: 0 auto;
           display: flex; justify-content: space-between; align-items: center;
         }
         .footer-bottom span, .footer-bottom a {
-          font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.35); text-decoration: none;
+          font-family: var(--mono);
+          font-size: 11px; color: rgba(240,237,231,0.3); text-decoration: none;
         }
         .footer-bottom a { color: rgb(217, 44, 43); }
 
         @media (max-width: 768px) {
           .footer-social { gap: 0; }
-          .footer-grid { grid-template-columns: 1fr; gap: 32px; padding: 36px 16px; }
+          .footer-grid { grid-template-columns: 1fr; gap: 32px; padding: 48px 16px; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
         }
       `}</style>
@@ -71,7 +72,7 @@ export default function Footer() {
           </a>
         </div>
         <div className="footer-grid">
-          <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
+          <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(240,237,231,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
             Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
           </p>
           <div>
@@ -85,7 +86,7 @@ export default function Footer() {
             <a href="tel:0248222298" className="footer-link">0248.222.298</a>
             <a href="mailto:contact@zonascule.ro" className="footer-link">contact@zonascule.ro</a>
             <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
-            <p style={{ fontFamily: 'Recursive, monospace', fontSize: '11px', color: 'rgba(0,0,0,0.3)' }}>CIF / VAT: RO 6796092</p>
+            <p style={{ fontFamily: 'var(--mono)', fontSize: '11px', color: 'rgba(240,237,231,0.3)' }}>CIF / VAT: RO 6796092</p>
           </div>
         </div>
         <div className="footer-bottom">

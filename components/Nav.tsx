@@ -115,12 +115,18 @@ export default function Nav() {
         .nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           height: 52px;
-          background: rgb(244, 244, 244);
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          background: rgba(13,12,11,0.55);
+          backdrop-filter: blur(16px) saturate(1.2);
+          -webkit-backdrop-filter: blur(16px) saturate(1.2);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
           display: flex; align-items: stretch;
-          transition: box-shadow 200ms;
+          transition: background 200ms, border-color 200ms, box-shadow 200ms;
         }
-        .nav.scrolled { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .nav.scrolled {
+          background: rgba(13,12,11,0.85);
+          border-bottom-color: rgba(255,255,255,0.1);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        }
 
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
@@ -132,7 +138,7 @@ export default function Nav() {
           display: flex; align-items: center;
           text-decoration: none; flex-shrink: 0;
           padding-right: 20px;
-          border-right: 1px solid rgba(0,0,0,0.1);
+          border-right: 1px solid rgba(255,255,255,0.08);
           height: 100%;
         }
 
@@ -140,7 +146,7 @@ export default function Nav() {
         .nav-search-wrap {
           flex: 1; min-width: 0;
           position: relative;
-          border-right: 1px solid rgba(0,0,0,0.1);
+          border-right: 1px solid rgba(255,255,255,0.08);
           display: flex; align-items: stretch;
         }
         .nav-search-form {
@@ -151,13 +157,13 @@ export default function Nav() {
           flex: 1; min-width: 0;
           border: none; outline: none; background: transparent;
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgb(0,0,0);
+          font-size: 14px; color: var(--white);
         }
-        .nav-search-input::placeholder { color: rgba(0,0,0,0.35); }
+        .nav-search-input::placeholder { color: rgba(240,237,231,0.32); }
         .nav-search-btn {
           flex-shrink: 0; background: none; border: none;
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; color: rgba(0,0,0,0.4);
+          cursor: pointer; color: rgba(240,237,231,0.4);
           padding: 4px; transition: color 150ms;
         }
         .nav-search-btn:hover { color: rgb(217,44,43); }
@@ -166,11 +172,13 @@ export default function Nav() {
         .nav-suggestions {
           position: absolute;
           top: calc(100% + 1px); left: 0; right: 0;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.09);
+          background: rgba(19,18,16,0.92);
+          backdrop-filter: blur(20px) saturate(1.2);
+          -webkit-backdrop-filter: blur(20px) saturate(1.2);
+          border: 1px solid rgba(255,255,255,0.1);
           border-top: none;
-          border-radius: 0 0 6px 6px;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+          border-radius: 0 0 10px 10px;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.45);
           z-index: 200;
           overflow: hidden;
         }
@@ -182,19 +190,19 @@ export default function Nav() {
           text-decoration: none;
           cursor: pointer;
           transition: background 100ms;
-          border-bottom: 1px solid rgba(0,0,0,0.04);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .nav-sug-item:last-of-type { border-bottom: none; }
         .nav-sug-item:hover,
-        .nav-sug-item.active { background: rgb(246,246,246); }
+        .nav-sug-item.active { background: rgba(255,255,255,0.05); }
 
         /* Image box */
         .nav-sug-img {
           flex-shrink: 0;
           width: 52px; height: 52px;
           border-radius: 4px;
-          background: rgb(250,250,250);
-          border: 1px solid rgba(0,0,0,0.05);
+          background: var(--paper);
+          border: 1px solid rgba(255,255,255,0.06);
           position: relative;
           overflow: hidden;
         }
@@ -211,32 +219,32 @@ export default function Nav() {
           display: flex; flex-direction: column; gap: 2px;
         }
         .nav-sug-brand {
-          font-family: 'Inter', sans-serif;
-          font-size: 9px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 9px; font-weight: 600;
           letter-spacing: 0.09em; text-transform: uppercase;
-          color: rgba(0,0,0,0.38);
+          color: rgba(240,237,231,0.42);
         }
         .nav-sug-model {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 500;
-          color: rgb(0,0,0); letter-spacing: -0.01em;
+          color: var(--white); letter-spacing: -0.01em;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .nav-sug-cat {
           font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.35);
+          font-size: 11px; color: rgba(240,237,231,0.35);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         /* Arrow icon */
         .nav-sug-arrow {
           flex-shrink: 0;
-          color: rgba(0,0,0,0.2);
+          color: rgba(240,237,231,0.25);
           transition: color 100ms, transform 100ms;
         }
         .nav-sug-item:hover .nav-sug-arrow,
         .nav-sug-item.active .nav-sug-arrow {
-          color: rgba(0,0,0,0.5);
+          color: rgb(217,44,43);
           transform: translate(1px, -1px);
         }
 
@@ -244,22 +252,22 @@ export default function Nav() {
         .nav-sug-footer {
           display: flex; align-items: center; justify-content: space-between;
           padding: 10px 14px;
-          background: rgb(249,249,249);
-          border-top: 1px solid rgba(0,0,0,0.06);
+          background: rgba(255,255,255,0.03);
+          border-top: 1px solid rgba(255,255,255,0.07);
           text-decoration: none;
           transition: background 100ms;
         }
-        .nav-sug-footer:hover { background: rgb(244,244,244); }
+        .nav-sug-footer:hover { background: rgba(255,255,255,0.06); }
         .nav-sug-footer-label {
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
+          font-size: 12px; color: rgba(240,237,231,0.55);
         }
         .nav-sug-footer-label strong {
-          color: rgb(0,0,0); font-weight: 600;
+          color: var(--white); font-weight: 600;
         }
         .nav-sug-footer-action {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           color: rgb(217,44,43);
         }
@@ -283,22 +291,22 @@ export default function Nav() {
         }
         .nav-catalog-link {
           flex-shrink: 0; padding: 8px 18px;
-          background: transparent; color: rgba(0,0,0,0.45);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
+          background: transparent; color: rgba(240,237,231,0.5);
+          border-radius: 2px; font-family: var(--mono);
+          font-size: 11px; font-weight: 500;
           letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none; transition: color 150ms; white-space: nowrap;
         }
         .nav-catalog-link:hover { color: rgb(217,44,43); }
         .nav-contact {
           flex-shrink: 0; padding: 8px 18px;
-          background: rgb(0,0,0); color: rgb(255,255,255);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
+          background: rgb(217,44,43); color: rgb(255,255,255);
+          border-radius: 2px; font-family: var(--mono);
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none; transition: background 150ms; white-space: nowrap;
         }
-        .nav-contact:hover { background: rgb(217,44,43); }
+        .nav-contact:hover { background: rgb(237,70,69); }
 
         /* ── Mobile ── */
         @media (max-width: 768px) {
@@ -306,18 +314,19 @@ export default function Nav() {
             display: none;
             position: absolute; top: 52px; left: 0; right: 0;
             border-right: none;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            background: rgb(244,244,244);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(13,12,11,0.97);
+            backdrop-filter: blur(20px);
             z-index: 99;
           }
           .nav-search-wrap.open { display: flex; flex-direction: column; }
           .nav-search-form { height: 48px; }
-          .nav-suggestions { border-radius: 0 0 6px 6px; }
+          .nav-suggestions { border-radius: 0 0 10px 10px; }
           .nav-search-toggle {
             display: flex; align-items: center; justify-content: center;
             width: 40px; height: 100%;
             background: none; border: none; cursor: pointer;
-            color: rgba(0,0,0,0.5); margin-left: auto;
+            color: rgba(240,237,231,0.6); margin-left: auto;
           }
           .nav-catalog-link { display: none; }
           .nav-contact { padding: 7px 12px; font-size: 10px; }

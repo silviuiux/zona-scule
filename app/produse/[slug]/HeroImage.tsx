@@ -10,8 +10,8 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
       <div style={{
         position: 'relative', width: '100%', aspectRatio: '1/1',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'rgba(0,0,0,0.15)', fontFamily: 'Recursive, sans-serif', fontSize: '12px',
-        background: 'rgb(255,255,255)',
+        color: 'rgba(0,0,0,0.2)', fontFamily: 'Recursive, sans-serif', fontSize: '12px',
+        background: 'var(--paper)', borderRadius: '12px',
       }}>
         NO IMAGE
       </div>
@@ -21,14 +21,15 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
   return (
     <>
       <style>{`
-        /* #4: no border/box, pure white, image fills container */
+        /* Clean paper mount so the product cutout reads correctly */
         .hero-img-wrap {
           position: relative;
           width: 100%;
           aspect-ratio: 1 / 1;
-          background: rgb(255,255,255);
+          background: var(--paper);
           overflow: hidden;
-          border-radius: 4px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.06);
           cursor: zoom-in;
           view-transition-name: product-hero;
         }
@@ -58,8 +59,8 @@ export default function HeroImage({ src, alt }: { src: string | null | undefined
           position: relative;
           width: min(90vw, 90vh);
           height: min(90vw, 90vh);
-          background: rgb(255,255,255);
-          border-radius: 4px;
+          background: var(--paper);
+          border-radius: 12px;
           overflow: hidden;
         }
         .lightbox-close {

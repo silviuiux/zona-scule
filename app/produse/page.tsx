@@ -62,15 +62,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     <>
       <Nav />
       <style>{`
-        /* ── Hero section (white) ── */
+        /* ── Hero section (dark) ── */
         .cat-hero {
-          background: rgb(255, 255, 255);
+          background: var(--surface);
           padding-top: 52px; /* nav height */
-          min-height: 62vh;
+          min-height: 56vh;
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          border-bottom: 1px solid rgba(0,0,0,0.07);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .cat-hero-inner {
           max-width: 1440px;
@@ -88,32 +88,32 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           flex-wrap: wrap;
         }
         .cat-bc-pill {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 500;
+          letter-spacing: 0.07em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.45);
+          color: rgba(240,237,231,0.5);
           text-decoration: none;
-          border: 1px solid rgba(0,0,0,0.18);
+          border: 1px solid rgba(255,255,255,0.14);
           border-radius: 999px;
           padding: 5px 14px;
           transition: color 150ms, border-color 150ms;
           white-space: nowrap;
         }
-        .cat-bc-pill:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.4); }
+        .cat-bc-pill:hover { color: var(--white); border-color: rgba(217,44,43,0.5); }
         .cat-bc-sep {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 11px;
-          color: rgba(0,0,0,0.25);
+          color: rgba(240,237,231,0.25);
         }
         .cat-bc-current {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 500;
+          letter-spacing: 0.07em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.45);
+          color: rgba(240,237,231,0.5);
           white-space: nowrap;
         }
 
@@ -127,26 +127,26 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
         .cat-hero-zona {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(48px, 7vw, 96px);
+          font-size: clamp(48px, 7vw, 104px);
           color: rgb(217, 44, 43);
           text-transform: uppercase;
-          letter-spacing: 0.005em;
-          line-height: 1;
+          letter-spacing: -0.005em;
+          line-height: 0.95;
         }
         .cat-hero-name {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(48px, 7vw, 96px);
-          color: rgb(0, 0, 0);
+          font-size: clamp(48px, 7vw, 104px);
+          color: var(--white);
           text-transform: uppercase;
-          letter-spacing: 0.005em;
-          line-height: 1;
+          letter-spacing: -0.005em;
+          line-height: 0.95;
         }
 
         /* Description */
         .cat-hero-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 15px;
-          color: rgba(0,0,0,0.5);
+          color: rgba(240,237,231,0.5);
           line-height: 1.6;
           max-width: 560px;
           margin: 0 0 28px;
@@ -166,26 +166,26 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-stat-num {
           font-family: 'Bungee', sans-serif;
           font-size: 22px;
-          color: rgb(0,0,0);
+          color: var(--white);
           letter-spacing: 0.02em;
         }
         .cat-hero-stat-label {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 10px;
-          font-weight: 600;
+          font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          color: rgba(240,237,231,0.35);
         }
         .cat-hero-stat-div {
           width: 1px;
           height: 20px;
-          background: rgba(0,0,0,0.12);
+          background: rgba(255,255,255,0.12);
         }
 
-        /* ── Listing section (gray) ── */
+        /* ── Listing section (dark, slightly elevated) ── */
         .catalog-page {
-          background: rgb(244, 244, 244);
+          background: var(--surface-2);
           min-height: 60vh;
           position: relative;
           isolation: isolate;
@@ -200,8 +200,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           background-repeat: repeat;
           background-size: 200px 200px;
           background-position: 0 var(--noise-y, 0px);
-          opacity: 0.08;
-          mix-blend-mode: multiply;
+          opacity: 0.12;
+          mix-blend-mode: overlay;
         }
 
         /* ─── Sidebar + grid layout ─── */
@@ -248,14 +248,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             transition: transform 300ms ease;
             height: 100vh;
             padding-top: 72px;
-            background: rgb(244,244,244);
-            box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+            background: rgba(19,18,16,0.97);
+            backdrop-filter: blur(20px);
+            box-shadow: 4px 0 32px rgba(0,0,0,0.5);
           }
           .sidebar.open { transform: translateX(0); }
           .sidebar-backdrop {
             display: block;
             position: fixed; inset: 0; z-index: 199;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.6);
             opacity: 0; pointer-events: none;
             transition: opacity 300ms;
           }
@@ -267,7 +268,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             background: none;
             border: none;
             padding: 0;
-            color: rgb(0,0,0);
+            color: var(--white);
             cursor: pointer;
           }
           .products-grid {

@@ -18,24 +18,24 @@ export default function Loading() {
         .skel {
           background: linear-gradient(
             90deg,
-            rgb(232,232,232) 25%,
-            rgb(244,244,244) 50%,
-            rgb(232,232,232) 75%
+            rgba(255,255,255,0.05) 25%,
+            rgba(255,255,255,0.1) 50%,
+            rgba(255,255,255,0.05) 75%
           );
           background-size: 600px 100%;
           animation: skel-shimmer 1.5s ease-in-out infinite;
           border-radius: 3px;
         }
 
-        /* ── Hero section (white) ── */
+        /* ── Hero section (dark) ── */
         .skel-hero {
-          background: rgb(255, 255, 255);
+          background: var(--surface);
           padding-top: 52px;
-          min-height: 62vh;
+          min-height: 56vh;
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          border-bottom: 1px solid rgba(0,0,0,0.07);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .skel-hero-inner {
           max-width: 1440px;
@@ -83,9 +83,9 @@ export default function Loading() {
           gap: 8px;
         }
 
-        /* ── Gray listing section ── */
+        /* ── Dark listing section ── */
         .skel-page {
-          background: rgb(244, 244, 244);
+          background: var(--surface-2);
           min-height: 60vh;
         }
         .skel-layout {
@@ -123,8 +123,9 @@ export default function Loading() {
           margin-bottom: 40px;
         }
         .skel-card {
-          background: rgb(255,255,255);
-          border-radius: 8px;
+          background: var(--surface-2);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
           overflow: hidden;
         }
         .skel-card-img {
@@ -139,8 +140,8 @@ export default function Loading() {
           display: flex; gap: 6px; margin-top: 4px;
         }
         .skel-card-spec {
-          background: rgb(238,238,238);
-          border-radius: 4px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 6px;
           padding: 8px 10px;
           display: flex; flex-direction: column; gap: 4px;
         }
@@ -161,7 +162,7 @@ export default function Loading() {
           <div className="skel-breadcrumb">
             {[70, 8, 120].map((w, i) =>
               i === 1
-                ? <div key={i} style={{ width: 8, height: 12, color: 'rgba(0,0,0,0.2)', fontSize: 12, fontFamily: 'sans-serif', display: 'flex', alignItems: 'center' }}>/</div>
+                ? <div key={i} style={{ width: 8, height: 12, color: 'rgba(240,237,231,0.25)', fontSize: 12, fontFamily: 'sans-serif', display: 'flex', alignItems: 'center' }}>/</div>
                 : <div key={i} className="skel" style={{ height: 26, width: w, borderRadius: 999 }} />
             )}
           </div>
@@ -184,7 +185,7 @@ export default function Loading() {
               <div className="skel" style={{ height: 24, width: 60, borderRadius: 3 }} />
               <div className="skel" style={{ height: 10, width: 52, borderRadius: 2 }} />
             </div>
-            <div style={{ width: 1, height: 20, background: 'rgba(0,0,0,0.1)' }} />
+            <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)' }} />
             <div className="skel-stat">
               <div className="skel" style={{ height: 24, width: 36, borderRadius: 3 }} />
               <div className="skel" style={{ height: 10, width: 60, borderRadius: 2 }} />

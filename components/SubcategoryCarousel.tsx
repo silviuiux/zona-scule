@@ -127,12 +127,13 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           width: 284px; height: 398px;
           margin-right: 12px;
           position: relative; overflow: hidden;
-          border-radius: 8px;
-          background: rgb(255,255,255);
+          border-radius: 12px;
+          background: var(--surface-2);
+          border: 1px solid rgba(255,255,255,0.08);
           text-decoration: none; display: block;
-          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), border-color 300ms;
         }
-        .sub-card:hover { transform: scale(1.02); }
+        .sub-card:hover { transform: scale(1.02); border-color: rgba(217,44,43,0.4); }
         .sub-card-img {
           position: absolute; inset: 0;
           width: 100%; height: 100%;
@@ -150,8 +151,8 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           position: absolute; bottom: 0; left: 0; right: 0; padding: 14px;
         }
         .sub-card-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
           text-transform: uppercase; color: rgba(255,255,255,0.5);
           display: block; margin-bottom: 4px;
         }

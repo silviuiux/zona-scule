@@ -82,9 +82,10 @@ export default async function HomePage() {
           }
         }
         .hero-sub {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--mono);
           font-weight: 400;
-          font-size: 18px; color: rgba(0,0,0,0.5);
+          font-size: 13px; color: rgba(240,237,231,0.45);
+          letter-spacing: 0.02em;
           line-height: 1.4;
           max-width: 50%;
           white-space: nowrap;
@@ -95,23 +96,26 @@ export default async function HomePage() {
           display: flex; align-items: stretch; gap: 0;
           width: 50%;
           min-width: 320px;
-          border: 1px solid rgba(0,0,0,0.12);
+          border: 1px solid rgba(255,255,255,0.14);
           border-radius: 4px;
           overflow: hidden;
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(16px) saturate(1.2);
+          -webkit-backdrop-filter: blur(16px) saturate(1.2);
         }
         /* ── Hero search input ── */
         .hero-search-box {
           display: flex; align-items: center; gap: 16px;
-          background: rgb(255,255,255);
+          background: transparent;
           padding: 0 12px;
           flex: 1;
           min-width: 0;
-          height: 44px;
+          height: 48px;
         }
         .hero-search-icon {
           background: none; border: none; cursor: pointer;
           display: flex; align-items: center; padding: 0;
-          color: rgba(0,0,0,0.3); flex-shrink: 0;
+          color: rgba(240,237,231,0.35); flex-shrink: 0;
           transition: color 150ms;
         }
         .hero-search-icon:hover { color: rgb(217,44,43); }
@@ -124,7 +128,7 @@ export default async function HomePage() {
           width: 100%; border: none; outline: none;
           background: transparent;
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgb(0,0,0);
+          font-size: 13px; color: var(--white);
           text-align: left;
         }
         .hero-search-placeholder {
@@ -132,37 +136,37 @@ export default async function HomePage() {
           pointer-events: none; white-space: nowrap;
           overflow: hidden; max-width: 100%;
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.35);
+          font-size: 13px; color: rgba(240,237,231,0.32);
         }
-        .hero-search-placeholder-count { color: rgb(0,0,0); }
+        .hero-search-placeholder-count { color: var(--white); }
         .hero-catalog-cta {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 36px; height: 44px;
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700;
+          padding: 0 36px; height: 48px;
+          font-family: var(--mono);
+          font-size: 12px; font-weight: 600;
           letter-spacing: 0.08em; text-transform: uppercase;
           text-decoration: none; white-space: nowrap;
           transition: background 150ms;
-          border-left: 1px solid rgba(0,0,0,0.1);
+          border-left: 1px solid rgba(255,255,255,0.1);
         }
-        .hero-catalog-cta:hover { background: rgb(190, 35, 34); }
+        .hero-catalog-cta:hover { background: rgb(237, 70, 69); }
 
         /* ─── CATEGORIES ── */
         .cats-section {
           background: transparent;
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px 64px;
+          padding: 40px 12px 140px;
         }
         .cats-row {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-          margin-bottom: 16px;
+          gap: 20px;
+          margin-bottom: 20px;
         }
         .cat-card {
           position: relative; overflow: hidden;
-          border-radius: 8px; background: rgb(200,200,200);
+          border-radius: 14px; background: var(--surface-2);
           text-decoration: none; display: block;
           height: 400px;
           /* Two independent vertical motions on each card:
@@ -198,26 +202,35 @@ export default async function HomePage() {
         }
         .cat-card-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);
+          background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 55%, transparent 78%);
         }
+        /* Thin border that brightens on hover — signature "catches light" line */
+        .cat-card-border {
+          position: absolute; inset: 0;
+          border-radius: inherit;
+          border: 1px solid rgba(255,255,255,0.1);
+          pointer-events: none;
+          transition: border-color 300ms;
+        }
+        .cat-card:hover .cat-card-border { border-color: rgba(217,44,43,0.45); }
         .cat-card-bottom {
-          position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
+          position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
         }
         .cat-card-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: rgba(255,255,255,0.55);
-          display: block; margin-bottom: 5px;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+          text-transform: uppercase; color: rgba(255,255,255,0.5);
+          display: block; margin-bottom: 6px;
         }
         .cat-card-label {
           font-family: 'Recursive', sans-serif;
-          font-size: 15px; font-weight: 500;
+          font-size: 17px; font-weight: 500;
           color: rgb(255,255,255); letter-spacing: -0.01em;
           line-height: 1.3; display: block;
         }
         .cat-card-desc {
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5;
+          font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;
           display: block; max-height: 0; overflow: hidden;
           opacity: 0; margin-top: 0;
           transition: max-height 300ms ease-in-out, opacity 250ms ease-in-out, margin-top 300ms ease;
@@ -227,28 +240,30 @@ export default async function HomePage() {
         /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px 12px 64px;
-          display: flex; flex-direction: column; gap: 64px;
+          padding: 0 12px 140px;
+          display: flex; flex-direction: column; gap: 56px;
         }
-        .services-header { display: flex; flex-direction: column; gap: 8px; }
+        .services-header { display: flex; flex-direction: column; gap: 10px; }
         .section-title {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(32px, 4vw, 56px);
-          color: rgb(0,0,0); line-height: 1; text-transform: uppercase;
+          font-size: clamp(36px, 4.5vw, 64px);
+          color: var(--white); line-height: 0.95; text-transform: uppercase;
         }
         .section-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 500;
+          font-family: var(--mono);
+          font-size: 12px; color: rgba(240,237,231,0.4); font-weight: 500;
+          letter-spacing: 0.04em;
         }
         .services-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
         }
         .service-card {
-          border-radius: 4px; overflow: hidden;
+          border-radius: 12px; overflow: hidden;
           display: flex; flex-direction: column; height: 707px;
+          border: 1px solid rgba(255,255,255,0.08);
         }
-        .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
-        .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
+        .service-img { flex: 1; position: relative; background: var(--surface-2); overflow: hidden; }
+        .service-body { padding: 28px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
         .service-body > * { position: relative; z-index: 2; }
         .service-title {
           font-family: 'Bungee', sans-serif;
@@ -274,9 +289,9 @@ export default async function HomePage() {
         .services-grid a:hover .service-img img { transform: scale(1.07); }
 
         .service-cta {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
+          font-family: var(--mono);
+          font-size: 11px; font-weight: 600;
+          letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none;
           display: flex; align-items: center; justify-content: space-between;
           width: 100%;
@@ -290,49 +305,54 @@ export default async function HomePage() {
 
         /* ─── CAROUSEL ── */
         .carousel-section {
-          background-color: rgb(18, 18, 18);
-          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+          background-color: var(--surface-2);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
           background-size: 28px 28px;
-          padding: 64px 0 64px;
+          padding: 120px 0;
+          border-top: 1px solid rgba(255,255,255,0.06);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .carousel-inner {
           max-width: 1440px; margin: 0 auto; padding: 0 12px;
         }
-        .carousel-header { margin-bottom: 40px; }
+        .carousel-header { margin-bottom: 48px; }
         .carousel-title {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 4vw, 48px);
+          font-size: clamp(32px, 4.5vw, 56px);
           color: rgb(255,255,255); text-transform: uppercase;
-          line-height: 1; margin-bottom: 8px;
+          line-height: 0.95; margin-bottom: 10px;
         }
         .carousel-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(255,255,255,0.35);
+          font-family: var(--mono);
+          font-size: 12px; color: rgba(255,255,255,0.35);
+          letter-spacing: 0.04em;
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
-          padding: 64px 12px;
+          padding: 140px 12px;
           max-width: 1440px; margin: 0 auto;
         }
         .contact-banner {
-          background: rgb(18, 18, 18);
-          background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+          background: var(--surface-2);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
           background-size: 28px 28px;
-          border-radius: 10px;
-          padding: 52px 64px;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          padding: 64px 72px;
           display: flex; align-items: center;
           justify-content: space-between; gap: 40px;
         }
         .contact-banner-eyebrow {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
+          font-family: var(--mono);
+          font-size: 12px; color: rgba(255,255,255,0.4);
+          letter-spacing: 0.06em; text-transform: uppercase;
           margin-bottom: 14px; display: block;
         }
         .contact-banner-title {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(22px, 2.8vw, 38px);
+          font-size: clamp(24px, 3vw, 42px);
           color: rgb(255,255,255); text-transform: uppercase;
-          line-height: 1.1; margin-bottom: 10px;
+          line-height: 1.05; margin-bottom: 10px;
         }
         .contact-banner-sub {
           font-family: 'Recursive', sans-serif;
@@ -341,14 +361,14 @@ export default async function HomePage() {
         .contact-banner-btn {
           display: inline-flex; align-items: center; gap: 8px;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 16px 36px; border-radius: 4px;
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          padding: 17px 38px; border-radius: 8px;
+          font-family: var(--mono);
+          font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
           text-transform: uppercase; text-decoration: none;
           white-space: nowrap; flex-shrink: 0;
           transition: background 150ms;
         }
-        .contact-banner-btn:hover { background: rgb(190, 35, 34); }
+        .contact-banner-btn:hover { background: rgb(237, 70, 69); }
 
         /* footer styles live in components/Footer.tsx */
 
@@ -364,7 +384,7 @@ export default async function HomePage() {
           .hero-search-box {
             min-width: 0; width: 100%;
             height: auto; padding: 8px 12px;
-            border: 1px solid rgba(0,0,0,0.12);
+            border: 1px solid rgba(255,255,255,0.14);
             border-radius: 3px;
           }
           .hero-catalog-cta {
@@ -448,9 +468,9 @@ export default async function HomePage() {
         </div>
         <div className="services-grid">
           {[
-            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
+            { bg: 'rgb(250,249,247)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
             { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
-            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
+            { bg: 'rgb(19,18,16)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
           ].map((s, i) => (
             <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
               <div className="service-card">

@@ -143,17 +143,18 @@ export default function LoadMore({
         .lm-skel {
           background: linear-gradient(
             90deg,
-            rgb(232,232,232) 25%,
-            rgb(244,244,244) 50%,
-            rgb(232,232,232) 75%
+            rgba(255,255,255,0.05) 25%,
+            rgba(255,255,255,0.1) 50%,
+            rgba(255,255,255,0.05) 75%
           );
           background-size: 600px 100%;
           animation: lm-shimmer 1.5s ease-in-out infinite;
           border-radius: 3px;
         }
         .lm-skel-card {
-          background: rgb(255,255,255);
-          border-radius: 4px;
+          background: var(--surface-2);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
           overflow: hidden;
         }
         .lm-skel-img { aspect-ratio: 1; width: 100%; }
@@ -194,11 +195,11 @@ export default function LoadMore({
           <button
             onClick={handleLoadMore}
             style={{
-              padding: '12px 40px',
-              background: 'rgb(0,0,0)',
+              padding: '13px 40px',
+              background: 'rgb(217,44,43)',
               color: 'rgb(255,255,255)',
-              border: 'none', borderRadius: '2px',
-              fontFamily: 'Inter, sans-serif',
+              border: 'none', borderRadius: '8px',
+              fontFamily: 'var(--mono)',
               fontSize: '12px', fontWeight: 600,
               letterSpacing: '0.07em', textTransform: 'uppercase',
               cursor: 'pointer',
@@ -208,9 +209,9 @@ export default function LoadMore({
             INCARCA MAI MULTE
           </button>
           <span style={{
-            fontFamily: 'Recursive, sans-serif',
-            fontSize: '12px',
-            color: 'rgba(0,0,0,0.35)',
+            fontFamily: 'var(--mono)',
+            fontSize: '11px',
+            color: 'rgba(240,237,231,0.4)',
           }}>
             {loadedCount} din {total.toLocaleString('ro')} produse
           </span>

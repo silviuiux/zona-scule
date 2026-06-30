@@ -57,17 +57,19 @@ export default function ContactForm({
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             padding: 64px 32px;
-            background: rgb(255,255,255);
-            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
             text-align: center; gap: 12px;
           }
           .cf-success-title {
             font-family: 'Bungee', sans-serif;
-            font-size: 32px; color: rgb(0,0,0);
+            font-size: 32px; color: var(--white);
           }
           .cf-success-sub {
             font-family: 'Recursive', sans-serif;
-            font-size: 14px; color: rgba(0,0,0,0.5); line-height: 1.6;
+            font-size: 14px; color: rgba(240,237,231,0.5); line-height: 1.6;
           }
         `}</style>
         <div className="cf-success">
@@ -82,8 +84,10 @@ export default function ContactForm({
     <>
       <style>{`
         .cf-wrap {
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(16px) saturate(1.2);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 14px;
           display: flex; flex-direction: column;
         }
         .cf-header {
@@ -93,12 +97,12 @@ export default function ContactForm({
         .cf-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(28px, 3vw, 42px);
-          line-height: 1; color: rgb(0,0,0);
+          line-height: 1; color: var(--white);
           text-transform: uppercase; margin-bottom: 12px;
         }
         .cf-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.45);
+          font-size: 13px; color: rgba(240,237,231,0.45);
           line-height: 1.6; max-width: 360px;
         }
 
@@ -107,13 +111,13 @@ export default function ContactForm({
 
         .cf-field {
           display: flex; align-items: center;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          border-bottom: 1px solid rgba(255,255,255,0.08);
           position: relative;
           transition: box-shadow 120ms;
         }
         .cf-field.cf-last { border-bottom: none; }
         .cf-field.cf-focused {
-          box-shadow: inset 0 0 0 1px rgba(30,100,255,0.35);
+          box-shadow: inset 0 -1px 0 0 rgb(217,44,43);
         }
 
         .cf-field input,
@@ -121,19 +125,19 @@ export default function ContactForm({
           flex: 1; min-width: 0;
           border: none; outline: none; background: transparent;
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgb(0,0,0);
+          font-size: 14px; color: var(--white);
           padding: 17px 0;
           resize: none;
         }
         .cf-field textarea { min-height: 88px; padding-top: 18px; }
 
         .cf-field input::placeholder,
-        .cf-field textarea::placeholder { color: rgba(0,0,0,0.28); }
+        .cf-field textarea::placeholder { color: rgba(240,237,231,0.25); }
 
         /* Right label — only visible when field has a value */
         .cf-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.3);
+          font-family: var(--mono);
+          font-size: 10px; color: rgba(240,237,231,0.3);
           white-space: nowrap; padding-left: 12px; flex-shrink: 0;
           pointer-events: none; opacity: 0; transition: opacity 120ms;
         }
@@ -141,20 +145,20 @@ export default function ContactForm({
         .cf-field textarea:not(:placeholder-shown) ~ .cf-label { opacity: 1; }
 
         /* Red prefilled value (from PDP "cere oferta") */
-        .cf-field.cf-prefilled input { color: rgb(217,44,43); }
+        .cf-field.cf-prefilled input { color: rgb(237,70,69); }
 
         /* Footer / submit */
         .cf-footer { padding: 64px 32px 32px; }
         .cf-submit {
           width: 100%; padding: 18px;
-          background: rgb(0,0,0); color: rgb(255,255,255);
-          border: none;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 700;
+          background: rgb(217,44,43); color: rgb(255,255,255);
+          border: none; border-radius: 8px;
+          font-family: var(--mono);
+          font-size: 11px; font-weight: 600;
           letter-spacing: 0.1em; text-transform: uppercase;
           cursor: pointer; transition: background 150ms;
         }
-        .cf-submit:hover { background: rgb(217,44,43); }
+        .cf-submit:hover { background: rgb(237,70,69); }
 
         @media (max-width: 768px) {
           .cf-header { padding: 40px 20px 0; }

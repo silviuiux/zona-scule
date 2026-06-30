@@ -11,19 +11,19 @@ export default function Loading() {
           0%   { background-position: -700px 0; }
           100% { background-position:  700px 0; }
         }
-        /* Light shimmer — for white bg sections */
+        /* Paper shimmer — for the product-image mount only */
         .ps {
           background: linear-gradient(
             90deg,
-            rgb(232,232,232) 25%,
-            rgb(244,244,244) 50%,
-            rgb(232,232,232) 75%
+            rgb(232,230,226) 25%,
+            rgb(244,242,238) 50%,
+            rgb(232,230,226) 75%
           );
           background-size: 700px 100%;
           animation: pdp-shimmer 1.5s ease-in-out infinite;
           border-radius: 3px;
         }
-        /* Dark shimmer — for dark bg specs section */
+        /* Dark shimmer — for dark bg sections */
         .ps-dark {
           background: linear-gradient(
             90deg,
@@ -37,12 +37,12 @@ export default function Loading() {
         }
 
         /* Page shell */
-        .pdp-skel { padding-top: 52px; background: rgb(244,244,244); }
+        .pdp-skel { padding-top: 52px; background: var(--surface-2); }
 
-        /* ── Top white section ── */
+        /* ── Top section ── */
         .pdp-skel-top {
-          background: rgb(255,255,255);
-          border-bottom: 1px solid rgba(0,0,0,0.06);
+          background: var(--surface);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .pdp-skel-top-inner {
           max-width: 1440px; margin: 0 auto;
@@ -64,20 +64,21 @@ export default function Loading() {
         .pdp-skel-sku { margin-bottom: 24px; }
         .pdp-skel-cta { border-radius: 2px; }
 
-        /* Right column — image area */
+        /* Right column — image area (kept on a paper mount, like the real photo) */
         .pdp-skel-img-wrap {
           aspect-ratio: 1;
           max-width: 520px;
           width: 100%;
           justify-self: center;
-          border-radius: 4px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.06);
           overflow: hidden;
         }
 
-        /* ── Dark specs section ── */
+        /* ── Specs section ── */
         .pdp-skel-specs {
-          background: rgb(26,26,26);
-          padding: 80px 0;
+          background: var(--surface-2);
+          padding: 96px 0;
         }
         .pdp-skel-specs-inner {
           max-width: 1440px; margin: 0 auto;
@@ -90,8 +91,9 @@ export default function Loading() {
           gap: 16px;
         }
         .pdp-skel-spec-card {
-          background: rgba(255,255,255,0.05);
-          border-radius: 4px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 10px;
           padding: 28px 24px;
           display: flex; flex-direction: column; gap: 16px;
         }
@@ -116,35 +118,35 @@ export default function Loading() {
               {/* Breadcrumbs */}
               <div className="pdp-skel-breadcrumbs">
                 {[60, 80, 100].map((w, i) => (
-                  <div key={i} className="ps" style={{ height: 28, width: w, borderRadius: 4 }} />
+                  <div key={i} className="ps-dark" style={{ height: 28, width: w, borderRadius: 999 }} />
                 ))}
               </div>
 
               {/* Brand */}
               <div className="pdp-skel-meta">
-                <div className="ps" style={{ height: 18, width: 90 }} />
+                <div className="ps-dark" style={{ height: 18, width: 90 }} />
               </div>
 
               {/* Product title */}
               <div className="pdp-skel-title" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-                <div className="ps" style={{ height: 40, width: '90%' }} />
-                <div className="ps" style={{ height: 40, width: '65%' }} />
+                <div className="ps-dark" style={{ height: 40, width: '90%' }} />
+                <div className="ps-dark" style={{ height: 40, width: '65%' }} />
               </div>
 
               {/* Description */}
               <div className="pdp-skel-desc">
-                <div className="ps" style={{ height: 14, width: '100%' }} />
-                <div className="ps" style={{ height: 14, width: '88%' }} />
-                <div className="ps" style={{ height: 14, width: '72%' }} />
+                <div className="ps-dark" style={{ height: 14, width: '100%' }} />
+                <div className="ps-dark" style={{ height: 14, width: '88%' }} />
+                <div className="ps-dark" style={{ height: 14, width: '72%' }} />
               </div>
 
               {/* SKU */}
               <div className="pdp-skel-sku">
-                <div className="ps" style={{ height: 36, width: 160, borderRadius: 4 }} />
+                <div className="ps-dark" style={{ height: 36, width: 160, borderRadius: 8 }} />
               </div>
 
               {/* CTA button */}
-              <div className="ps pdp-skel-cta" style={{ height: 48, width: '100%', maxWidth: 460 }} />
+              <div className="ps-dark pdp-skel-cta" style={{ height: 48, width: '100%', maxWidth: 460, borderRadius: 8 }} />
             </div>
 
             {/* Right: image */}

@@ -46,10 +46,10 @@ export default function Sidebar({
 
         .sidebar-block { margin-bottom: 36px; }
         .sidebar-section-title {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 600;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.32);
+          color: rgba(240,237,231,0.32);
           margin-bottom: 14px;
           padding-left: 30px;
         }
@@ -61,18 +61,18 @@ export default function Sidebar({
           padding: 10px 8px 10px 0;
           font-family: 'Recursive', sans-serif;
           font-size: 15px; font-weight: 400;
-          color: rgba(0,0,0,0.5);
+          color: rgba(240,237,231,0.5);
           text-decoration: none;
           transition: color 150ms, font-weight 150ms;
         }
-        .side-item:hover { color: rgb(0,0,0); font-weight: 500; }
-        .side-item.active { color: rgb(0,0,0); font-weight: 500; }
+        .side-item:hover { color: var(--white); font-weight: 500; }
+        .side-item.active { color: rgb(217,44,43); font-weight: 500; }
 
         /* Chevron — only visible on active */
         .side-chev {
           width: 22px; flex-shrink: 0;
           display: inline-flex; align-items: center; justify-content: center;
-          color: rgb(0,0,0);
+          color: rgb(217,44,43);
           opacity: 0;
           transition: opacity 150ms;
         }
@@ -84,7 +84,7 @@ export default function Sidebar({
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* Count pill — black bg, white text. Positioned absolutely so layout
+        /* Count pill — glass chip. Positioned absolutely so layout
            doesn't shift when it appears on hover. */
         .side-count {
           position: absolute;
@@ -92,11 +92,11 @@ export default function Sidebar({
           top: 50%;
           transform: translateY(-50%);
           flex-shrink: 0;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 500;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 500;
           padding: 4px 11px;
           border-radius: 999px;
-          background: rgb(0,0,0); color: rgb(255,255,255);
+          background: rgba(255,255,255,0.08); color: var(--white);
           letter-spacing: 0.02em;
           opacity: 0;
           transition: opacity 150ms;
@@ -105,16 +105,16 @@ export default function Sidebar({
         /* Show count on hover BUT only when not the active row */
         .side-item:not(.active):hover .side-count { opacity: 1; }
 
-        /* TOATE total count — always visible, transparent bg, plain black number */
+        /* TOATE total count — always visible, transparent bg */
         .side-count-all {
           position: absolute;
           right: 0;
           top: 50%;
           transform: translateY(-50%);
           flex-shrink: 0;
-          font-family: 'Inter', sans-serif;
-          font-size: 13px; font-weight: 400;
-          color: rgb(0,0,0);
+          font-family: var(--mono);
+          font-size: 12px; font-weight: 400;
+          color: rgba(240,237,231,0.45);
           background: transparent;
           pointer-events: none;
           letter-spacing: 0.01em;

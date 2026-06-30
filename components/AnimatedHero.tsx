@@ -36,28 +36,28 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
         }
         .brand-chips-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5);
+          font-family: var(--mono);
+          font-size: 12px; color: rgba(240,237,231,0.4);
+          text-transform: uppercase; letter-spacing: 0.08em;
         }
-        /* Brand link: name + count are one underlined element, regular weight,
-           no border / no chip background. */
+        /* Brand link: monospace pill — instrument-readout feel */
         .brand-chip {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 400;
-          color: rgb(0,0,0);
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          text-decoration-thickness: 1px;
-          padding: 0; border: none; background: none;
-          display: inline-flex; align-items: baseline; gap: 5px;
-          transition: color 150ms;
+          font-family: var(--mono);
+          font-size: 12px; font-weight: 500;
+          color: rgba(240,237,231,0.75);
+          text-decoration: none;
+          letter-spacing: 0.04em;
+          padding: 6px 14px; border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 999px; background: rgba(255,255,255,0.03);
+          display: inline-flex; align-items: baseline; gap: 6px;
+          transition: color 150ms, border-color 150ms, background 150ms;
         }
-        .brand-chip:hover { color: rgb(217, 44, 43); }
-        /* Count rides along inside the same underlined link, slightly smaller */
+        .brand-chip:hover { color: rgb(237,70,69); border-color: rgba(217,44,43,0.5); background: rgba(217,44,43,0.06); }
+        /* Count rides along inside the same pill, slightly dimmer */
         .brand-chip-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 400;
-          color: inherit;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 400;
+          color: rgba(240,237,231,0.4);
           letter-spacing: 0.01em;
         }
 
@@ -78,17 +78,17 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
 
         .hero-word-toate {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
+          font-size: clamp(56px, 7.5vw, 128px);
           text-transform: uppercase;
-          color: rgb(0,0,0);
-          letter-spacing: 0.01em;
-          line-height: 1;
+          color: var(--white);
+          letter-spacing: -0.01em;
+          line-height: 0.95;
           flex-shrink: 0;
         }
 
         /* Fixed height container matching Framer's 96px — clips slide animation */
         .hero-word-clip {
-          height: clamp(52px, 6.5vw, 96px);
+          height: clamp(56px, 7.5vw, 128px);
           overflow: hidden;
           display: flex;
           align-items: flex-start;
@@ -96,7 +96,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
 
         .hero-animated-word {
           font-family: 'Bungee Inline', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
+          font-size: clamp(56px, 7.5vw, 128px);
           text-transform: uppercase;
           color: rgb(217,44,43);
           letter-spacing: 0.01em;
@@ -122,11 +122,11 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         /* Line 2: DE CARE AI NEVOIE */
         .hero-line2 {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
+          font-size: clamp(56px, 7.5vw, 128px);
           text-transform: uppercase;
-          color: rgb(0,0,0);
-          letter-spacing: 0.01em;
-          line-height: 1;
+          color: var(--white);
+          letter-spacing: -0.01em;
+          line-height: 0.95;
         }
 
         /* On mobile, stack the animated word below TOATE so it doesn't overflow */

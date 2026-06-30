@@ -24,11 +24,11 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
       <style>{`
         /* ── Hero ── */
         .zs-hero {
-          background: rgb(255,255,255);
+          background: var(--surface);
           padding-top: 52px;
           min-height: 52vh;
           display: flex; flex-direction: column; justify-content: flex-end;
-          border-bottom: 1px solid rgba(0,0,0,0.07);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .zs-hero-inner {
           max-width: 1440px; margin: 0 auto;
@@ -38,63 +38,63 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         /* Breadcrumb */
         .zs-bc { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
         .zs-bc-pill {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(0,0,0,0.45); text-decoration: none;
-          border: 1px solid rgba(0,0,0,0.18); border-radius: 999px; padding: 5px 14px;
+          font-family: var(--mono); font-size: 11px; font-weight: 500;
+          letter-spacing: 0.07em; text-transform: uppercase;
+          color: rgba(240,237,231,0.5); text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; padding: 5px 14px;
           transition: color 150ms, border-color 150ms; white-space: nowrap;
         }
-        .zs-bc-pill:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.4); }
-        .zs-bc-sep { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(0,0,0,0.25); }
+        .zs-bc-pill:hover { color: var(--white); border-color: rgba(217,44,43,0.5); }
+        .zs-bc-sep { font-family: var(--mono); font-size: 11px; color: rgba(240,237,231,0.25); }
         .zs-bc-cur {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.45);
+          font-family: var(--mono); font-size: 11px; font-weight: 500;
+          letter-spacing: 0.07em; text-transform: uppercase; color: rgba(240,237,231,0.5);
         }
 
         /* Title */
         .zs-title { display: flex; flex-direction: column; gap: 0; margin-bottom: 28px; line-height: 1; }
         .zs-title-zona {
-          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 96px);
-          color: rgb(217,44,43); text-transform: uppercase; letter-spacing: 0.005em; line-height: 1;
+          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 104px);
+          color: rgb(217,44,43); text-transform: uppercase; letter-spacing: -0.005em; line-height: 0.95;
         }
         .zs-title-name {
-          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 96px);
-          color: rgb(0,0,0); text-transform: uppercase; letter-spacing: 0.005em; line-height: 1;
+          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 104px);
+          color: var(--white); text-transform: uppercase; letter-spacing: -0.005em; line-height: 0.95;
         }
 
         .zs-desc {
           font-family: 'Recursive', sans-serif; font-size: 15px;
-          color: rgba(0,0,0,0.5); line-height: 1.6; max-width: 560px; margin: 0 0 36px;
+          color: rgba(240,237,231,0.5); line-height: 1.6; max-width: 560px; margin: 0 0 36px;
         }
 
         /* Stats */
         .zs-stats { display: flex; align-items: center; gap: 24px; }
         .zs-stat { display: flex; align-items: baseline; gap: 8px; }
-        .zs-stat-num { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(0,0,0); }
+        .zs-stat-num { font-family: 'Bungee', sans-serif; font-size: 22px; color: var(--white); }
         .zs-stat-label {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.35);
+          font-family: var(--mono); font-size: 10px; font-weight: 500;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,231,0.35);
         }
-        .zs-stat-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
+        .zs-stat-div { width: 1px; height: 20px; background: rgba(255,255,255,0.12); }
 
         /* ── Listing section ── */
         .zs-body {
-          background: rgb(244,244,244); min-height: 60vh;
+          background: var(--surface-2); min-height: 60vh;
         }
-        .zs-body-inner { max-width: 1440px; margin: 0 auto; padding: 40px 24px 80px; }
+        .zs-body-inner { max-width: 1440px; margin: 0 auto; padding: 56px 24px 96px; }
 
         /* Profession filter pills */
-        .zs-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+        .zs-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; }
         .zs-filter {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+          font-family: var(--mono); font-size: 11px; font-weight: 500;
           letter-spacing: 0.07em; text-transform: uppercase;
           padding: 7px 16px; border-radius: 999px; text-decoration: none;
-          border: 1.5px solid rgba(0,0,0,0.18); color: rgba(0,0,0,0.55);
+          border: 1px solid rgba(255,255,255,0.14); color: rgba(240,237,231,0.55);
           transition: all 150ms; white-space: nowrap;
         }
-        .zs-filter:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.5); }
+        .zs-filter:hover { color: var(--white); border-color: rgba(255,255,255,0.35); }
         .zs-filter.active {
-          background: rgb(0,0,0); color: rgb(255,255,255); border-color: rgb(0,0,0);
+          background: rgb(217,44,43); color: rgb(255,255,255); border-color: rgb(217,44,43);
         }
 
         /* Article grid */
@@ -106,17 +106,18 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
 
         /* Article card */
         .zs-card {
-          background: rgb(255,255,255);
-          border-radius: 4px;
+          background: var(--surface);
+          border-radius: 12px;
           overflow: hidden;
           text-decoration: none;
           display: flex; flex-direction: column;
-          transition: transform 180ms, box-shadow 180ms;
-          border: 1px solid rgba(0,0,0,0.06);
+          transition: transform 180ms, box-shadow 180ms, border-color 180ms;
+          border: 1px solid rgba(255,255,255,0.08);
         }
         .zs-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+          transform: translateY(-4px);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+          border-color: rgba(217,44,43,0.35);
         }
 
         /* Cover */
@@ -129,38 +130,38 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         /* Card body */
         .zs-card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
         .zs-card-tag {
-          font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700;
+          font-family: var(--mono); font-size: 9px; font-weight: 600;
           letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgb(217,44,43); align-self: flex-start;
+          color: rgb(237,70,69); align-self: flex-start;
         }
         .zs-card-title {
           font-family: 'Recursive', sans-serif; font-size: 16px; font-weight: 700;
-          color: rgb(0,0,0); line-height: 1.35; letter-spacing: -0.01em;
+          color: var(--white); line-height: 1.35; letter-spacing: -0.01em;
           flex: 1;
         }
         .zs-card-excerpt {
           font-family: 'Recursive', sans-serif; font-size: 13px;
-          color: rgba(0,0,0,0.5); line-height: 1.55;
+          color: rgba(240,237,231,0.5); line-height: 1.55;
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
           overflow: hidden;
         }
         .zs-card-meta {
           display: flex; align-items: center; gap: 12px; padding-top: 8px;
-          border-top: 1px solid rgba(0,0,0,0.07); margin-top: auto;
+          border-top: 1px solid rgba(255,255,255,0.07); margin-top: auto;
         }
         .zs-card-date {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500;
-          color: rgba(0,0,0,0.35); letter-spacing: 0.03em;
+          font-family: var(--mono); font-size: 10px; font-weight: 500;
+          color: rgba(240,237,231,0.35); letter-spacing: 0.03em;
         }
         .zs-card-read {
-          font-family: 'Inter', sans-serif; font-size: 10px;
-          color: rgba(0,0,0,0.3); margin-left: auto;
+          font-family: var(--mono); font-size: 10px;
+          color: rgba(240,237,231,0.3); margin-left: auto;
         }
 
         /* Empty state */
         .zs-empty {
           grid-column: 1/-1; text-align: center; padding: 80px 0;
-          font-family: 'Recursive', sans-serif; font-size: 15px; color: rgba(0,0,0,0.4);
+          font-family: 'Recursive', sans-serif; font-size: 15px; color: rgba(240,237,231,0.4);
         }
 
         /* ── Mobile ── */

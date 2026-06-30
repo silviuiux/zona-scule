@@ -16,13 +16,13 @@ export default function GallerySection({ images, productName }: { images: string
           height: 80vh;
           display: grid;
           gap: 4px;
-          background: rgb(230,228,224);
+          background: var(--surface);
         }
         .gallery-col {
           position: relative;
           overflow: hidden;
           cursor: zoom-in;
-          background: rgb(220,218,214);
+          background: var(--surface-2);
         }
         .gallery-col:hover::after {
           content: '';

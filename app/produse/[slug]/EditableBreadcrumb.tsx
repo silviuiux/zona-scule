@@ -86,55 +86,55 @@ export default function EditableBreadcrumb({
         .ebc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; align-items: center; }
 
         .bc-pill {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
+          font-family: var(--mono);
+          font-size: 11px; color: rgba(240,237,231,0.5);
           padding: 4px 12px;
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 999px;
           text-decoration: none;
           transition: border-color 150ms, color 150ms;
           white-space: nowrap;
         }
-        .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
+        .bc-pill:hover { border-color: rgba(217,44,43,0.5); color: var(--white); }
 
         /* Split pill: [navigable text | ↓ trigger] */
         .ebc-wrap { position: relative; }
         .ebc-split {
           display: inline-flex; align-items: stretch;
-          border: 1px solid rgba(0,0,0,0.12);
-          border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 999px;
           overflow: hidden;
           transition: border-color 150ms;
         }
-        .ebc-split:hover { border-color: rgba(0,0,0,0.45); }
-        .ebc-split.open { border-color: rgb(0,0,0); }
+        .ebc-split:hover { border-color: rgba(255,255,255,0.3); }
+        .ebc-split.open { border-color: rgb(217,44,43); }
 
         /* Left: navigable link */
         .ebc-split-link {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.6);
-          padding: 5px 10px 5px 12px;
+          font-family: var(--mono);
+          font-size: 11px; color: rgba(240,237,231,0.55);
+          padding: 5px 10px 5px 14px;
           text-decoration: none;
           white-space: nowrap;
           display: flex; align-items: center;
           transition: color 150ms, background 150ms;
         }
-        .ebc-split-link:hover { color: rgb(0,0,0); background: rgba(0,0,0,0.03); }
+        .ebc-split-link:hover { color: var(--white); background: rgba(255,255,255,0.04); }
 
         /* Right: chevron trigger */
         .ebc-split-trigger {
           display: flex; align-items: center; justify-content: center;
           width: 30px; flex-shrink: 0;
           border: none;
-          border-left: 1px solid rgba(0,0,0,0.1);
+          border-left: 1px solid rgba(255,255,255,0.12);
           background: none;
           cursor: pointer;
-          color: rgba(0,0,0,0.35);
+          color: rgba(240,237,231,0.35);
           padding: 0;
           transition: background 150ms, color 150ms, border-color 150ms;
         }
-        .ebc-split-trigger:hover { background: rgba(0,0,0,0.04); color: rgb(0,0,0); }
-        .ebc-split.open .ebc-split-trigger { background: rgba(0,0,0,0.04); color: rgb(0,0,0); border-left-color: rgba(0,0,0,0.25); }
+        .ebc-split-trigger:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+        .ebc-split.open .ebc-split-trigger { background: rgba(217,44,43,0.08); color: rgb(217,44,43); border-left-color: rgba(217,44,43,0.3); }
 
         .ebc-chevron { flex-shrink: 0; transition: transform 200ms; }
         .ebc-split.open .ebc-chevron { transform: rotate(180deg); }
@@ -142,49 +142,50 @@ export default function EditableBreadcrumb({
         /* Dropdown */
         .ebc-drop {
           position: absolute; top: calc(100% + 4px); left: 0;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.12);
-          border-radius: 6px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+          background: rgba(19,18,16,0.95);
+          backdrop-filter: blur(20px) saturate(1.2);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 10px;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.5);
           z-index: 200;
           min-width: 220px; max-width: 320px;
           max-height: 320px; overflow-y: auto;
           padding: 4px;
         }
         .ebc-drop::-webkit-scrollbar { width: 4px; }
-        .ebc-drop::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+        .ebc-drop::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
         .ebc-option {
           display: block; width: 100%; text-align: left;
           padding: 7px 10px;
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.7);
+          font-size: 12px; color: rgba(240,237,231,0.65);
           background: none; border: none; cursor: pointer;
-          border-radius: 4px;
+          border-radius: 6px;
           transition: background 100ms, color 100ms;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .ebc-option:hover { background: rgba(0,0,0,0.05); color: rgb(0,0,0); }
-        .ebc-option.active { background: rgba(217,44,43,0.08); color: rgb(217,44,43); font-weight: 500; }
+        .ebc-option:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+        .ebc-option.active { background: rgba(217,44,43,0.12); color: rgb(237,70,69); font-weight: 500; }
 
         /* Saved indicator */
         .ebc-saved {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 10px; font-weight: 600;
           color: rgb(34,197,94);
           padding: 2px 6px;
-          background: rgba(34,197,94,0.1);
+          background: rgba(34,197,94,0.12);
           border-radius: 999px;
           animation: fadeIn 200ms ease;
         }
         .ebc-saving {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; color: rgba(0,0,0,0.3);
+          font-family: var(--mono);
+          font-size: 10px; color: rgba(240,237,231,0.3);
         }
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
         /* Separator */
-        .bc-sep { color: rgba(0,0,0,0.2); font-size: 12px; }
+        .bc-sep { color: rgba(240,237,231,0.25); font-size: 12px; }
       `}</style>
 
       <div className="ebc-row">

@@ -46,9 +46,9 @@ export default function VariantSelector({
       <label
         htmlFor="variant-select"
         style={{
-          display: 'block', fontFamily: 'Inter, sans-serif', fontSize: '11px',
-          fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-          color: 'rgba(0,0,0,0.45)', marginBottom: '6px',
+          display: 'block', fontFamily: 'var(--mono)', fontSize: '11px',
+          fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+          color: 'rgba(240,237,231,0.45)', marginBottom: '8px',
         }}
       >
         Alege varianta ({variants.length})
@@ -63,20 +63,20 @@ export default function VariantSelector({
           }}
           style={{
             width: '100%', appearance: 'none', WebkitAppearance: 'none',
-            padding: '12px 38px 12px 14px', border: '1px solid rgba(0,0,0,0.15)',
-            borderRadius: '4px', background: '#fff', cursor: 'pointer',
-            fontFamily: 'Recursive, sans-serif', fontSize: '14px', color: 'rgb(20,20,20)',
+            padding: '13px 38px 13px 16px', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: '8px', background: 'rgba(255,255,255,0.04)', cursor: 'pointer',
+            fontFamily: 'Recursive, sans-serif', fontSize: '14px', color: 'rgb(240,237,231)',
           }}
         >
           {opts.map(v => (
-            <option key={v.slug} value={v.slug}>{labelFor(v)}</option>
+            <option key={v.slug} value={v.slug} style={{ background: 'rgb(19,18,16)', color: 'rgb(240,237,231)' }}>{labelFor(v)}</option>
           ))}
         </select>
         <span
           aria-hidden
           style={{
             position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
-            pointerEvents: 'none', color: 'rgba(0,0,0,0.5)', fontSize: '12px',
+            pointerEvents: 'none', color: 'rgba(240,237,231,0.5)', fontSize: '12px',
           }}
         >
           ▾

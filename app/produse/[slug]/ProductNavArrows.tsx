@@ -125,21 +125,22 @@ export default function ProductNavArrows({
           z-index: 40;
           width: 44px; height: 44px;
           display: flex; align-items: center; justify-content: center;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 3px;
+          background: rgba(19,18,16,0.7);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 8px;
           cursor: pointer;
           text-decoration: none;
-          color: rgb(0,0,0);
-          box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+          color: var(--white);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
           transition: background 150ms, border-color 150ms, box-shadow 150ms, opacity 150ms;
           opacity: 0.7;
         }
         .prod-nav-arrow:hover {
-          background: rgb(0,0,0);
+          background: rgb(217,44,43);
           color: rgb(255,255,255);
           border-color: transparent;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+          box-shadow: 0 8px 28px rgba(217,44,43,0.35);
           opacity: 1;
         }
         .prod-nav-arrow.disabled {

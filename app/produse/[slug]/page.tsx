@@ -72,141 +72,140 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <>
       <Nav />
       <style>{`
-        .pdp { padding-top: 52px; background: rgb(244,244,244); }
+        .pdp { padding-top: 52px; background: var(--surface-2); }
 
-        /* ── TOP WHITE SECTION ── */
-        /* #4: full white background, no border on image */
+        /* ── TOP SECTION ── */
         .pdp-top {
-          background: rgb(255,255,255);
-          border-bottom: 1px solid rgba(0,0,0,0.06);
+          background: var(--surface);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .pdp-top-inner {
           max-width: 1440px; margin: 0 auto;
           padding: 40px 12px 60px;
           display: grid; grid-template-columns: 1fr 1fr;
           gap: 80px;
-          /* #6: vertically center left content */
           align-items: center;
         }
 
         /* Left content */
         .bc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
-        /* #10: breadcrumb pills with border-radius 4px */
         .bc-pill {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
+          font-family: var(--mono);
+          font-size: 11px; color: rgba(240,237,231,0.5);
           padding: 4px 12px;
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 999px;
           text-decoration: none;
           transition: border-color 150ms, color 150ms;
           white-space: nowrap;
         }
-        .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
+        .bc-pill:hover { border-color: rgba(217,44,43,0.5); color: var(--white); }
 
         .pdp-brand {
-          font-family: 'Recursive', sans-serif;
-          font-weight: 500; font-size: 18px; color: rgb(0,0,0);
-          margin-bottom: 4px; letter-spacing: -0.02em;
+          font-family: var(--mono);
+          font-weight: 600; font-size: 13px; color: rgba(240,237,231,0.55);
+          margin-bottom: 8px; letter-spacing: 0.06em; text-transform: uppercase;
           text-decoration: none; display: inline-block;
         }
-        .pdp-brand:hover { text-decoration: underline; }
+        .pdp-brand:hover { color: rgb(217,44,43); }
         .pdp-sku {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 3.5vw, 44px);
-          color: rgb(0,0,0); line-height: 1;
+          font-size: clamp(30px, 3.8vw, 48px);
+          color: var(--white); line-height: 1;
           text-transform: uppercase; margin-bottom: 12px;
         }
         .pdp-desc {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
+          font-size: 14px; color: rgba(240,237,231,0.5);
           line-height: 1.65; margin-bottom: 28px;
         }
         .cere-btn {
-          display: block; width: 100%; padding: 14px;
+          display: block; width: 100%; padding: 16px;
           background: rgb(217,44,43); color: rgb(255,255,255); border: none;
-          border-radius: 3px; font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          border-radius: 8px; font-family: var(--mono);
+          font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
           text-transform: uppercase; text-align: center;
           text-decoration: none; cursor: pointer; transition: background 150ms;
         }
-        .cere-btn:hover { background: rgb(190,35,34); }
+        .cere-btn:hover { background: rgb(237,70,69); }
 
-        /* ── DARK SPECS — #3: comes right after hero, before gallery ── */
-        /* #9: padding 96px top/bottom for sections */
-        .pdp-specs { background: rgb(30,30,30); }
+        /* ── SPECS — comes right after hero, before gallery ── */
+        .pdp-specs { background: var(--surface-2); }
         .pdp-specs-inner {
           max-width: 1440px; margin: 0 auto; padding: 96px 12px;
         }
         .specs-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 600;
           letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.3); margin-bottom: 28px;
+          color: rgba(240,237,231,0.35); margin-bottom: 28px;
         }
         .specs-grid { display: grid; gap: 16px; }
-        /* #9: spec cards — 96px top, 32px bottom padding */
         .spec-card {
-          background: rgb(255,255,255); border-radius: 4px;
-          padding: 96px 24px 32px;
+          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 10px;
+          padding: 32px 24px;
         }
         .spec-card-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 6px;
+          font-family: var(--mono);
+          font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+          color: rgba(240,237,231,0.4); margin-bottom: 8px;
         }
         .spec-card-value {
           font-family: 'Bungee', sans-serif;
           font-size: 28px; text-transform: uppercase;
-          letter-spacing: -0.01em; color: rgb(0,0,0);
-          line-height: 1; margin-bottom: 6px;
+          letter-spacing: -0.01em; color: var(--white);
+          line-height: 1; margin-bottom: 8px;
         }
         .spec-card-detail {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.5;
+          font-size: 13px; color: rgba(240,237,231,0.5); line-height: 1.5;
         }
 
         /* ── INFO CARDS ── */
-        /* #9: section padding 96px */
         .info-section {
-          max-width: 1440px; margin: 0 auto; padding: 96px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 120px 12px;
         }
         .info-section-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 600;
           letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(0,0,0,0.35); margin-bottom: 24px;
+          color: rgba(240,237,231,0.35); margin-bottom: 24px;
         }
-        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        /* #9: info cards — 96px top, 32px bottom */
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .info-card {
-          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.06);
-          border-radius: 4px; padding: 96px 24px 32px;
-          display: flex; flex-direction: column; gap: 6px;
+          background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 10px; padding: 28px 24px;
+          display: flex; flex-direction: column; gap: 8px;
+          transition: border-color 200ms, transform 200ms;
         }
+        .info-card:hover { border-color: rgba(217,44,43,0.35); transform: translateY(-2px); }
         .info-num {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.3); font-weight: 500;
+          font-family: var(--mono);
+          font-size: 11px; color: rgba(217,44,43,0.7); font-weight: 600;
         }
         .info-title {
           font-family: 'Recursive', sans-serif;
           font-size: 17px; font-weight: 500;
-          color: rgb(0,0,0); letter-spacing: -0.02em; line-height: 1.25;
+          color: var(--white); letter-spacing: -0.02em; line-height: 1.25;
         }
         .info-body {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.6;
+          font-size: 13px; color: rgba(240,237,231,0.5); line-height: 1.6;
         }
 
         /* ── CTA BANNER ── */
-        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 0 12px 72px; }
+        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 0 12px 96px; }
         .cta-banner-inner {
-          background: rgb(30,30,30); border-radius: 4px;
-          padding: 32px 40px;
+          background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 16px;
+          padding: 36px 44px;
           display: flex; justify-content: space-between; align-items: center; gap: 24px;
         }
         .cta-banner-eyebrow {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px;
+          font-family: var(--mono);
+          font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+          color: rgba(240,237,231,0.4); margin-bottom: 6px;
         }
         .cta-banner-title {
           font-family: 'Bungee', sans-serif;
@@ -216,18 +215,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .cta-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
         .cta-primary {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 11px 20px; background: rgb(217,44,43); color: rgb(255,255,255);
-          border-radius: 3px; font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
+          padding: 12px 22px; background: rgb(217,44,43); color: rgb(255,255,255);
+          border-radius: 8px; font-family: var(--mono);
+          font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
           text-transform: uppercase; text-decoration: none; white-space: nowrap;
           transition: background 150ms;
         }
-        .cta-primary:hover { background: rgb(190,35,34); }
+        .cta-primary:hover { background: rgb(237,70,69); }
         .cta-secondary {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 11px 20px;
-          border: 1px solid rgba(255,255,255,0.2); color: rgb(255,255,255);
-          border-radius: 3px; font-family: 'Inter', sans-serif;
+          padding: 12px 22px;
+          border: 1px solid rgba(255,255,255,0.18); color: rgb(255,255,255);
+          border-radius: 8px; font-family: var(--mono);
           font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
           text-transform: uppercase; text-decoration: none; white-space: nowrap;
           transition: border-color 150ms;
@@ -235,30 +234,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
 
         /* ── FOOTER ── */
-        .footer { background: rgb(244,244,244); border-top: 1px solid rgba(0,0,0,0.08); }
+        .footer { background: var(--surface-2); border-top: 1px solid rgba(255,255,255,0.07); }
         .footer-social {
-          padding: 18px 12px; max-width: 1440px; margin: 0 auto;
+          padding: 28px 12px; max-width: 1440px; margin: 0 auto;
           display: flex; gap: 48px; justify-content: center;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
         }
-        .footer-social a { font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(0,0,0,0.4); text-decoration: none; }
-        .footer-social a:hover { color: rgb(0,0,0); }
+        .footer-social a { font-family: var(--mono); font-size: 11px; color: rgba(240,237,231,0.4); text-decoration: none; }
+        .footer-social a:hover { color: rgb(217,44,43); }
         .footer-grid {
-          max-width: 1440px; margin: 0 auto; padding: 48px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 80px 12px;
           display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
         }
         .footer-col-title {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(0,0,0); margin-bottom: 14px;
+          font-family: var(--mono); font-size: 11px; font-weight: 600;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,231,0.4); margin-bottom: 14px;
         }
-        .footer-link { font-family: 'Recursive', sans-serif; font-size: 13px; color: rgba(0,0,0,0.45); text-decoration: none; display: block; margin-bottom: 8px; }
-        .footer-link:hover { color: rgb(0,0,0); }
+        .footer-link { font-family: 'Recursive', sans-serif; font-size: 13px; color: rgba(240,237,231,0.55); text-decoration: none; display: block; margin-bottom: 8px; }
+        .footer-link:hover { color: var(--white); }
         .footer-bottom {
-          border-top: 1px solid rgba(0,0,0,0.08); padding: 14px 12px;
+          border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 12px;
           max-width: 1440px; margin: 0 auto;
           display: flex; justify-content: space-between; align-items: center;
         }
-        .footer-bottom span, .footer-bottom a { font-family: 'Recursive', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); text-decoration: none; }
+        .footer-bottom span, .footer-bottom a { font-family: var(--mono); font-size: 11px; color: rgba(240,237,231,0.3); text-decoration: none; }
         .footer-bottom a { color: rgb(217,44,43); }
 
         /* ══ SCROLL ANIMATIONS ══════════════════════════════════════ */
@@ -421,7 +420,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* ── CARACTERISTICI ── */}
         {caracteristici.length > 0 && (
-          <div className="pdp-char-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="pdp-char-section" style={{ background: 'var(--surface-2)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="info-section">
               <p className="info-section-label reveal">Caracteristici</p>
               <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(caracteristici.length, 3)}, 1fr)` }}>
@@ -439,7 +438,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* ── APLICATII ── */}
         {aplicatii.length > 0 && (
-          <div className="pdp-app-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="pdp-app-section" style={{ background: 'var(--surface-2)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="info-section">
               <p className="info-section-label reveal">Aplicatii recomandate</p>
               <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(aplicatii.length, 3)}, 1fr)` }}>
@@ -475,7 +474,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {['Facebook', 'Instagram', 'YouTube', 'Email', 'Telefon'].map(s => <a key={s} href="#">{s}</a>)}
           </div>
           <div className="footer-grid">
-            <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
+            <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(240,237,231,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
               Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
             </p>
             <div>

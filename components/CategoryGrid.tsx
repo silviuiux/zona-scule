@@ -171,10 +171,11 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
                   {cat.hero_image_url ? (
                     <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
                   ) : (
-                    <div style={{ position: 'absolute', inset: 0, background: `hsl(${(rowIdx * 90 + colStart * 22) % 360}, 6%, 74%)` }} />
+                    <div style={{ position: 'absolute', inset: 0, background: `hsl(${(rowIdx * 90 + colStart * 22) % 360}, 14%, 14%)` }} />
                   )}
                 </div>
                 <div className="cat-card-overlay" />
+                <div className="cat-card-border" />
                 <div className="cat-card-bottom">
                   <span className="cat-card-count">
                     {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse

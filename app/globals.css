@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --surface: rgb(244, 244, 244);
-  --white: rgb(255, 255, 255);
+  /* ── Industrial Night palette ── */
+  --surface: rgb(13, 12, 11);
+  --surface-2: rgb(19, 18, 16);
+  --paper: rgb(250, 249, 247);
+  --white: rgb(240, 237, 231);
   --black: rgb(0, 0, 0);
-  --light-black: rgb(30, 30, 30);
+  --light-black: rgb(19, 18, 16);
   --red: rgb(217, 44, 43);
-  --red-hover: rgb(190, 35, 34);
-  --text-70: rgb(102, 102, 102);
-  --border: rgba(0,0,0,0.08);
+  --red-hover: rgb(237, 70, 69);
+  --text-70: rgba(240, 237, 231, 0.62);
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(255,255,255,0.18);
+  --glass: rgba(255,255,255,0.035);
+  --mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 
   /*
     Noise texture — matches Figma Noise plugin settings:
@@ -34,8 +40,8 @@ html.lenis, html.lenis body { height: auto; }
   html { scroll-behavior: smooth; }
 }
 body {
-  background-color: rgb(244, 244, 244);
-  color: var(--black);
+  background-color: var(--surface);
+  color: var(--white);
   font-family: 'Recursive', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
@@ -74,7 +80,7 @@ body::before {
   background-image: var(--noise-svg);
   background-repeat: repeat;
   background-size: 200px 200px;
-  opacity: 0.45;
+  opacity: 0.55;
   mix-blend-mode: overlay;
 }
 
@@ -120,4 +126,12 @@ body::before {
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
+
+/* ── Glass panel utility — frosted material over the dark canvas ── */
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid var(--border);
+}

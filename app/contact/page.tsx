@@ -13,26 +13,27 @@ export default function ContactPage({
         .contact-page {
           padding-top: 52px;
           min-height: 100vh;
-          background: rgb(244,244,244);
+          background: var(--surface);
         }
         .contact-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 102px 96px;
+          padding: 96px 102px 120px;
         }
 
         /* ── Header ── */
         .contact-location {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
+          color: rgba(240,237,231,0.4);
           margin-bottom: 16px;
         }
         .contact-title {
           font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 7vw, 96px);
-          line-height: 0.92;
+          font-size: clamp(56px, 7.5vw, 104px);
+          line-height: 0.9;
           text-transform: uppercase;
+          color: var(--white);
           margin-bottom: 20px;
         }
         .contact-title .red {
@@ -41,43 +42,46 @@ export default function ContactPage({
         }
         .contact-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
+          font-size: 14px; color: rgba(240,237,231,0.5);
           line-height: 1.6; max-width: 420px;
-          margin-bottom: 64px;
+          margin-bottom: 72px;
         }
 
         /* ── Info bar ── */
         .contact-info-bar {
           display: grid; grid-template-columns: repeat(3, 1fr);
           gap: 0;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 14px;
+          overflow: hidden;
           margin-bottom: 96px;
         }
         .info-card {
           padding: 32px;
-          border-right: 1px solid rgba(0,0,0,0.08);
+          border-right: 1px solid rgba(255,255,255,0.08);
           display: flex; flex-direction: column; gap: 8px;
           text-decoration: none;
         }
         .info-card:nth-child(n+2) { padding-left: 16px; }
         .info-card:last-child { border-right: none; }
         .info-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: var(--mono);
+          font-size: 10px; font-weight: 600;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          color: rgba(240,237,231,0.35);
         }
         .info-value {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(20px, 2.2vw, 32px);
-          line-height: 1; color: rgb(0,0,0);
+          line-height: 1; color: var(--white);
           text-decoration: none;
         }
         .info-value.red { color: rgb(217,44,43); }
         .info-note {
           font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.4);
+          font-size: 12px; color: rgba(240,237,231,0.4);
         }
 
         /* ── Form + Photo ── */
@@ -89,7 +93,9 @@ export default function ContactPage({
         }
         .contact-photo {
           position: relative; overflow: hidden;
-          background: rgb(220,218,214);
+          background: var(--surface-2);
+          border-radius: 14px;
+          border: 1px solid rgba(255,255,255,0.08);
         }
         .contact-photo img {
           width: 100%; height: 100%;
@@ -103,7 +109,7 @@ export default function ContactPage({
         @media (max-width: 768px) {
           .contact-inner { padding: 48px 16px 64px; }
           .contact-info-bar { grid-template-columns: 1fr; }
-          .info-card { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
+          .info-card { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
           .info-card:last-child { border-bottom: none; }
           .contact-bottom { grid-template-columns: 1fr; }
           .contact-photo { min-height: 300px; }

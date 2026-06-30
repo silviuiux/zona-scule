@@ -101,26 +101,28 @@ export default function ProductCard({ product }: { product: Product }) {
       <style>{`
         .pcard-link { text-decoration: none; display: flex; flex-direction: column; height: 100%; min-width: 0; }
         .pcard {
-          background: rgb(255, 255, 255);
-          border-radius: 8px;
+          background: var(--surface-2);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
           overflow: hidden;
           display: flex; flex-direction: column;
           flex: 1;
           min-width: 0;
           position: relative;
           isolation: isolate;
-          transition: box-shadow 200ms, transform 200ms;
+          transition: box-shadow 200ms, transform 200ms, border-color 200ms;
         }
         .pcard-link:hover .pcard {
-          box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-          transform: translateY(-2px);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+          transform: translateY(-4px);
+          border-color: rgba(217,44,43,0.35);
         }
 
-        /* ── Image area ── */
+        /* ── Image area — clean paper mount so product cutouts render correctly ── */
         .pcard-img {
           position: relative;
           aspect-ratio: 1;
-          background: rgb(255,255,255);
+          background: var(--paper);
           overflow: clip;
         }
 
@@ -150,13 +152,14 @@ export default function ProductCard({ product }: { product: Product }) {
           min-width: 0;
         }
         .pcard-brand {
-          font-family: 'Recursive', sans-serif;
-          font-weight: 500; font-size: 13px;
-          color: rgb(0,0,0); letter-spacing: -0.02em;
+          font-family: var(--mono);
+          font-weight: 600; font-size: 10px;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: rgba(240,237,231,0.45);
         }
         .pcard-model {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5);
+          font-size: 14px; color: var(--white);
           line-height: 1.4;
           white-space: nowrap;
           overflow: hidden;
@@ -185,24 +188,25 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
         .pcard-spec {
-          display: flex; flex-direction: column; gap: 2px;
-          background: rgb(244, 244, 244);
-          border-radius: 4px;
+          display: flex; flex-direction: column; gap: 3px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 6px;
           padding: 8px 10px;
         }
         /* Wide variant for app description — fills full card width */
         .pcard-spec-wide { width: 100%; }
 
         .pcard-spec-label {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 9px; font-weight: 600;
           letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
+          color: rgba(240,237,231,0.4);
         }
         .pcard-spec-value {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500;
-          color: rgb(0,0,0); letter-spacing: -0.02em;
+          font-family: var(--mono);
+          font-size: 12px; font-weight: 500;
+          color: var(--white); letter-spacing: -0.01em;
         }
         /* App description: single line, truncated */
         .pcard-spec-value-clamp {

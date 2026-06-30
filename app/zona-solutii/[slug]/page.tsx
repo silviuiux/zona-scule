@@ -103,26 +103,26 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         /* ── Body section ── */
         .art-body-wrap {
-          background: rgb(255,255,255); padding: 0 24px;
+          background: var(--surface); padding: 0 24px;
         }
         .art-body-layout {
           max-width: 860px; margin: 0 auto;
           display: grid;
           grid-template-columns: 1fr 260px;
           gap: 60px;
-          padding: 60px 0 80px;
+          padding: 72px 0 96px;
         }
 
         /* Rich text */
         .art-content { min-width: 0; }
         .art-content p {
           font-family: 'Recursive', sans-serif; font-size: 16px;
-          color: rgba(0,0,0,0.75); line-height: 1.75;
+          color: rgba(240,237,231,0.75); line-height: 1.75;
           margin: 0 0 20px;
         }
         .art-content h2 {
           font-family: 'Bungee', sans-serif; font-size: 18px;
-          color: rgb(0,0,0); text-transform: uppercase;
+          color: var(--white); text-transform: uppercase;
           letter-spacing: 0.04em; margin: 36px 0 12px;
         }
         .art-content h2:first-child { margin-top: 0; }
@@ -131,50 +131,50 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         }
         .art-content li {
           font-family: 'Recursive', sans-serif; font-size: 16px;
-          color: rgba(0,0,0,0.75); line-height: 1.7; margin-bottom: 6px;
+          color: rgba(240,237,231,0.75); line-height: 1.7; margin-bottom: 6px;
         }
-        .art-content strong { color: rgb(0,0,0); font-weight: 700; }
+        .art-content strong { color: var(--white); font-weight: 700; }
 
         /* Sidebar */
         .art-sidebar { display: flex; flex-direction: column; gap: 32px; }
         .art-sidebar-block {}
         .art-sidebar-label {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.35);
+          font-family: var(--mono); font-size: 10px; font-weight: 600;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,231,0.35);
           margin-bottom: 12px; display: block;
         }
 
         /* Related article mini-card */
         .art-related-card {
           display: block; text-decoration: none; padding: 14px;
-          border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
           margin-bottom: 10px; transition: border-color 150ms, background 150ms;
         }
-        .art-related-card:hover { background: rgb(249,249,249); border-color: rgba(0,0,0,0.18); }
+        .art-related-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(217,44,43,0.35); }
         .art-related-tag {
-          font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(217,44,43);
+          font-family: var(--mono); font-size: 9px; font-weight: 600;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(237,70,69);
           display: block; margin-bottom: 4px;
         }
         .art-related-title {
           font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 600;
-          color: rgb(0,0,0); line-height: 1.4;
+          color: var(--white); line-height: 1.4;
         }
 
         /* ── Products section ── */
         .art-products-wrap {
-          background: rgb(244,244,244); padding: 60px 24px;
+          background: var(--surface-2); padding: 96px 24px;
         }
         .art-products-inner { max-width: 1200px; margin: 0 auto; }
-        .art-products-header { margin-bottom: 28px; }
+        .art-products-header { margin-bottom: 32px; }
         .art-products-eyebrow {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.12em; text-transform: uppercase; color: rgb(217,44,43);
+          font-family: var(--mono); font-size: 10px; font-weight: 600;
+          letter-spacing: 0.12em; text-transform: uppercase; color: rgb(237,70,69);
           display: block; margin-bottom: 6px;
         }
         .art-products-title {
-          font-family: 'Bungee', sans-serif; font-size: 22px;
-          color: rgb(0,0,0); text-transform: uppercase; letter-spacing: 0.03em;
+          font-family: 'Bungee', sans-serif; font-size: 24px;
+          color: var(--white); text-transform: uppercase; letter-spacing: 0.01em;
         }
         .art-products-grid {
           display: grid;
@@ -182,17 +182,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           gap: 16px;
         }
         .art-products-cta {
-          margin-top: 28px; display: flex; justify-content: center;
+          margin-top: 32px; display: flex; justify-content: center;
         }
         .art-products-link {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+          font-family: var(--mono); font-size: 11px; font-weight: 600;
           letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgb(0,0,0); text-decoration: none;
-          border: 1.5px solid rgba(0,0,0,0.3); border-radius: 2px; padding: 10px 24px;
+          color: var(--white); text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; padding: 11px 26px;
           transition: background 150ms, color 150ms, border-color 150ms;
         }
         .art-products-link:hover {
-          background: rgb(0,0,0); color: rgb(255,255,255); border-color: rgb(0,0,0);
+          background: rgb(217,44,43); color: rgb(255,255,255); border-color: rgb(217,44,43);
         }
 
         /* ── Mobile ── */

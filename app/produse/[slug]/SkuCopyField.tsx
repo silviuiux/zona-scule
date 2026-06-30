@@ -29,9 +29,9 @@ export default function SkuCopyField({ sku }: { sku: string }) {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: rgb(244,244,244);
-          border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 4px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
           padding: 10px 16px;
           margin-bottom: 12px;
           cursor: pointer;
@@ -39,35 +39,35 @@ export default function SkuCopyField({ sku }: { sku: string }) {
           user-select: none;
         }
         .sku-field:hover {
-          background: rgb(235,235,235);
-          border-color: rgba(0,0,0,0.15);
+          background: rgba(255,255,255,0.07);
+          border-color: rgba(255,255,255,0.18);
         }
         .sku-field.copied {
-          background: rgb(230,245,235);
+          background: rgba(34,197,94,0.1);
           border-color: rgba(34,197,94,0.3);
         }
         .sku-field-label {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--mono);
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          color: rgba(240,237,231,0.4);
         }
         .sku-field-value {
-          font-family: 'Recursive', sans-serif;
+          font-family: var(--mono);
           font-size: 13px;
           font-weight: 500;
-          color: rgb(0,0,0);
+          color: var(--white);
         }
         .sku-field-icon {
           display: flex;
           align-items: center;
-          color: rgba(0,0,0,0.3);
+          color: rgba(240,237,231,0.35);
           transition: color 150ms;
           flex-shrink: 0;
         }
-        .sku-field:hover .sku-field-icon { color: rgba(0,0,0,0.6); }
+        .sku-field:hover .sku-field-icon { color: rgba(240,237,231,0.7); }
         .sku-field.copied .sku-field-icon { color: rgb(34,197,94); }
       `}</style>
 
