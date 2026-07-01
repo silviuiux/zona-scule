@@ -125,11 +125,17 @@ export async function getProducts({
   // product_listing = one row per family (representative variant); products with
   // no family fall back to themselves, so nothing is hidden. 'exact' because
   // estimated counts are unreliable on a view.
+  //
+  // Image requirement is "has ANY image", not "has a migrated storage image" —
+  // requiring main_image_storage_url specifically hid whole batches (e.g. the
+  // FFGroup import) that only have the original supplier main_image_url and
+  // haven't been through the storage-migration script yet. ProductCard already
+  // falls back to main_image_url when the storage copy is absent.
   let query = supabase
     .from('product_listing_mv')
     .select('*', { count: 'exact' })
     .not('slug', 'is', null)
-    .not('main_image_storage_url', 'is', null)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
     .order('name')
     .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -204,7 +210,7 @@ export async function getAdjacentProducts(
       .from('product_listing_mv')   // family-level: prev/next skips sibling variants
       .select('slug')
       .not('slug', 'is', null)
-      .not('main_image_storage_url', 'is', null)
+      .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
     if (subcategoryText) q = q.eq('subcategory_text', subcategoryText)
     return q
   }
@@ -346,7 +352,7 @@ export async function getTotalProductCount(): Promise<number> {
     .from('product_listing_mv')   // family-level total (one per family)
     .select('*', { count: 'exact', head: true })
     .not('slug', 'is', null)
-    .not('main_image_storage_url', 'is', null)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
   return count ?? 0
 }
 

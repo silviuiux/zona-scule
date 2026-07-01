@@ -433,7 +433,7 @@ export default function Nav() {
           {/* Right links */}
           <div className="nav-links">
             <Link href="/produse" className="nav-catalog-link">Catalog</Link>
-            <Link href="/zona-solutii" className="nav-catalog-link">Zona Soluții</Link>
+            {/* "Zona Soluții" temporarily removed from nav — pages/entries stay live, just unlinked for now */}
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>
         </div>
