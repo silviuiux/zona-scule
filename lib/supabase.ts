@@ -245,13 +245,16 @@ export async function getBrands(): Promise<BrandWithCount[]> {
   ])
   if (error) throw error
 
+  // Lowercase+trim keys — matches the pattern already used for categories/
+  // subcategories, so a brands.name/products.brand_name casing mismatch (e.g.
+  // "Pferd" vs "PFERD") can't silently drop a brand from the sidebar again.
   const countMap: Record<string, number> = {}
   for (const row of (counts as { brand_name: string; cnt: number }[] ?? [])) {
-    if (row.brand_name) countMap[row.brand_name] = row.cnt
+    if (row.brand_name) countMap[row.brand_name.toLowerCase().trim()] = row.cnt
   }
 
   return (brands as Brand[])
-    .map(b => ({ ...b, product_count: countMap[b.name] ?? 0 }))
+    .map(b => ({ ...b, product_count: countMap[b.name.toLowerCase().trim()] ?? 0 }))
     .filter(b => b.product_count > 0)
     .sort((a, b) => b.product_count - a.product_count)
 }
@@ -279,14 +282,15 @@ export async function getBrandsByFilter({
   ])
   if (error || !brands) return []
 
+  // Same lowercase+trim normalization as getBrands() — see comment there.
   const countMap: Record<string, number> = {}
   for (const row of (counts as { brand_name: string; cnt: number }[] ?? [])) {
-    if (row.brand_name) countMap[row.brand_name] = row.cnt
+    if (row.brand_name) countMap[row.brand_name.toLowerCase().trim()] = row.cnt
   }
 
   return (brands as Brand[])
-    .filter(b => (countMap[b.name] ?? 0) > 0)
-    .map(b => ({ ...b, product_count: countMap[b.name] }))
+    .filter(b => (countMap[b.name.toLowerCase().trim()] ?? 0) > 0)
+    .map(b => ({ ...b, product_count: countMap[b.name.toLowerCase().trim()] }))
     .sort((a, b) => b.product_count - a.product_count)
 }
 

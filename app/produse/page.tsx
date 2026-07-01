@@ -218,9 +218,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar {
           width: 280px; flex-shrink: 0;
           padding: 32px 16px 40px 24px;
+          /* Sticky, but NOT height-capped — a fixed height + overflow-y:auto
+             with a hidden scrollbar (see Sidebar.tsx) made a long
+             Categorii+Branduri list look clipped at the viewport edge with no
+             visible way to reach the rest. Letting it grow naturally means
+             it sticks to the top while it fits, then releases and scrolls
+             with the page once the list is taller than the viewport — every
+             brand stays reachable via normal page scroll. */
           position: sticky; top: 52px;
-          height: calc(100vh - 52px);
-          overflow-y: auto;
         }
         .products-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
         .products-header {
@@ -256,6 +261,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             padding-top: 72px;
             background: rgb(244,244,244);
             box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+            /* Unlike desktop, this is a fixed full-height overlay drawer, not
+               part of normal page flow — it needs its own internal scroll to
+               reach everything. */
+            overflow-y: auto;
           }
           .sidebar.open { transform: translateX(0); }
           .sidebar-backdrop {
