@@ -39,21 +39,25 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.5);
         }
-        /* Brand link: name + count are one underlined element, regular weight,
-           no border / no chip background. */
+        /* Brand pill: name + count inside a rounded pill chip. */
         .brand-chip {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 400;
+          font-size: 13px; font-weight: 500;
           color: rgb(0,0,0);
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          text-decoration-thickness: 1px;
-          padding: 0; border: none; background: none;
+          text-decoration: none;
+          padding: 6px 14px;
+          border: 1px solid rgba(0,0,0,0.14);
+          border-radius: 999px;
+          background: rgba(0,0,0,0.03);
           display: inline-flex; align-items: baseline; gap: 5px;
-          transition: color 150ms;
+          transition: color 150ms, border-color 150ms, background-color 150ms;
         }
-        .brand-chip:hover { color: rgb(217, 44, 43); }
-        /* Count rides along inside the same underlined link, slightly smaller */
+        .brand-chip:hover {
+          color: rgb(217, 44, 43);
+          border-color: rgba(217, 44, 43, 0.35);
+          background: rgba(217, 44, 43, 0.06);
+        }
+        /* Count rides along inside the same pill, slightly smaller */
         .brand-chip-count {
           font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 400;

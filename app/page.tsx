@@ -16,12 +16,15 @@ export const revalidate = 3600
 
 
 export default async function HomePage() {
-  const [categories, brands, featuredSubs, totalCount] = await Promise.all([
+  const [categoriesRaw, brands, featuredSubs, totalCount] = await Promise.all([
     getCategoriesWithCount(),
     getBrands(),
     getFeaturedSubcategoriesWithImage(),
     getTotalProductCount(),
   ])
+
+  // Hide the catch-all "Necategorizat" bucket from the homepage categories grid
+  const categories = categoriesRaw.filter(c => c.name.toLowerCase() !== 'necategorizat')
 
   // Enrich subcategories with their parent category name for correct deep-link URLs
   const enrichedSubs = featuredSubs.map(s => ({
@@ -87,9 +90,6 @@ export default async function HomePage() {
           font-size: 18px; color: rgba(0,0,0,0.5);
           line-height: 1.4;
           max-width: 50%;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
@@ -432,7 +432,7 @@ export default async function HomePage() {
       <section className="hero">
         <div className="hero-inner">
           <AnimatedHero brands={brands} />
-          <p className="hero-sub">Lider in furnizarea de scule electrice, industriale si de constructii de peste 26 de ani</p>
+          <p className="hero-sub">Lider in furnizarea de scule electrice<br />industriale si de constructii de peste 26 de ani</p>
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
             <Link href="/produse" className="hero-catalog-cta">CATALOG</Link>

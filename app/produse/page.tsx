@@ -31,7 +31,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
-  const [{ products: rawProducts, total }, categories, brands, allSubs, brandSubs] = await Promise.all([
+  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs] = await Promise.all([
     getProducts({
       page: 1,
       pageSize,
@@ -50,6 +50,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
   ])
 
+  // Hide the catch-all "Necategorizat" bucket from the sidebar category list
+  const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
+
   // Shuffle on "Toate" views (no specific subcategory or search query).
   // Preserves DB order when drilling into a subcategory or searching.
   const products = (sp.subcategorie || sp.q) ? rawProducts : shuffle(rawProducts)
@@ -66,16 +69,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero {
           background: rgb(255, 255, 255);
           padding-top: 52px; /* nav height */
-          min-height: 62vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }
         .cat-hero-inner {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 40px 12px 56px;
+          padding: 56px 12px;
           width: 100%;
         }
 
@@ -235,8 +234,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
-          .cat-hero { min-height: auto; }
-          .cat-hero-inner { padding: 24px 12px 40px; }
+          .cat-hero-inner { padding: 40px 12px; }
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
 
