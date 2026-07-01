@@ -47,7 +47,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           text-decoration: none;
           padding: 6px 14px;
           border: 1px solid rgba(0,0,0,0.14);
-          border-radius: 999px;
+          border-radius: 4px;
           background: rgba(0,0,0,0.03);
           display: inline-flex; align-items: baseline; gap: 5px;
           transition: color 150ms, border-color 150ms, background-color 150ms;

@@ -74,7 +74,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-inner {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 56px 12px;
+          padding: 112px 12px 56px;
           width: 100%;
         }
 
@@ -95,7 +95,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           color: rgba(0,0,0,0.45);
           text-decoration: none;
           border: 1px solid rgba(0,0,0,0.18);
-          border-radius: 999px;
+          border-radius: 4px;
           padding: 5px 14px;
           transition: color 150ms, border-color 150ms;
           white-space: nowrap;
@@ -234,7 +234,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
-          .cat-hero-inner { padding: 40px 12px; }
+          .cat-hero-inner { padding: 80px 12px 40px; }
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
 
