@@ -21,7 +21,6 @@ export type EnrichmentRow = {
   has_app1: number
   has_app2: number
   has_app3: number
-  enriched_count: number
 }
 
 export default async function AdminStatusPage() {

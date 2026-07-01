@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react'
 import { logoutAction } from '@/lib/auth-actions'
 import type { EnrichmentRow } from './page'
 
-type SortKey = 'brand_name' | 'category_text' | 'total' | 'has_desc' | 'detailed' | 'enriched_count'
+type SortKey = 'brand_name' | 'category_text' | 'total' | 'has_desc' | 'detailed'
 type SortDir = 'asc' | 'desc'
 
 // Row shape after folding st1-3 + app1-3 into one "detailed description" metric.
@@ -55,7 +55,6 @@ export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] 
       has_desc: sum('has_desc'),
       detailed_count: sum('detailed_count'),
       detailed_total: sum('detailed_total'),
-      enriched_count: sum('enriched_count'),
     }
   }, [rows])
 
@@ -228,10 +227,6 @@ export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] 
             <span className="ov-label">Descriere detaliata (ST1-3 + App1-3)</span>
             <span className="ov-value">{pctOf(overall.detailed_count, overall.detailed_total)}%</span>
           </div>
-          <div className="ov-item">
-            <span className="ov-label">Enriched (flag)</span>
-            <span className="ov-value">{pctOf(overall.enriched_count, overall.total)}%</span>
-          </div>
         </div>
 
         {/* Brand filter chips */}
@@ -270,7 +265,6 @@ export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] 
                 <th className={sortKey === 'total' ? 'sorted' : ''} onClick={() => toggleSort('total')}>Produse{sortIndicator('total')}</th>
                 <th className={sortKey === 'has_desc' ? 'sorted' : ''} onClick={() => toggleSort('has_desc')}>Descriere{sortIndicator('has_desc')}</th>
                 <th className={sortKey === 'detailed' ? 'sorted' : ''} onClick={() => toggleSort('detailed')}>Descriere detaliata{sortIndicator('detailed')}</th>
-                <th className={sortKey === 'enriched_count' ? 'sorted' : ''} onClick={() => toggleSort('enriched_count')}>Enriched{sortIndicator('enriched_count')}</th>
               </tr>
             </thead>
             <tbody>
@@ -281,7 +275,6 @@ export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] 
                   <td className="count-mono">{r.total.toLocaleString('ro')}</td>
                   <td><PctCell count={r.has_desc} total={r.total} /></td>
                   <td><PctCell count={r.detailed_count} total={r.detailed_total} /></td>
-                  <td><PctCell count={r.enriched_count} total={r.total} /></td>
                 </tr>
               ))}
             </tbody>
