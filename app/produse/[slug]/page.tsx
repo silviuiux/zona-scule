@@ -1,4 +1,5 @@
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 import { getProductBySlug, getAdjacentProducts, getProductVariants } from '@/lib/supabase'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -198,7 +199,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
 
         /* ── CTA BANNER ── */
-        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 0 12px 72px; }
+        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 72px 12px; }
         .cta-banner-inner {
           background: rgb(30,30,30); border-radius: 4px;
           padding: 32px 40px;
@@ -233,33 +234,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           transition: border-color 150ms;
         }
         .cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
-
-        /* ── FOOTER ── */
-        .footer { background: rgb(244,244,244); border-top: 1px solid rgba(0,0,0,0.08); }
-        .footer-social {
-          padding: 18px 12px; max-width: 1440px; margin: 0 auto;
-          display: flex; gap: 48px; justify-content: center;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
-        }
-        .footer-social a { font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(0,0,0,0.4); text-decoration: none; }
-        .footer-social a:hover { color: rgb(0,0,0); }
-        .footer-grid {
-          max-width: 1440px; margin: 0 auto; padding: 48px 12px;
-          display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px;
-        }
-        .footer-col-title {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(0,0,0); margin-bottom: 14px;
-        }
-        .footer-link { font-family: 'Recursive', sans-serif; font-size: 13px; color: rgba(0,0,0,0.45); text-decoration: none; display: block; margin-bottom: 8px; }
-        .footer-link:hover { color: rgb(0,0,0); }
-        .footer-bottom {
-          border-top: 1px solid rgba(0,0,0,0.08); padding: 14px 12px;
-          max-width: 1440px; margin: 0 auto;
-          display: flex; justify-content: space-between; align-items: center;
-        }
-        .footer-bottom span, .footer-bottom a { font-family: 'Recursive', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); text-decoration: none; }
-        .footer-bottom a { color: rgb(217,44,43); }
 
         /* ══ SCROLL ANIMATIONS ══════════════════════════════════════ */
 
@@ -326,8 +300,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           }
           .cta-banner-btns { flex-direction: column; width: 100%; }
           .cta-primary, .cta-secondary { text-align: center; justify-content: center; }
-          .footer-grid { grid-template-columns: 1fr !important; gap: 24px; padding: 28px 16px; }
-          .footer-bottom { flex-direction: column; gap: 6px; }
         }
       `}</style>
 
@@ -466,38 +438,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <p className="cta-banner-title">{product.brand_name} {product.sku ?? product.slug}</p>
             </div>
             <div className="cta-banner-btns">
-              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cta-primary">CERE OFERTA PERSONALIZATA ↗</Link>
-              <a href="tel:0248222298" className="cta-secondary">📞 SAU SUNA LA 0248 222 298</a>
+              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cta-primary">CERE OFERTA PERSONALIZATA</Link>
+              <a href="tel:0248222298" className="cta-secondary">SUNA LA 0248.222.298</a>
             </div>
           </div>
         </div>
 
-        {/* ── FOOTER ── */}
-        <footer className="footer">
-          <div className="footer-social">
-            {['Facebook', 'Instagram', 'YouTube', 'Email', 'Telefon'].map(s => <a key={s} href="#">{s}</a>)}
-          </div>
-          <div className="footer-grid">
-            <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: '13px', color: 'rgba(0,0,0,0.5)', lineHeight: 1.7, maxWidth: '300px' }}>
-              Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
-            </p>
-            <div>
-              <p className="footer-col-title">INFORMATII</p>
-              {['Termene si conditii','Politica de retur','Achizitii S.E.A.P.','ANPC SAL'].map(l => <a key={l} href="#" className="footer-link">{l}</a>)}
-            </div>
-            <div>
-              <p className="footer-col-title">CONTACT</p>
-              <p className="footer-link">0248.222.298</p>
-              <p className="footer-link">contact@zonascule.ro</p>
-              <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <span>ZONA SCULE : Technology Promotion SRL</span>
-            <a href="https://x.com/silviux">silviuX</a>
-            <span>2026</span>
-          </div>
-        </footer>
+        <Footer />
 
       </div>
     </>
