@@ -1,17 +1,19 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { Fragment, useState, useMemo } from 'react'
 import { logoutAction } from '@/lib/auth-actions'
 import type { EnrichmentRow } from './page'
 
-type SortKey =
-  | 'brand_name' | 'category_text' | 'subcategory_text' | 'total'
-  | 'has_desc' | 'has_st1' | 'has_st2' | 'has_st3'
-  | 'has_app1' | 'has_app2' | 'has_app3' | 'enriched_count'
-
+type SortKey = 'category_text' | 'subcategory_text' | 'total' | 'has_desc' | 'detailed' | 'enriched_count'
 type SortDir = 'asc' | 'desc'
+
+// Row shape after folding st1-3 + app1-3 into one "detailed description" metric.
+type Row = EnrichmentRow & { detailed_count: number; detailed_total: number }
 
 // Completion-rate color buckets — green means "largely mapped", red means
 // "mostly missing", so a glance at the table surfaces the worst gaps.
+function pctOf(count: number, total: number): number {
+  return total > 0 ? Math.round((count / total) * 100) : 0
+}
 function pctClass(pct: number): string {
   if (pct >= 80) return 'pct-good'
   if (pct >= 40) return 'pct-mid'
@@ -19,7 +21,7 @@ function pctClass(pct: number): string {
 }
 
 function PctCell({ count, total }: { count: number; total: number }) {
-  const pct = total > 0 ? Math.round((count / total) * 100) : 0
+  const pct = pctOf(count, total)
   return (
     <span className={`pct-badge ${pctClass(pct)}`}>
       <span className="pct-num">{pct}%</span>
@@ -28,29 +30,33 @@ function PctCell({ count, total }: { count: number; total: number }) {
   )
 }
 
-export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
+export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] }) {
+  const rows: Row[] = useMemo(() => rawRows.map(r => ({
+    ...r,
+    detailed_count: r.has_st1 + r.has_st2 + r.has_st3 + r.has_app1 + r.has_app2 + r.has_app3,
+    detailed_total: r.total * 6,
+  })), [rawRows])
+
   const [brandFilter, setBrandFilter] = useState('all')
   const [search, setSearch] = useState('')
-  const [sortKey, setSortKey] = useState<SortKey>('total')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [sortKey, setSortKey] = useState<SortKey>('category_text')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
 
-  const brandTotals = useMemo(() => {
-    const m: Record<string, number> = {}
-    rows.forEach(r => { m[r.brand_name] = (m[r.brand_name] ?? 0) + r.total })
-    return m
+  // Brand order: same "biggest catalog first" order used by the filter chips,
+  // so the grouped table and the chip list read the same way top to bottom.
+  const brandOrder = useMemo(() => {
+    const totals: Record<string, number> = {}
+    rows.forEach(r => { totals[r.brand_name] = (totals[r.brand_name] ?? 0) + r.total })
+    return Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([b]) => b)
   }, [rows])
 
   const overall = useMemo(() => {
-    const sum = (k: keyof EnrichmentRow) => rows.reduce((acc, r) => acc + (r[k] as number), 0)
+    const sum = (k: keyof Row) => rows.reduce((acc, r) => acc + (r[k] as number), 0)
     return {
       total: sum('total'),
       has_desc: sum('has_desc'),
-      has_st1: sum('has_st1'),
-      has_st2: sum('has_st2'),
-      has_st3: sum('has_st3'),
-      has_app1: sum('has_app1'),
-      has_app2: sum('has_app2'),
-      has_app3: sum('has_app3'),
+      detailed_count: sum('detailed_count'),
+      detailed_total: sum('detailed_total'),
       enriched_count: sum('enriched_count'),
     }
   }, [rows])
@@ -67,34 +73,47 @@ export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
     })
   }, [rows, brandFilter, search])
 
-  const sorted = useMemo(() => {
-    const copy = [...filtered]
-    copy.sort((a, b) => {
-      const av = a[sortKey]
-      const bv = b[sortKey]
-      let cmp: number
-      if (typeof av === 'string' && typeof bv === 'string') {
-        cmp = av.localeCompare(bv)
-      } else {
-        cmp = (av as number) - (bv as number)
-      }
-      return sortDir === 'asc' ? cmp : -cmp
+  // Grouped by brand (in brandOrder), rows within each group sorted by the
+  // active column — brand itself is a section header now, not a sortable column.
+  const groups = useMemo(() => {
+    const byBrand = new Map<string, Row[]>()
+    filtered.forEach(r => {
+      const list = byBrand.get(r.brand_name) ?? []
+      list.push(r)
+      byBrand.set(r.brand_name, list)
     })
-    return copy
-  }, [filtered, sortKey, sortDir])
+    const sortRows = (list: Row[]) => {
+      const copy = [...list]
+      copy.sort((a, b) => {
+        let cmp: number
+        if (sortKey === 'category_text' || sortKey === 'subcategory_text') {
+          cmp = a[sortKey].localeCompare(b[sortKey])
+        } else if (sortKey === 'detailed') {
+          cmp = pctOf(a.detailed_count, a.detailed_total) - pctOf(b.detailed_count, b.detailed_total)
+        } else {
+          cmp = (a[sortKey] as number) - (b[sortKey] as number)
+        }
+        return sortDir === 'asc' ? cmp : -cmp
+      })
+      return copy
+    }
+    return brandOrder
+      .filter(b => byBrand.has(b))
+      .map(brand => ({ brand, rows: sortRows(byBrand.get(brand)!) }))
+  }, [filtered, brandOrder, sortKey, sortDir])
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
       setSortDir(prev => prev === 'asc' ? 'desc' : 'asc')
     } else {
       setSortKey(key)
-      // Text columns default to A→Z, numeric/completion columns default to
-      // lowest-first — that's the direction that surfaces gaps immediately.
-      setSortDir(['brand_name', 'category_text', 'subcategory_text'].includes(key) ? 'asc' : 'asc')
+      setSortDir(['category_text', 'subcategory_text'].includes(key) ? 'asc' : 'asc')
     }
   }
 
   const sortIndicator = (key: SortKey) => sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''
+
+  const totalRowCount = filtered.length
 
   return (
     <>
@@ -165,21 +184,46 @@ export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
         .search-input::placeholder { color: rgba(255,255,255,0.25); }
 
         .table-wrap { overflow-x: auto; padding: 0 24px 80px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1360px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
         thead th {
           text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3);
           border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap;
           cursor: pointer; user-select: none; transition: color 150ms;
+          position: sticky; top: 56px; background: #0f0f11; z-index: 10;
         }
         thead th:hover { color: rgba(255,255,255,0.6); }
         thead th.sorted { color: rgb(217,44,43); }
-        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 100ms; }
-        tbody tr:hover { background: rgba(255,255,255,0.02); }
+        tbody tr.data-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 100ms; }
+        tbody tr.data-row:hover { background: rgba(255,255,255,0.02); }
         td { padding: 9px 12px; vertical-align: middle; }
 
-        .brand-cell { font-weight: 600; color: #e8e6e3; }
-        .cat-cell { color: rgba(255,255,255,0.6); }
+        /* Brand group header — a full-width row that separates one brand's
+           categories/subcategories from the next, so the hierarchy reads
+           brand → its rows → next brand, instead of repeating the brand on
+           every line. */
+        tr.brand-row td {
+          padding: 14px 12px 8px;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        tr.brand-row:not(:first-child) td { padding-top: 28px; }
+        .brand-head {
+          display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+        }
+        .brand-name {
+          font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px;
+          letter-spacing: -0.01em; color: #fff;
+        }
+        .brand-count {
+          font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.35);
+        }
+        .brand-mini-pcts { display: flex; gap: 12px; margin-left: auto; }
+        .brand-mini { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.35); }
+        .brand-mini b.pct-good { color: rgb(34,197,94); }
+        .brand-mini b.pct-mid { color: rgb(234,179,8); }
+        .brand-mini b.pct-bad { color: rgb(217,44,43); }
+
+        .cat-cell { color: rgba(255,255,255,0.75); padding-left: 24px !important; }
         .subcat-cell { color: rgba(255,255,255,0.45); }
         .count-mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.6); }
 
@@ -219,25 +263,17 @@ export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
           </div>
           <div className="ov-item">
             <span className="ov-label">Descriere</span>
-            <span className={`ov-value ${pctClass(Math.round(overall.has_desc / overall.total * 100)) === 'pct-good' ? 'good' : pctClass(Math.round(overall.has_desc / overall.total * 100)) === 'pct-mid' ? 'mid' : 'bad'}`}>
-              {overall.total > 0 ? Math.round(overall.has_desc / overall.total * 100) : 0}%
+            <span className={`ov-value ${pctClass(pctOf(overall.has_desc, overall.total)) === 'pct-good' ? 'good' : pctClass(pctOf(overall.has_desc, overall.total)) === 'pct-mid' ? 'mid' : 'bad'}`}>
+              {pctOf(overall.has_desc, overall.total)}%
             </span>
           </div>
           <div className="ov-item">
-            <span className="ov-label">Specificatii (ST1-3)</span>
-            <span className="ov-value">
-              {overall.total > 0 ? Math.round((overall.has_st1 + overall.has_st2 + overall.has_st3) / (overall.total * 3) * 100) : 0}%
-            </span>
-          </div>
-          <div className="ov-item">
-            <span className="ov-label">Aplicatii (1-3)</span>
-            <span className="ov-value">
-              {overall.total > 0 ? Math.round((overall.has_app1 + overall.has_app2 + overall.has_app3) / (overall.total * 3) * 100) : 0}%
-            </span>
+            <span className="ov-label">Descriere detaliata (ST1-3 + App1-3)</span>
+            <span className="ov-value">{pctOf(overall.detailed_count, overall.detailed_total)}%</span>
           </div>
           <div className="ov-item">
             <span className="ov-label">Enriched (flag)</span>
-            <span className="ov-value">{overall.total > 0 ? Math.round(overall.enriched_count / overall.total * 100) : 0}%</span>
+            <span className="ov-value">{pctOf(overall.enriched_count, overall.total)}%</span>
           </div>
         </div>
 
@@ -245,18 +281,21 @@ export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
         <div className="stats-bar">
           <div className={`stat-chip${brandFilter === 'all' ? ' active' : ''}`} onClick={() => setBrandFilter('all')}>
             Toate brandurile
-            <span className="stat-chip-count">{rows.reduce((a, r) => a + r.total, 0).toLocaleString('ro')}</span>
+            <span className="stat-chip-count">{overall.total.toLocaleString('ro')}</span>
           </div>
-          {Object.entries(brandTotals).sort((a, b) => b[1] - a[1]).map(([brand, cnt]) => (
-            <div
-              key={brand}
-              className={`stat-chip${brandFilter === brand ? ' active' : ''}`}
-              onClick={() => setBrandFilter(prev => prev === brand ? 'all' : brand)}
-            >
-              {brand}
-              <span className="stat-chip-count">{cnt.toLocaleString('ro')}</span>
-            </div>
-          ))}
+          {brandOrder.map(brand => {
+            const cnt = rows.filter(r => r.brand_name === brand).reduce((a, r) => a + r.total, 0)
+            return (
+              <div
+                key={brand}
+                className={`stat-chip${brandFilter === brand ? ' active' : ''}`}
+                onClick={() => setBrandFilter(prev => prev === brand ? 'all' : brand)}
+              >
+                {brand}
+                <span className="stat-chip-count">{cnt.toLocaleString('ro')}</span>
+              </div>
+            )
+          })}
         </div>
 
         <div className="toolbar">
@@ -272,43 +311,55 @@ export default function StatusClient({ rows }: { rows: EnrichmentRow[] }) {
           <table>
             <thead>
               <tr>
-                <th className={sortKey === 'brand_name' ? 'sorted' : ''} onClick={() => toggleSort('brand_name')}>Brand{sortIndicator('brand_name')}</th>
                 <th className={sortKey === 'category_text' ? 'sorted' : ''} onClick={() => toggleSort('category_text')}>Categorie{sortIndicator('category_text')}</th>
                 <th className={sortKey === 'subcategory_text' ? 'sorted' : ''} onClick={() => toggleSort('subcategory_text')}>Subcategorie{sortIndicator('subcategory_text')}</th>
                 <th className={sortKey === 'total' ? 'sorted' : ''} onClick={() => toggleSort('total')}>Produse{sortIndicator('total')}</th>
                 <th className={sortKey === 'has_desc' ? 'sorted' : ''} onClick={() => toggleSort('has_desc')}>Descriere{sortIndicator('has_desc')}</th>
-                <th className={sortKey === 'has_st1' ? 'sorted' : ''} onClick={() => toggleSort('has_st1')}>ST1{sortIndicator('has_st1')}</th>
-                <th className={sortKey === 'has_st2' ? 'sorted' : ''} onClick={() => toggleSort('has_st2')}>ST2{sortIndicator('has_st2')}</th>
-                <th className={sortKey === 'has_st3' ? 'sorted' : ''} onClick={() => toggleSort('has_st3')}>ST3{sortIndicator('has_st3')}</th>
-                <th className={sortKey === 'has_app1' ? 'sorted' : ''} onClick={() => toggleSort('has_app1')}>App1{sortIndicator('has_app1')}</th>
-                <th className={sortKey === 'has_app2' ? 'sorted' : ''} onClick={() => toggleSort('has_app2')}>App2{sortIndicator('has_app2')}</th>
-                <th className={sortKey === 'has_app3' ? 'sorted' : ''} onClick={() => toggleSort('has_app3')}>App3{sortIndicator('has_app3')}</th>
+                <th className={sortKey === 'detailed' ? 'sorted' : ''} onClick={() => toggleSort('detailed')}>Descriere detaliata{sortIndicator('detailed')}</th>
                 <th className={sortKey === 'enriched_count' ? 'sorted' : ''} onClick={() => toggleSort('enriched_count')}>Enriched{sortIndicator('enriched_count')}</th>
               </tr>
             </thead>
             <tbody>
-              {sorted.map((r, i) => (
-                <tr key={`${r.brand_name}-${r.category_text}-${r.subcategory_text}-${i}`}>
-                  <td className="brand-cell">{r.brand_name}</td>
-                  <td className="cat-cell">{r.category_text}</td>
-                  <td className="subcat-cell">{r.subcategory_text}</td>
-                  <td className="count-mono">{r.total.toLocaleString('ro')}</td>
-                  <td><PctCell count={r.has_desc} total={r.total} /></td>
-                  <td><PctCell count={r.has_st1} total={r.total} /></td>
-                  <td><PctCell count={r.has_st2} total={r.total} /></td>
-                  <td><PctCell count={r.has_st3} total={r.total} /></td>
-                  <td><PctCell count={r.has_app1} total={r.total} /></td>
-                  <td><PctCell count={r.has_app2} total={r.total} /></td>
-                  <td><PctCell count={r.has_app3} total={r.total} /></td>
-                  <td><PctCell count={r.enriched_count} total={r.total} /></td>
-                </tr>
-              ))}
+              {groups.map(({ brand, rows: brandRows }) => {
+                const bTotal = brandRows.reduce((a, r) => a + r.total, 0)
+                const bDesc = brandRows.reduce((a, r) => a + r.has_desc, 0)
+                const bDetC = brandRows.reduce((a, r) => a + r.detailed_count, 0)
+                const bDetT = brandRows.reduce((a, r) => a + r.detailed_total, 0)
+                const bEnr = brandRows.reduce((a, r) => a + r.enriched_count, 0)
+                return (
+                  <Fragment key={brand}>
+                    <tr className="brand-row">
+                      <td colSpan={6}>
+                        <div className="brand-head">
+                          <span className="brand-name">{brand}</span>
+                          <span className="brand-count">{bTotal.toLocaleString('ro')} produse · {brandRows.length} categorii/subcategorii</span>
+                          <div className="brand-mini-pcts">
+                            <span className="brand-mini">Descriere <b className={pctClass(pctOf(bDesc, bTotal))}>{pctOf(bDesc, bTotal)}%</b></span>
+                            <span className="brand-mini">Detaliata <b className={pctClass(pctOf(bDetC, bDetT))}>{pctOf(bDetC, bDetT)}%</b></span>
+                            <span className="brand-mini">Enriched <b className={pctClass(pctOf(bEnr, bTotal))}>{pctOf(bEnr, bTotal)}%</b></span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    {brandRows.map((r, i) => (
+                      <tr className="data-row" key={`${brand}-${r.category_text}-${r.subcategory_text}-${i}`}>
+                        <td className="cat-cell">{r.category_text}</td>
+                        <td className="subcat-cell">{r.subcategory_text}</td>
+                        <td className="count-mono">{r.total.toLocaleString('ro')}</td>
+                        <td><PctCell count={r.has_desc} total={r.total} /></td>
+                        <td><PctCell count={r.detailed_count} total={r.detailed_total} /></td>
+                        <td><PctCell count={r.enriched_count} total={r.total} /></td>
+                      </tr>
+                    ))}
+                  </Fragment>
+                )
+              })}
             </tbody>
           </table>
         </div>
 
         <div className="table-footer">
-          <span>Afișând <strong>{sorted.length}</strong> din <strong>{rows.length}</strong> combinații brand/categorie/subcategorie</span>
+          <span>Afișând <strong>{totalRowCount}</strong> din <strong>{rows.length}</strong> combinații categorie/subcategorie, în <strong>{groups.length}</strong> branduri</span>
           <span>{overall.total.toLocaleString('ro')} produse în total</span>
         </div>
       </div>
