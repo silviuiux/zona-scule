@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
 import HeroImage from './HeroImage'
-import EditableBreadcrumb from './EditableBreadcrumb'
 import ProductNavArrows from './ProductNavArrows'
 import SkuCopyField from './SkuCopyField'
 import ScrollAnimations from './ScrollAnimations'
@@ -103,6 +102,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           white-space: nowrap;
         }
         .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
+        .bc-sep { color: rgba(0,0,0,0.2); font-size: 12px; }
 
         .pdp-brand {
           font-family: 'Recursive', sans-serif;
@@ -342,12 +342,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             {/* LEFT — staggered reveals on each text block */}
             <div>
-              <div className="reveal" style={{ transitionDelay: '0ms' }}>
-                <EditableBreadcrumb
-                  productId={product.id}
-                  categoryText={product.category_text}
-                  subcategoryText={product.subcategory_text}
-                />
+              {/* Static breadcrumb — category/subcategory editing was removed
+                  from the PDP; reassignment now only happens from /admin. */}
+              <div className="bc-row reveal" style={{ transitionDelay: '0ms' }}>
+                {breadcrumbs.map((b, i) => (
+                  <span key={b.href + b.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {i > 0 && <span className="bc-sep">/</span>}
+                    <Link href={b.href} className="bc-pill">{b.label}</Link>
+                  </span>
+                ))}
               </div>
               <Link
                 href={`/produse?brand=${encodeURIComponent(product.brand_name ?? '')}`}

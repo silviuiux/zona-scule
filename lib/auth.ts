@@ -1,6 +1,6 @@
 // Minimal, dependency-free admin session: a signed cookie, checked in
-// proxy.ts before /admin/* or /api/update-product-category are ever
-// reached by route code. No third-party auth provider — per REBUILD.md §3.6,
+// proxy.ts before /admin/* is ever reached by route code. No third-party
+// auth provider — per REBUILD.md §3.6,
 // "even basic" real auth is the bar, and ADMIN_USER/ADMIN_PASS were the
 // suggested env vars.
 //
@@ -86,9 +86,9 @@ export const ADMIN_SESSION_COOKIE_OPTIONS = {
  * Authoritative check for Server Components and route handlers — reads
  * `next/headers` cookies() directly (Node runtime, not Edge), so this can
  * do the full signature+expiry verification rather than the "thin proxy"
- * presence check in proxy.ts. Called in app/admin/page.tsx, the admin server
- * actions, and app/api/update-product-category/route.ts — proxy.ts alone is
- * UX, not the security boundary (the CVE-2025-29927 lesson: never trust Edge
+ * presence check in proxy.ts. Called in app/admin/page.tsx and the admin
+ * server actions — proxy.ts alone is UX, not the security boundary (the
+ * CVE-2025-29927 lesson: never trust Edge
  * middleware/proxy as the only gate).
  */
 export async function hasValidAdminSession(): Promise<boolean> {
