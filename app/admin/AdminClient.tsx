@@ -429,6 +429,7 @@ export default function AdminClient({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span className="admin-badge">Category Audit</span>
+            <a href="/admin/status" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Status produse</a>
             <form action={logoutAction} style={{ margin: 0 }}>
               <button type="submit" className="btn btn-ghost">Ieșire</button>
             </form>
