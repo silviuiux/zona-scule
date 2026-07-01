@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -31,7 +31,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
-  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs] = await Promise.all([
+  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, rawTotal] = await Promise.all([
     getProducts({
       page: 1,
       pageSize,
@@ -48,6 +48,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     }),
     !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
     sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
+    getRawProductCount(),
   ])
 
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
@@ -60,6 +61,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const activeCategory = sp.categorie
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
     : null
+
+  // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
+  // show the site-wide raw total (same number as /admin/status and the
+  // homepage) instead of the family-deduped, image-filtered listing count.
+  // Any actual filter still shows its own accurately-scoped count.
+  const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
+  const heroTotal = isTrulyUnfiltered ? rawTotal : total
 
   return (
     <>
@@ -363,7 +371,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           {/* Stats */}
           <div className="cat-hero-stats">
             <div className="cat-hero-stat">
-              <span className="cat-hero-stat-num">{total.toLocaleString('ro')}</span>
+              <span className="cat-hero-stat-num">{heroTotal.toLocaleString('ro')}</span>
               <span className="cat-hero-stat-label">Produse</span>
             </div>
             {brands.length > 0 && (
@@ -389,6 +397,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             activeCat={sp.categorie}
             activeSub={sp.subcategorie}
             activeBrand={sp.brand}
+            totalCount={rawTotal}
           />
 
           <main className="products-main">
@@ -414,7 +423,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             ) : !isFiltered ? (
               <SubcategoryBar
                 activeSub={sp.subcategorie}
-                total={total}
+                total={heroTotal}
                 prefetchedSubs={allSubs}
               />
             ) : null}

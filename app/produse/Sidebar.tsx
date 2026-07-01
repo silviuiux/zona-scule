@@ -28,15 +28,20 @@ export default function Sidebar({
   brands,
   activeCat,
   activeBrand,
+  totalCount,
 }: {
   categories: CategoryWithCount[]
   brands: BrandWithCount[]
   activeCat?: string
   activeSub?: string  // kept for API compatibility; subcategories now show in pill bar
   activeBrand?: string
+  /** Site-wide raw product count (same number shown everywhere else) — passed
+   * in rather than summed from `categories` here, since that sum silently
+   * misses the "Necategorizat" bucket (filtered out of this list) and any
+   * category_text values with no matching row in the categories table. */
+  totalCount: number
 }) {
   const allActive = !activeCat && !activeBrand
-  const totalCount = categories.reduce((sum, c) => sum + (c.product_count ?? 0), 0)
 
   return (
     <>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getTotalProductCount } from '@/lib/supabase'
+import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryGrid from '@/components/CategoryGrid'
@@ -20,7 +20,7 @@ export default async function HomePage() {
     getCategoriesWithCount(),
     getBrands(),
     getFeaturedSubcategoriesWithImage(),
-    getTotalProductCount(),
+    getRawProductCount(),
   ])
 
   // Hide the catch-all "Necategorizat" bucket from the homepage categories grid

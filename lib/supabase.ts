@@ -347,12 +347,22 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
     .sort((a, b) => b.product_count - a.product_count)
 }
 
-export async function getTotalProductCount(): Promise<number> {
+/**
+ * Site-wide "total produse" figure shown in the homepage hero, the /produse
+ * hero + "Toate" pill, and the sidebar — a single raw row count from
+ * `products` (every SKU/variant), matching what /admin/status shows.
+ *
+ * Deliberately NOT the family-deduped, image-filtered count that
+ * `product_listing_mv` gives (that's a *smaller*, "browsable cards" number —
+ * fewer than this because variants collapse into one family and rows without
+ * an image are excluded). Product decision: always show the biggest true
+ * number, consistently, everywhere — not a number that depends on which
+ * page happens to query which table.
+ */
+export async function getRawProductCount(): Promise<number> {
   const { count } = await supabase
-    .from('product_listing_mv')   // family-level total (one per family)
+    .from('products')
     .select('*', { count: 'exact', head: true })
-    .not('slug', 'is', null)
-    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
   return count ?? 0
 }
 
