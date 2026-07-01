@@ -17,8 +17,11 @@ export default function ContactPage({
           background: rgb(244,244,244);
         }
         .contact-inner {
+          /* Same max-width + 12px side padding as the nav's own container
+             (Nav.tsx .nav-inner) — was 102px, way more inset than the nav,
+             which is why this page read as noticeably narrower. */
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 102px 96px;
+          padding: 80px 12px 96px;
         }
 
         /* ── Header ── */
@@ -98,9 +101,6 @@ export default function ContactPage({
           display: block;
         }
 
-        @media (max-width: 1100px) {
-          .contact-inner { padding: 64px 40px 80px; }
-        }
         @media (max-width: 768px) {
           .contact-inner { padding: 48px 16px 64px; }
           .contact-info-bar { grid-template-columns: 1fr; }

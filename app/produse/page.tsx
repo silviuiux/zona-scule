@@ -212,12 +212,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
 
         /* ─── Sidebar + grid layout ─── */
+        /* Same max-width + 12px side padding as the nav's own container (see
+           Nav.tsx .nav-inner) — sidebar/grid edges now line up exactly with
+           the logo/contact button above. The gap between sidebar and grid
+           comes from the flex gap below, not from asymmetric padding on each child
+           (that's what was pushing the sidebar/grid inward past the 12px
+           mark and making this container read as narrower than the nav). */
         .catalog-layout {
-          display: flex; max-width: 1440px; margin: 0 auto; padding: 0 12px;
+          display: flex; max-width: 1440px; margin: 0 auto; padding: 0 12px; gap: 32px;
         }
         .sidebar {
           width: 280px; flex-shrink: 0;
-          padding: 32px 16px 40px 24px;
+          padding: 32px 0 40px;
           /* Sticky, but NOT height-capped — a fixed height + overflow-y:auto
              with a hidden scrollbar (see Sidebar.tsx) made a long
              Categorii+Branduri list look clipped at the viewport edge with no
@@ -227,7 +233,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
              brand stays reachable via normal page scroll. */
           position: sticky; top: 52px;
         }
-        .products-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
+        .products-main { flex: 1; padding: 32px 0 80px; min-width: 0; }
         .products-header {
           margin-bottom: 24px;
           display: flex; align-items: center; gap: 16px;
@@ -258,7 +264,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             transform: translateX(-100%);
             transition: transform 300ms ease;
             height: 100vh;
-            padding-top: 72px;
+            /* Overlay drawer, not part of the flex layout above — needs its
+               own explicit horizontal padding (desktop's is 0, meant to line
+               up with the flex gap on .catalog-layout instead). */
+            padding: 72px 16px 40px 24px;
             background: rgb(244,244,244);
             box-shadow: 4px 0 24px rgba(0,0,0,0.12);
             /* Unlike desktop, this is a fixed full-height overlay drawer, not

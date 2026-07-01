@@ -31,8 +31,9 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }
         .zs-hero-inner {
+          /* Same max-width + 12px side padding as the nav's own container. */
           max-width: 1440px; margin: 0 auto;
-          padding: 40px 24px 56px; width: 100%;
+          padding: 40px 12px 56px; width: 100%;
         }
 
         /* Breadcrumb */
@@ -81,7 +82,7 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         .zs-body {
           background: rgb(244,244,244); min-height: 60vh;
         }
-        .zs-body-inner { max-width: 1440px; margin: 0 auto; padding: 40px 24px 80px; }
+        .zs-body-inner { max-width: 1440px; margin: 0 auto; padding: 40px 12px 80px; }
 
         /* Profession filter pills */
         .zs-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
