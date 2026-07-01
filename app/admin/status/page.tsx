@@ -13,7 +13,6 @@ export const dynamic = 'force-dynamic'
 export type EnrichmentRow = {
   brand_name: string
   category_text: string
-  subcategory_text: string
   total: number
   has_desc: number
   has_st1: number
