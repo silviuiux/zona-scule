@@ -140,6 +140,16 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
             align-items: flex-start;
             gap: 0;
           }
+          /* The clamp() floor (52px) never actually kicks in below its vw
+             value on phone-width screens, so the title rendered at its
+             biggest, most awkward size right where space is tightest.
+             Fixed, smaller size for mobile instead. */
+          .hero-word-toate,
+          .hero-animated-word,
+          .hero-line2 {
+            font-size: 36px;
+          }
+          .hero-word-clip { height: 36px; }
         }
       `}</style>
 

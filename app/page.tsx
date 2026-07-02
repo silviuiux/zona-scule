@@ -91,6 +91,11 @@ export default async function HomePage() {
           line-height: 1.4;
           max-width: 50%;
         }
+        @media (max-width: 768px) {
+          /* Full width instead of the desktop 50% cap — lets the subtitle
+             wrap onto ~2 lines instead of 5 in the narrow mobile column. */
+          .hero-sub { max-width: 100%; }
+        }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
           width: 50%;
@@ -372,7 +377,10 @@ export default async function HomePage() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          .hero { min-height: 75vh; padding-top: 48px; padding-bottom: 48px; }
+          /* Nav is fixed at 52px tall — padding-top must clear it before
+             adding the actual breathing room, or content sits flush/under
+             the nav (was 48px total, less than the nav's own height). */
+          .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 32px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
