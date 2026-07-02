@@ -72,7 +72,18 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.brand_name && (
             <p className="pcard-brand">{product.brand_name}</p>
           )}
-          <p className="pcard-model">{product.model ?? product.short_description ?? product.name}</p>
+          {/* `model` is only useful as a subtitle when it actually carries
+              info beyond the SKU — for Milwaukee (and Yato/Vorel/Toya/Fala/
+              Sthor, plus some Benman/FFGroup rows) it's literally a mirror
+              of `sku` with zero descriptive value, so those cards fall
+              through to short_description instead. Brands like PFERD/Ruko/
+              Karcher have a genuinely distinct model code and keep showing
+              it as before. */}
+          <p className="pcard-model">
+            {product.model && product.model !== product.sku
+              ? product.model
+              : product.short_description ?? product.name}
+          </p>
 
           {(specs.length > 0 || altSpec) && (
             <div className="pcard-specs-wrap">
