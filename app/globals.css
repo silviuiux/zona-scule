@@ -23,8 +23,15 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Lenis drives smooth scrolling in JS; native scroll-behavior must stay auto to
-   avoid conflicting with it. The reduced-motion fallback restores smooth anchors. */
-html { scroll-behavior: auto; overflow-x: hidden; }
+   avoid conflicting with it. The reduced-motion fallback restores smooth anchors.
+   overflow-x uses "clip" rather than "hidden" — setting only one axis to
+   "hidden" forces the other axis (overflow-y) to compute as "auto", which
+   turns html/body into their own scroll containers and is a well-known way to
+   silently break position:sticky (mainly iOS Safari) — the subcategory
+   filter bar on /produse relies on staying sticky while scrolling the whole
+   listing, so this matters sitewide, not just on that page. "clip" blocks the
+   same horizontal bleed without that side effect. */
+html { scroll-behavior: auto; overflow-x: clip; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
@@ -39,7 +46,7 @@ body {
   font-family: 'Recursive', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip; /* see html rule above — clip, not hidden, preserves position:sticky */
 }
 
 /* Dot pattern — kept but hidden. --dot-y is updated by <DotsParallax /> on scroll.
