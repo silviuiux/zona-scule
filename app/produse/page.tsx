@@ -3,7 +3,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
-import LoadMore, { makeStoreKey } from './LoadMore'
+import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
@@ -506,7 +506,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 // tree), so its accumulated `products` state from the old
                 // subcategory's "load more" clicks stayed in memory and got
                 // rendered underneath the new subcategory's first page.
-                key={makeStoreKey({ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q })}
+                // Built inline (not imported from LoadMore.tsx's exported
+                // makeStoreKey) — that file has 'use client' at the top, and
+                // calling one of its functions directly from this Server
+                // Component during render is what caused the "server error"
+                // on every /produse visit: Next.js turns every export of a
+                // 'use client' module into a client reference, and a Server
+                // Component can't invoke that reference as a plain function.
+                key={`${sp.brand ?? ''}|${sp.categorie ?? ''}|${sp.subcategorie ?? ''}|${sp.q ?? ''}`}
                 initialCount={products.length}
                 total={total}
                 filters={{ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q }}
