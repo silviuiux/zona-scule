@@ -289,15 +289,24 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             transition: opacity 300ms;
           }
           .sidebar-backdrop.open { opacity: 1; pointer-events: all; }
+          /* Lives as the first flex item inside .subcat-bar's horizontal
+             scroll row (see SubcategoryBar.tsx) — sticky to the left edge
+             of that scroll container so it stays put while the pills swipe
+             past behind it, and stays clear of the page's own vertical
+             sticky-under-nav positioning (a separate concern). */
           .sidebar-toggle {
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             width: 44px; height: 44px;
-            background: none;
+            border-radius: 10px;
+            background: rgb(217,44,43);
             border: none;
             padding: 0;
-            color: rgb(0,0,0);
+            color: rgb(255,255,255);
             cursor: pointer;
+            position: sticky;
+            left: 0;
+            z-index: 2;
           }
           .products-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -424,13 +433,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           />
 
           <main className="products-main">
-            <div className="products-header">
-              <MobileFilterToggle />
-            </div>
-
-            {/* Subcategory bar — category, brand, or all-products view */}
+            {/* Subcategory bar — category, brand, or all-products view.
+                The mobile filter toggle renders INSIDE the bar (as its first,
+                left-pinned item) so it and the pills read as one scrollable
+                row; when there's no bar to show (search results, filters
+                with no subcategories) it falls back to its own standalone
+                row so the toggle is still reachable. */}
             {sp.categorie ? (
               <SubcategoryBar
+                toggle={<MobileFilterToggle />}
                 categoryName={sp.categorie}
                 brandName={sp.brand}
                 activeSub={sp.subcategorie}
@@ -438,6 +449,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               />
             ) : sp.brand && brandSubs.length > 0 ? (
               <SubcategoryBar
+                toggle={<MobileFilterToggle />}
                 brandName={sp.brand}
                 activeSub={sp.subcategorie}
                 total={total}
@@ -445,11 +457,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               />
             ) : !isFiltered ? (
               <SubcategoryBar
+                toggle={<MobileFilterToggle />}
                 activeSub={sp.subcategorie}
                 total={heroTotal}
                 prefetchedSubs={allSubs}
               />
-            ) : null}
+            ) : (
+              <div className="products-header">
+                <MobileFilterToggle />
+              </div>
+            )}
 
             <div className="products-grid">
               {products.map(p => <ProductCard key={p.id} product={p} />)}

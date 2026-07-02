@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { getSubcategoriesByCategoryName, SubcategoryWithCount } from '@/lib/supabase'
 
 export default async function SubcategoryBar({
@@ -7,6 +8,7 @@ export default async function SubcategoryBar({
   activeSub,
   total,
   prefetchedSubs,
+  toggle,
 }: {
   categoryName?: string
   brandName?: string
@@ -15,9 +17,13 @@ export default async function SubcategoryBar({
   total?: number
   /** Pre-fetched subs — skips internal fetch when provided */
   prefetchedSubs?: SubcategoryWithCount[]
+  /** Mobile filter-drawer toggle button, rendered as the sticky-left first
+   *  item in the scroll row so it stays put while pills swipe past behind
+   *  it. Optional so this component still works where no toggle applies. */
+  toggle?: ReactNode
 }) {
   const subs = prefetchedSubs ?? (categoryName ? await getSubcategoriesByCategoryName(categoryName) : [])
-  if (subs.length === 0) return null
+  if (subs.length === 0) return toggle ? <div className="products-header">{toggle}</div> : null
 
   const brandParam = brandName ? `&brand=${encodeURIComponent(brandName)}` : ''
 
@@ -92,6 +98,7 @@ export default async function SubcategoryBar({
       `}</style>
 
       <div className="subcat-bar">
+        {toggle}
         <Link
           href={allHref}
           className={`subcat-pill${!activeSub ? ' active' : ''}`}
