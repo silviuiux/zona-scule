@@ -3,7 +3,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
-import LoadMore from './LoadMore'
+import LoadMore, { makeStoreKey } from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
@@ -485,6 +485,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
             {total > pageSize && (
               <LoadMore
+                // Forces a full remount whenever the filter combo changes.
+                // Without this, clicking from one subcategory pill to
+                // another keeps the SAME LoadMore instance alive (Next.js
+                // just re-renders it with new props at the same spot in the
+                // tree), so its accumulated `products` state from the old
+                // subcategory's "load more" clicks stayed in memory and got
+                // rendered underneath the new subcategory's first page.
+                key={makeStoreKey({ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q })}
                 initialCount={products.length}
                 total={total}
                 filters={{ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q }}

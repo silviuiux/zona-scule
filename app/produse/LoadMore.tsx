@@ -16,7 +16,10 @@ type SavedState = {
   lastSlug?: string
 }
 
-function makeStoreKey(filters: Filters) {
+// Exported so app/produse/page.tsx can build the exact same identity string
+// to use as this component's React `key` — see the note on LoadMore's props
+// below for why that matters.
+export function makeStoreKey(filters: Filters) {
   return `zs_lm:${filters.brand ?? ''}|${filters.categorie ?? ''}|${filters.subcategorie ?? ''}|${filters.q ?? ''}`
 }
 
