@@ -164,6 +164,130 @@ export async function getProducts({
   return { products: data as Product[], total: count ?? 0 }
 }
 
+// ─── "Toate" merchandising order ────────────────────────────────────────────
+// The fully-unfiltered /produse listing ("Toate", no brand/category/
+// subcategory/search) prioritizes three business-picked groups ahead of
+// everything else, in this order:
+//   1) Aspiratoare — every vacuum-cleaner subcategory under Curatenie
+//   2) Scule electrice — the whole category
+//   3) The rest of Curatenie — cleaning machines/appliances not already
+//      counted as "aspiratoare" above (split into two tiers internally to
+//      correctly include the rare product with no subcategory at all — see
+//      HOME_TIER_FILTERS)
+//   4) Everything else
+// Ordering is alphabetical (by name) *within* each tier, not shuffled — the
+// tiers are stitched together purely by offset math (see below), which only
+// stays correct across "Load more" pages if each tier's own order is stable
+// between requests.
+const HOME_VACUUM_SUBCATS = [
+  'Aspiratoare casnice',
+  'Aspiratoare industriale',
+  'Aspiratoare de geamuri',
+  'Aspiratoare umed-uscat (NT)',
+  'Aspiratoare uscate (T)',
+]
+
+/** Quote+escape a list of values for a raw PostgREST `in.(...)` filter literal
+ *  (needed for `.not(col, 'in', ...)`, which — unlike `.in()` — takes a raw
+ *  string instead of auto-escaping an array). Always double-quoting is safe
+ *  even for values with no special characters, and required for the ones
+ *  that contain parentheses (e.g. "Aspiratoare umed-uscat (NT)"). */
+function toPgListLiteral(values: string[]) {
+  return `(${values.map(v => `"${v.replace(/"/g, '""')}"`).join(',')})`
+}
+
+function homeBaseQuery() {
+  return supabase
+    .from('product_listing_mv')
+    .select('*', { count: 'exact' })
+    .not('slug', 'is', null)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
+    .order('name')
+}
+
+// `any` here (rather than ReturnType<typeof homeBaseQuery>) sidesteps a
+// TS2589 "type instantiation excessively deep" error — the Postgrest
+// builder's generics don't hold up well through this many chained calls
+// inside an array of functions. Runtime behavior is unaffected either way.
+const HOME_TIER_FILTERS: Array<(q: any) => any> = [
+  // Tier 0: aspiratoare
+  q => q.in('subcategory_text', HOME_VACUUM_SUBCATS),
+  // Tier 1: Scule electrice
+  q => q.eq('category_text', 'Scule electrice'),
+  // Tier 2: rest of Curatenie, excluding aspiratoare (non-null subcategory
+  // case only — kept as a single `.not(...in...)` rather than folding an
+  // `.or()` on top of the base query's own `.or()` for the image filter.
+  // Stacking two `.or()` calls on one query is a real PostgREST pattern but
+  // wasn't practical to verify against the live API from this sandbox
+  // (network egress to Supabase's REST endpoint is blocked here), so tier 2b
+  // below picks up the tiny NULL-subcategory edge case with a plain `.is()`
+  // filter instead — no ambiguity, no reliance on unverified composition.
+  q => q.eq('category_text', 'Curatenie')
+        .not('subcategory_text', 'is', null)
+        .not('subcategory_text', 'in', toPgListLiteral(HOME_VACUUM_SUBCATS)),
+  // Tier 2b: Curatenie rows with no subcategory at all (currently ~1 row) —
+  // would otherwise silently vanish from "Toate" (NULL fails both `in` and
+  // `not in` under 3-valued SQL logic), so it gets its own tiny tier.
+  q => q.eq('category_text', 'Curatenie').is('subcategory_text', null),
+  // Tier 3: everything else
+  q => q.not('category_text', 'in', toPgListLiteral(['Scule electrice', 'Curatenie'])),
+]
+
+/** Overlap of [reqStart,reqEnd) with [tierStart,tierEnd) as *local* (tier-
+ *  relative) [start,end) indices, or null if there's no overlap. */
+function tierOverlap(
+  reqStart: number, reqEnd: number, tierStart: number, tierEnd: number
+): [number, number] | null {
+  const start = Math.max(reqStart, tierStart)
+  const end = Math.min(reqEnd, tierEnd)
+  return start < end ? [start - tierStart, end - tierStart] : null
+}
+
+export async function getHomeProducts({
+  page = 1,
+  pageSize = 24,
+}: { page?: number; pageSize?: number } = {}) {
+  // Count each tier up front so we know its slot in the merged sequence.
+  // Cheap head-only queries — no rows fetched, just counts.
+  const counts = await Promise.all(
+    HOME_TIER_FILTERS.map(async filter => {
+      const { count, error } = await filter(
+        supabase
+          .from('product_listing_mv')
+          .select('*', { count: 'exact', head: true })
+          .not('slug', 'is', null)
+          .or('main_image_storage_url.not.is.null,main_image_url.not.is.null') as any
+      )
+      if (error) throw error
+      return count ?? 0
+    })
+  )
+
+  const total = counts.reduce((a, b) => a + b, 0)
+  const reqStart = (page - 1) * pageSize
+  const reqEnd = reqStart + pageSize
+
+  // Walk the tiers in priority order, fetching whichever local slice of each
+  // tier overlaps this page's [reqStart, reqEnd) window in the merged
+  // sequence. A page only ever spans 2 tiers in practice (each tier here has
+  // well over a page's worth of products), but the loop handles any split.
+  const chunks: Product[][] = []
+  let tierStart = 0
+  for (let i = 0; i < HOME_TIER_FILTERS.length; i++) {
+    const tierEnd = tierStart + counts[i]
+    const overlap = tierOverlap(reqStart, reqEnd, tierStart, tierEnd)
+    if (overlap) {
+      const [localStart, localEnd] = overlap
+      const { data, error } = await HOME_TIER_FILTERS[i](homeBaseQuery()).range(localStart, localEnd - 1)
+      if (error) throw error
+      chunks.push((data ?? []) as Product[])
+    }
+    tierStart = tierEnd
+  }
+
+  return { products: chunks.flat(), total }
+}
+
 export async function getProductBySlug(slug: string) {
   const { data, error } = await supabase
     .from('products')

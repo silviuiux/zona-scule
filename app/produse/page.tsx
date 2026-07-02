@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
+import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -30,16 +30,25 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const pageSize = 24
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
+  // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
+  // computed up front so we can pick the right fetch below.
+  const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
+
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
   const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, rawTotal] = await Promise.all([
-    getProducts({
-      page: 1,
-      pageSize,
-      brandName: sp.brand,
-      categoryText: sp.categorie,
-      subcategoryText: sp.subcategorie,
-      search: sp.q,
-    }),
+    // "Toate" gets the merchandising-priority fetch (aspiratoare → scule
+    // electrice → restul Curatenie → rest), everything else keeps the plain
+    // filtered/DB-ordered fetch.
+    isTrulyUnfiltered
+      ? getHomeProducts({ page: 1, pageSize })
+      : getProducts({
+          page: 1,
+          pageSize,
+          brandName: sp.brand,
+          categoryText: sp.categorie,
+          subcategoryText: sp.subcategorie,
+          search: sp.q,
+        }),
     getCategoriesWithCount(),
     getBrandsByFilter({
       categoryText: sp.categorie,
@@ -54,19 +63,21 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
   const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
 
-  // Shuffle on "Toate" views (no specific subcategory or search query).
-  // Preserves DB order when drilling into a subcategory or searching.
-  const products = (sp.subcategorie || sp.q) ? rawProducts : shuffle(rawProducts)
+  // Shuffle only applies to brand-only/category-only filtered views now —
+  // "Toate" already comes back in a fixed tier order from getHomeProducts
+  // (shuffling would undermine the whole point of prioritizing aspiratoare
+  // first), and subcategory/search views keep stable DB order as before.
+  const products = isTrulyUnfiltered
+    ? rawProducts
+    : (sp.subcategorie || sp.q) ? rawProducts : shuffle(rawProducts)
 
   const activeCategory = sp.categorie
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
     : null
 
-  // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
-  // show the site-wide raw total (same number as /admin/status and the
+  // Show the site-wide raw total (same number as /admin/status and the
   // homepage) instead of the family-deduped, image-filtered listing count.
   // Any actual filter still shows its own accurately-scoped count.
-  const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
   const heroTotal = isTrulyUnfiltered ? rawTotal : total
 
   return (
