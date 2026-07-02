@@ -34,21 +34,35 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // computed up front so we can pick the right fetch below.
   const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
 
+  // "Toate" gets the merchandising-priority fetch (aspiratoare → scule
+  // electrice → restul Curatenie → rest); everything else keeps the plain
+  // filtered/DB-ordered fetch. getHomeProducts is new and does a fair bit of
+  // its own query composition (multiple tiers, offset math across them) —
+  // if it ever throws for a reason not caught in testing, falling back to
+  // the plain unfiltered getProducts() means /produse degrades to "no
+  // priority ordering" instead of a hard 500 for every visitor.
+  const fetchListing = async () => {
+    if (!isTrulyUnfiltered) {
+      return getProducts({
+        page: 1,
+        pageSize,
+        brandName: sp.brand,
+        categoryText: sp.categorie,
+        subcategoryText: sp.subcategorie,
+        search: sp.q,
+      })
+    }
+    try {
+      return await getHomeProducts({ page: 1, pageSize })
+    } catch (err) {
+      console.error('[produse] getHomeProducts failed, falling back to plain listing:', err)
+      return getProducts({ page: 1, pageSize })
+    }
+  }
+
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
   const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, rawTotal] = await Promise.all([
-    // "Toate" gets the merchandising-priority fetch (aspiratoare → scule
-    // electrice → restul Curatenie → rest), everything else keeps the plain
-    // filtered/DB-ordered fetch.
-    isTrulyUnfiltered
-      ? getHomeProducts({ page: 1, pageSize })
-      : getProducts({
-          page: 1,
-          pageSize,
-          brandName: sp.brand,
-          categoryText: sp.categorie,
-          subcategoryText: sp.subcategorie,
-          search: sp.q,
-        }),
+    fetchListing(),
     getCategoriesWithCount(),
     getBrandsByFilter({
       categoryText: sp.categorie,

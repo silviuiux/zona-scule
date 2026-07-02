@@ -18,9 +18,21 @@ export async function GET(req: NextRequest) {
   // pages would skip/repeat products.
   const isTrulyUnfiltered = !brandName && !categoryText && !subcategoryText && !search
 
-  const result = isTrulyUnfiltered
-    ? await getHomeProducts({ page, pageSize })
-    : await getProducts({ page, pageSize, brandName, categoryText, subcategoryText, search })
+  let result
+  if (isTrulyUnfiltered) {
+    try {
+      result = await getHomeProducts({ page, pageSize })
+    } catch (err) {
+      // Falling back here can duplicate/skip a few items right at the seam
+      // (the plain listing isn't offset-aligned with the tiered one), but
+      // that's a minor "Load more" glitch — far better than a 500 on every
+      // subsequent page once someone's already looking at page 1.
+      console.error('[api/products] getHomeProducts failed, falling back to plain listing:', err)
+      result = await getProducts({ page, pageSize })
+    }
+  } else {
+    result = await getProducts({ page, pageSize, brandName, categoryText, subcategoryText, search })
+  }
 
   return NextResponse.json(result)
 }
