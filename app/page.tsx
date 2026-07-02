@@ -381,7 +381,7 @@ export default async function HomePage() {
              adding the actual breathing room, or content sits flush/under
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
-          .hero-inner { gap: 20px; padding: 0 32px; }
+          .hero-inner { gap: 20px; padding: 0 12px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
             border: none; border-radius: 0;
@@ -400,17 +400,22 @@ export default async function HomePage() {
             border-radius: 3px;
           }
 
-          .cats-section { padding: 0 32px 64px; }
-          .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-          .cat-card { height: 260px; }
+          .cats-section { padding: 0 12px 64px; }
+          .cats-row { grid-template-columns: 1fr; gap: 10px; }
+          /* Featured categories carry an inline gridColumn:'span 2' (see
+             CategoryGrid.tsx) for the desktop 4-col layout. Left alone here,
+             a span-2 item in an otherwise 1-column grid can pull in an extra
+             implicit column, making that one card wider/narrower than its
+             siblings — force every card to the single column instead. */
+          .cat-card { height: 260px; grid-column: 1 / -1 !important; }
 
           .services-section { padding: 64px 0 64px; gap: 40px; }
-          .services-header { padding: 0 32px; }
+          .services-header { padding: 0 12px; }
           .services-grid {
             display: flex;
             overflow-x: auto;
             gap: 12px;
-            padding: 0 32px;
+            padding: 0 12px;
             margin: 0;
             scrollbar-width: none; -ms-overflow-style: none;
           }
@@ -422,9 +427,9 @@ export default async function HomePage() {
           .service-desc { margin-bottom: 16px; }
 
           .carousel-section { padding: 64px 0 64px; }
-          .carousel-inner { padding: 0 32px; }
+          .carousel-inner { padding: 0 12px; }
 
-          .contact-banner-wrap { padding: 64px 32px; }
+          .contact-banner-wrap { padding: 64px 12px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
           .contact-banner-btn { width: 100%; justify-content: center; }
 

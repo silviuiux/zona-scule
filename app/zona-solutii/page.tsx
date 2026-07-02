@@ -167,9 +167,9 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         /* ── Mobile ── */
         @media (max-width: 900px) { .zs-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 560px) {
-          .zs-hero-inner { padding: 24px 16px 40px; }
+          .zs-hero-inner { padding: 24px 12px 40px; }
           .zs-title-zona, .zs-title-name { font-size: 40px; }
-          .zs-body-inner { padding: 28px 16px 60px; }
+          .zs-body-inner { padding: 28px 12px 60px; }
           .zs-grid { grid-template-columns: 1fr; }
         }
       `}</style>

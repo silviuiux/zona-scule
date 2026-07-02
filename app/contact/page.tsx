@@ -102,7 +102,7 @@ export default function ContactPage({
         }
 
         @media (max-width: 768px) {
-          .contact-inner { padding: 48px 16px 64px; }
+          .contact-inner { padding: 48px 12px 64px; }
           .contact-info-bar { grid-template-columns: 1fr; }
           .info-card { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
           .info-card:last-child { border-bottom: none; }

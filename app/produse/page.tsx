@@ -296,7 +296,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           }
           .products-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
           }
           /* Every 25th card spans 2 rows — bigger hero product */
           .products-grid .pcard-link:nth-child(25n) {

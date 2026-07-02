@@ -162,7 +162,7 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
         }
 
         @media (max-width: 768px) {
-          .sub-carousel-track { padding-left: 32px; }
+          .sub-carousel-track { padding-left: 12px; }
           .sub-card { width: 192px; height: 269px; }
         }
       `}</style>

@@ -200,9 +200,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           .art-body-layout { grid-template-columns: 1fr; gap: 40px; }
           .art-sidebar { order: -1; }
           .art-products-grid { grid-template-columns: repeat(2, 1fr); }
-          .art-hero-inner { padding: 32px 16px 40px; }
-          .art-body-wrap { padding: 0 16px; }
-          .art-products-wrap { padding: 40px 16px; }
+          .art-hero-inner { padding: 32px 12px 40px; }
+          .art-body-wrap { padding: 0 12px; }
+          .art-products-wrap { padding: 40px 12px; }
         }
         @media (max-width: 480px) {
           .art-products-grid { grid-template-columns: 1fr; }

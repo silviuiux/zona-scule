@@ -83,7 +83,7 @@ export default function Footer() {
         }
 
         @media (max-width: 768px) {
-          .footer-grid { grid-template-columns: 1fr; gap: 36px; padding: 56px 16px 40px; }
+          .footer-grid { grid-template-columns: 1fr; gap: 36px; padding: 56px 12px 40px; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px 12px; }
         }
       `}</style>

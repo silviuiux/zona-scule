@@ -282,7 +282,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         @media (max-width: 768px) {
           .pdp-top-inner {
             grid-template-columns: 1fr !important;
-            gap: 32px; padding: 32px 16px 40px;
+            gap: 32px; padding: 32px 12px 40px;
           }
           .pdp-top-inner > :last-child { order: -1; }
           .pdp-sku { font-size: clamp(24px, 7vw, 44px); }
@@ -291,9 +291,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             overflow-x: auto; gap: 10px; padding-bottom: 8px;
           }
           .spec-card { min-width: 220px; padding: 40px 20px 24px; }
-          .pdp-specs-inner { padding: 48px 16px; }
+          .pdp-specs-inner { padding: 48px 12px; }
           .info-grid { grid-template-columns: 1fr !important; }
-          .info-section { padding: 48px 16px; }
+          .info-section { padding: 48px 12px; }
           .cta-banner-inner {
             flex-direction: column; align-items: flex-start;
             padding: 24px 20px; gap: 16px;
