@@ -257,7 +257,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
 
-          .catalog-layout { flex-direction: column; }
+          /* Sidebar becomes a fixed-position overlay drawer below, so
+             products-main is the only in-flow child here on mobile — its
+             own 12px side padding (below) is the single source of truth.
+             Keeping this rule's desktop "padding: 0 12px" too would stack
+             both, doubling the edge padding to 24px vs. the nav's 12px. */
+          .catalog-layout { flex-direction: column; padding: 0; }
           .sidebar {
             position: fixed; top: 0; left: 0; bottom: 0;
             width: 280px; z-index: 200;
