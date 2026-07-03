@@ -181,7 +181,7 @@ export default function ProductCard({ product }: { product: Product }) {
           padding-top: 4px;
         }
         .pcard-specs {
-          display: flex; flex-wrap: wrap; gap: 6px;
+          display: flex; gap: 6px;
         }
         .pcard-specs-alt {
           position: absolute;
@@ -195,9 +195,15 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-link.has-spec-alt:hover .pcard-specs-default.swappable { opacity: 0; }
         .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
+        /* Fill-container: each spec box grows to share the row equally —
+           full width alone, 50/50 when there are two — and never wraps to
+           a second row. min-width: 0 is required alongside flex-grow for
+           the label/value ellipsis truncation below to actually kick in. */
         .pcard-spec {
           display: flex; flex-direction: column; gap: 2px;
-          background: rgb(244, 244, 244);
+          flex: 1 1 0; min-width: 0;
+          background: rgb(255, 255, 255);
+          border: 1px solid rgba(0,0,0,0.14);
           border-radius: 4px;
           padding: 8px 10px;
         }
@@ -205,15 +211,23 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-spec-wide { width: 100%; }
 
         .pcard-spec-label {
+          display: block;
           font-family: 'Inter', sans-serif;
           font-size: 9px; font-weight: 600;
           letter-spacing: 0.08em; text-transform: uppercase;
           color: rgba(0,0,0,0.4);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .pcard-spec-value {
+          display: block;
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 500;
           color: rgb(0,0,0); letter-spacing: -0.02em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         /* App description: single line, truncated */
         .pcard-spec-value-clamp {

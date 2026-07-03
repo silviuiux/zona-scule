@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
 import SmoothScroll from '@/components/SmoothScroll'
+import { NavigationProgressProvider } from '@/components/NavigationProgress'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
         <SmoothScroll />
         <DotsParallax />
-        {children}
+        <NavigationProgressProvider>
+          {children}
+        </NavigationProgressProvider>
         <Analytics />
       </body>
     </html>

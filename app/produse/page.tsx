@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'

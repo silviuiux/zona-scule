@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { TransitionLink as Link } from '@/components/NavigationProgress'
 import type { ReactNode } from 'react'
 import { getSubcategoriesByCategoryName, SubcategoryWithCount } from '@/lib/supabase'
 

@@ -1,5 +1,5 @@
 'use client'
-import Link from 'next/link'
+import { TransitionLink as Link } from '@/components/NavigationProgress'
 import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
 
 const SHOW_BRANDS = true
