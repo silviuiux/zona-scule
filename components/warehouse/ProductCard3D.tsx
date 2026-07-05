@@ -118,13 +118,14 @@ export default function ProductCard3D({
         setSelected(product)
       }}
     >
-      {/* photo card */}
+      {/* photo card — unlit (basic) material so the product photo always reads
+          clearly regardless of scene lighting, like a printed shelf card */}
       <mesh position={[0, CARD_H / 2, 0]}>
         <planeGeometry args={[CARD_W, CARD_H]} />
         {texture ? (
-          <meshStandardMaterial map={texture} transparent side={THREE.DoubleSide} />
+          <meshBasicMaterial map={texture} transparent toneMapped={false} side={THREE.DoubleSide} />
         ) : (
-          <meshStandardMaterial color={fallbackColor} side={THREE.DoubleSide} />
+          <meshBasicMaterial color={fallbackColor} side={THREE.DoubleSide} />
         )}
       </mesh>
       {/* tiny plinth so cards feel placed, not floating */}

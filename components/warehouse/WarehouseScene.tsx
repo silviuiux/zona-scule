@@ -61,18 +61,19 @@ export default function WarehouseScene({ data }: { data: WarehouseData }) {
 
   return (
     <>
-      <color attach="background" args={['#0d0f12']} />
-      <fog attach="fog" args={['#0d0f12', 14, 55]} />
+      <color attach="background" args={['#13161b']} />
+      <fog attach="fog" args={['#13161b', 18, 70]} />
 
-      {/* ambient + cool fill */}
-      <ambientLight intensity={0.35} />
-      <hemisphereLight args={['#8fa3bf', '#1a1c1f', 0.4]} />
+      {/* ambient + cool fill — generous: readability beats gloom */}
+      <ambientLight intensity={0.7} />
+      <hemisphereLight args={['#aebdd4', '#2a2d33', 0.7]} />
+      <directionalLight position={[10, 18, 14]} intensity={0.5} color="#ffffff" />
 
       {/* warm dock lights down each aisle */}
       {data.aisles.map((_, i) => (
         <group key={i}>
-          <pointLight position={[aisleX(i), 5.2, -6]} intensity={26} distance={22} color="#ffd9a0" />
-          <pointLight position={[aisleX(i), 5.2, -20]} intensity={26} distance={22} color="#ffd9a0" />
+          <pointLight position={[aisleX(i), 5.2, -6]} intensity={70} distance={26} color="#ffd9a0" />
+          <pointLight position={[aisleX(i), 5.2, -20]} intensity={70} distance={26} color="#ffd9a0" />
           {/* light fixture proxies */}
           {[-6, -20].map(z => (
             <mesh key={z} position={[aisleX(i), 5.6, z]}>
@@ -86,7 +87,7 @@ export default function WarehouseScene({ data }: { data: WarehouseData }) {
       {/* concrete floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[centerX, 0, -10]}>
         <planeGeometry args={[width, 90]} />
-        <meshStandardMaterial color="#33363b" roughness={0.92} metalness={0.05} />
+        <meshStandardMaterial color="#3c4046" roughness={0.92} metalness={0.05} />
       </mesh>
       {/* painted safety lines along each aisle */}
       {data.aisles.map((_, i) => (

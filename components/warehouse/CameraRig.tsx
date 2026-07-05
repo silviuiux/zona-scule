@@ -146,13 +146,13 @@ export default function CameraRig({ aisleCount }: { aisleCount: number }) {
       // dolly: high over the dock doors → settle at aisle 0 entrance
       pos.current.set(
         THREE.MathUtils.lerp(centerX, aisleX(0), t),
-        THREE.MathUtils.lerp(10, EYE_HEIGHT, t),
+        THREE.MathUtils.lerp(10, 3.2, t), // settle at the aisle-overview framing
         THREE.MathUtils.lerp(30, AISLE_Z_START, t)
       )
       lookTarget.current.set(
         THREE.MathUtils.lerp(centerX, aisleX(0), t),
-        THREE.MathUtils.lerp(2.5, EYE_HEIGHT, t),
-        THREE.MathUtils.lerp(0, -8, t)
+        THREE.MathUtils.lerp(2.5, 3.6, t),
+        THREE.MathUtils.lerp(0, AISLE_Z_START - 7, t)
       )
       camera.position.copy(pos.current)
       camera.lookAt(lookTarget.current)
@@ -166,19 +166,25 @@ export default function CameraRig({ aisleCount }: { aisleCount: number }) {
     }
 
     // ── explore: damped glide toward the active aisle/progress target ──
+    // Progress 0 is a pulled-back, elevated "aisle overview" that frames the
+    // red category sign; by ~progress 0.25 the camera has descended to eye
+    // height inside the aisle.
     const targetX = aisleX(s.activeAisle)
     const targetZ = THREE.MathUtils.lerp(AISLE_Z_START, AISLE_Z_END, s.aisleProgress)
+    const overview = 1 - Math.min(1, s.aisleProgress / 0.25) // 1 at entrance → 0 inside
+    const targetY = THREE.MathUtils.lerp(EYE_HEIGHT, 3.2, overview)
     const damp = reducedMotion ? 1 : 1 - Math.exp(-3.2 * delta)
 
     pos.current.x = THREE.MathUtils.lerp(pos.current.x, targetX, damp)
-    pos.current.y = THREE.MathUtils.lerp(pos.current.y, EYE_HEIGHT, damp)
+    pos.current.y = THREE.MathUtils.lerp(pos.current.y, targetY, damp)
     pos.current.z = THREE.MathUtils.lerp(pos.current.z, targetZ, damp)
     camera.position.copy(pos.current)
 
     const lookAmt = reducedMotion ? 0 : 1
     lookTarget.current.set(
       targetX + look.current.x * 2.4 * lookAmt,
-      EYE_HEIGHT + 0.25 - look.current.y * 1.1 * lookAmt,
+      // pulled back: look up toward the sign; inside: level gaze down the aisle
+      THREE.MathUtils.lerp(EYE_HEIGHT + 0.25, 3.6, overview) - look.current.y * 1.1 * lookAmt,
       targetZ - 7
     )
     camera.lookAt(lookTarget.current)

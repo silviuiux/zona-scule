@@ -79,7 +79,7 @@ export const useWarehouse = create<WarehouseStore>(set => ({
 // ── Shared spatial constants (single source of truth for scene + camera) ──
 export const AISLE_SPACING = 14 // X distance between aisle centerlines
 export const AISLE_LENGTH = 34 // Z extent of one aisle
-export const AISLE_Z_START = 2 // camera Z at aisle entrance
+export const AISLE_Z_START = 8 // camera Z at aisle entrance (pulled back so the overhead sign is framed)
 export const AISLE_Z_END = -(AISLE_LENGTH - 6) // camera Z at far end
 export const EYE_HEIGHT = 1.7
 
