@@ -580,7 +580,9 @@ export async function getProductsForShelf({
     console.error('[warehouse] getProductsForShelf failed:', error.message)
     return []
   }
-  return (data ?? []) as ShelfProduct[]
+  // double-cast: the client is untyped (no generated DB types), so supabase-js
+  // can't parse this string column list and infers GenericStringError[]
+  return (data ?? []) as unknown as ShelfProduct[]
 }
 
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
