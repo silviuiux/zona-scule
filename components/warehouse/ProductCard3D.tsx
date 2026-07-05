@@ -50,7 +50,8 @@ export default function ProductCard3D({
   countTowardLoader: boolean
 }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null)
-  const [attempted, setAttempted] = useState(false)
+  const attempted = useRef(false) // ref, not state — no re-render needed, and
+  // avoids sync setState in the effect (react-hooks/set-state-in-effect)
   const group = useRef<THREE.Group>(null)
   const setHovered = useWarehouse(s => s.setHovered)
   const setSelected = useWarehouse(s => s.setSelected)
@@ -71,8 +72,8 @@ export default function ProductCard3D({
   }, [product.slug])
 
   useEffect(() => {
-    if (!near || attempted || !url) return
-    setAttempted(true)
+    if (!near || attempted.current || !url) return
+    attempted.current = true
     if (countTowardLoader) registerTexture()
     let alive = true
     loadTexture(url).then(tex => {
@@ -82,7 +83,7 @@ export default function ProductCard3D({
     return () => {
       alive = false
     }
-  }, [near, attempted, url, countTowardLoader, registerTexture, textureDone])
+  }, [near, url, countTowardLoader, registerTexture, textureDone])
 
   const fallbackColor = useMemo(() => {
     // deterministic per-product tint so fallback shelves still look varied

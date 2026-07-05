@@ -54,12 +54,16 @@ export default function DepozitClient({ data }: { data: WarehouseData }) {
       texLoaded: 0,
       introSkipped: false,
     })
-    const c = detectCapability()
-    setCap(c)
-    // reduced-motion users who still land in 3D via future toggles get calm camera
-    setReducedMotion(
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    )
+    // detection runs in a rAF callback so setState isn't synchronous in the
+    // effect body (react-hooks/set-state-in-effect)
+    const id = requestAnimationFrame(() => {
+      setCap(detectCapability())
+      // reduced-motion users who still land in 3D via future toggles get calm camera
+      setReducedMotion(
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      )
+    })
+    return () => cancelAnimationFrame(id)
   }, [setReducedMotion])
 
   if (cap.kind === 'checking') {

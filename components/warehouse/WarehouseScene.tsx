@@ -10,16 +10,29 @@ import CameraRig from './CameraRig'
 import { aisleX, AISLE_LENGTH, useWarehouse } from './store'
 import type { WarehouseData } from '@/lib/warehouse-data'
 
+// Deterministic PRNG (mulberry32) — keeps render pure (react-hooks/purity)
+// while still scattering the dust naturally.
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
 function DustMotes({ centerX }: { centerX: number }) {
   const ref = useRef<THREE.Points>(null)
   const reducedMotion = useWarehouse(s => s.reducedMotion)
   const positions = useMemo(() => {
+    const rand = mulberry32(1987)
     const n = 350
     const arr = new Float32Array(n * 3)
     for (let i = 0; i < n; i++) {
-      arr[i * 3] = centerX + (Math.random() - 0.5) * 80
-      arr[i * 3 + 1] = Math.random() * 6
-      arr[i * 3 + 2] = -Math.random() * (AISLE_LENGTH + 10) + 5
+      arr[i * 3] = centerX + (rand() - 0.5) * 80
+      arr[i * 3 + 1] = rand() * 6
+      arr[i * 3 + 2] = -rand() * (AISLE_LENGTH + 10) + 5
     }
     return arr
   }, [centerX])

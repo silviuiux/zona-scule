@@ -13,15 +13,19 @@ export default function LoadingScreen() {
   const setPhase = useWarehouse(s => s.setPhase)
   const texTotal = useWarehouse(s => s.texTotal)
   const texLoaded = useWarehouse(s => s.texLoaded)
-  const mountedAt = useRef(Date.now())
+  const mountedAt = useRef<number | null>(null)
   const [gone, setGone] = useState(false)
+
+  useEffect(() => {
+    mountedAt.current ??= Date.now()
+  }, [])
 
   const progress = texTotal > 0 ? texLoaded / texTotal : 0
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
     if (phase !== 'loading') return
-    const elapsed = Date.now() - mountedAt.current
+    const elapsed = Date.now() - (mountedAt.current ?? Date.now())
     const ready =
       (texTotal > 0 && texLoaded >= texTotal) || (texTotal === 0 && elapsed > GRACE_MS)
     if (ready) {
