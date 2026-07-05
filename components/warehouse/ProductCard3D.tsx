@@ -33,8 +33,9 @@ function loadTexture(url: string): Promise<THREE.Texture | null> {
   return p
 }
 
-const CARD_W = 0.72
-const CARD_H = 0.72
+// square (no photo distortion), sized to clear the next shelf board (0.9 gap)
+const CARD_W = 0.8
+const CARD_H = 0.8
 
 export default function ProductCard3D({
   product,

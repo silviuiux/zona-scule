@@ -43,8 +43,8 @@ function ShelfSection({
     [shelf.label, shelf.productCount]
   )
 
-  // 10 products over 3 boards: 4 / 3 / 3
-  const perLevel = [4, 3, 3]
+  // 15 products over 3 boards: 5 / 5 / 5
+  const perLevel = [5, 5, 5]
   const placed: { p: (typeof shelf.products)[number]; level: number; slot: number; slots: number }[] = []
   let idx = 0
   perLevel.forEach((n, level) => {
@@ -65,17 +65,34 @@ function ShelfSection({
           <meshStandardMaterial color={STEEL_DARK} />
         </mesh>
       ))}
-      {/* shelf boards */}
+      {/* shelf boards + hidden LED strip under each board's front lip */}
       {SHELF_LEVELS.map(y => (
-        <mesh key={y} position={[0, y - 0.03, 0]}>
-          <boxGeometry args={[SECTION_LEN, 0.06, 0.55]} />
-          <meshStandardMaterial color={STEEL} metalness={0.35} roughness={0.6} />
-        </mesh>
+        <group key={y}>
+          <mesh position={[0, y - 0.03, 0]}>
+            <boxGeometry args={[SECTION_LEN, 0.06, 0.55]} />
+            <meshStandardMaterial color={STEEL} metalness={0.35} roughness={0.6} />
+          </mesh>
+          {/* LED strip glow — emissive, cheap (no real light source) */}
+          <mesh position={[0, y - 0.075, 0.26]}>
+            <boxGeometry args={[SECTION_LEN * 0.97, 0.02, 0.03]} />
+            <meshStandardMaterial
+              color="#111"
+              emissive="#ffedcc"
+              emissiveIntensity={3.2}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
       ))}
-      {/* back panel */}
+      {/* backlit panel — warm glow so dark tools read as crisp silhouettes */}
       <mesh position={[0, 1.5, -0.28]}>
         <planeGeometry args={[SECTION_LEN, 3]} />
-        <meshStandardMaterial color="#23272e" side={THREE.DoubleSide} />
+        <meshStandardMaterial
+          color="#5c574e"
+          emissive="#ffe9c2"
+          emissiveIntensity={0.55}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       {/* subcategory label rail */}
       <mesh position={[0, 3.12, 0.1]}>

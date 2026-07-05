@@ -30,7 +30,7 @@ export type WarehouseData = {
 
 const MAX_AISLES = 6
 const MAX_SHELVES_PER_AISLE = 4
-const PRODUCTS_PER_SHELF = 10
+const PRODUCTS_PER_SHELF = 15
 
 export async function getWarehouseData(): Promise<WarehouseData> {
   let categories: Awaited<ReturnType<typeof getCategoriesWithCount>> = []
