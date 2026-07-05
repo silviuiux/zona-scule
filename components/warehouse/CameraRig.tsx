@@ -21,7 +21,6 @@ function smoothstep(t: number) {
 
 export default function CameraRig({ aisleCount }: { aisleCount: number }) {
   const camera = useThree(s => s.camera)
-  const phase = useWarehouse(s => s.phase)
   const setPhase = useWarehouse(s => s.setPhase)
   const reducedMotion = useWarehouse(s => s.reducedMotion)
   const introSkipped = useWarehouse(s => s.introSkipped)
@@ -138,6 +137,7 @@ export default function CameraRig({ aisleCount }: { aisleCount: number }) {
 
   useFrame((_, delta) => {
     const s = useWarehouse.getState()
+    if (s.phase === 'loading') return // hold the opening shot behind the loader
     const centerX = aisleX(Math.floor((aisleCount - 1) / 2))
 
     if (s.phase === 'intro' && !introSkipped && !reducedMotion) {

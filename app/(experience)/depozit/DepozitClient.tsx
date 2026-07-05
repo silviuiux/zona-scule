@@ -14,7 +14,7 @@ import type { WarehouseData } from '@/lib/warehouse-data'
 type Capability =
   | { kind: 'checking' }
   | { kind: '3d' }
-  | { kind: 'fallback'; reason: 'no-webgl' | 'reduced-motion' | 'low-end' }
+  | { kind: 'fallback'; reason: 'no-webgl' | 'reduced-motion' | 'low-end' | 'no-data' }
 
 function detectCapability(): Capability {
   try {
@@ -41,6 +41,19 @@ export default function DepozitClient({ data }: { data: WarehouseData }) {
   const setReducedMotion = useWarehouse(s => s.setReducedMotion)
 
   useEffect(() => {
+    // the store is a module singleton — reset it so a revisit gets a fresh
+    // loader/intro instead of last visit's state
+    useWarehouse.setState({
+      phase: 'loading',
+      activeAisle: 0,
+      aisleProgress: 0,
+      hovered: null,
+      selected: null,
+      jumpOpen: false,
+      texTotal: 0,
+      texLoaded: 0,
+      introSkipped: false,
+    })
     const c = detectCapability()
     setCap(c)
     // reduced-motion users who still land in 3D via future toggles get calm camera
@@ -59,7 +72,7 @@ export default function DepozitClient({ data }: { data: WarehouseData }) {
 
   if (data.aisles.length === 0) {
     // best-effort data: nothing came back → don't render an empty void
-    return <Fallback data={data} reason="low-end" />
+    return <Fallback data={data} reason="no-data" />
   }
 
   return (

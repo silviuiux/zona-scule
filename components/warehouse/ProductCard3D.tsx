@@ -60,6 +60,16 @@ export default function ProductCard3D({
 
   const url = product.main_image_storage_url || product.main_image_url
 
+  // if this card unmounts while hovered (aisle switch), restore the cursor
+  useEffect(() => {
+    return () => {
+      if (useWarehouse.getState().hovered?.product.slug === product.slug) {
+        useWarehouse.getState().setHovered(null)
+        document.body.style.cursor = 'auto'
+      }
+    }
+  }, [product.slug])
+
   useEffect(() => {
     if (!near || attempted || !url) return
     setAttempted(true)
@@ -94,8 +104,13 @@ export default function ProductCard3D({
       }}
       onPointerOut={() => {
         setHover(false)
-        setHovered(null)
-        document.body.style.cursor = 'auto'
+        // only clear if we're still the hovered product — pointer-over on the
+        // next card may already have replaced it
+        const s = useWarehouse.getState()
+        if (s.hovered?.product.slug === product.slug) {
+          s.setHovered(null)
+          document.body.style.cursor = 'auto'
+        }
       }}
       onClick={e => {
         e.stopPropagation()

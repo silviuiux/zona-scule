@@ -17,6 +17,7 @@ export default function LoadingScreen() {
   const [gone, setGone] = useState(false)
 
   const progress = texTotal > 0 ? texLoaded / texTotal : 0
+  const [tick, setTick] = useState(0)
 
   useEffect(() => {
     if (phase !== 'loading') return
@@ -31,16 +32,13 @@ export default function LoadingScreen() {
       }, wait)
       return () => clearTimeout(id)
     }
-    // re-check on a timer for the grace-period path
-    const id = setTimeout(() => {}, 250)
-    return () => clearTimeout(id)
-  }, [phase, texTotal, texLoaded, setPhase])
+  }, [phase, texTotal, texLoaded, setPhase, tick])
 
-  // grace timer tick (forces the effect above to re-evaluate)
-  const [, force] = useState(0)
+  // grace-period tick — re-runs the readiness effect above even when no
+  // texture events arrive (e.g. empty data)
   useEffect(() => {
     if (phase !== 'loading') return
-    const id = setInterval(() => force(n => n + 1), 300)
+    const id = setInterval(() => setTick(n => n + 1), 300)
     return () => clearInterval(id)
   }, [phase])
 

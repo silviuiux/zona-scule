@@ -12,7 +12,7 @@ export default function Fallback({
   reason,
 }: {
   data: WarehouseData
-  reason: 'no-webgl' | 'reduced-motion' | 'low-end'
+  reason: 'no-webgl' | 'reduced-motion' | 'low-end' | 'no-data'
 }) {
   return (
     <div className="wh-fallback">
@@ -24,7 +24,9 @@ export default function Fallback({
         <p>
           {reason === 'no-webgl'
             ? 'Browserul tău nu suportă experiența 3D — dar depozitul e tot aici, raft cu raft.'
-            : 'Versiune simplificată, fără animații — depozitul e tot aici, raft cu raft.'}
+            : reason === 'no-data'
+              ? 'Rafturile se aprovizionează chiar acum — între timp, catalogul complet te așteaptă mai jos.'
+              : 'Versiune simplificată, fără animații — depozitul e tot aici, raft cu raft.'}
         </p>
       </header>
 
