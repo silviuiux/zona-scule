@@ -1,0 +1,439 @@
+/* /depozit — warehouse experience overlay + fallback styles.
+   Scoped by wh- prefix; page fills the viewport, no document scroll. */
+
+.wh-root {
+  position: fixed;
+  inset: 0;
+  background: #0d0f12;
+  overflow: hidden;
+}
+.wh-root canvas {
+  display: block;
+}
+.wh-boot {
+  position: fixed;
+  inset: 0;
+  background: #0d0f12;
+}
+
+/* ── HUD ─────────────────────────────────────────────── */
+.wh-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.wh-hud > * {
+  pointer-events: auto;
+}
+
+.wh-exit {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 40;
+  font-family: 'Bungee', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(217, 44, 43, 0.95);
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+}
+.wh-exit:hover,
+.wh-exit:focus-visible {
+  background: rgb(190, 35, 34);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.wh-skip {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  font-family: 'Bungee', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.wh-skip:hover,
+.wh-skip:focus-visible {
+  color: #fff;
+  border-color: #fff;
+  outline: none;
+}
+
+.wh-jump-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  font-family: 'Bungee', sans-serif;
+  font-size: 13px;
+  color: #fff;
+  background: rgba(30, 30, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.wh-jump-btn:hover,
+.wh-jump-btn:focus-visible {
+  border-color: #fff;
+  outline: none;
+}
+
+.wh-jump-panel {
+  position: fixed;
+  top: 64px;
+  right: 18px;
+  width: min(320px, calc(100vw - 36px));
+  background: rgba(18, 20, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(6px);
+}
+.wh-jump-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #fff;
+  text-decoration: none;
+}
+.wh-jump-item:hover,
+.wh-jump-item:focus-visible {
+  background: rgba(217, 44, 43, 0.25);
+  outline: none;
+}
+.wh-jump-item.active {
+  background: rgba(217, 44, 43, 0.45);
+}
+.wh-jump-name {
+  font-family: 'Bungee', sans-serif;
+  font-size: 12px;
+}
+.wh-jump-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+.wh-jump-all {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin-top: 4px;
+}
+
+.wh-controls-hint {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .wh-controls-hint {
+    display: none;
+  }
+}
+
+/* hover tooltip */
+.wh-tooltip {
+  position: fixed;
+  bottom: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 260px;
+  max-width: min(420px, calc(100vw - 32px));
+  background: rgba(18, 20, 24, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 4px solid rgb(217, 44, 43);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #fff;
+}
+.wh-tooltip-brand {
+  font-family: 'Bungee', sans-serif;
+  font-size: 10px;
+  color: rgb(255, 120, 119);
+  letter-spacing: 0.08em;
+}
+.wh-tooltip-name {
+  font-family: 'Recursive', sans-serif;
+  font-size: 14px;
+  margin: 4px 0;
+}
+.wh-tooltip-specs {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  flex-wrap: wrap;
+}
+
+/* detail panel */
+.wh-panel {
+  position: fixed;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  width: min(360px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: rgba(16, 18, 22, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.wh-panel-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+}
+.wh-panel-close:hover,
+.wh-panel-close:focus-visible {
+  background: rgba(217, 44, 43, 0.8);
+  outline: none;
+}
+.wh-panel-img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.wh-panel-brand {
+  font-family: 'Bungee', sans-serif;
+  font-size: 11px;
+  color: rgb(255, 120, 119);
+  letter-spacing: 0.08em;
+}
+.wh-panel-name {
+  font-family: 'Recursive', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  margin: 6px 0 10px;
+  line-height: 1.35;
+}
+.wh-panel-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.wh-panel-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.wh-panel-specs div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+.wh-panel-specs span {
+  color: rgba(255, 255, 255, 0.55);
+}
+.wh-panel-cta {
+  display: block;
+  text-align: center;
+  font-family: 'Bungee', sans-serif;
+  font-size: 13px;
+  color: #fff;
+  background: rgb(217, 44, 43);
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.wh-panel-cta:hover,
+.wh-panel-cta:focus-visible {
+  background: rgb(190, 35, 34);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── loading screen ──────────────────────────────────── */
+.wh-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #0d0f12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transition: opacity 0.6s ease;
+}
+.wh-loader-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.wh-loader-logo {
+  font-family: 'Bungee', sans-serif;
+  font-size: clamp(28px, 6vw, 52px);
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.wh-loader-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: rgba(255, 255, 255, 0.5);
+}
+.wh-loader-bar {
+  width: min(320px, 70vw);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.wh-loader-fill {
+  height: 100%;
+  background: rgb(217, 44, 43);
+  transition: width 0.3s ease;
+}
+
+/* ── fallback (no WebGL / reduced motion / low-end) ──── */
+.wh-fallback {
+  min-height: 100vh;
+  background: #0d0f12;
+  color: #fff;
+  font-family: 'Recursive', system-ui, sans-serif;
+  padding: 90px 20px 60px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.wh-fb-head h1 {
+  font-family: 'Bungee', sans-serif;
+  font-size: clamp(26px, 5vw, 44px);
+  margin-bottom: 8px;
+}
+.wh-fb-head p {
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 40px;
+}
+.wh-fb-aisle {
+  margin-bottom: 48px;
+}
+.wh-fb-sign {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  background: rgb(217, 44, 43);
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+}
+.wh-fb-sign h2 {
+  font-family: 'Bungee', sans-serif;
+  font-size: 18px;
+}
+.wh-fb-sign span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.wh-fb-shelf h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 18px 0 10px;
+}
+.wh-fb-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  /* shelf board */
+  border-bottom: 6px solid #3d4550;
+}
+.wh-fb-card {
+  flex: 0 0 140px;
+  background: #17191d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  text-decoration: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wh-fb-card:hover,
+.wh-fb-card:focus-visible {
+  border-color: rgb(217, 44, 43);
+  outline: none;
+}
+.wh-fb-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 4px;
+}
+.wh-fb-brand {
+  font-family: 'Bungee', sans-serif;
+  font-size: 9px;
+  color: rgb(255, 120, 119);
+}
+.wh-fb-name {
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.85);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wh-fb-foot {
+  text-align: center;
+  margin-top: 20px;
+}
+.wh-fb-foot a {
+  font-family: 'Bungee', sans-serif;
+  color: #fff;
+  background: rgb(217, 44, 43);
+  padding: 14px 26px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+}

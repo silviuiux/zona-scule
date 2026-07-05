@@ -528,6 +528,61 @@ export async function getFeaturedSubcategoriesWithImage(): Promise<FeaturedSubca
   return data as FeaturedSubcategoryWithImage[]
 }
 
+/**
+ * Warehouse experience (app/(experience)/depozit): a bounded, representative
+ * sample of products for one 3D shelf. Mirrors getProducts()' querying of
+ * `product_listing_mv` (image OR-filter, non-null slug), but selects only the
+ * slim column set the shelf actually renders, orders featured-first, and hard-
+ * caps the limit. Read-only, best-effort: returns [] on error instead of
+ * throwing — an empty shelf, never a crashed scene.
+ */
+export type ShelfProduct = {
+  slug: string
+  name: string
+  brand_name: string | null
+  short_description: string | null
+  main_image_url: string | null
+  main_image_storage_url: string | null
+  st1_label: string | null
+  st1_value: string | null
+  st2_label: string | null
+  st2_value: string | null
+  featured: boolean
+}
+
+const SHELF_PRODUCT_COLUMNS =
+  'slug, name, brand_name, short_description, main_image_url, main_image_storage_url, ' +
+  'st1_label, st1_value, st2_label, st2_value, featured'
+
+export async function getProductsForShelf({
+  categoryText,
+  subcategoryText,
+  limit = 12,
+}: {
+  categoryText: string
+  subcategoryText?: string
+  limit?: number
+}): Promise<ShelfProduct[]> {
+  const capped = Math.min(Math.max(1, limit), 16)
+  let query = supabase
+    .from('product_listing_mv')
+    .select(SHELF_PRODUCT_COLUMNS)
+    .not('slug', 'is', null)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
+    .eq('category_text', categoryText)
+    .order('featured', { ascending: false })
+    .order('name')
+    .limit(capped)
+  if (subcategoryText) query = query.eq('subcategory_text', subcategoryText)
+
+  const { data, error } = await query
+  if (error) {
+    console.error('[warehouse] getProductsForShelf failed:', error.message)
+    return []
+  }
+  return (data ?? []) as ShelfProduct[]
+}
+
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
   // Step 1: resolve category id
   const { data: cat } = await supabase
