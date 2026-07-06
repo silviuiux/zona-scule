@@ -335,7 +335,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 className="pdp-sku reveal"
                 style={{ transitionDelay: '150ms' }}
               >
-                {product.model || product.sku || product.slug}
+                {product.name || product.model || product.sku || product.slug}
               </h1>
               {product.short_description && (
                 <p

@@ -8,7 +8,7 @@
 
 Zona Scule (zonascule.ro) is a B2B/B2C product catalog website for a Romanian professional-tools distributor, presenting ~31,000 products across 28 brands, 38 categories, and 80 subcategories. It is built on Next.js 16 (App Router, Turbopack) with React 19 and TypeScript (strict mode), backed by Supabase PostgreSQL for data, storage, and full-text search. There is no e-commerce checkout; the site drives leads via a contact form (stored in Supabase, notified via Resend email) and offers an internal admin dashboard for taxonomy management, protected by a lightweight HMAC-cookie session.
 
-The architecture is sound for its scale: hybrid rendering (ISR for stable pages, dynamic for filtered listings), a materialized view for family-deduplicated listings, tsvector/GIN full-text search, and a Claude-assisted data-enrichment pipeline that scrapes and normalizes supplier data (Kärcher et al.), with a bidirectional Supabase↔Airtable sync for manual curation.
+The architecture is sound for its scale: hybrid rendering (ISR for stable pages, dynamic for filtered listings), a materialized view for family-deduplicated listings, tsvector/GIN full-text search, and a Claude-assisted data-enrichment pipeline that scrapes and normalizes supplier data (Kärcher et al.). Airtable is no longer part of the stack — Supabase is the sole source of truth, and the former bidirectional sync tool has been removed.
 
 The code review identified **no critical vulnerabilities but several high-impact gaps**: (a) SEO is largely unrealized — no sitemap, robots, per-product metadata, or structured data, which for a 31k-product catalog is the single biggest missed opportunity; (b) admin authentication reuses the login password as the session-signing secret and has no login rate limiting; (c) the main catalog page performs ~10–12 uncached database round-trips per view; (d) a wildcard image-host allowlist turns the image optimizer into an open proxy; and (e) there are zero automated tests and no CI. Section 7 lays out all findings with severity and suggested fixes for review before any changes are made.
 
@@ -67,9 +67,9 @@ Navigation/layout: `Nav` (443 lines, sticky navbar + debounced typeahead), `Foot
 
 **Image strategy:** migration in progress from supplier CDNs to Supabase Storage (`main_image_storage_url` preferred, `main_image_url` fallback). Remote patterns allow Supabase, S3, Cloudinary, Milwaukee, PFERD, Novalia, Krause — plus a wildcard `**` (see finding S-4).
 
-**Enrichment pipeline (`scripts/`):** `enrich-karcher.mjs` (fetch supplier pages → Claude extracts specs/descriptions → upsert, ~2s/product, resumable), `enrich-karcher-playwright.py` (JS-heavy pages), `verify-products.mjs` (audits quality, classifies completeness, flags cross-contamination → `logs/verify-report-*.json`, `logs/to-fix-*.csv`), URL resolvers, description importer, `download-storage-images.mjs`. `KARCHER-Grid_view.csv` (3,482 rows) is the Airtable import source.
+**Enrichment pipeline (`scripts/`):** `enrich-karcher.mjs` (fetch supplier pages → Claude extracts specs/descriptions → upsert, ~2s/product, resumable), `enrich-karcher-playwright.py` (JS-heavy pages), `verify-products.mjs` (audits quality, classifies completeness, flags cross-contamination → `logs/verify-report-*.json`, `logs/to-fix-*.csv`), URL resolvers, description importer, `download-storage-images.mjs`. `KARCHER-Grid_view.csv` (the historical Airtable import source) has been deleted now that Airtable is no longer part of the stack.
 
-**`sync.py` (568 lines):** bidirectional Supabase↔Airtable sync in dependency order (brands→categories→subcategories→products); strategies `at2sb`, `sb2at`, `push-all`; rate-limited batches; `--dry-run` supported.
+**Airtable sync (removed 2026-07-07):** the project previously maintained a bidirectional Supabase↔Airtable sync (`sync.py`) for manual curation. Airtable is no longer used — `sync.py` was deleted and the `airtable_id` columns/unique indexes were dropped from `brands`, `categories`, `subcategories`, and `products` (the `product_listing` view and `product_listing_mv` materialized view were recreated without that column).
 
 ## 5. Authentication & Security Model
 
@@ -136,7 +136,7 @@ Severity: 🔴 High · 🟡 Medium · 🟢 Low. Each item is a proposal; nothing
 | R-2 | 🟡 | **Admin actions non-atomic:** reassign/rename perform 2–3 sequential writes without a transaction — partial failure leaves taxonomy inconsistent. | Move each operation into a single Postgres RPC/transaction. |
 | R-3 | 🟢 | Taxonomy helpers swallow DB errors as empty arrays (silent empty sidebar). | Log before returning `[]`. |
 | R-4 | 🟢 | Contact submit awaits the Resend call inline, adding latency to every user submit. | Use `after()`/`waitUntil` for the notification. |
-| R-5 | 🟢 | `sync.py:421` zips Supabase IDs with created Airtable records assuming order-preserving prefix on partial batch failure — possible ID mis-pairing. | Match on a request key instead of position. |
+| R-5 | ✅ | ~~`sync.py:421` zips Supabase IDs with created Airtable records...~~ Resolved 2026-07-07: `sync.py` and Airtable integration removed entirely. | — |
 
 ### 7.6 Testing, Tooling & Accessibility
 
