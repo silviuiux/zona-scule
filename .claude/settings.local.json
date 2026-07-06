@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -iname \"*.env*\" -not -path \"*/node_modules/*\"; echo \"---\"; ls -la ~/.claude 2>/dev/null | head -5; echo \"--- check gitignore for env ---\"; cat .gitignore)",
+      "mcp__f724e59b-52e9-4aee-83b4-d7a8759a1cb3__list_projects",
+      "mcp__f724e59b-52e9-4aee-83b4-d7a8759a1cb3__list_tables",
+      "mcp__f724e59b-52e9-4aee-83b4-d7a8759a1cb3__execute_sql",
+      "mcp__f724e59b-52e9-4aee-83b4-d7a8759a1cb3__apply_migration",
+      "Bash(grep -rEn \"\\\\+40[0-9 .-]{9,}|0[0-9]{9}\\\\b|@zonascule|contact@|office@|[a-z0-9._%+-]+@\\(zonascule|gmail\\)\\\\.[a-z]+\" --include=\"*.tsx\" --include=\"*.ts\" app components lib)",
+      "mcp__f724e59b-52e9-4aee-83b4-d7a8759a1cb3__get_advisors"
+    ]
+  }
+}

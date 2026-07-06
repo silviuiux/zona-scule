@@ -40,3 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 images-backup/
+WAREHOUSE_EXPERIENCE_PROMPT.md
