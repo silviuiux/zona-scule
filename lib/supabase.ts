@@ -131,13 +131,22 @@ export async function getProducts({
   // FFGroup import) that only have the original supplier main_image_url and
   // haven't been through the storage-migration script yet. ProductCard already
   // falls back to main_image_url when the storage copy is absent.
+  //
+  // This image requirement is deliberately SKIPPED when `search` is set: a
+  // no-image product (e.g. the 2026 Milwaukee price-list batch, inserted
+  // ahead of their image migration) should still be findable by exact name/SKU
+  // search, it just shouldn't show up when someone is casually browsing a
+  // category/subcategory grid with no search term.
   let query = supabase
     .from('product_listing_mv')
     .select('*', { count: 'exact' })
     .not('slug', 'is', null)
-    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
     .order('name')
     .range((page - 1) * pageSize, page * pageSize - 1)
+
+  if (!search) {
+    query = query.or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
+  }
 
   if (brandName) query = query.eq('brand_name', brandName)
   if (categoryText) query = query.eq('category_text', categoryText)
