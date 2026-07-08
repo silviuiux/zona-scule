@@ -538,10 +538,12 @@ export async function getFeaturedSubcategoriesWithImage(): Promise<FeaturedSubca
 }
 
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
-  // Step 1: resolve category id
+  // Step 1: resolve category id (and canonical name — categoryName as typed
+  // in the URL may differ in case from the stored category_text values, and
+  // p_category below needs an exact match against product_listing_mv).
   const { data: cat } = await supabase
     .from('categories')
-    .select('id')
+    .select('id, name')
     .ilike('name', categoryName)
     .single()
 
@@ -558,11 +560,14 @@ export async function getSubcategoriesByCategoryName(categoryName: string): Prom
 
   if (subsErr || !subs || subs.length === 0) return []
 
-  // Step 3: count products per subcategory_text using the global RPC.
-  // We key by subcategory name and intersect with the subcategories belonging
-  // to this category (step 2), so subcategory names don't need to be globally
-  // unique — only the ones for this category are used.
-  const { data: rpcData } = await supabase.rpc('count_products_by_subcategory')
+  // Step 3: count products per subcategory_text, scoped to this category via
+  // p_category. Several subcategory names (e.g. "Fixare", "Force Logic",
+  // "Beton") exist under more than one category, so an unscoped count here
+  // would add both categories' totals together — that's the bug that made a
+  // subcategory pill show a bigger number than the category's own "Toate"
+  // pill. Passing p_category filters count_products_by_subcategory to just
+  // this category's products before grouping.
+  const { data: rpcData } = await supabase.rpc('count_products_by_subcategory', { p_category: cat.name })
 
   const countByName: Record<string, number> = {}
   if (rpcData) {
