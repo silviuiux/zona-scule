@@ -326,6 +326,24 @@ export async function getProductVariants(familyId: string): Promise<VariantOptio
   return (data ?? []) as VariantOption[]
 }
 
+/**
+ * Every sibling variant in a family, as full Product rows — used by the PDP
+ * variant carousel (needs images/specs/brand for ProductCard, not just the
+ * slim fields getProductVariants selects for the dropdown). Only images
+ * required is deliberately NOT enforced here: a variant missing an image
+ * shouldn't silently vanish from its own family's carousel the way it would
+ * from a browse listing.
+ */
+export async function getFamilyVariantsFull(familyId: string): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('family_id', familyId)
+    .order('variant_label', { nullsFirst: false })
+  if (error || !data) return []
+  return data as Product[]
+}
+
 export async function getAdjacentProducts(
   currentSlug: string,
   subcategoryText: string | null | undefined

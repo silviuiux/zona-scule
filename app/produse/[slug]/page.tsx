@@ -1,6 +1,6 @@
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getProductBySlug, getAdjacentProducts, getProductVariants } from '@/lib/supabase'
+import { getProductBySlug, getAdjacentProducts, getFamilyVariantsFull } from '@/lib/supabase'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -10,6 +10,7 @@ import ProductNavArrows from './ProductNavArrows'
 import SkuCopyField from './SkuCopyField'
 import ScrollAnimations from './ScrollAnimations'
 import VariantSelector from './VariantSelector'
+import ProductVariantCarousel from '@/components/ProductVariantCarousel'
 
 export const revalidate = 3600
 export const dynamicParams = true
@@ -23,10 +24,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound()
   const { prevSlug, nextSlug } = adjacent
 
-  // sibling variants in the same family (empty if no family / single variant)
-  const variants = product.family_id
-    ? await getProductVariants(product.family_id)
+  // sibling variants in the same family (empty if no family / single variant).
+  // One query returns full Product rows — reused for both the dropdown
+  // (slim fields below) and the variant carousel (needs the full row for
+  // ProductCard's image/specs/brand).
+  const familyVariants = product.family_id
+    ? await getFamilyVariantsFull(product.family_id)
     : []
+  const variants = familyVariants.map(v => ({
+    slug: v.slug, sku: v.sku, name: v.name, variant_label: v.variant_label,
+    specs: v.specs, ean: v.ean,
+  }))
 
   const mainImg = product.main_image_storage_url || product.main_image_url
 
@@ -443,6 +451,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         </div>
+
+        {/* ── VARIANT CAROUSEL — only renders when the family has >4 variants ── */}
+        <ProductVariantCarousel variants={familyVariants} />
 
         <Footer />
 
