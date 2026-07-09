@@ -40,7 +40,14 @@ export default async function HomePage() {
       <style>{`
         /* ─── HERO ─────────────────────────────── */
         .hero {
-          padding-top: 280px;
+          /* Viewport-height responsive top padding. The non-padding hero
+             content (chips + title + subtitle + search row) is ~410px tall,
+             so pinning padding-top to (100vh - ~540px) keeps the hero bottom
+             ~130px short of the fold — guaranteeing a peek of the first
+             category row on short/laptop screens (fixes cards not showing at
+             all). Capped at 280px so tall screens keep the roomy composition
+             and simply reveal MORE of the cards below. */
+          padding-top: clamp(88px, calc(100vh - 540px), 280px);
           padding-bottom: 24px;
           background: transparent;
           min-height: max(320px, calc(100vh - 395px));

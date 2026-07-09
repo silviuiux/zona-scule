@@ -97,6 +97,14 @@ export default function Nav() {
     setActiveIdx(-1)
   }, [router])
 
+  const clearSearch = () => {
+    setQ('')
+    setSuggestions([])
+    setDropOpen(false)
+    setActiveIdx(-1)
+    inputRef.current?.focus()
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = q.trim()
@@ -161,6 +169,16 @@ export default function Nav() {
           padding: 4px; transition: color 150ms;
         }
         .nav-search-btn:hover { color: rgb(217,44,43); }
+
+        /* Right-side "go" affordance — subtle at rest, red once there's a query */
+        .nav-search-go {
+          flex-shrink: 0; background: none; border: none; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          padding: 4px; color: rgba(0,0,0,0.22);
+          transition: color 150ms, transform 220ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .nav-search-go:hover { color: rgb(217,44,43); }
+        .nav-search-go.active { color: rgb(217,44,43); transform: translateX(2px); }
 
         /* ── Suggestions dropdown ── */
         .nav-suggestions {
@@ -342,11 +360,19 @@ export default function Nav() {
           {/* Search + dropdown — wrap is relative so dropdown anchors here */}
           <div ref={wrapRef} className={`nav-search-wrap${searchOpen ? ' open' : ''}`}>
             <form className="nav-search-form" onSubmit={handleSubmit}>
-              <button className="nav-search-btn" type="submit" aria-label="Cauta">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-              </button>
+              {q ? (
+                <button className="nav-search-btn" type="button" onClick={clearSearch} aria-label="Sterge cautarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              ) : (
+                <button className="nav-search-btn" type="submit" aria-label="Cauta">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  </svg>
+                </button>
+              )}
               <input
                 ref={inputRef}
                 className="nav-search-input"
@@ -358,6 +384,16 @@ export default function Nav() {
                 autoComplete="off"
                 spellCheck={false}
               />
+              <button
+                className={`nav-search-go${q.trim() ? ' active' : ''}`}
+                type="submit"
+                aria-label="Cauta"
+                tabIndex={-1}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </button>
             </form>
 
             {/* Dropdown */}
