@@ -6,6 +6,8 @@ import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
+import CategoryPillBar from './CategoryPillBar'
+import CatalogLayout from './CatalogLayout'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
 export const dynamic = 'force-dynamic'
@@ -446,81 +448,92 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
       {/* ── Gray listing section ── */}
       <div className="catalog-page">
-        <div className="catalog-layout">
-          <MobileFilterBackdrop />
-          <Sidebar
-            categories={categories}
-            brands={brands}
-            activeCat={sp.categorie}
-            activeSub={sp.subcategorie}
-            activeBrand={sp.brand}
-            totalCount={rawTotal}
-          />
-
-          <main className="products-main">
-            {/* Subcategory bar — category, brand, or all-products view.
-                The mobile filter toggle renders INSIDE the bar (as its first,
-                left-pinned item) so it and the pills read as one scrollable
-                row; when there's no bar to show (search results, filters
-                with no subcategories) it falls back to its own standalone
-                row so the toggle is still reachable. */}
-            {sp.categorie ? (
-              <SubcategoryBar
-                toggle={<MobileFilterToggle />}
-                categoryName={sp.categorie}
-                brandName={sp.brand}
+        <CatalogLayout
+          sidebar={
+            <>
+              <MobileFilterBackdrop />
+              <Sidebar
+                categories={categories}
+                brands={brands}
+                activeCat={sp.categorie}
                 activeSub={sp.subcategorie}
-                total={activeCategory?.product_count}
+                activeBrand={sp.brand}
+                totalCount={rawTotal}
               />
-            ) : sp.brand && brandSubs.length > 0 ? (
-              <SubcategoryBar
-                toggle={<MobileFilterToggle />}
-                brandName={sp.brand}
-                activeSub={sp.subcategorie}
-                total={total}
-                prefetchedSubs={brandSubs}
-              />
-            ) : !isFiltered ? (
-              <SubcategoryBar
-                toggle={<MobileFilterToggle />}
-                activeSub={sp.subcategorie}
-                total={heroTotal}
-                prefetchedSubs={allSubs}
-              />
-            ) : (
-              <div className="products-header">
-                <MobileFilterToggle />
-              </div>
-            )}
-
-            <div className="products-grid">
-              {products.map(p => <ProductCard key={p.id} product={p} />)}
+            </>
+          }
+          pillBar={
+            <CategoryPillBar
+              categories={categories}
+              brands={brands}
+              activeCat={sp.categorie}
+              activeBrand={sp.brand}
+              totalCount={rawTotal}
+            />
+          }
+        >
+          {/* Subcategory bar — category, brand, or all-products view.
+              The mobile filter toggle renders INSIDE the bar (as its first,
+              left-pinned item) so it and the pills read as one scrollable
+              row; when there's no bar to show (search results, filters
+              with no subcategories) it falls back to its own standalone
+              row so the toggle is still reachable. */}
+          {sp.categorie ? (
+            <SubcategoryBar
+              toggle={<MobileFilterToggle />}
+              categoryName={sp.categorie}
+              brandName={sp.brand}
+              activeSub={sp.subcategorie}
+              total={activeCategory?.product_count}
+            />
+          ) : sp.brand && brandSubs.length > 0 ? (
+            <SubcategoryBar
+              toggle={<MobileFilterToggle />}
+              brandName={sp.brand}
+              activeSub={sp.subcategorie}
+              total={total}
+              prefetchedSubs={brandSubs}
+            />
+          ) : !isFiltered ? (
+            <SubcategoryBar
+              toggle={<MobileFilterToggle />}
+              activeSub={sp.subcategorie}
+              total={heroTotal}
+              prefetchedSubs={allSubs}
+            />
+          ) : (
+            <div className="products-header">
+              <MobileFilterToggle />
             </div>
+          )}
 
-            {total > pageSize && (
-              <LoadMore
-                // Forces a full remount whenever the filter combo changes.
-                // Without this, clicking from one subcategory pill to
-                // another keeps the SAME LoadMore instance alive (Next.js
-                // just re-renders it with new props at the same spot in the
-                // tree), so its accumulated `products` state from the old
-                // subcategory's "load more" clicks stayed in memory and got
-                // rendered underneath the new subcategory's first page.
-                // Built inline (not imported from LoadMore.tsx's exported
-                // makeStoreKey) — that file has 'use client' at the top, and
-                // calling one of its functions directly from this Server
-                // Component during render is what caused the "server error"
-                // on every /produse visit: Next.js turns every export of a
-                // 'use client' module into a client reference, and a Server
-                // Component can't invoke that reference as a plain function.
-                key={`${sp.brand ?? ''}|${sp.categorie ?? ''}|${sp.subcategorie ?? ''}|${sp.q ?? ''}`}
-                initialCount={products.length}
-                total={total}
-                filters={{ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q }}
-              />
-            )}
-          </main>
-        </div>
+          <div className="products-grid">
+            {products.map(p => <ProductCard key={p.id} product={p} />)}
+          </div>
+
+          {total > pageSize && (
+            <LoadMore
+              // Forces a full remount whenever the filter combo changes.
+              // Without this, clicking from one subcategory pill to
+              // another keeps the SAME LoadMore instance alive (Next.js
+              // just re-renders it with new props at the same spot in the
+              // tree), so its accumulated `products` state from the old
+              // subcategory's "load more" clicks stayed in memory and got
+              // rendered underneath the new subcategory's first page.
+              // Built inline (not imported from LoadMore.tsx's exported
+              // makeStoreKey) — that file has 'use client' at the top, and
+              // calling one of its functions directly from this Server
+              // Component during render is what caused the "server error"
+              // on every /produse visit: Next.js turns every export of a
+              // 'use client' module into a client reference, and a Server
+              // Component can't invoke that reference as a plain function.
+              key={`${sp.brand ?? ''}|${sp.categorie ?? ''}|${sp.subcategorie ?? ''}|${sp.q ?? ''}`}
+              initialCount={products.length}
+              total={total}
+              filters={{ brand: sp.brand, categorie: sp.categorie, subcategorie: sp.subcategorie, q: sp.q }}
+            />
+          )}
+        </CatalogLayout>
       </div>
       <Footer />
     </>
