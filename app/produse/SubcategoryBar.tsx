@@ -9,6 +9,7 @@ export default async function SubcategoryBar({
   total,
   prefetchedSubs,
   toggle,
+  sticky = true,
 }: {
   categoryName?: string
   brandName?: string
@@ -17,10 +18,17 @@ export default async function SubcategoryBar({
   total?: number
   /** Pre-fetched subs — skips internal fetch when provided */
   prefetchedSubs?: SubcategoryWithCount[]
-  /** Mobile filter-drawer toggle button, rendered as the sticky-left first
-   *  item in the scroll row so it stays put while pills swipe past behind
-   *  it. Optional so this component still works where no toggle applies. */
+  /** Mobile filter-drawer toggle + desktop view-switcher buttons, rendered
+   *  as the sticky-left first items in the scroll row so they stay put
+   *  while pills swipe past behind them. Optional so this component still
+   *  works where no toggle applies. */
   toggle?: ReactNode
+  /** Pin this bar right under the navbar. Only one bar should be sticky at
+   *  a time — the pills-mode dropdown row (CatalogLayout.tsx) is sticky
+   *  exactly when this isn't (i.e. when no category/brand is selected),
+   *  and this bar takes over stickiness once one is. Defaults to true so
+   *  existing callers that don't care keep the old always-sticky behavior. */
+  sticky?: boolean
 }) {
   const subs = prefetchedSubs ?? (categoryName ? await getSubcategoriesByCategoryName(categoryName) : [])
   if (subs.length === 0) return toggle ? <div className="products-header">{toggle}</div> : null
@@ -44,6 +52,14 @@ export default async function SubcategoryBar({
     <>
       <style>{`
         .subcat-bar {
+          margin: 16px 0;
+          padding: 0;
+          display: flex; gap: 10px;
+          overflow-x: auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .subcat-bar::-webkit-scrollbar { display: none; }
+        .subcat-bar.is-sticky {
           position: sticky;
           top: 52px;
           z-index: 50;
@@ -51,11 +67,7 @@ export default async function SubcategoryBar({
           padding: 32px 0;
           background: rgb(244, 244, 244);
           border-bottom: 1px solid rgba(0,0,0,0.07);
-          display: flex; gap: 10px;
-          overflow-x: auto;
-          scrollbar-width: none; -ms-overflow-style: none;
         }
-        .subcat-bar::-webkit-scrollbar { display: none; }
 
         .subcat-pill {
           display: inline-flex; align-items: center; gap: 8px;
@@ -89,15 +101,24 @@ export default async function SubcategoryBar({
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
 
         @media (max-width: 768px) {
-          .subcat-bar {
+          /* Mobile always keeps the pill bar pinned under the navbar,
+             regardless of the desktop-only sticky/non-sticky split above —
+             the .is-sticky compound selector is included here purely so
+             this wins on specificity over the desktop-only .is-sticky rule
+             above (not to gate the behavior on that class). */
+          .subcat-bar,
+          .subcat-bar.is-sticky {
+            position: sticky;
             top: 52px;
             margin: -20px 0 20px;
             padding: 32px 0;
+            background: rgb(244, 244, 244);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
           }
         }
       `}</style>
 
-      <div className="subcat-bar">
+      <div className={`subcat-bar${sticky ? ' is-sticky' : ''}`}>
         {toggle}
         <Link
           href={allHref}

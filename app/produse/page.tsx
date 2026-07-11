@@ -8,6 +8,7 @@ import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
 import CatalogDropdowns from './CategoryPillBar'
 import CatalogLayout from './CatalogLayout'
+import ViewSwitcherButton from './ViewSwitcherButton'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
 export const dynamic = 'force-dynamic'
@@ -89,6 +90,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     : (sp.brand && !sp.categorie && brandSubs.length > 0)
     ? brandSubs
     : allSubs
+
+  // Only one bar is ever sticky right under the navbar at a time: the
+  // dropdown row (CatalogLayout) while nothing's selected, or the
+  // subcategory pill bar (SubcategoryBar) once a category/brand is active.
+  const categoryOrBrandActive = !!(sp.categorie || sp.brand)
 
   // Shuffle only applies to brand-only/category-only filtered views now —
   // "Toate" already comes back in a fixed tier order from getHomeProducts
@@ -483,16 +489,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               activeSub={sp.subcategorie}
             />
           }
+          filterRowSticky={!categoryOrBrandActive}
         >
-          {/* Subcategory bar — category, brand, or all-products view.
-              The mobile filter toggle renders INSIDE the bar (as its first,
-              left-pinned item) so it and the pills read as one scrollable
-              row; when there's no bar to show (search results, filters
-              with no subcategories) it falls back to its own standalone
-              row so the toggle is still reachable. */}
+          {/* Subcategory bar — category, brand, or all-products view. The
+              desktop view-switcher + mobile filter toggle render INSIDE the
+              bar (as its first, left-pinned items) so they and the pills
+              read as one scrollable row; when there's no bar to show
+              (search results, filters with no subcategories) it falls back
+              to its own standalone row so both stay reachable. Only sticky
+              right under the navbar once a category/brand is active — see
+              filterRowSticky above for the dropdown row's complementary
+              sticky state. */}
           {sp.categorie ? (
             <SubcategoryBar
-              toggle={<MobileFilterToggle />}
+              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
               categoryName={sp.categorie}
               brandName={sp.brand}
               activeSub={sp.subcategorie}
@@ -501,7 +511,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
           ) : sp.brand && brandSubs.length > 0 ? (
             <SubcategoryBar
-              toggle={<MobileFilterToggle />}
+              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
               brandName={sp.brand}
               activeSub={sp.subcategorie}
               total={total}
@@ -509,13 +519,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
           ) : !isFiltered ? (
             <SubcategoryBar
-              toggle={<MobileFilterToggle />}
+              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
               activeSub={sp.subcategorie}
               total={heroTotal}
               prefetchedSubs={allSubs}
+              sticky={false}
             />
           ) : (
             <div className="products-header">
+              <ViewSwitcherButton />
               <MobileFilterToggle />
             </div>
           )}
