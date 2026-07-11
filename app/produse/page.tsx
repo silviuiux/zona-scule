@@ -2,7 +2,7 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -12,16 +12,6 @@ import ViewSwitcherButton from './ViewSwitcherButton'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
 export const dynamic = 'force-dynamic'
-
-/** Fisher-Yates shuffle — server-side, runs fresh each request */
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
 
 type SP = { brand?: string; categorie?: string; subcategorie?: string; q?: string }
 
@@ -34,40 +24,25 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
 
   // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
-  // computed up front so we can pick the right fetch below.
+  // still needed for the fetch-shape decisions below (which sidebar data to
+  // load), even though every view now goes through the same getProducts()
+  // call with the same global price-descending order (2026-07-11 — see
+  // "sorting order rules july 11.md" for the merchandising-tier/shuffle
+  // logic this replaced).
   const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
-
-  // "Toate" gets the merchandising-priority fetch (aspiratoare → scule
-  // electrice → restul Curatenie → rest); everything else keeps the plain
-  // filtered/DB-ordered fetch. getHomeProducts is new and does a fair bit of
-  // its own query composition (multiple tiers, offset math across them) —
-  // if it ever throws for a reason not caught in testing, falling back to
-  // the plain unfiltered getProducts() means /produse degrades to "no
-  // priority ordering" instead of a hard 500 for every visitor.
-  const fetchListing = async () => {
-    if (!isTrulyUnfiltered) {
-      return getProducts({
-        page: 1,
-        pageSize,
-        brandName: sp.brand,
-        categoryText: sp.categorie,
-        subcategoryText: sp.subcategorie,
-        search: sp.q,
-      })
-    }
-    try {
-      return await getHomeProducts({ page: 1, pageSize })
-    } catch (err) {
-      console.error('[produse] getHomeProducts failed, falling back to plain listing:', err)
-      return getProducts({ page: 1, pageSize })
-    }
-  }
 
   // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active;
   // categorySubs when a category is active (shared by SubcategoryBar and the pills-mode dropdowns
   // below, so the two views never disagree on the list).
-  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
-    fetchListing(),
+  const [{ products, total }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
+    getProducts({
+      page: 1,
+      pageSize,
+      brandName: sp.brand,
+      categoryText: sp.categorie,
+      subcategoryText: sp.subcategorie,
+      search: sp.q,
+    }),
     getCategoriesWithCount(),
     getBrandsByFilter({
       categoryText: sp.categorie,
@@ -95,14 +70,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // dropdown row (CatalogLayout) while nothing's selected, or the
   // subcategory pill bar (SubcategoryBar) once a category/brand is active.
   const categoryOrBrandActive = !!(sp.categorie || sp.brand)
-
-  // Shuffle only applies to brand-only/category-only filtered views now —
-  // "Toate" already comes back in a fixed tier order from getHomeProducts
-  // (shuffling would undermine the whole point of prioritizing aspiratoare
-  // first), and subcategory/search views keep stable DB order as before.
-  const products = isTrulyUnfiltered
-    ? rawProducts
-    : (sp.subcategorie || sp.q) ? rawProducts : shuffle(rawProducts)
 
   const activeCategory = sp.categorie
     ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())

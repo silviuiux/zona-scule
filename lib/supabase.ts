@@ -56,6 +56,10 @@ export type Product = {
   images_migrated: boolean
   manufacturer_url: string | null
   created_at: string | null
+  // Acquisition/cost price (see lib/quote-pricing.ts) — added to
+  // product_listing/product_listing_mv 2026-07-11 specifically so the
+  // storefront listing can sort by it (see getProducts' default order).
+  price: number | null
   // ── PFERD variants (additive migration) ──
   family_id: string | null
   family_name: string | null
@@ -137,10 +141,17 @@ export async function getProducts({
   // ahead of their image migration) should still be findable by exact name/SKU
   // search, it just shouldn't show up when someone is casually browsing a
   // category/subcategory grid with no search term.
+  //
+  // Sort order (2026-07-11): price descending — most expensive first — is
+  // now the single global rule for every listing view (replaced the old
+  // per-view mix of alphabetical order, "Toate" merchandising tiers, and a
+  // brand/category shuffle; see "sorting order rules july 11.md" for what
+  // used to be here). `name` is just the tiebreak for equal/NULL prices.
   let query = supabase
     .from('product_listing_mv')
     .select('*', { count: 'exact' })
     .not('slug', 'is', null)
+    .order('price', { ascending: false, nullsFirst: false })
     .order('name')
     .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -173,7 +184,13 @@ export async function getProducts({
   return { products: data as Product[], total: count ?? 0 }
 }
 
-// ─── "Toate" merchandising order ────────────────────────────────────────────
+// ─── "Toate" merchandising order (SUPERSEDED 2026-07-11) ──────────────────
+// getHomeProducts() below is no longer called anywhere — the fully-
+// unfiltered "Toate" view now goes through plain getProducts() like every
+// other view, so it gets the same global price-descending order. Left
+// defined (unused) rather than deleted in case the tiering is wanted back;
+// full behavior is documented in "sorting order rules july 11.md".
+//
 // The fully-unfiltered /produse listing ("Toate", no brand/category/
 // subcategory/search) prioritizes three business-picked groups ahead of
 // everything else, in this order:
