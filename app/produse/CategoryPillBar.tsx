@@ -73,20 +73,20 @@ export default function CatalogDropdowns({
   return (
     <>
       <style>{`
-        .cat-dropdown-bar {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          padding: 0 0 24px;
-        }
+        /* No outer wrapper on purpose — these three cells render as direct
+           children of CatalogLayout's ".filter-row" grid (alongside the view
+           switcher button), so all four cells share one grid track and end
+           up exactly as wide as a product card column. */
         .cat-dropdown {
           position: relative;
           display: flex;
           align-items: center;
+          min-width: 0;
         }
         .cat-dropdown select {
           appearance: none;
           -webkit-appearance: none;
+          width: 100%;
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 500;
           color: rgb(0,0,0);
@@ -94,7 +94,7 @@ export default function CatalogDropdowns({
           border: 1px solid rgba(0,0,0,0.12);
           border-radius: 8px;
           padding: 10px 34px 10px 14px;
-          min-width: 160px;
+          min-height: 40px;
           cursor: pointer;
           transition: border-color 150ms;
         }
@@ -109,68 +109,66 @@ export default function CatalogDropdowns({
         }
       `}</style>
 
-      <div className="cat-dropdown-bar">
-        <div className="cat-dropdown">
-          <select
-            value={activeCat ?? ''}
-            onChange={e => onCategoryChange(e.target.value)}
-            aria-label="Categorie"
-          >
-            <option value="">Toate categoriile</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.name}>
-                {cat.name} ({cat.product_count.toLocaleString('ro')})
-              </option>
-            ))}
-          </select>
-          <span className="cat-dropdown-chevron" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
-          </span>
-        </div>
+      <div className="cat-dropdown">
+        <select
+          value={activeBrand ?? ''}
+          onChange={e => onBrandChange(e.target.value)}
+          aria-label="Brand"
+          disabled={brands.length === 0}
+        >
+          <option value="">Toate brandurile</option>
+          {brands.map(brand => (
+            <option key={brand.id} value={brand.name}>
+              {brand.name} ({brand.product_count.toLocaleString('ro')})
+            </option>
+          ))}
+        </select>
+        <span className="cat-dropdown-chevron" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </span>
+      </div>
 
-        <div className="cat-dropdown">
-          <select
-            value={activeBrand ?? ''}
-            onChange={e => onBrandChange(e.target.value)}
-            aria-label="Brand"
-            disabled={brands.length === 0}
-          >
-            <option value="">Toate brandurile</option>
-            {brands.map(brand => (
-              <option key={brand.id} value={brand.name}>
-                {brand.name} ({brand.product_count.toLocaleString('ro')})
-              </option>
-            ))}
-          </select>
-          <span className="cat-dropdown-chevron" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
-          </span>
-        </div>
+      <div className="cat-dropdown">
+        <select
+          value={activeCat ?? ''}
+          onChange={e => onCategoryChange(e.target.value)}
+          aria-label="Categorie"
+        >
+          <option value="">Toate categoriile</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.name}>
+              {cat.name} ({cat.product_count.toLocaleString('ro')})
+            </option>
+          ))}
+        </select>
+        <span className="cat-dropdown-chevron" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </span>
+      </div>
 
-        <div className="cat-dropdown">
-          <select
-            value={activeSub ?? ''}
-            onChange={e => onSubChange(e.target.value)}
-            aria-label="Subcategorie"
-            disabled={subcategories.length === 0}
-          >
-            <option value="">Toate subcategoriile</option>
-            {subcategories.map(sub => (
-              <option key={sub.id} value={sub.name}>
-                {sub.name} ({sub.product_count.toLocaleString('ro')})
-              </option>
-            ))}
-          </select>
-          <span className="cat-dropdown-chevron" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
-          </span>
-        </div>
+      <div className="cat-dropdown">
+        <select
+          value={activeSub ?? ''}
+          onChange={e => onSubChange(e.target.value)}
+          aria-label="Subcategorie"
+          disabled={subcategories.length === 0}
+        >
+          <option value="">Toate subcategoriile</option>
+          {subcategories.map(sub => (
+            <option key={sub.id} value={sub.name}>
+              {sub.name} ({sub.product_count.toLocaleString('ro')})
+            </option>
+          ))}
+        </select>
+        <span className="cat-dropdown-chevron" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </span>
       </div>
     </>
   )
