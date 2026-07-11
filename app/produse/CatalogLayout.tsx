@@ -1,22 +1,23 @@
 'use client'
 import type { ReactNode } from 'react'
 import { ViewModeProvider, useViewMode } from './ViewModeContext'
+import ViewSwitcherButton from './ViewSwitcherButton'
 
 /**
  * Wraps the sidebar/grid area of /produse and lets desktop visitors switch
  * between two states:
- *  - "pills":   (default) sidebar collapsed into a row of 3 dropdowns
- *               (brand/category/subcategory — CategoryPillBar.tsx), each
- *               cell the same width as a product card (same 4-col grid +
- *               gap as .products-grid). Product grid steps up to 4 columns
- *               since the fixed-width sidebar column is gone.
- *  - "sidebar": the classic vertical category/brand list (Sidebar.tsx).
- *               Reached only by clicking the switcher — never the default.
+ *  - "pills":   (default) sidebar collapsed into a row of 4 equal-width
+ *               cells — the view switcher (ViewSwitcherButton.tsx) plus
+ *               brand/category/subcategory dropdowns (CategoryPillBar.tsx)
+ *               — same 4-col grid + gap as .products-grid, so every cell is
+ *               the same width as a product card. Product grid steps up to
+ *               4 columns since the fixed-width sidebar column is gone.
+ *  - "sidebar": the classic vertical category/brand list (Sidebar.tsx),
+ *               with its own full-width switcher as the first item
+ *               (SidebarViewToggle.tsx, rendered inside Sidebar.tsx).
  *
- * The switcher button itself does NOT live in this row — it's rendered as
- * the first item of the subcategory pill bar instead (see
- * ViewSwitcherButton.tsx + page.tsx), which stays reachable via a shared
- * ViewModeContext regardless of where in the tree it renders.
+ * Both switcher variants share the same ViewModeContext regardless of where
+ * in the tree they render.
  *
  * The dropdown row is sticky right under the navbar ONLY while no
  * category/brand is selected (`filterRowSticky`) — once one is, the
@@ -42,6 +43,7 @@ function LayoutInner({
       {sidebar}
       <main className="products-main">
         <div className={`filter-row${filterRowSticky ? ' is-sticky' : ''}`}>
+          <ViewSwitcherButton />
           {dropdowns}
         </div>
         {children}
@@ -59,9 +61,10 @@ export default function CatalogLayout(props: {
   return (
     <>
       <style>{`
-        /* Row of dropdown cells — matches .products-grid's 4-col template +
-           gap so every cell lines up with a product card column below it.
-           Normal-flow by default; .is-sticky pins it right under the navbar
+        /* Row of 4 equal cells (switcher + 3 dropdowns) — matches
+           .products-grid's 4-col template + gap so every cell lines up with
+           a product card column below it. Normal-flow by default;
+           .is-sticky pins it right under the navbar with its own padding
            (only while nothing's filtered — see filterRowSticky above). */
         .filter-row {
           margin: 16px 0;
@@ -74,6 +77,8 @@ export default function CatalogLayout(props: {
           position: sticky;
           top: 52px;
           z-index: 51;
+          margin: 0 0 16px;
+          padding: 16px 0;
           background: rgb(244, 244, 244);
         }
 

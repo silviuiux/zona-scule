@@ -8,7 +8,6 @@ import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
 import CatalogDropdowns from './CategoryPillBar'
 import CatalogLayout from './CatalogLayout'
-import ViewSwitcherButton from './ViewSwitcherButton'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
 export const dynamic = 'force-dynamic'
@@ -31,9 +30,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // logic this replaced).
   const isTrulyUnfiltered = !isFiltered && !sp.subcategorie
 
-  // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active;
-  // categorySubs when a category is active (shared by SubcategoryBar and the pills-mode dropdowns
-  // below, so the two views never disagree on the list).
+  // Fetch in parallel. allSubs is fetched unconditionally now — it's the
+  // Subcategorie dropdown's universal fallback (see subcategoryOptions
+  // below), not just the "Toate" pill bar's data source, so it needs to be
+  // available in every filter state, not just the unfiltered one.
   const [{ products, total }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
     getProducts({
       page: 1,
@@ -49,7 +49,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       subcategoryText: sp.subcategorie,
       search: sp.q,
     }),
-    !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
+    getAllSubcategoriesWithCount(),
     sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
     sp.categorie ? getSubcategoriesByCategoryName(sp.categorie) : Promise.resolve([]),
     getRawProductCount(),
@@ -58,8 +58,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
   const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
 
-  // Same subcategory set the visible SubcategoryBar/pill row would show —
-  // used to populate the "pills mode" Subcategorie dropdown.
+  // Subcategorie dropdown options: category-scoped list when a category's
+  // active, brand-scoped when just a brand is, otherwise every subcategory
+  // site-wide — always non-empty (never disabled) so the dropdown works
+  // regardless of what else is filtered, including plain search/no-subs
+  // cases where neither categorySubs nor brandSubs applies.
   const subcategoryOptions = sp.categorie
     ? categorySubs
     : (sp.brand && !sp.categorie && brandSubs.length > 0)
@@ -459,17 +462,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           filterRowSticky={!categoryOrBrandActive}
         >
           {/* Subcategory bar — category, brand, or all-products view. The
-              desktop view-switcher + mobile filter toggle render INSIDE the
-              bar (as its first, left-pinned items) so they and the pills
-              read as one scrollable row; when there's no bar to show
-              (search results, filters with no subcategories) it falls back
-              to its own standalone row so both stay reachable. Only sticky
-              right under the navbar once a category/brand is active — see
-              filterRowSticky above for the dropdown row's complementary
-              sticky state. */}
+              mobile filter toggle renders INSIDE the bar (as its first,
+              left-pinned item) so it and the pills read as one scrollable
+              row; when there's no bar to show (search results, filters
+              with no subcategories) it falls back to its own standalone
+              row so it's still reachable. Only sticky right under the
+              navbar once a category/brand is active — see filterRowSticky
+              above for the dropdown row's complementary sticky state
+              (the desktop view-switcher itself lives in that row / in
+              Sidebar.tsx now, not here — see CatalogLayout.tsx). */}
           {sp.categorie ? (
             <SubcategoryBar
-              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
+              toggle={<MobileFilterToggle />}
               categoryName={sp.categorie}
               brandName={sp.brand}
               activeSub={sp.subcategorie}
@@ -478,7 +482,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
           ) : sp.brand && brandSubs.length > 0 ? (
             <SubcategoryBar
-              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
+              toggle={<MobileFilterToggle />}
               brandName={sp.brand}
               activeSub={sp.subcategorie}
               total={total}
@@ -486,7 +490,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
           ) : !isFiltered ? (
             <SubcategoryBar
-              toggle={<><ViewSwitcherButton /><MobileFilterToggle /></>}
+              toggle={<MobileFilterToggle />}
               activeSub={sp.subcategorie}
               total={heroTotal}
               prefetchedSubs={allSubs}
@@ -494,7 +498,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
           ) : (
             <div className="products-header">
-              <ViewSwitcherButton />
               <MobileFilterToggle />
             </div>
           )}

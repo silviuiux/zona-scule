@@ -1,6 +1,7 @@
 'use client'
 import { TransitionLink as Link } from '@/components/NavigationProgress'
 import type { CategoryWithCount, BrandWithCount } from '@/lib/supabase'
+import SidebarViewToggle from './SidebarViewToggle'
 
 const SHOW_BRANDS = true
 
@@ -127,6 +128,8 @@ export default function Sidebar({
       `}</style>
 
       <aside className="sidebar">
+        <SidebarViewToggle />
+
         {/* ── CATEGORII ── */}
         <div className="sidebar-block">
           <Link

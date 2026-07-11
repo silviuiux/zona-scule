@@ -63,8 +63,14 @@ export default async function SubcategoryBar({
           position: sticky;
           top: 52px;
           z-index: 50;
-          margin: -32px 0 32px;
-          padding: 32px 0;
+          /* No negative top margin here — this bar is never the first child
+             of .products-main (the filter-row always precedes it), so
+             pulling it up to cancel main's own padding would just overlap
+             whatever's rendered above it instead. Plain padding gives it
+             the same "stuck" breathing room without reaching past its own
+             box. */
+          margin: 0 0 16px;
+          padding: 16px 0;
           background: rgb(244, 244, 244);
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }

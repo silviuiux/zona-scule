@@ -2,10 +2,12 @@
 import { useViewMode } from './ViewModeContext'
 
 /**
- * Desktop-only sidebar/pills view switcher. Rendered as the first,
- * sticky-left item inside the subcategory pill row (SubcategoryBar) or the
- * standalone products-header fallback — same slot/positioning pattern as
- * MobileFilterToggle (which is the mobile equivalent, shown only <=768px).
+ * Desktop-only pills-mode ↔ sidebar-mode switcher. Rendered as the first
+ * cell of CatalogLayout's ".filter-row" grid, alongside the brand/category/
+ * subcategory dropdowns — same fill-width/height styling as those cells so
+ * all four line up as equal columns. The sidebar-mode equivalent is a
+ * separate, differently-styled control (SidebarViewToggle.tsx) rendered
+ * inside Sidebar.tsx itself.
  */
 export default function ViewSwitcherButton() {
   const { mode, toggleMode } = useViewMode()
@@ -15,23 +17,16 @@ export default function ViewSwitcherButton() {
       <style>{`
         .view-switcher-btn {
           display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          width: 44px; height: 44px;
-          border-radius: 10px;
+          width: 100%;
+          min-height: 40px;
+          border-radius: 8px;
           background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.1);
+          border: 1px solid rgba(0,0,0,0.12);
           color: rgba(0,0,0,0.6);
           cursor: pointer;
-          position: sticky;
-          left: 0;
-          z-index: 2;
           transition: color 150ms, border-color 150ms;
         }
         .view-switcher-btn:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.3); }
-
-        @media (max-width: 768px) {
-          .view-switcher-btn { display: none; }
-        }
       `}</style>
       <button
         type="button"
