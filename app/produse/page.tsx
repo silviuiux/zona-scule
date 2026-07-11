@@ -2,11 +2,11 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getRawProductCount } from '@/lib/supabase'
+import { getProducts, getHomeProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
-import CategoryPillBar from './CategoryPillBar'
+import CatalogDropdowns from './CategoryPillBar'
 import CatalogLayout from './CatalogLayout'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
 
@@ -62,8 +62,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     }
   }
 
-  // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active
-  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, rawTotal] = await Promise.all([
+  // Fetch in parallel — all-subs only needed for unfiltered view; brand-subs when brand filter active;
+  // categorySubs when a category is active (shared by SubcategoryBar and the pills-mode dropdowns
+  // below, so the two views never disagree on the list).
+  const [{ products: rawProducts, total }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
     fetchListing(),
     getCategoriesWithCount(),
     getBrandsByFilter({
@@ -73,11 +75,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     }),
     !isFiltered ? getAllSubcategoriesWithCount() : Promise.resolve([]),
     sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
+    sp.categorie ? getSubcategoriesByCategoryName(sp.categorie) : Promise.resolve([]),
     getRawProductCount(),
   ])
 
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
   const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
+
+  // Same subcategory set the visible SubcategoryBar/pill row would show —
+  // used to populate the "pills mode" Subcategorie dropdown.
+  const subcategoryOptions = sp.categorie
+    ? categorySubs
+    : (sp.brand && !sp.categorie && brandSubs.length > 0)
+    ? brandSubs
+    : allSubs
 
   // Shuffle only applies to brand-only/category-only filtered views now —
   // "Toate" already comes back in a fixed tier order from getHomeProducts
@@ -462,13 +473,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               />
             </>
           }
-          pillBar={
-            <CategoryPillBar
+          dropdowns={
+            <CatalogDropdowns
               categories={categories}
               brands={brands}
+              subcategories={subcategoryOptions}
               activeCat={sp.categorie}
               activeBrand={sp.brand}
-              totalCount={rawTotal}
+              activeSub={sp.subcategorie}
             />
           }
         >
@@ -485,6 +497,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               brandName={sp.brand}
               activeSub={sp.subcategorie}
               total={activeCategory?.product_count}
+              prefetchedSubs={categorySubs}
             />
           ) : sp.brand && brandSubs.length > 0 ? (
             <SubcategoryBar

@@ -20,11 +20,11 @@ type ViewMode = 'sidebar' | 'pills'
  */
 export default function CatalogLayout({
   sidebar,
-  pillBar,
+  dropdowns,
   children,
 }: {
   sidebar: ReactNode
-  pillBar: ReactNode
+  dropdowns: ReactNode
   children: ReactNode
 }) {
   const [mode, setMode] = useState<ViewMode>('pills')
@@ -45,11 +45,16 @@ export default function CatalogLayout({
   return (
     <>
       <style>{`
-        .view-toggle-col {
-          flex-shrink: 0;
-          padding: 32px 0 0;
-        }
+        /* Toggle button is positioned absolutely (not a flex sibling) so it
+           never pushes .sidebar / .products-main to the right — both must
+           start flush at the container's own left edge, lining up with the
+           hero content and navbar above. */
+        .catalog-layout { position: relative; }
         .view-toggle-btn {
+          position: absolute;
+          top: 32px;
+          right: 0;
+          z-index: 5;
           display: flex; align-items: center; justify-content: center;
           width: 36px; height: 36px;
           border-radius: 8px;
@@ -61,49 +66,47 @@ export default function CatalogLayout({
         }
         .view-toggle-btn:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.3); }
 
-        /* Default (pills mode): sidebar list hidden, pill carousel shown,
+        /* Default (pills mode): sidebar list hidden, dropdown row shown,
            grid at 4 columns. Only on desktop — mobile always uses its own
            drawer + 2-col grid regardless of stored mode. */
         @media (min-width: 769px) {
           .catalog-layout.pills-mode .sidebar { display: none; }
           .catalog-layout.pills-mode .products-grid { grid-template-columns: repeat(4, 1fr); }
-          .catalog-layout:not(.pills-mode) .cat-pill-bar { display: none; }
+          .catalog-layout:not(.pills-mode) .cat-dropdown-bar { display: none; }
         }
 
         @media (max-width: 768px) {
-          .view-toggle-col { display: none; }
-          .cat-pill-bar { display: none !important; }
+          .view-toggle-btn { display: none; }
+          .cat-dropdown-bar { display: none !important; }
         }
       `}</style>
 
       <div className={`catalog-layout${mode === 'pills' ? ' pills-mode' : ''}`}>
-        <div className="view-toggle-col">
-          <button
-            type="button"
-            className="view-toggle-btn"
-            onClick={toggleMode}
-            aria-label={mode === 'pills' ? 'Comută la meniu lateral' : 'Comută la vizualizare compactă'}
-            title={mode === 'pills' ? 'Meniu lateral' : 'Vizualizare compactă'}
-          >
-            {mode === 'pills' ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="4" width="7" height="16" rx="1"/>
-                <rect x="13" y="4" width="8" height="7" rx="1"/>
-                <rect x="13" y="14" width="8" height="6" rx="1"/>
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="4" width="6" height="16" rx="1"/>
-                <line x1="13" y1="8" x2="21" y2="8"/>
-                <line x1="13" y1="12" x2="21" y2="12"/>
-                <line x1="13" y1="16" x2="21" y2="16"/>
-              </svg>
-            )}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="view-toggle-btn"
+          onClick={toggleMode}
+          aria-label={mode === 'pills' ? 'Comută la meniu lateral' : 'Comută la vizualizare compactă'}
+          title={mode === 'pills' ? 'Meniu lateral' : 'Vizualizare compactă'}
+        >
+          {mode === 'pills' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="7" height="16" rx="1"/>
+              <rect x="13" y="4" width="8" height="7" rx="1"/>
+              <rect x="13" y="14" width="8" height="6" rx="1"/>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="6" height="16" rx="1"/>
+              <line x1="13" y1="8" x2="21" y2="8"/>
+              <line x1="13" y1="12" x2="21" y2="12"/>
+              <line x1="13" y1="16" x2="21" y2="16"/>
+            </svg>
+          )}
+        </button>
         {sidebar}
         <main className="products-main">
-          {pillBar}
+          {dropdowns}
           {children}
         </main>
       </div>
