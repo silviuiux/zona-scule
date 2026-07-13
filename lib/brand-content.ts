@@ -118,7 +118,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Precizie care ' }, { text: 'nu iartă.', em: true }],
     ],
     heroSub:
-      'Peste 150 de ani de inginerie germană în pile, freze, carote și corpuri abrazive. Fie că ești meseriaș la primul șantier sau atelier industrial cu flux continuu, gama PFERD are scula potrivită — găsește-o în câteva secunde.',
+      'Peste 150 de ani de inginerie germană — pile, freze, carote și corpuri abrazive pentru orice atelier, de la primul șantier la flux industrial continuu.',
 
     intentGroups: [
       {
@@ -251,7 +251,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Fără compromis pe ' }, { text: 'durabilitate.', em: true }],
     ],
     heroSub:
-      'De la măturători pentru aeroporturi și porturi la aparate de curățat pentru turnătorii și hale de producție — gama Karcher acoperă orice suprafață, orice volum, orice tip de murdărie industrială.',
+      'De la aeroporturi și porturi la turnătorii și hale de producție — gama Karcher acoperă orice suprafață, orice volum, orice murdărie industrială.',
 
     // No hand-curated intent chips for Karcher — the real app_01_title data
     // (already populated by scripts/enrich-karcher.mjs) drives discovery

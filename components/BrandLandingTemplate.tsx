@@ -57,6 +57,18 @@ export default function BrandLandingTemplate({
     })),
   }
 
+  // In-page quick nav — lets someone landing on a long, section-heavy page
+  // jump straight to the part they need instead of scrolling past
+  // everything else. Built conditionally so it never links to a section a
+  // given brand doesn't render (see file header: sections are optional).
+  const quickNav: { label: string; href: string }[] = []
+  if (subcategories.length > 0) quickNav.push({ label: 'Categorii', href: '#categorii' })
+  if (config.useUseCaseCarousels && applicationGroups.length > 0) quickNav.push({ label: 'Recomandări', href: '#descopera' })
+  if (config.pillars) quickNav.push({ label: 'Gama de produse', href: '#descopera' })
+  if (config.glossary) quickNav.push({ label: 'Ghid tehnic', href: '#ghid-tehnic' })
+  quickNav.push({ label: 'Specialist', href: '#specialist' })
+  if (config.faq.length > 0) quickNav.push({ label: 'Întrebări', href: '#faq' })
+
   return (
     <div style={{ ['--brand-accent' as string]: accent }}>
       <style>{`
@@ -126,11 +138,49 @@ export default function BrandLandingTemplate({
         .bp-btn-secondary { color: rgb(0,0,0); border: 1px solid rgba(0,0,0,0.18); }
         .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
 
-        /* Trust bar */
+        /* Trust bar — icon + number pairs read as a glance-able strip rather
+           than a sentence; the icon gives each stat a distinct silhouette
+           so the row scans instantly instead of needing to be read word by
+           word. */
         .bp-trust { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
-        .bp-trust-stat { display: flex; flex-direction: column; gap: 2px; }
-        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(0,0,0); }
-        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+        .bp-trust-stat { display: flex; align-items: center; gap: 10px; }
+        .bp-trust-icon {
+          width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          background: color-mix(in srgb, var(--brand-accent) 8%, transparent);
+          color: var(--brand-accent);
+        }
+        .bp-trust-text { display: flex; flex-direction: column; gap: 0; }
+        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 20px; line-height: 1.1; color: rgb(0,0,0); }
+        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+
+        /* ══════════════════ QUICK NAV ══════════════════ */
+        /* Sticky in-page contents strip — sits right under the main site
+           nav (top: 52px, same offset SubcategoryBar.tsx uses) so a visitor
+           can jump straight to the section they need on a long page instead
+           of scrolling past everything else. */
+        .bp-quicknav-wrap {
+          position: sticky; top: 52px; z-index: 40;
+          background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
+          border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+        .bp-quicknav {
+          display: flex; gap: 8px; overflow-x: auto; padding: 12px 12px;
+          max-width: 1440px; margin: 0 auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .bp-quicknav::-webkit-scrollbar { display: none; }
+        .bp-quicknav-link {
+          font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+          color: rgba(0,0,0,0.65); text-decoration: none; flex-shrink: 0; white-space: nowrap;
+          padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.1);
+          transition: border-color 150ms, background-color 150ms, color 150ms;
+        }
+        .bp-quicknav-link:hover { border-color: var(--brand-accent); color: rgb(0,0,0); background: color-mix(in srgb, var(--brand-accent) 6%, transparent); }
+
+        /* Anchor targets sit behind the main nav + quick-nav strip unless
+           offset — clears both (52px + ~58px). */
+        #categorii, #descopera, #ghid-tehnic, #specialist, #faq { scroll-margin-top: 112px; }
 
         /* Intent toggles */
         .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
@@ -228,10 +278,16 @@ export default function BrandLandingTemplate({
         .bp-pillar-card:hover { box-shadow: 0 20px 48px rgba(0,0,0,0.1); transform: translateY(-3px); border-color: color-mix(in srgb, var(--brand-accent) 25%, transparent); }
         .bp-pillar-code { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; color: rgba(0,0,0,0.22); letter-spacing: 0.08em; }
         .bp-pillar-title { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.01em; color: rgb(0,0,0); }
-        .bp-pillar-desc { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.55; color: rgba(0,0,0,0.5); }
-        .bp-pillar-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
-        .bp-pillar-bullets li { font-family: 'Recursive', sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.7); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
-        .bp-pillar-bullets li::before { content: ''; width: 5px; height: 5px; margin-top: 6px; flex-shrink: 0; background: var(--brand-accent); border-radius: 1px; }
+        .bp-pillar-desc { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.5; color: rgba(0,0,0,0.5); }
+        /* Compact tags instead of a bulleted sentence list — same
+           information, scannable in one sweep instead of read line by
+           line. */
+        .bp-pillar-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+        .bp-pillar-tags li {
+          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+          color: rgba(0,0,0,0.6); background: rgba(0,0,0,0.045);
+          padding: 5px 10px; border-radius: 6px; line-height: 1.3;
+        }
         .bp-pillar-cta {
           margin-top: auto; padding-top: 14px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
           letter-spacing: 0.07em; text-transform: uppercase; color: var(--brand-accent); text-decoration: none;
@@ -243,15 +299,27 @@ export default function BrandLandingTemplate({
         @media (max-width: 640px) { .bp-pillars-grid { grid-template-columns: 1fr; } }
 
         /* ══════════════════ GLOSSARY ══════════════════ */
+        /* Glance-then-dive pattern: code + term + material badges are
+           visible closed (that's the "cheat sheet" — often enough on its
+           own), the full explanation is one click away via <details> rather
+           than a permanent paragraph on every card. */
         .bp-glossary-section { background: rgb(236,236,236); padding: 56px 12px; }
-        .bp-glossary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
-        .bp-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(0,0,0); padding: 4px 10px; border-radius: 4px; }
+        .bp-glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; overflow: hidden; }
+        .bp-gloss-summary {
+          list-style: none; cursor: pointer; padding: 16px 18px;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+        .bp-gloss-summary::-webkit-details-marker { display: none; }
+        .bp-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(0,0,0); padding: 4px 9px; border-radius: 4px; }
         .bp-gloss-badges { display: flex; gap: 6px; flex-wrap: wrap; }
-        .bp-gloss-title { font-family: 'Recursive', sans-serif; font-weight: 600; font-size: 14px; color: rgb(0,0,0); }
-        .bp-gloss-desc { font-family: 'Recursive', sans-serif; font-size: 12.5px; line-height: 1.55; color: rgba(0,0,0,0.55); }
-        @media (max-width: 768px) { .bp-glossary-grid { grid-template-columns: 1fr; } }
+        .bp-gloss-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .bp-gloss-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13.5px; color: rgb(0,0,0); }
+        .bp-gloss-card[open] .bp-gloss-plus { transform: rotate(45deg); }
+        .bp-gloss-desc { padding: 0 18px 16px; font-family: 'Recursive', sans-serif; font-size: 12.5px; line-height: 1.55; color: rgba(0,0,0,0.55); }
+        @media (max-width: 1024px) { .bp-glossary-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .bp-glossary-grid { grid-template-columns: 1fr; } }
 
         /* ══════════════════ SPECIALIST ══════════════════ */
         .bp-specialist-wrap { padding: 56px 12px; max-width: 1440px; margin: 0 auto; }
@@ -272,7 +340,11 @@ export default function BrandLandingTemplate({
 
         /* ══════════════════ FAQ ══════════════════ */
         .bp-faq-section { padding: 56px 12px 72px; }
-        .bp-faq-list { display: flex; flex-direction: column; gap: 10px; }
+        /* Two columns on desktop — uses the full container width the way a
+           single centered text column can't, without stretching each Q&A
+           row to an unreadable ~1400px line length. */
+        .bp-faq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-items: start; }
+        @media (max-width: 800px) { .bp-faq-list { grid-template-columns: 1fr; } }
         .bp-faq-item { background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
         .bp-faq-q {
           list-style: none; cursor: pointer; padding: 18px 20px;
@@ -326,12 +398,22 @@ export default function BrandLandingTemplate({
 
           <div className="bp-trust">
             <div className="bp-trust-stat">
-              <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
-              <span className="bp-trust-l">Produse</span>
+              <span className="bp-trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              </span>
+              <span className="bp-trust-text">
+                <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
+                <span className="bp-trust-l">Produse</span>
+              </span>
             </div>
             <div className="bp-trust-stat">
-              <span className="bp-trust-n">{subcategories.length}</span>
-              <span className="bp-trust-l">Subcategorii</span>
+              <span className="bp-trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              </span>
+              <span className="bp-trust-text">
+                <span className="bp-trust-n">{subcategories.length}</span>
+                <span className="bp-trust-l">Subcategorii</span>
+              </span>
             </div>
             {config.seapEligible && (
               <span className="badge badge-seap">Eligibil S.E.A.P.</span>
@@ -363,9 +445,20 @@ export default function BrandLandingTemplate({
         </div>
       </section>
 
+      {/* ══════════════════ QUICK NAV ══════════════════ */}
+      {quickNav.length > 0 && (
+        <div className="bp-quicknav-wrap">
+          <nav className="bp-quicknav" aria-label="Navigare rapidă în pagină">
+            {quickNav.map(item => (
+              <a key={item.label + item.href} href={item.href} className="bp-quicknav-link">{item.label}</a>
+            ))}
+          </nav>
+        </div>
+      )}
+
       {/* ══════════════════ CATEGORY / SUBCATEGORY RAIL ══════════════════ */}
       {subcategories.length > 0 && (
-        <section className="bp-rail-section bp-section">
+        <section id="categorii" className="bp-rail-section bp-section">
           <div className="bp-rail">
             <Link href={catalogHref} className="bp-rail-chip">
               Toate <span className="cnt">{totalProductCount.toLocaleString('ro-RO')}</span>
@@ -385,7 +478,7 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ USE-CASE CAROUSELS ══════════════════ */}
       {config.useUseCaseCarousels && applicationGroups.length > 0 && (
-        <section className="bp-usecase-section bp-section">
+        <section id="descopera" className="bp-usecase-section bp-section">
           <div className="bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Recomandare pe context</span>
             <h2 className="bp-section-title">{config.useCaseSectionTitle}</h2>
@@ -412,7 +505,7 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ PRODUCT PILLARS ══════════════════ */}
       {config.pillars && (
-        <section className="bp-pillars-section bp-section">
+        <section id="descopera" className="bp-pillars-section bp-section">
           <div className="bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Pilonii de gamă</span>
             <h2 className="bp-section-title">Toată gama, organizată pe uz.</h2>
@@ -425,7 +518,7 @@ export default function BrandLandingTemplate({
                   <h3 className="bp-pillar-title">{p.title}</h3>
                   <p className="bp-pillar-desc" style={{ marginTop: 6 }}>{p.desc}</p>
                 </div>
-                <ul className="bp-pillar-bullets">
+                <ul className="bp-pillar-tags">
                   {p.bullets.map(b => <li key={b}>{b}</li>)}
                 </ul>
                 <Link href={`${catalogHref}&q=${encodeURIComponent(p.q)}`} className="bp-pillar-cta">
@@ -440,7 +533,7 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
       {config.glossary && (
-        <section className="bp-glossary-section">
+        <section id="ghid-tehnic" className="bp-glossary-section">
           <div className="bp-section bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
             <h2 className="bp-section-title">{config.glossaryTitle}</h2>
@@ -448,25 +541,32 @@ export default function BrandLandingTemplate({
           </div>
           <div className="bp-section bp-glossary-grid">
             {config.glossary.map(g => (
-              <div key={g.code} className="bp-gloss-card">
-                <div className="bp-gloss-top">
-                  <span className="bp-gloss-code">{g.code}</span>
-                  {g.badges && (
-                    <div className="bp-gloss-badges">
-                      {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
-                    </div>
-                  )}
-                </div>
-                <span className="bp-gloss-title">{g.title}</span>
+              <details key={g.code} className="bp-gloss-card">
+                <summary className="bp-gloss-summary">
+                  <div className="bp-gloss-top">
+                    <span className="bp-gloss-code">{g.code}</span>
+                    {g.badges && (
+                      <div className="bp-gloss-badges">
+                        {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="bp-gloss-bottom">
+                    <span className="bp-gloss-title">{g.title}</span>
+                    <span className="bp-intent-plus bp-gloss-plus" style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'rgba(0,0,0,0.5)' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    </span>
+                  </div>
+                </summary>
                 <p className="bp-gloss-desc">{g.desc}</p>
-              </div>
+              </details>
             ))}
           </div>
         </section>
       )}
 
       {/* ══════════════════ ASK A SPECIALIST ══════════════════ */}
-      <div className="bp-specialist-wrap">
+      <div id="specialist" className="bp-specialist-wrap">
         <div className="bp-specialist">
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div className="bp-specialist-photo">
@@ -489,7 +589,7 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ FAQ (with FAQPage JSON-LD) ══════════════════ */}
       {config.faq.length > 0 && (
-        <section className="bp-faq-section bp-section">
+        <section id="faq" className="bp-faq-section bp-section">
           <div className="bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Întrebări frecvente</span>
             <h2 className="bp-section-title">Ce întreabă alți profesioniști</h2>

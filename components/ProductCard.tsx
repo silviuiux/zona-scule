@@ -70,12 +70,16 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Info */}
         <div className="pcard-info">
-          {product.brand_name && (
-            <p className="pcard-brand">{product.brand_name}</p>
+          {(product.brand_name || product.model) && (
+            <p className="pcard-brand">
+              {[product.brand_name, product.model].filter(Boolean).join(' ')}
+            </p>
           )}
-          <p className="pcard-model">
-            {product.name || product.model || stripMarkdown(product.short_description)}
-          </p>
+          {product.short_description && (
+            <p className="pcard-desc">
+              {stripMarkdown(product.short_description)}
+            </p>
+          )}
 
           {(specs.length > 0 || altSpec) && (
             <div className="pcard-specs-wrap">
@@ -156,8 +160,11 @@ export default function ProductCard({ product }: { product: Product }) {
           font-family: 'Recursive', sans-serif;
           font-weight: 500; font-size: 13px;
           color: rgb(0,0,0); letter-spacing: -0.02em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .pcard-model {
+        .pcard-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.5);
           line-height: 1.4;
