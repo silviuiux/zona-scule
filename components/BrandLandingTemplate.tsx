@@ -35,13 +35,15 @@ type Props = {
 }
 
 export default function BrandLandingTemplate({
-  brand,
   config,
   subcategories,
   applicationGroups,
   totalProductCount,
 }: Props) {
-  const accent = brand.brand_color || '#e14e00'
+  // Accent is the site's own red, not brand.brand_color — brand pages stay
+  // on the same white/black/red look as the rest of zonascule.online rather
+  // than reskinning per brand.
+  const accent = 'rgb(217,44,43)'
   const contactHref = `/contact?brand=${encodeURIComponent(config.brandName)}`
   const catalogHref = `/produse?brand=${encodeURIComponent(config.brandName)}`
 
@@ -87,26 +89,28 @@ export default function BrandLandingTemplate({
         /* ══════════════════ HERO ══════════════════ */
         .bp-hero {
           position: relative;
-          background-color: rgb(17,17,17);
+          background-color: rgb(255,255,255);
           background-image:
-            radial-gradient(circle at 92% -10%, color-mix(in srgb, var(--brand-accent) 22%, transparent), transparent 42%),
-            radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+            radial-gradient(circle at 92% -10%, color-mix(in srgb, var(--brand-accent) 8%, transparent), transparent 42%),
+            radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
           background-size: auto, 27px 27px;
           padding-top: 52px;
           overflow: hidden;
+          border-bottom: 1px solid rgba(0,0,0,0.06);
         }
-        .bp-hero-inner { padding: 96px 12px 72px; max-width: 1120px; }
-        .bp-hero .bp-eyebrow { color: rgba(255,255,255,0.55); margin-bottom: 22px; }
+        .bp-hero-inner { padding: 96px 12px 72px; max-width: 1440px; margin: 0 auto; }
+        .bp-hero-copy { max-width: 1120px; }
+        .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 22px; }
         .bp-hero-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(38px, 5.6vw, 74px);
-          line-height: 1.02; text-transform: uppercase; color: rgb(255,255,255);
+          line-height: 1.02; text-transform: uppercase; color: rgb(0,0,0);
           margin-bottom: 20px;
         }
         .bp-hero-title em { color: var(--brand-accent); font-style: normal; }
         .bp-hero-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.55);
+          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.6);
           max-width: 620px; margin-bottom: 32px;
         }
         .bp-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
@@ -119,46 +123,46 @@ export default function BrandLandingTemplate({
         }
         .bp-btn-primary { background: var(--brand-accent); color: rgb(255,255,255); }
         .bp-btn-primary:hover { filter: brightness(0.9); }
-        .bp-btn-secondary { color: rgb(255,255,255); border: 1px solid rgba(255,255,255,0.25); }
-        .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 10%, transparent); }
+        .bp-btn-secondary { color: rgb(0,0,0); border: 1px solid rgba(0,0,0,0.18); }
+        .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
 
         /* Trust bar */
         .bp-trust { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
         .bp-trust-stat { display: flex; flex-direction: column; gap: 2px; }
-        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(255,255,255); }
-        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(0,0,0); }
+        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
 
         /* Intent toggles */
         .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .bp-intent { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .bp-intent { background: rgb(250,250,249); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
         .bp-intent-summary {
           list-style: none; cursor: pointer;
           display: flex; align-items: center; justify-content: space-between;
           padding: 20px 22px;
           font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
-          letter-spacing: 0.05em; text-transform: uppercase; color: rgb(255,255,255);
+          letter-spacing: 0.05em; text-transform: uppercase; color: rgb(0,0,0);
           transition: background 150ms;
         }
         .bp-intent-summary::-webkit-details-marker { display: none; }
-        .bp-intent-summary:hover { background: rgba(255,255,255,0.03); }
+        .bp-intent-summary:hover { background: rgba(0,0,0,0.02); }
         .bp-intent-plus {
           width: 22px; height: 22px; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
-          border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
-          color: rgba(255,255,255,0.7);
+          border-radius: 50%; border: 1px solid rgba(0,0,0,0.2);
+          color: rgba(0,0,0,0.6);
           transition: transform 220ms cubic-bezier(0.22,1,0.36,1), background 150ms;
         }
         .bp-intent[open] .bp-intent-plus { transform: rotate(45deg); background: var(--brand-accent); border-color: var(--brand-accent); color: rgb(255,255,255); }
         .bp-intent-body { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 20px; }
         .bp-chip {
           font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 500;
-          color: rgb(255,255,255); text-decoration: none; padding: 8px 14px;
-          border: 1px solid rgba(255,255,255,0.16); border-radius: 100px;
+          color: rgb(0,0,0); text-decoration: none; padding: 8px 14px;
+          border: 1px solid rgba(0,0,0,0.14); border-radius: 100px;
           display: inline-flex; align-items: center; gap: 7px;
           transition: border-color 150ms, background-color 150ms;
         }
-        .bp-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 12%, transparent); }
-        .bp-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+        .bp-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
+        .bp-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; }
 
         @media (max-width: 768px) {
           .bp-hero-inner { padding: 64px 12px 48px; }
@@ -166,29 +170,43 @@ export default function BrandLandingTemplate({
         }
 
         /* ══════════════════ CATEGORY RAIL ══════════════════ */
+        /* Same horizontal-scroll pill carousel as the /produse catalog's
+           SubcategoryBar (see app/produse/SubcategoryBar.tsx) — kept as a
+           local copy rather than importing that (server) component here,
+           since this template doesn't have an "active" subcategory to
+           highlight the way a filtered listing page does. */
         .bp-rail-section { padding: 40px 12px 8px; }
-        .bp-rail { display: flex; flex-wrap: wrap; gap: 8px; }
-        .bp-rail-chip {
-          font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
-          color: rgb(0,0,0); text-decoration: none;
-          padding: 9px 16px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.12);
-          display: inline-flex; align-items: center; gap: 8px;
-          transition: border-color 150ms, background-color 150ms;
+        .bp-rail {
+          display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+          scrollbar-width: none; -ms-overflow-style: none;
         }
-        .bp-rail-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
-        .bp-rail-chip .cnt { color: rgba(0,0,0,0.4); font-weight: 500; }
+        .bp-rail::-webkit-scrollbar { display: none; }
+        .bp-rail-chip {
+          font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 400;
+          color: rgba(0,0,0,0.7); text-decoration: none; flex-shrink: 0;
+          padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.08);
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgb(255,255,255); white-space: nowrap;
+          transition: border-color 150ms, background-color 150ms, color 150ms;
+        }
+        .bp-rail-chip:hover { border-color: rgba(0,0,0,0.25); color: rgb(0,0,0); }
+        .bp-rail-chip .cnt { color: rgba(0,0,0,0.4); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
 
         /* ══════════════════ SECTION HEADS ══════════════════ */
-        .bp-section-head { margin-bottom: 28px; max-width: 640px; }
+        .bp-section-head { margin-bottom: 28px; max-width: 900px; text-align: left; }
         .bp-section-title {
-          font-family: 'Bungee', sans-serif; font-size: clamp(26px, 3.2vw, 40px);
-          text-transform: uppercase; line-height: 1.05; color: rgb(0,0,0); margin: 10px 0 10px;
+          font-family: 'Bungee', sans-serif; font-size: clamp(22px, 2.6vw, 34px);
+          text-transform: uppercase; line-height: 1.1; color: rgb(0,0,0); margin: 10px 0 10px;
+          white-space: nowrap; text-align: left;
         }
-        .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 14px; color: rgba(0,0,0,0.5); }
+        .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 14px; color: rgba(0,0,0,0.5); text-align: left; }
+        @media (max-width: 640px) {
+          .bp-section-title { white-space: normal; }
+        }
 
         /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
         .bp-usecase-section { padding: 56px 12px; }
-        .bp-usecase-group { margin-bottom: 40px; }
+        .bp-usecase-group { margin-bottom: 56px; }
         .bp-usecase-group:last-child { margin-bottom: 0; }
         .bp-usecase-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding: 0 2px; }
         .bp-usecase-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: rgb(0,0,0); }
@@ -201,15 +219,15 @@ export default function BrandLandingTemplate({
 
         /* ══════════════════ PILLARS ══════════════════ */
         .bp-pillars-section { padding: 56px 12px; }
-        .bp-pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .bp-pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
         .bp-pillar-card {
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
           padding: 24px; display: flex; flex-direction: column; gap: 16px;
           transition: box-shadow 220ms, transform 220ms, border-color 220ms;
         }
         .bp-pillar-card:hover { box-shadow: 0 20px 48px rgba(0,0,0,0.1); transform: translateY(-3px); border-color: color-mix(in srgb, var(--brand-accent) 25%, transparent); }
-        .bp-pillar-code { font-family: 'Bungee', sans-serif; font-size: 13px; color: rgba(0,0,0,0.18); letter-spacing: 0.05em; }
-        .bp-pillar-title { font-family: 'Bungee', sans-serif; font-size: 18px; line-height: 1.2; text-transform: uppercase; color: rgb(0,0,0); }
+        .bp-pillar-code { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; color: rgba(0,0,0,0.22); letter-spacing: 0.08em; }
+        .bp-pillar-title { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.01em; color: rgb(0,0,0); }
         .bp-pillar-desc { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.55; color: rgba(0,0,0,0.5); }
         .bp-pillar-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
         .bp-pillar-bullets li { font-family: 'Recursive', sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.7); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
@@ -226,7 +244,7 @@ export default function BrandLandingTemplate({
 
         /* ══════════════════ GLOSSARY ══════════════════ */
         .bp-glossary-section { background: rgb(236,236,236); padding: 56px 12px; }
-        .bp-glossary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .bp-glossary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
         .bp-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
         .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(0,0,0); padding: 4px 10px; border-radius: 4px; }
@@ -254,7 +272,7 @@ export default function BrandLandingTemplate({
 
         /* ══════════════════ FAQ ══════════════════ */
         .bp-faq-section { padding: 56px 12px 72px; }
-        .bp-faq-list { display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
+        .bp-faq-list { display: flex; flex-direction: column; gap: 10px; }
         .bp-faq-item { background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
         .bp-faq-q {
           list-style: none; cursor: pointer; padding: 18px 20px;
@@ -285,8 +303,9 @@ export default function BrandLandingTemplate({
       `}</style>
 
       {/* ══════════════════ HERO ══════════════════ */}
-      <section className="bp-hero noise-dark">
+      <section className="bp-hero">
         <div className="bp-hero-inner">
+        <div className="bp-hero-copy">
           <span className="bp-eyebrow">{config.eyebrow}</span>
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
@@ -341,13 +360,17 @@ export default function BrandLandingTemplate({
             </div>
           )}
         </div>
+        </div>
       </section>
 
       {/* ══════════════════ CATEGORY / SUBCATEGORY RAIL ══════════════════ */}
       {subcategories.length > 0 && (
         <section className="bp-rail-section bp-section">
           <div className="bp-rail">
-            {subcategories.slice(0, 16).map(s => (
+            <Link href={catalogHref} className="bp-rail-chip">
+              Toate <span className="cnt">{totalProductCount.toLocaleString('ro-RO')}</span>
+            </Link>
+            {subcategories.map(s => (
               <Link
                 key={s.id}
                 href={`/produse?brand=${encodeURIComponent(config.brandName)}&subcategorie=${encodeURIComponent(s.name)}`}
