@@ -403,6 +403,68 @@ export async function getCategories() {
   return data as Category[]
 }
 
+/**
+ * Single brand row by slug — powers flagship brand landing pages
+ * (app/brand/[slug]), which need the brand's logo/color/description without
+ * pulling the whole getBrands() list + counts just to find one row.
+ */
+export async function getBrandBySlug(slug: string): Promise<Brand | null> {
+  const { data, error } = await supabase
+    .from('brands')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (error || !data) return null
+  return data as Brand
+}
+
+export type ApplicationGroup = { title: string; count: number; products: Product[] }
+
+/**
+ * Groups a brand's products by their primary application/use-case label
+ * (`app_01_title` — e.g. "Aeroporturi și porturi", "Turnătorii", "Logistică
+ * și depozitare" on enriched Karcher rows; see scripts/enrich-karcher.mjs).
+ * Powers the "Găsește scula potrivită pentru lucrarea ta" carousels on brand
+ * landing pages — this mirrors how a professional buyer actually searches
+ * (by job, not by category or SKU), and costs nothing extra to build: the
+ * data is already there from the enrichment pipeline, no admin curation
+ * needed.
+ *
+ * Not every brand has this field populated yet (PFERD's catalog, for
+ * instance, is enriched from a hand-written nomenclature blueprint instead —
+ * see extras/karcher_nomenclature_blueprint.md and app/brand/pferd) — brands
+ * without app_01_title data simply return an empty array and the template
+ * omits the section.
+ *
+ * Implementation note: groups client-side over one brand-scoped fetch rather
+ * than a dedicated SQL RPC (no `group_products_by_application` function
+ * exists yet). Counts reflect the sampled page only, not the true brand-wide
+ * total — fine at current brand sizes and cached via the page's ISR window;
+ * if a brand's catalog grows enough for this to matter, add an RPC mirroring
+ * `count_products_by_subcategory` instead.
+ */
+export async function getApplicationGroupsByBrand(
+  brandName: string,
+  { maxGroups = 6, perGroup = 10, sampleSize = 500 }:
+    { maxGroups?: number; perGroup?: number; sampleSize?: number } = {}
+): Promise<ApplicationGroup[]> {
+  const { products } = await getProducts({ brandName, pageSize: sampleSize })
+
+  const byTitle = new Map<string, Product[]>()
+  for (const p of products) {
+    const title = p.app_01_title?.trim()
+    if (!title) continue
+    const arr = byTitle.get(title) ?? []
+    arr.push(p)
+    byTitle.set(title, arr)
+  }
+
+  return Array.from(byTitle.entries())
+    .map(([title, all]) => ({ title, count: all.length, products: all.slice(0, perGroup) }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, maxGroups)
+}
+
 export type BrandWithCount = Brand & { product_count: number }
 
 /** Returns all brands with at least 1 product across the whole catalogue. */

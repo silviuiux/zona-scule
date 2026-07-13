@@ -1,0 +1,1544 @@
+diff --git a/app/brand/karcher/page.tsx b/app/brand/karcher/page.tsx
+new file mode 100644
+index 0000000..ee800cf
+--- /dev/null
++++ b/app/brand/karcher/page.tsx
+@@ -0,0 +1,59 @@
++import type { Metadata } from 'next'
++import { notFound } from 'next/navigation'
++import Nav from '@/components/Nav'
++import Footer from '@/components/Footer'
++import BrandLandingTemplate from '@/components/BrandLandingTemplate'
++import { getBrandBySlug, getSubcategoriesByBrandName, getApplicationGroupsByBrand } from '@/lib/supabase'
++import { getBrandPageConfig } from '@/lib/brand-content'
++
++// ─────────────────────────────────────────────────────────────────────────
++// Brand Landing Page — Karcher
++// Second flagship page on the shared template (see app/brand/pferd for the
++// hand-curated pattern). This one leans on real data instead of curated
++// copy: Karcher's product rows already carry populated app_01_title values
++// from the enrichment pipeline (scripts/enrich-karcher.mjs), so the
++// "find the right tool for your job" section is driven live by
++// getApplicationGroupsByBrand() rather than a hardcoded chip list — this is
++// the concrete implementation of the application-based-discovery
++// differentiator from the brand-pages research spec.
++//
++// Same nav/sitemap note as PFERD: reachable only by direct URL until wired
++// into <Nav /> / app/brand/page.tsx.
++// ─────────────────────────────────────────────────────────────────────────
++
++export const revalidate = 3600
++
++export async function generateMetadata(): Promise<Metadata> {
++  const config = getBrandPageConfig('karcher')
++  if (!config) return {}
++  return { title: config.metaTitle, description: config.metaDescription }
++}
++
++export default async function KarcherBrandPage() {
++  const config = getBrandPageConfig('karcher')
++  if (!config) return notFound()
++
++  const [brand, subcategories, applicationGroups] = await Promise.all([
++    getBrandBySlug('karcher'),
++    getSubcategoriesByBrandName(config.brandName),
++    config.useUseCaseCarousels ? getApplicationGroupsByBrand(config.brandName) : Promise.resolve([]),
++  ])
++
++  const totalProductCount = subcategories.reduce((sum, s) => sum + s.product_count, 0)
++
++  const brandRow = brand ?? { id: 'karcher', slug: 'karcher', name: config.brandName, logo_url: null, brand_color: '#005f9e', country: 'Germania', short_description: null, featured: true }
++
++  return (
++    <>
++      <Nav />
++      <BrandLandingTemplate
++        brand={brandRow}
++        config={config}
++        subcategories={subcategories}
++        applicationGroups={applicationGroups}
++        totalProductCount={totalProductCount}
++      />
++      <Footer />
++    </>
++  )
++}
+diff --git a/app/brand/pferd/page.tsx b/app/brand/pferd/page.tsx
+index 113a923..0674693 100644
+--- a/app/brand/pferd/page.tsx
++++ b/app/brand/pferd/page.tsx
+@@ -1,553 +1,60 @@
+ import type { Metadata } from 'next'
+-import Link from 'next/link'
++import { notFound } from 'next/navigation'
+ import Nav from '@/components/Nav'
+ import Footer from '@/components/Footer'
++import BrandLandingTemplate from '@/components/BrandLandingTemplate'
++import { getBrandBySlug, getSubcategoriesByBrandName, getApplicationGroupsByBrand } from '@/lib/supabase'
++import { getBrandPageConfig } from '@/lib/brand-content'
+ 
+ // ─────────────────────────────────────────────────────────────────────────
+ // Brand Landing Page — PFERD
+-// First implementation of the reusable "brand landing" template. Deliberately
+-// left OUT of <Nav /> / sitemap for now — no entry point is wired up yet.
+-// Reachable only by direct URL (/brand/pferd) until we decide where it hooks
+-// into the main nav / brand index.
++// Thin data-fetching wrapper around the shared BrandLandingTemplate — all
++// copy/structure now lives in lib/brand-content.ts (PFERD entry) and the
++// template itself (components/BrandLandingTemplate.tsx). This file used to
++// be the ~500-line original template; it's kept as the reference
++// implementation for the hand-curated (no structured `applications` field)
++// brand pattern. See app/brand/karcher for the data-driven pattern.
+ //
+-// Copy + nomenclature (Corinox, TOUGH/ALLROUND/STEEL, ZYA/KUD/TRE, HICOAT,
+-// STB, KES/UGT, J5V/O5V, PH/FH) sourced from the PFERD nomenclature blueprint.
+-// Every CTA links into the real /produse catalog filtered to brand=Pferd —
+-// there's no dedicated "aplicație" / "material" filter column yet, so those
+-// searches ride the existing free-text `q` param. Swap for a real
+-// categorie/subcategorie/attribute filter once PFERD's subcategory tree is
+-// mapped in the DB (placeholder comments mark each spot below).
++// Deliberately left OUT of <Nav /> / sitemap for now — no entry point is
++// wired up yet. Reachable only by direct URL (/brand/pferd) until we decide
++// where it hooks into the main nav / brand index (see app/brand/page.tsx).
+ // ─────────────────────────────────────────────────────────────────────────
+ 
+-export const metadata: Metadata = {
+-  title: 'PFERD — Scule Industriale de Precizie | Zona Scule',
+-  description: 'Descoperă gama completă PFERD: pile, freze rotative, carote și corpuri abrazive pentru profesioniști și amatori pasionați.',
++export const revalidate = 3600
++
++export async function generateMetadata(): Promise<Metadata> {
++  const config = getBrandPageConfig('pferd')
++  if (!config) return {}
++  return { title: config.metaTitle, description: config.metaDescription }
+ }
+ 
+-type AppChip = { label: string; q: string }
+-const APP_CHIPS: AppChip[] = [
+-  { label: 'Ascuțire lanț drujbă', q: 'ascutire lant drujba' },
+-  { label: 'Debavurare', q: 'debavurare' },
+-  { label: 'Finisare', q: 'finisare' },
+-  { label: 'Găurire / Carote', q: 'carote' },
+-  { label: 'Șlefuire', q: 'slefuire' },
+-  { label: 'Perii industriale', q: 'perii industriale' },
+-]
++export default async function PferdBrandPage() {
++  const config = getBrandPageConfig('pferd')
++  if (!config) return notFound()
+ 
+-type MatChip = { label: string; q: string; badge: string }
+-const MAT_CHIPS: MatChip[] = [
+-  { label: 'Inox', q: 'inox', badge: 'badge-inox' },
+-  { label: 'Oțel / Steel', q: 'otel', badge: 'badge-steel' },
+-  { label: 'Aluminiu', q: 'aluminiu', badge: 'badge-alu' },
+-  { label: 'Fontă / Cast', q: 'fonta', badge: 'badge-cast' },
+-  { label: 'Lemn', q: 'lemn', badge: '' },
+-]
++  const [brand, subcategories, applicationGroups] = await Promise.all([
++    getBrandBySlug('pferd'),
++    getSubcategoriesByBrandName(config.brandName),
++    config.useUseCaseCarousels ? getApplicationGroupsByBrand(config.brandName) : Promise.resolve([]),
++  ])
+ 
+-type Pillar = {
+-  code: string
+-  title: string
+-  desc: string
+-  bullets: string[]
+-  q: string
+-}
+-const PILLARS: Pillar[] = [
+-  {
+-    code: '01',
+-    title: 'Pile, Răspe și Accesorii',
+-    desc: 'Ascuțire manuală de precizie — de la ateliere de lăcătușărie la sculărie fină.',
+-    bullets: [
+-      'Ascuțire lanțuri Classic & Premium',
+-      'Pile de precizie CORINOX',
+-      'Mânere ergonomice FH / PH',
+-    ],
+-    q: 'pile',
+-  },
+-  {
+-    code: '02',
+-    title: 'Freze Rotative (Carbură & HSS)',
+-    desc: 'Debavurare și prelucrare de detaliu, pe orice material — de la oțel la plastic.',
+-    bullets: [
+-      'Geometrii ZYA, KUD, TRE',
+-      'Linii TOUGH, ALLROUND, STEEL',
+-      'Carbură metalică & HSS',
+-    ],
+-    q: 'freze rotative',
+-  },
+-  {
+-    code: '03',
+-    title: 'Găurire, Carote și Adâncitoare',
+-    desc: 'De la prima gaură pilot la teșirea finală — un sistem complet, nu scule izolate.',
+-    bullets: [
+-      'Pânze bi-metal LS',
+-      'Burghie în trepte STB',
+-      'Adâncitoare KES / UGT cu HICOAT',
+-    ],
+-    q: 'carote adancitoare',
+-  },
+-  {
+-    code: '04',
+-    title: 'Corpuri Abrazive (Pietre polizoare)',
+-    desc: 'Șlefuire și degroșare controlată, cu liant potrivit pentru fiecare suprafață.',
+-    bullets: [
+-      'Forme ZY, WR, KU',
+-      'Liant J5V / O5V',
+-      'Dornuri suport compatibile',
+-    ],
+-    q: 'pietre polizoare',
+-  },
+-]
++  const totalProductCount = subcategories.reduce((sum, s) => sum + s.product_count, 0)
+ 
+-type GlossaryItem = {
+-  code: string
+-  title: string
+-  desc: string
+-  badges?: { label: string; cls: string }[]
+-}
+-const GLOSSARY: GlossaryItem[] = [
+-  {
+-    code: 'C3 / C5',
+-    title: 'Dantură',
+-    desc: 'Dantură încrucișată pentru îndepărtare optimă de material și finisare controlată a suprafeței.',
+-  },
+-  {
+-    code: 'TOUGH / STEEL',
+-    title: 'Linie constructivă',
+-    desc: 'TOUGH — construcție ultra-robustă pentru aplicații grele. STEEL — geometrie optimizată special pentru oțel.',
+-  },
+-  {
+-    code: 'INOX / CAST / ALU',
+-    title: 'Optimizare pe material',
+-    desc: 'Geometrie specială care previne încărcarea frezei și supraîncălzirea materialului respectiv.',
+-    badges: [
+-      { label: 'INOX', cls: 'badge-inox' },
+-      { label: 'CAST', cls: 'badge-cast' },
+-      { label: 'ALU', cls: 'badge-alu' },
+-    ],
+-  },
+-  {
+-    code: 'J5V / O5V',
+-    title: 'Liant piatră polizoare',
+-    desc: 'Tipul de liant al pietrei — moale sau dur — optimizat pentru suprafețe plane sau pentru muchii.',
+-  },
+-  {
+-    code: 'HICOAT / DLC',
+-    title: 'Acoperire premium',
+-    desc: 'Acoperiri speciale pentru durată de viață dublă a sculei și frecare redusă în timpul lucrului.',
+-  },
+-]
++  // Brand row may not exist yet in the `brands` table (slug wasn't required
++  // pre-template) — fall back to a minimal shape so the page still renders
++  // with the default accent color rather than 404-ing.
++  const brandRow = brand ?? { id: 'pferd', slug: 'pferd', name: config.brandName, logo_url: null, brand_color: '#d92c2b', country: 'Germania', short_description: null, featured: true }
+ 
+-export default function PferdBrandPage() {
+   return (
+     <>
+       <Nav />
+-      <style>{`
+-        /* ══════════════════ SHARED ══════════════════ */
+-        .pf-section { max-width: 1440px; margin: 0 auto; padding: 0 12px; }
+-        .pf-eyebrow {
+-          font-family: 'Inter', sans-serif;
+-          font-size: 11px; font-weight: 600;
+-          letter-spacing: 0.12em; text-transform: uppercase;
+-          display: inline-flex; align-items: center; gap: 8px;
+-        }
+-        .pf-eyebrow::before {
+-          content: ''; width: 6px; height: 6px; border-radius: 1px;
+-          background: rgb(217,44,43); flex-shrink: 0;
+-        }
+-
+-        /* Material badge system — color-coded so users match tool ↔ material at a glance */
+-        .badge {
+-          display: inline-flex; align-items: center;
+-          font-family: 'Inter', sans-serif;
+-          font-size: 10px; font-weight: 700;
+-          letter-spacing: 0.07em; text-transform: uppercase;
+-          padding: 4px 10px; border-radius: 100px;
+-          border: 1px solid transparent;
+-        }
+-        .badge-inox  { background: rgba(59,130,246,0.12);  color: rgb(37,99,235);   border-color: rgba(59,130,246,0.25); }
+-        .badge-alu   { background: rgba(148,163,184,0.16); color: rgb(71,85,105);   border-color: rgba(148,163,184,0.35); }
+-        .badge-cast  { background: rgba(120,79,42,0.14);   color: rgb(120,63,24);   border-color: rgba(120,79,42,0.3); }
+-        .badge-steel { background: rgba(217,44,43,0.1);    color: rgb(190,35,34);   border-color: rgba(217,44,43,0.28); }
+-
+-        /* ══════════════════ HERO ══════════════════ */
+-        .pf-hero {
+-          position: relative;
+-          background-color: rgb(17,17,17);
+-          background-image:
+-            radial-gradient(circle at 92% -10%, rgba(217,44,43,0.22), transparent 42%),
+-            radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+-          background-size: auto, 27px 27px;
+-          padding-top: 52px; /* clears fixed nav */
+-          overflow: hidden;
+-        }
+-        .pf-hero-inner {
+-          padding: 96px 12px 72px;
+-          max-width: 1120px;
+-        }
+-        .pf-hero .pf-eyebrow { color: rgba(255,255,255,0.55); margin-bottom: 22px; }
+-        .pf-hero-title {
+-          font-family: 'Bungee', sans-serif;
+-          font-size: clamp(38px, 5.6vw, 74px);
+-          line-height: 1.02;
+-          text-transform: uppercase;
+-          color: rgb(255,255,255);
+-          margin-bottom: 20px;
+-        }
+-        .pf-hero-title em { color: rgb(217,44,43); font-style: normal; }
+-        .pf-hero-sub {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 16px; line-height: 1.6;
+-          color: rgba(255,255,255,0.55);
+-          max-width: 620px;
+-          margin-bottom: 44px;
+-        }
+-
+-        /* Intent toggles — two large <details> "cards" side by side */
+-        .pf-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+-        .pf-intent {
+-          background: rgba(255,255,255,0.04);
+-          border: 1px solid rgba(255,255,255,0.1);
+-          border-radius: 10px;
+-          overflow: hidden;
+-        }
+-        .pf-intent-summary {
+-          list-style: none; cursor: pointer;
+-          display: flex; align-items: center; justify-content: space-between;
+-          padding: 20px 22px;
+-          font-family: 'Inter', sans-serif;
+-          font-size: 13px; font-weight: 700;
+-          letter-spacing: 0.05em; text-transform: uppercase;
+-          color: rgb(255,255,255);
+-          transition: background 150ms;
+-        }
+-        .pf-intent-summary::-webkit-details-marker { display: none; }
+-        .pf-intent-summary:hover { background: rgba(255,255,255,0.03); }
+-        .pf-intent-plus {
+-          width: 22px; height: 22px; flex-shrink: 0;
+-          display: flex; align-items: center; justify-content: center;
+-          border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
+-          color: rgba(255,255,255,0.7);
+-          transition: transform 220ms cubic-bezier(0.22,1,0.36,1), background 150ms;
+-        }
+-        .pf-intent[open] .pf-intent-plus {
+-          transform: rotate(45deg);
+-          background: rgb(217,44,43); border-color: rgb(217,44,43); color: rgb(255,255,255);
+-        }
+-        .pf-intent-body {
+-          display: flex; flex-wrap: wrap; gap: 8px;
+-          padding: 0 22px 20px;
+-        }
+-        .pf-chip {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 13px; font-weight: 500;
+-          color: rgb(255,255,255);
+-          text-decoration: none;
+-          padding: 8px 14px;
+-          border: 1px solid rgba(255,255,255,0.16);
+-          border-radius: 100px;
+-          display: inline-flex; align-items: center; gap: 7px;
+-          transition: border-color 150ms, background-color 150ms;
+-        }
+-        .pf-chip:hover { border-color: rgb(217,44,43); background: rgba(217,44,43,0.12); }
+-        .pf-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+-
+-        @media (max-width: 768px) {
+-          .pf-hero-inner { padding: 64px 12px 48px; }
+-          .pf-intent-row { grid-template-columns: 1fr; }
+-        }
+-
+-        /* ══════════════════ PILLARS ══════════════════ */
+-        .pf-pillars-section { padding: 72px 12px; }
+-        .pf-section-head { margin-bottom: 36px; max-width: 640px; }
+-        .pf-section-title {
+-          font-family: 'Bungee', sans-serif;
+-          font-size: clamp(28px, 3.6vw, 44px);
+-          text-transform: uppercase; line-height: 1.05;
+-          color: rgb(0,0,0); margin: 10px 0 10px;
+-        }
+-        .pf-section-sub {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 14px; color: rgba(0,0,0,0.5);
+-        }
+-        .pf-pillars-grid {
+-          display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+-        }
+-        .pf-pillar-card {
+-          background: rgb(255,255,255);
+-          border: 1px solid rgba(0,0,0,0.08);
+-          border-radius: 10px;
+-          padding: 24px;
+-          display: flex; flex-direction: column; gap: 16px;
+-          transition: box-shadow 220ms, transform 220ms, border-color 220ms;
+-        }
+-        .pf-pillar-card:hover {
+-          box-shadow: 0 20px 48px rgba(0,0,0,0.1);
+-          transform: translateY(-3px);
+-          border-color: rgba(217,44,43,0.25);
+-        }
+-        .pf-pillar-code {
+-          font-family: 'Bungee', sans-serif;
+-          font-size: 13px; color: rgba(0,0,0,0.18);
+-          letter-spacing: 0.05em;
+-        }
+-        .pf-pillar-title {
+-          font-family: 'Bungee', sans-serif;
+-          font-size: 18px; line-height: 1.2;
+-          text-transform: uppercase;
+-          color: rgb(0,0,0);
+-        }
+-        .pf-pillar-desc {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 13px; line-height: 1.55;
+-          color: rgba(0,0,0,0.5);
+-        }
+-        .pf-pillar-bullets {
+-          list-style: none; display: flex; flex-direction: column; gap: 8px;
+-          margin-top: 2px;
+-        }
+-        .pf-pillar-bullets li {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 12.5px; color: rgba(0,0,0,0.7);
+-          display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;
+-        }
+-        .pf-pillar-bullets li::before {
+-          content: ''; width: 5px; height: 5px; margin-top: 6px; flex-shrink: 0;
+-          background: rgb(217,44,43); border-radius: 1px;
+-        }
+-        .pf-pillar-cta {
+-          margin-top: auto; padding-top: 14px;
+-          font-family: 'Inter', sans-serif;
+-          font-size: 11px; font-weight: 700;
+-          letter-spacing: 0.07em; text-transform: uppercase;
+-          color: rgb(217,44,43);
+-          text-decoration: none;
+-          display: flex; align-items: center; justify-content: space-between;
+-        }
+-        .pf-pillar-cta svg { transition: transform 220ms cubic-bezier(0.22,1,0.36,1); }
+-        .pf-pillar-card:hover .pf-pillar-cta svg { transform: translateX(4px); }
+-
+-        @media (max-width: 1024px) {
+-          .pf-pillars-grid { grid-template-columns: 1fr 1fr; }
+-        }
+-        @media (max-width: 640px) {
+-          .pf-pillars-grid { grid-template-columns: 1fr; }
+-        }
+-
+-        /* ══════════════════ GLOSSARY ══════════════════ */
+-        .pf-glossary-section {
+-          background: rgb(236,236,236);
+-          padding: 72px 12px;
+-        }
+-        .pf-glossary-grid {
+-          display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+-        }
+-        .pf-gloss-card {
+-          background: rgb(255,255,255);
+-          border-radius: 10px;
+-          padding: 20px 22px;
+-          display: flex; flex-direction: column; gap: 8px;
+-        }
+-        .pf-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+-        .pf-gloss-code {
+-          font-family: 'Inter', sans-serif;
+-          font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+-          color: rgb(255,255,255); background: rgb(0,0,0);
+-          padding: 4px 10px; border-radius: 4px;
+-        }
+-        .pf-gloss-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+-        .pf-gloss-title {
+-          font-family: 'Recursive', sans-serif;
+-          font-weight: 600; font-size: 14px; color: rgb(0,0,0);
+-        }
+-        .pf-gloss-desc {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 12.5px; line-height: 1.55; color: rgba(0,0,0,0.55);
+-        }
+-        @media (max-width: 768px) {
+-          .pf-glossary-grid { grid-template-columns: 1fr; }
+-        }
+-
+-        /* ══════════════════ CROSS-SELL BANNER ══════════════════ */
+-        .pf-crosssell-wrap { padding: 72px 12px; max-width: 1440px; margin: 0 auto; }
+-        .pf-crosssell {
+-          position: relative;
+-          background-color: rgb(17,17,17);
+-          background-image:
+-            radial-gradient(circle at 6% 110%, rgba(217,44,43,0.2), transparent 45%),
+-            radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+-          background-size: auto, 27px 27px;
+-          border-radius: 12px;
+-          padding: 48px 52px;
+-          display: flex; align-items: center; gap: 40px; justify-content: space-between;
+-        }
+-        .pf-crosssell-icon {
+-          flex-shrink: 0;
+-          width: 76px; height: 76px; border-radius: 50%;
+-          background: rgba(217,44,43,0.12);
+-          border: 1px solid rgba(217,44,43,0.3);
+-          display: flex; align-items: center; justify-content: center;
+-          color: rgb(217,44,43);
+-        }
+-        .pf-crosssell-title {
+-          font-family: 'Bungee', sans-serif;
+-          font-size: clamp(20px, 2.4vw, 30px);
+-          text-transform: uppercase; line-height: 1.15;
+-          color: rgb(255,255,255); margin-bottom: 10px;
+-        }
+-        .pf-crosssell-body {
+-          font-family: 'Recursive', sans-serif;
+-          font-size: 14px; line-height: 1.6;
+-          color: rgba(255,255,255,0.55);
+-          max-width: 640px;
+-        }
+-        .pf-crosssell-body strong { color: rgb(255,255,255); font-weight: 600; }
+-        .pf-crosssell-btn {
+-          flex-shrink: 0;
+-          display: inline-flex; align-items: center; gap: 8px;
+-          background: rgb(217,44,43); color: rgb(255,255,255);
+-          padding: 15px 32px; border-radius: 4px;
+-          font-family: 'Inter', sans-serif;
+-          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+-          text-transform: uppercase; text-decoration: none; white-space: nowrap;
+-          transition: background 150ms;
+-        }
+-        .pf-crosssell-btn:hover { background: rgb(190,35,34); }
+-
+-        @media (max-width: 900px) {
+-          .pf-crosssell { flex-direction: column; align-items: flex-start; padding: 36px 24px; gap: 24px; }
+-          .pf-crosssell-btn { width: 100%; justify-content: center; }
+-        }
+-      `}</style>
+-
+-      {/* ══════════════════ HERO ══════════════════ */}
+-      <section className="pf-hero noise-dark">
+-        <div className="pf-hero-inner">
+-          <span className="pf-eyebrow">Partener oficial PFERD</span>
+-          <h1 className="pf-hero-title">
+-            Rezistență care <em>nu cedează.</em><br />
+-            Precizie care <em>nu iartă.</em>
+-          </h1>
+-          <p className="pf-hero-sub">
+-            Peste 150 de ani de inginerie germană în pile, freze, carote și corpuri abrazive.
+-            Fie că ești meseriaș la primul șantier sau atelier industrial cu flux continuu,
+-            gama PFERD are scula potrivită — găsește-o în câteva secunde.
+-          </p>
+-
+-          {/* Intent toggles — zero-JS accordion via <details>, styled as cards */}
+-          <div className="pf-intent-row">
+-            <details className="pf-intent">
+-              <summary className="pf-intent-summary">
+-                Caută după Aplicație
+-                <span className="pf-intent-plus">
+-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+-                </span>
+-              </summary>
+-              <div className="pf-intent-body">
+-                {/* Real app filter param TBD — currently rides the free-text `q` search scoped to brand=Pferd */}
+-                {APP_CHIPS.map(c => (
+-                  <Link key={c.q} href={`/produse?brand=Pferd&q=${encodeURIComponent(c.q)}`} className="pf-chip">
+-                    <span className="dot" />{c.label}
+-                  </Link>
+-                ))}
+-              </div>
+-            </details>
+-
+-            <details className="pf-intent">
+-              <summary className="pf-intent-summary">
+-                Caută după Material
+-                <span className="pf-intent-plus">
+-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+-                </span>
+-              </summary>
+-              <div className="pf-intent-body">
+-                {MAT_CHIPS.map(c => (
+-                  <Link key={c.q} href={`/produse?brand=Pferd&q=${encodeURIComponent(c.q)}`} className="pf-chip">
+-                    <span className="dot" />{c.label}
+-                  </Link>
+-                ))}
+-              </div>
+-            </details>
+-          </div>
+-        </div>
+-      </section>
+-
+-      {/* ══════════════════ PRODUCT PILLARS ══════════════════ */}
+-      <section className="pf-pillars-section pf-section">
+-        <div className="pf-section-head">
+-          <span className="pf-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Pilonii de gamă</span>
+-          <h2 className="pf-section-title">Patru familii. O singură logică.</h2>
+-          <p className="pf-section-sub">Toată nomenclatura PFERD organizată pe uz, nu pe cod de catalog.</p>
+-        </div>
+-
+-        <div className="pf-pillars-grid">
+-          {/* PRODUCT LOOP — replace with real PFERD subcategory query once mapped in DB */}
+-          {PILLARS.map(p => (
+-            <div key={p.code} className="pf-pillar-card">
+-              <span className="pf-pillar-code">{p.code}</span>
+-              <div>
+-                <h3 className="pf-pillar-title">{p.title}</h3>
+-                <p className="pf-pillar-desc" style={{ marginTop: 6 }}>{p.desc}</p>
+-              </div>
+-              <ul className="pf-pillar-bullets">
+-                {p.bullets.map(b => <li key={b}>{b}</li>)}
+-              </ul>
+-              <Link href={`/produse?brand=Pferd&q=${encodeURIComponent(p.q)}`} className="pf-pillar-cta">
+-                Vezi Produsele
+-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+-              </Link>
+-            </div>
+-          ))}
+-        </div>
+-      </section>
+-
+-      {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
+-      <section className="pf-glossary-section">
+-        <div className="pf-section pf-section-head">
+-          <span className="pf-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
+-          <h2 className="pf-section-title">Descifrează codul PFERD</h2>
+-          <p className="pf-section-sub">Cheat-sheet rapid pentru codurile de pe etichetă — fără să deschizi catalogul.</p>
+-        </div>
+-        <div className="pf-section pf-glossary-grid">
+-          {GLOSSARY.map(g => (
+-            <div key={g.code} className="pf-gloss-card">
+-              <div className="pf-gloss-top">
+-                <span className="pf-gloss-code">{g.code}</span>
+-                {g.badges && (
+-                  <div className="pf-gloss-badges">
+-                    {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
+-                  </div>
+-                )}
+-              </div>
+-              <span className="pf-gloss-title">{g.title}</span>
+-              <p className="pf-gloss-desc">{g.desc}</p>
+-            </div>
+-          ))}
+-        </div>
+-      </section>
+-
+-      {/* ══════════════════ CROSS-SELL BANNER ══════════════════ */}
+-      <div className="pf-crosssell-wrap">
+-        <div className="pf-crosssell noise-dark">
+-          <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+-            <div className="pf-crosssell-icon">
+-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+-                <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>
+-              </svg>
+-            </div>
+-            <div>
+-              <h2 className="pf-crosssell-title">Potrivire inteligentă de accesorii</h2>
+-              <p className="pf-crosssell-body">
+-                Ai ales o freză sau o piatră polizoare? Nu uita să verifici <strong>diametrul tijei
+-                (3mm, 6mm, 8mm)</strong> pentru a alege dornul suport potrivit (<strong>BO</strong>) sau
+-                mânerul ergonomic (<strong>PH / FH</strong>) pentru pile.
+-              </p>
+-            </div>
+-          </div>
+-          <Link href="/produse?brand=Pferd&q=dorn+suport" className="pf-crosssell-btn">
+-            Vezi Accesorii Compatibile
+-          </Link>
+-        </div>
+-      </div>
+-
++      <BrandLandingTemplate
++        brand={brandRow}
++        config={config}
++        subcategories={subcategories}
++        applicationGroups={applicationGroups}
++        totalProductCount={totalProductCount}
++      />
+       <Footer />
+     </>
+   )
+diff --git a/components/BrandLandingTemplate.tsx b/components/BrandLandingTemplate.tsx
+new file mode 100644
+index 0000000..c939073
+--- /dev/null
++++ b/components/BrandLandingTemplate.tsx
+@@ -0,0 +1,510 @@
++import Link from 'next/link'
++import type { Brand, ApplicationGroup } from '@/lib/supabase'
++import type { SubcategoryWithCount } from '@/lib/supabase'
++import type { BrandPageConfig } from '@/lib/brand-content'
++import ProductCard from './ProductCard'
++
++// ─────────────────────────────────────────────────────────────────────────
++// Brand Landing Page — shared template
++//
++// Generalized from the original app/brand/pferd/page.tsx (the first
++// flagship brand page, built before this template existed). Every visual
++// pattern below (hero, intent chips, pillars, glossary, cross-sell) is
++// unchanged from that original — this file just parameterizes it via
++// `config` (lib/brand-content.ts) and real Supabase data instead of
++// hardcoding one brand's copy inline.
++//
++// Theming: brand.brand_color drives every accent color via the
++// --brand-accent CSS variable + color-mix() for tints, so a new brand needs
++// a hex code in the `brands` table, not a CSS rewrite.
++//
++// Sections are conditional on what each brand actually has:
++//   - intentGroups / pillars / glossary → hand-curated brands (PFERD-style
++//     nomenclature that has no structured DB field to query)
++//   - useUseCaseCarousels + applicationGroups → data-driven brands (Karcher-
++//     style, real app_01_title values from the enrichment pipeline)
++// A brand can use both, either, or neither — see lib/brand-content.ts.
++// ─────────────────────────────────────────────────────────────────────────
++
++type Props = {
++  brand: Brand
++  config: BrandPageConfig
++  subcategories: SubcategoryWithCount[]
++  applicationGroups: ApplicationGroup[]
++  totalProductCount: number
++}
++
++export default function BrandLandingTemplate({
++  brand,
++  config,
++  subcategories,
++  applicationGroups,
++  totalProductCount,
++}: Props) {
++  const accent = brand.brand_color || '#e14e00'
++  const contactHref = `/contact?brand=${encodeURIComponent(config.brandName)}`
++  const catalogHref = `/produse?brand=${encodeURIComponent(config.brandName)}`
++
++  const faqJsonLd = {
++    '@context': 'https://schema.org',
++    '@type': 'FAQPage',
++    mainEntity: config.faq.map(item => ({
++      '@type': 'Question',
++      name: item.q,
++      acceptedAnswer: { '@type': 'Answer', text: item.a },
++    })),
++  }
++
++  return (
++    <div style={{ ['--brand-accent' as string]: accent }}>
++      <style>{`
++        /* ══════════════════ SHARED ══════════════════ */
++        .bp-section { max-width: 1440px; margin: 0 auto; padding: 0 12px; }
++        .bp-eyebrow {
++          font-family: 'Inter', sans-serif;
++          font-size: 11px; font-weight: 600;
++          letter-spacing: 0.12em; text-transform: uppercase;
++          display: inline-flex; align-items: center; gap: 8px;
++        }
++        .bp-eyebrow::before {
++          content: ''; width: 6px; height: 6px; border-radius: 1px;
++          background: var(--brand-accent); flex-shrink: 0;
++        }
++        .badge {
++          display: inline-flex; align-items: center;
++          font-family: 'Inter', sans-serif;
++          font-size: 10px; font-weight: 700;
++          letter-spacing: 0.07em; text-transform: uppercase;
++          padding: 4px 10px; border-radius: 100px;
++          border: 1px solid transparent;
++        }
++        .badge-inox  { background: rgba(59,130,246,0.12);  color: rgb(37,99,235);   border-color: rgba(59,130,246,0.25); }
++        .badge-alu   { background: rgba(148,163,184,0.16); color: rgb(71,85,105);   border-color: rgba(148,163,184,0.35); }
++        .badge-cast  { background: rgba(120,79,42,0.14);   color: rgb(120,63,24);   border-color: rgba(120,79,42,0.3); }
++        .badge-steel { background: color-mix(in srgb, var(--brand-accent) 10%, transparent); color: var(--brand-accent); border-color: color-mix(in srgb, var(--brand-accent) 28%, transparent); }
++        .badge-seap  { background: rgba(21,128,61,0.08); color: rgb(21,128,61); border-color: rgba(21,128,61,0.22); }
++
++        /* ══════════════════ HERO ══════════════════ */
++        .bp-hero {
++          position: relative;
++          background-color: rgb(17,17,17);
++          background-image:
++            radial-gradient(circle at 92% -10%, color-mix(in srgb, var(--brand-accent) 22%, transparent), transparent 42%),
++            radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
++          background-size: auto, 27px 27px;
++          padding-top: 52px;
++          overflow: hidden;
++        }
++        .bp-hero-inner { padding: 96px 12px 72px; max-width: 1120px; }
++        .bp-hero .bp-eyebrow { color: rgba(255,255,255,0.55); margin-bottom: 22px; }
++        .bp-hero-title {
++          font-family: 'Bungee', sans-serif;
++          font-size: clamp(38px, 5.6vw, 74px);
++          line-height: 1.02; text-transform: uppercase; color: rgb(255,255,255);
++          margin-bottom: 20px;
++        }
++        .bp-hero-title em { color: var(--brand-accent); font-style: normal; }
++        .bp-hero-sub {
++          font-family: 'Recursive', sans-serif;
++          font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.55);
++          max-width: 620px; margin-bottom: 32px;
++        }
++        .bp-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
++        .bp-btn-primary, .bp-btn-secondary {
++          display: inline-flex; align-items: center; gap: 8px;
++          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
++          letter-spacing: 0.08em; text-transform: uppercase;
++          padding: 13px 24px; border-radius: 4px; text-decoration: none;
++          transition: background 150ms, border-color 150ms;
++        }
++        .bp-btn-primary { background: var(--brand-accent); color: rgb(255,255,255); }
++        .bp-btn-primary:hover { filter: brightness(0.9); }
++        .bp-btn-secondary { color: rgb(255,255,255); border: 1px solid rgba(255,255,255,0.25); }
++        .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 10%, transparent); }
++
++        /* Trust bar */
++        .bp-trust { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
++        .bp-trust-stat { display: flex; flex-direction: column; gap: 2px; }
++        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(255,255,255); }
++        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
++
++        /* Intent toggles */
++        .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
++        .bp-intent { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
++        .bp-intent-summary {
++          list-style: none; cursor: pointer;
++          display: flex; align-items: center; justify-content: space-between;
++          padding: 20px 22px;
++          font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
++          letter-spacing: 0.05em; text-transform: uppercase; color: rgb(255,255,255);
++          transition: background 150ms;
++        }
++        .bp-intent-summary::-webkit-details-marker { display: none; }
++        .bp-intent-summary:hover { background: rgba(255,255,255,0.03); }
++        .bp-intent-plus {
++          width: 22px; height: 22px; flex-shrink: 0;
++          display: flex; align-items: center; justify-content: center;
++          border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
++          color: rgba(255,255,255,0.7);
++          transition: transform 220ms cubic-bezier(0.22,1,0.36,1), background 150ms;
++        }
++        .bp-intent[open] .bp-intent-plus { transform: rotate(45deg); background: var(--brand-accent); border-color: var(--brand-accent); color: rgb(255,255,255); }
++        .bp-intent-body { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 20px; }
++        .bp-chip {
++          font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 500;
++          color: rgb(255,255,255); text-decoration: none; padding: 8px 14px;
++          border: 1px solid rgba(255,255,255,0.16); border-radius: 100px;
++          display: inline-flex; align-items: center; gap: 7px;
++          transition: border-color 150ms, background-color 150ms;
++        }
++        .bp-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 12%, transparent); }
++        .bp-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
++
++        @media (max-width: 768px) {
++          .bp-hero-inner { padding: 64px 12px 48px; }
++          .bp-intent-row { grid-template-columns: 1fr; }
++        }
++
++        /* ══════════════════ CATEGORY RAIL ══════════════════ */
++        .bp-rail-section { padding: 40px 12px 8px; }
++        .bp-rail { display: flex; flex-wrap: wrap; gap: 8px; }
++        .bp-rail-chip {
++          font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
++          color: rgb(0,0,0); text-decoration: none;
++          padding: 9px 16px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.12);
++          display: inline-flex; align-items: center; gap: 8px;
++          transition: border-color 150ms, background-color 150ms;
++        }
++        .bp-rail-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
++        .bp-rail-chip .cnt { color: rgba(0,0,0,0.4); font-weight: 500; }
++
++        /* ══════════════════ SECTION HEADS ══════════════════ */
++        .bp-section-head { margin-bottom: 28px; max-width: 640px; }
++        .bp-section-title {
++          font-family: 'Bungee', sans-serif; font-size: clamp(26px, 3.2vw, 40px);
++          text-transform: uppercase; line-height: 1.05; color: rgb(0,0,0); margin: 10px 0 10px;
++        }
++        .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 14px; color: rgba(0,0,0,0.5); }
++
++        /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
++        .bp-usecase-section { padding: 56px 12px; }
++        .bp-usecase-group { margin-bottom: 40px; }
++        .bp-usecase-group:last-child { margin-bottom: 0; }
++        .bp-usecase-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding: 0 2px; }
++        .bp-usecase-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: rgb(0,0,0); }
++        .bp-usecase-count { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(0,0,0,0.4); }
++        .bp-usecase-scroll {
++          display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
++          scroll-snap-type: x mandatory; scrollbar-width: thin;
++        }
++        .bp-usecase-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
++
++        /* ══════════════════ PILLARS ══════════════════ */
++        .bp-pillars-section { padding: 56px 12px; }
++        .bp-pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
++        .bp-pillar-card {
++          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
++          padding: 24px; display: flex; flex-direction: column; gap: 16px;
++          transition: box-shadow 220ms, transform 220ms, border-color 220ms;
++        }
++        .bp-pillar-card:hover { box-shadow: 0 20px 48px rgba(0,0,0,0.1); transform: translateY(-3px); border-color: color-mix(in srgb, var(--brand-accent) 25%, transparent); }
++        .bp-pillar-code { font-family: 'Bungee', sans-serif; font-size: 13px; color: rgba(0,0,0,0.18); letter-spacing: 0.05em; }
++        .bp-pillar-title { font-family: 'Bungee', sans-serif; font-size: 18px; line-height: 1.2; text-transform: uppercase; color: rgb(0,0,0); }
++        .bp-pillar-desc { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.55; color: rgba(0,0,0,0.5); }
++        .bp-pillar-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
++        .bp-pillar-bullets li { font-family: 'Recursive', sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.7); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
++        .bp-pillar-bullets li::before { content: ''; width: 5px; height: 5px; margin-top: 6px; flex-shrink: 0; background: var(--brand-accent); border-radius: 1px; }
++        .bp-pillar-cta {
++          margin-top: auto; padding-top: 14px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
++          letter-spacing: 0.07em; text-transform: uppercase; color: var(--brand-accent); text-decoration: none;
++          display: flex; align-items: center; justify-content: space-between;
++        }
++        .bp-pillar-cta svg { transition: transform 220ms cubic-bezier(0.22,1,0.36,1); }
++        .bp-pillar-card:hover .bp-pillar-cta svg { transform: translateX(4px); }
++        @media (max-width: 1024px) { .bp-pillars-grid { grid-template-columns: 1fr 1fr; } }
++        @media (max-width: 640px) { .bp-pillars-grid { grid-template-columns: 1fr; } }
++
++        /* ══════════════════ GLOSSARY ══════════════════ */
++        .bp-glossary-section { background: rgb(236,236,236); padding: 56px 12px; }
++        .bp-glossary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
++        .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
++        .bp-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
++        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(0,0,0); padding: 4px 10px; border-radius: 4px; }
++        .bp-gloss-badges { display: flex; gap: 6px; flex-wrap: wrap; }
++        .bp-gloss-title { font-family: 'Recursive', sans-serif; font-weight: 600; font-size: 14px; color: rgb(0,0,0); }
++        .bp-gloss-desc { font-family: 'Recursive', sans-serif; font-size: 12.5px; line-height: 1.55; color: rgba(0,0,0,0.55); }
++        @media (max-width: 768px) { .bp-glossary-grid { grid-template-columns: 1fr; } }
++
++        /* ══════════════════ SPECIALIST ══════════════════ */
++        .bp-specialist-wrap { padding: 56px 12px; max-width: 1440px; margin: 0 auto; }
++        .bp-specialist {
++          background: rgb(250,250,249); border: 1px solid rgba(0,0,0,0.08); border-radius: 12px;
++          padding: 40px 44px; display: flex; align-items: center; gap: 32px; justify-content: space-between; flex-wrap: wrap;
++        }
++        .bp-specialist-photo {
++          width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
++          background: color-mix(in srgb, var(--brand-accent) 14%, transparent);
++          display: flex; align-items: center; justify-content: center;
++          color: var(--brand-accent); font-family: 'Bungee', sans-serif; font-size: 20px;
++        }
++        .bp-specialist-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: rgb(0,0,0); }
++        .bp-specialist-role { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-accent); margin: 2px 0 8px; }
++        .bp-specialist-note { font-family: 'Recursive', sans-serif; font-size: 13.5px; line-height: 1.55; color: rgba(0,0,0,0.6); max-width: 560px; }
++        @media (max-width: 900px) { .bp-specialist { flex-direction: column; align-items: flex-start; } }
++
++        /* ══════════════════ FAQ ══════════════════ */
++        .bp-faq-section { padding: 56px 12px 72px; }
++        .bp-faq-list { display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
++        .bp-faq-item { background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
++        .bp-faq-q {
++          list-style: none; cursor: pointer; padding: 18px 20px;
++          font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: rgb(0,0,0);
++          display: flex; align-items: center; justify-content: space-between; gap: 12px;
++        }
++        .bp-faq-q::-webkit-details-marker { display: none; }
++        .bp-faq-a { padding: 0 20px 18px; font-family: 'Recursive', sans-serif; font-size: 13.5px; line-height: 1.6; color: rgba(0,0,0,0.6); }
++
++        /* ══════════════════ CROSS-SELL ══════════════════ */
++        .bp-crosssell-wrap { padding: 56px 12px; max-width: 1440px; margin: 0 auto; }
++        .bp-crosssell {
++          position: relative; background-color: rgb(17,17,17);
++          background-image: radial-gradient(circle at 6% 110%, color-mix(in srgb, var(--brand-accent) 20%, transparent), transparent 45%), radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
++          background-size: auto, 27px 27px; border-radius: 12px; padding: 48px 52px;
++          display: flex; align-items: center; gap: 40px; justify-content: space-between; flex-wrap: wrap;
++        }
++        .bp-crosssell-title { font-family: 'Bungee', sans-serif; font-size: clamp(20px, 2.4vw, 30px); text-transform: uppercase; line-height: 1.15; color: rgb(255,255,255); margin-bottom: 10px; }
++        .bp-crosssell-body { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.55); max-width: 640px; }
++        .bp-crosssell-btn {
++          flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px;
++          background: var(--brand-accent); color: rgb(255,255,255); padding: 15px 32px; border-radius: 4px;
++          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
++          text-transform: uppercase; text-decoration: none; white-space: nowrap; transition: filter 150ms;
++        }
++        .bp-crosssell-btn:hover { filter: brightness(0.9); }
++        @media (max-width: 900px) { .bp-crosssell { flex-direction: column; align-items: flex-start; padding: 36px 24px; } .bp-crosssell-btn { width: 100%; justify-content: center; } }
++      `}</style>
++
++      {/* ══════════════════ HERO ══════════════════ */}
++      <section className="bp-hero noise-dark">
++        <div className="bp-hero-inner">
++          <span className="bp-eyebrow">{config.eyebrow}</span>
++          <h1 className="bp-hero-title">
++            {config.heroTitle.map((line, i) => (
++              <span key={i}>
++                {line.map((tok, j) =>
++                  tok.em ? <em key={j}>{tok.text}</em> : <span key={j}>{tok.text}</span>
++                )}
++                {i < config.heroTitle.length - 1 && <br />}
++              </span>
++            ))}
++          </h1>
++          <p className="bp-hero-sub">{config.heroSub}</p>
++
++          <div className="bp-hero-ctas">
++            <Link href={catalogHref} className="bp-btn-primary">Vezi Catalogul</Link>
++            <Link href={contactHref} className="bp-btn-secondary">Vorbește cu un Specialist</Link>
++          </div>
++
++          <div className="bp-trust">
++            <div className="bp-trust-stat">
++              <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
++              <span className="bp-trust-l">Produse</span>
++            </div>
++            <div className="bp-trust-stat">
++              <span className="bp-trust-n">{subcategories.length}</span>
++              <span className="bp-trust-l">Subcategorii</span>
++            </div>
++            {config.seapEligible && (
++              <span className="badge badge-seap">Eligibil S.E.A.P.</span>
++            )}
++          </div>
++
++          {config.intentGroups && (
++            <div className="bp-intent-row">
++              {config.intentGroups.map(group => (
++                <details key={group.label} className="bp-intent">
++                  <summary className="bp-intent-summary">
++                    {group.label}
++                    <span className="bp-intent-plus">
++                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
++                    </span>
++                  </summary>
++                  <div className="bp-intent-body">
++                    {group.chips.map(c => (
++                      <Link key={c.q} href={`${catalogHref}&q=${encodeURIComponent(c.q)}`} className="bp-chip">
++                        <span className="dot" />{c.label}
++                      </Link>
++                    ))}
++                  </div>
++                </details>
++              ))}
++            </div>
++          )}
++        </div>
++      </section>
++
++      {/* ══════════════════ CATEGORY / SUBCATEGORY RAIL ══════════════════ */}
++      {subcategories.length > 0 && (
++        <section className="bp-rail-section bp-section">
++          <div className="bp-rail">
++            {subcategories.slice(0, 16).map(s => (
++              <Link
++                key={s.id}
++                href={`/produse?brand=${encodeURIComponent(config.brandName)}&subcategorie=${encodeURIComponent(s.name)}`}
++                className="bp-rail-chip"
++              >
++                {s.name} <span className="cnt">{s.product_count}</span>
++              </Link>
++            ))}
++          </div>
++        </section>
++      )}
++
++      {/* ══════════════════ USE-CASE CAROUSELS ══════════════════ */}
++      {config.useUseCaseCarousels && applicationGroups.length > 0 && (
++        <section className="bp-usecase-section bp-section">
++          <div className="bp-section-head">
++            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Recomandare pe context</span>
++            <h2 className="bp-section-title">{config.useCaseSectionTitle}</h2>
++            <p className="bp-section-sub">{config.useCaseSectionSub}</p>
++          </div>
++          {applicationGroups.map(group => (
++            <div key={group.title} className="bp-usecase-group">
++              <div className="bp-usecase-head">
++                <span className="bp-usecase-title">{group.title}</span>
++                <Link
++                  href={`${catalogHref}&q=${encodeURIComponent(group.title)}`}
++                  className="bp-usecase-count"
++                >
++                  {group.count} produse →
++                </Link>
++              </div>
++              <div className="bp-usecase-scroll">
++                {group.products.map(p => <ProductCard key={p.id} product={p} />)}
++              </div>
++            </div>
++          ))}
++        </section>
++      )}
++
++      {/* ══════════════════ PRODUCT PILLARS ══════════════════ */}
++      {config.pillars && (
++        <section className="bp-pillars-section bp-section">
++          <div className="bp-section-head">
++            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Pilonii de gamă</span>
++            <h2 className="bp-section-title">Toată gama, organizată pe uz.</h2>
++          </div>
++          <div className="bp-pillars-grid">
++            {config.pillars.map(p => (
++              <div key={p.code} className="bp-pillar-card">
++                <span className="bp-pillar-code">{p.code}</span>
++                <div>
++                  <h3 className="bp-pillar-title">{p.title}</h3>
++                  <p className="bp-pillar-desc" style={{ marginTop: 6 }}>{p.desc}</p>
++                </div>
++                <ul className="bp-pillar-bullets">
++                  {p.bullets.map(b => <li key={b}>{b}</li>)}
++                </ul>
++                <Link href={`${catalogHref}&q=${encodeURIComponent(p.q)}`} className="bp-pillar-cta">
++                  Vezi Produsele
++                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
++                </Link>
++              </div>
++            ))}
++          </div>
++        </section>
++      )}
++
++      {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
++      {config.glossary && (
++        <section className="bp-glossary-section">
++          <div className="bp-section bp-section-head">
++            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
++            <h2 className="bp-section-title">{config.glossaryTitle}</h2>
++            <p className="bp-section-sub">{config.glossarySub}</p>
++          </div>
++          <div className="bp-section bp-glossary-grid">
++            {config.glossary.map(g => (
++              <div key={g.code} className="bp-gloss-card">
++                <div className="bp-gloss-top">
++                  <span className="bp-gloss-code">{g.code}</span>
++                  {g.badges && (
++                    <div className="bp-gloss-badges">
++                      {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
++                    </div>
++                  )}
++                </div>
++                <span className="bp-gloss-title">{g.title}</span>
++                <p className="bp-gloss-desc">{g.desc}</p>
++              </div>
++            ))}
++          </div>
++        </section>
++      )}
++
++      {/* ══════════════════ ASK A SPECIALIST ══════════════════ */}
++      <div className="bp-specialist-wrap">
++        <div className="bp-specialist">
++          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
++            <div className="bp-specialist-photo">
++              {(config.specialist?.name ?? 'Echipa tehnică Zona Scule').split(' ').map(w => w[0]).slice(0, 2).join('')}
++            </div>
++            <div>
++              <div className="bp-specialist-name">{config.specialist?.name ?? 'Echipa tehnică Zona Scule'}</div>
++              <div className="bp-specialist-role">{config.specialist?.role ?? `Consultanță produse ${config.brandName}`}</div>
++              <p className="bp-specialist-note">
++                {config.specialist?.note ??
++                  `Nu ești sigur ce variantă ${config.brandName} se potrivește proiectului tău? Scrie-ne — răspundem cu recomandarea tehnică, nu doar cu un link către catalog.`}
++              </p>
++            </div>
++          </div>
++          <Link href={contactHref} className="bp-btn-primary" style={{ flexShrink: 0 }}>
++            Vorbește cu un Specialist
++          </Link>
++        </div>
++      </div>
++
++      {/* ══════════════════ FAQ (with FAQPage JSON-LD) ══════════════════ */}
++      {config.faq.length > 0 && (
++        <section className="bp-faq-section bp-section">
++          <div className="bp-section-head">
++            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Întrebări frecvente</span>
++            <h2 className="bp-section-title">Ce întreabă alți profesioniști</h2>
++          </div>
++          <div className="bp-faq-list">
++            {config.faq.map(item => (
++              <details key={item.q} className="bp-faq-item">
++                <summary className="bp-faq-q">
++                  {item.q}
++                  <span className="bp-intent-plus" style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'rgba(0,0,0,0.5)' }}>
++                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
++                  </span>
++                </summary>
++                <p className="bp-faq-a">{item.a}</p>
++              </details>
++            ))}
++          </div>
++          <script
++            type="application/ld+json"
++            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
++          />
++        </section>
++      )}
++
++      {/* ══════════════════ CROSS-SELL BANNER ══════════════════ */}
++      {config.crossSell && (
++        <div className="bp-crosssell-wrap">
++          <div className="bp-crosssell noise-dark">
++            <div>
++              <h2 className="bp-crosssell-title">{config.crossSell.title}</h2>
++              <p className="bp-crosssell-body">{config.crossSell.body}</p>
++            </div>
++            <Link href={`${catalogHref}&q=${encodeURIComponent(config.crossSell.q)}`} className="bp-crosssell-btn">
++              {config.crossSell.ctaLabel}
++            </Link>
++          </div>
++        </div>
++      )}
++    </div>
++  )
++}
+diff --git a/lib/brand-content.ts b/lib/brand-content.ts
+new file mode 100644
+index 0000000..47a4c13
+--- /dev/null
++++ b/lib/brand-content.ts
+@@ -0,0 +1,287 @@
++// ─────────────────────────────────────────────────────────────────────────
++// Brand landing page content config
++//
++// One config object per flagship brand (Karcher, Milwaukee, PFERD, FFGroup +
++// whichever 2-3 join them). This file is the thing Călin/content edits to
++// add or update a brand page — components/BrandLandingTemplate.tsx renders
++// whatever's here plus live Supabase data (subcategories, application
++// groups, brand row). Adding brand #7 means adding an entry here, not
++// building a new page.
++//
++// Every section is optional except heroTitle/heroSub/eyebrow — different
++// brands lean on different strengths:
++//   - PFERD has no structured `applications` data, so it leans on curated
++//     `pillars` + `intentGroups` (hand-built from the nomenclature blueprint).
++//   - Karcher has real `app_01_title` data from the enrichment pipeline, so
++//     it leans on the live use-case carousels (see getApplicationGroupsByBrand)
++//     instead of hardcoded chips/pillars.
++// See TECHNICAL_SPEC.md §4 for which fields are actually populated per brand.
++// ─────────────────────────────────────────────────────────────────────────
++
++export type HeroToken = { text: string; em?: boolean }
++export type HeroLine = HeroToken[]
++
++export type IntentChip = { label: string; q: string }
++export type IntentGroup = { label: string; chips: IntentChip[] }
++
++export type Pillar = {
++  code: string
++  title: string
++  desc: string
++  bullets: string[]
++  q: string
++}
++
++export type GlossaryItem = {
++  code: string
++  title: string
++  desc: string
++  badges?: { label: string; cls: 'badge-inox' | 'badge-alu' | 'badge-cast' | 'badge-steel' }[]
++}
++
++export type FaqItem = { q: string; a: string }
++
++export type Specialist = {
++  name: string
++  role: string
++  photoUrl?: string
++  note: string // one line on why this person specifically, e.g. category expertise
++}
++
++export type CrossSell = {
++  title: string
++  body: string // plain text; template wraps key phrases, no HTML needed
++  ctaLabel: string
++  q: string
++}
++
++export type BrandPageConfig = {
++  slug: string
++  brandName: string // must match products.brand_name exactly (case-sensitive per lib/supabase.ts normalization notes)
++  metaTitle: string
++  metaDescription: string
++
++  eyebrow: string
++  heroTitle: HeroLine[]
++  heroSub: string
++
++  /** Hand-curated discovery chips — omit for brands with real `applications` data (use useCaseCarousels instead). */
++  intentGroups?: IntentGroup[]
++
++  /** Curated product-family cards — best for brands with complex nomenclature (PFERD-style), not needed if use-case carousels cover discovery well. */
++  pillars?: Pillar[]
++
++  /** Whether to render live "find the right tool for your job" carousels from app_01_title data (see getApplicationGroupsByBrand). */
++  useUseCaseCarousels: boolean
++  useCaseSectionTitle: string
++  useCaseSectionSub: string
++
++  /** Technical glossary / code cheat-sheet — optional, PFERD-style nomenclature brands only. */
++  glossary?: GlossaryItem[]
++  glossaryTitle?: string
++  glossarySub?: string
++
++  /** Named human expertise — the actual differentiator distributors have over marketplaces. Falls back to a shared team block if omitted. */
++  specialist?: Specialist
++
++  /** S.E.A.P. (Romanian public-procurement platform) eligibility — small badge, big trust signal for institutional buyers. */
++  seapEligible: boolean
++
++  /** Answer-first FAQ, rendered with FAQPage JSON-LD for AI-search/AEO visibility (TECHNICAL_SPEC.md SEO-1/SEO-2). */
++  faq: FaqItem[]
++
++  crossSell?: CrossSell
++}
++
++const SHARED_SEAP_FAQ: FaqItem = {
++  q: 'Puteți emite ofertă pentru achiziții publice (S.E.A.P.)?',
++  a: 'Da — Zona Scule este furnizor înregistrat pentru achiziții publice prin S.E.A.P. Contactați-ne cu specificațiile tehnice și cantitatea, iar echipa noastră pregătește oferta conform cerințelor instituției dvs.',
++}
++
++const SHARED_WARRANTY_FAQ: FaqItem = {
++  q: 'Ce se întâmplă dacă un echipament are nevoie de service?',
++  a: 'Ca partener autorizat, oferim intervenții prin tehnicieni certificați și acces la piese originale. Contactați-ne cu seria produsului pentru a stabili cel mai rapid traseu de reparație.',
++}
++
++export const BRAND_PAGES: Record<string, BrandPageConfig> = {
++  // ── PFERD ──────────────────────────────────────────────────────────────
++  pferd: {
++    slug: 'pferd',
++    brandName: 'Pferd',
++    metaTitle: 'PFERD — Scule Industriale de Precizie | Zona Scule',
++    metaDescription:
++      'Descoperă gama completă PFERD: pile, freze rotative, carote și corpuri abrazive pentru profesioniști și amatori pasionați.',
++
++    eyebrow: 'Partener oficial PFERD',
++    heroTitle: [
++      [{ text: 'Rezistență care ' }, { text: 'nu cedează.', em: true }],
++      [{ text: 'Precizie care ' }, { text: 'nu iartă.', em: true }],
++    ],
++    heroSub:
++      'Peste 150 de ani de inginerie germană în pile, freze, carote și corpuri abrazive. Fie că ești meseriaș la primul șantier sau atelier industrial cu flux continuu, gama PFERD are scula potrivită — găsește-o în câteva secunde.',
++
++    intentGroups: [
++      {
++        label: 'Caută după Aplicație',
++        chips: [
++          { label: 'Ascuțire lanț drujbă', q: 'ascutire lant drujba' },
++          { label: 'Debavurare', q: 'debavurare' },
++          { label: 'Finisare', q: 'finisare' },
++          { label: 'Găurire / Carote', q: 'carote' },
++          { label: 'Șlefuire', q: 'slefuire' },
++          { label: 'Perii industriale', q: 'perii industriale' },
++        ],
++      },
++      {
++        label: 'Caută după Material',
++        chips: [
++          { label: 'Inox', q: 'inox' },
++          { label: 'Oțel / Steel', q: 'otel' },
++          { label: 'Aluminiu', q: 'aluminiu' },
++          { label: 'Fontă / Cast', q: 'fonta' },
++          { label: 'Lemn', q: 'lemn' },
++        ],
++      },
++    ],
++
++    pillars: [
++      {
++        code: '01',
++        title: 'Pile, Răspe și Accesorii',
++        desc: 'Ascuțire manuală de precizie — de la ateliere de lăcătușărie la sculărie fină.',
++        bullets: ['Ascuțire lanțuri Classic & Premium', 'Pile de precizie CORINOX', 'Mânere ergonomice FH / PH'],
++        q: 'pile',
++      },
++      {
++        code: '02',
++        title: 'Freze Rotative (Carbură & HSS)',
++        desc: 'Debavurare și prelucrare de detaliu, pe orice material — de la oțel la plastic.',
++        bullets: ['Geometrii ZYA, KUD, TRE', 'Linii TOUGH, ALLROUND, STEEL', 'Carbură metalică & HSS'],
++        q: 'freze rotative',
++      },
++      {
++        code: '03',
++        title: 'Găurire, Carote și Adâncitoare',
++        desc: 'De la prima gaură pilot la teșirea finală — un sistem complet, nu scule izolate.',
++        bullets: ['Pânze bi-metal LS', 'Burghie în trepte STB', 'Adâncitoare KES / UGT cu HICOAT'],
++        q: 'carote adancitoare',
++      },
++      {
++        code: '04',
++        title: 'Corpuri Abrazive (Pietre polizoare)',
++        desc: 'Șlefuire și degroșare controlată, cu liant potrivit pentru fiecare suprafață.',
++        bullets: ['Forme ZY, WR, KU', 'Liant J5V / O5V', 'Dornuri suport compatibile'],
++        q: 'pietre polizoare',
++      },
++    ],
++
++    useUseCaseCarousels: false,
++    useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
++    useCaseSectionSub: 'Produse PFERD grupate după aplicația reală, nu după codul din catalog.',
++
++    glossaryTitle: 'Descifrează codul PFERD',
++    glossarySub: 'Cheat-sheet rapid pentru codurile de pe etichetă — fără să deschizi catalogul.',
++    glossary: [
++      {
++        code: 'C3 / C5',
++        title: 'Dantură',
++        desc: 'Dantură încrucișată pentru îndepărtare optimă de material și finisare controlată a suprafeței.',
++      },
++      {
++        code: 'TOUGH / STEEL',
++        title: 'Linie constructivă',
++        desc: 'TOUGH — construcție ultra-robustă pentru aplicații grele. STEEL — geometrie optimizată special pentru oțel.',
++      },
++      {
++        code: 'INOX / CAST / ALU',
++        title: 'Optimizare pe material',
++        desc: 'Geometrie specială care previne încărcarea frezei și supraîncălzirea materialului respectiv.',
++        badges: [
++          { label: 'INOX', cls: 'badge-inox' },
++          { label: 'CAST', cls: 'badge-cast' },
++          { label: 'ALU', cls: 'badge-alu' },
++        ],
++      },
++      {
++        code: 'J5V / O5V',
++        title: 'Liant piatră polizoare',
++        desc: 'Tipul de liant al pietrei — moale sau dur — optimizat pentru suprafețe plane sau pentru muchii.',
++      },
++      {
++        code: 'HICOAT / DLC',
++        title: 'Acoperire premium',
++        desc: 'Acoperiri speciale pentru durată de viață dublă a sculei și frecare redusă în timpul lucrului.',
++      },
++    ],
++
++    specialist: {
++      name: 'Echipa tehnică PFERD',
++      role: 'Consultanță nomenclatură & alegere sculă',
++      note: 'Cunosc pe dinafară codurile PFERD (ZYA, TOUGH, J5V) — spune-le materialul și aplicația, primești varianta corectă din prima.',
++    },
++    seapEligible: true,
++    faq: [
++      SHARED_SEAP_FAQ,
++      SHARED_WARRANTY_FAQ,
++      {
++        q: 'Cum aleg diametrul de tijă corect pentru freze/pietre?',
++        a: 'Cele mai comune diametre de tijă PFERD sunt 3mm, 6mm și 8mm — verificați specificația mandrinei mașinii dvs. înainte de a alege dornul suport (cod BO). Echipa tehnică vă poate confirma compatibilitatea dacă ne trimiteți modelul mașinii.',
++      },
++    ],
++
++    crossSell: {
++      title: 'Potrivire inteligentă de accesorii',
++      body: 'Ai ales o freză sau o piatră polizoare? Verifică diametrul tijei (3mm, 6mm, 8mm) pentru a alege dornul suport potrivit (BO) sau mânerul ergonomic (PH / FH) pentru pile.',
++      ctaLabel: 'Vezi Accesorii Compatibile',
++      q: 'dorn suport',
++    },
++  },
++
++  // ── KARCHER ────────────────────────────────────────────────────────────
++  karcher: {
++    slug: 'karcher',
++    brandName: 'Karcher',
++    metaTitle: 'Karcher — Curățare Industrială Profesională | Zona Scule',
++    metaDescription:
++      'Măturătoare, aparate de curățat cu presiune și echipamente industriale Karcher pentru aeroporturi, șantiere, depozite și centre de producție.',
++
++    eyebrow: 'Partener autorizat Karcher',
++    heroTitle: [
++      [{ text: 'Curățare la scară ' }, { text: 'industrială.', em: true }],
++      [{ text: 'Fără compromis pe ' }, { text: 'durabilitate.', em: true }],
++    ],
++    heroSub:
++      'De la măturători pentru aeroporturi și porturi la aparate de curățat pentru turnătorii și hale de producție — gama Karcher acoperă orice suprafață, orice volum, orice tip de murdărie industrială.',
++
++    // No hand-curated intent chips for Karcher — the real app_01_title data
++    // (already populated by scripts/enrich-karcher.mjs) drives discovery
++    // instead, via the use-case carousels below.
++    useUseCaseCarousels: true,
++    useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
++    useCaseSectionSub:
++      'Produse Karcher grupate după domeniul real de utilizare — exact cum întreabă un procurement manager, nu cum e organizat un catalog.',
++
++    specialist: {
++      name: 'Echipa tehnică Karcher',
++      role: 'Consultanță echipamente industriale de curățare',
++      note: 'Vă ajutăm să alegeți între variantele Bp (baterie), D (diesel) și LPG în funcție de suprafața și mediul de lucru.',
++    },
++    seapEligible: true,
++    faq: [
++      SHARED_SEAP_FAQ,
++      SHARED_WARRANTY_FAQ,
++      {
++        q: 'Care este diferența dintre variantele Bp, D și LPG?',
++        a: 'Bp rulează pe acumulator (potrivit pentru spații închise, fără emisii), D pe motorină (autonomie mare, exterior), iar LPG pe gaz petrolier lichefiat (echilibru între autonomie și emisii reduse pentru spații semi-închise). Alegerea corectă depinde de suprafața de curățat și de mediul de lucru — echipa tehnică vă poate recomanda varianta potrivită.',
++      },
++      {
++        q: 'Oferiți piese de schimb și consumabile pentru echipamentele Karcher?',
++        a: 'Da, ca partener autorizat avem acces la piese originale Karcher și la rețeaua de service a producătorului — contactați-ne cu seria echipamentului pentru disponibilitate și termen.',
++      },
++    ],
++  },
++}
++
++export function getBrandPageConfig(slug: string): BrandPageConfig | null {
++  return BRAND_PAGES[slug] ?? null
++}
+diff --git a/lib/supabase.ts b/lib/supabase.ts
+index 994ea61..ad85c91 100644
+--- a/lib/supabase.ts
++++ b/lib/supabase.ts
+@@ -403,6 +403,68 @@ export async function getCategories() {
+   return data as Category[]
+ }
+ 
++/**
++ * Single brand row by slug — powers flagship brand landing pages
++ * (app/brand/[slug]), which need the brand's logo/color/description without
++ * pulling the whole getBrands() list + counts just to find one row.
++ */
++export async function getBrandBySlug(slug: string): Promise<Brand | null> {
++  const { data, error } = await supabase
++    .from('brands')
++    .select('*')
++    .eq('slug', slug)
++    .maybeSingle()
++  if (error || !data) return null
++  return data as Brand
++}
++
++export type ApplicationGroup = { title: string; count: number; products: Product[] }
++
++/**
++ * Groups a brand's products by their primary application/use-case label
++ * (`app_01_title` — e.g. "Aeroporturi și porturi", "Turnătorii", "Logistică
++ * și depozitare" on enriched Karcher rows; see scripts/enrich-karcher.mjs).
++ * Powers the "Găsește scula potrivită pentru lucrarea ta" carousels on brand
++ * landing pages — this mirrors how a professional buyer actually searches
++ * (by job, not by category or SKU), and costs nothing extra to build: the
++ * data is already there from the enrichment pipeline, no admin curation
++ * needed.
++ *
++ * Not every brand has this field populated yet (PFERD's catalog, for
++ * instance, is enriched from a hand-written nomenclature blueprint instead —
++ * see extras/karcher_nomenclature_blueprint.md and app/brand/pferd) — brands
++ * without app_01_title data simply return an empty array and the template
++ * omits the section.
++ *
++ * Implementation note: groups client-side over one brand-scoped fetch rather
++ * than a dedicated SQL RPC (no `group_products_by_application` function
++ * exists yet). Counts reflect the sampled page only, not the true brand-wide
++ * total — fine at current brand sizes and cached via the page's ISR window;
++ * if a brand's catalog grows enough for this to matter, add an RPC mirroring
++ * `count_products_by_subcategory` instead.
++ */
++export async function getApplicationGroupsByBrand(
++  brandName: string,
++  { maxGroups = 6, perGroup = 10, sampleSize = 500 }:
++    { maxGroups?: number; perGroup?: number; sampleSize?: number } = {}
++): Promise<ApplicationGroup[]> {
++  const { products } = await getProducts({ brandName, pageSize: sampleSize })
++
++  const byTitle = new Map<string, Product[]>()
++  for (const p of products) {
++    const title = p.app_01_title?.trim()
++    if (!title) continue
++    const arr = byTitle.get(title) ?? []
++    arr.push(p)
++    byTitle.set(title, arr)
++  }
++
++  return Array.from(byTitle.entries())
++    .map(([title, all]) => ({ title, count: all.length, products: all.slice(0, perGroup) }))
++    .sort((a, b) => b.count - a.count)
++    .slice(0, maxGroups)
++}
++
+ export type BrandWithCount = Brand & { product_count: number }
+ 
+ /** Returns all brands with at least 1 product across the whole catalogue. */

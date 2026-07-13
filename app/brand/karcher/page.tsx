@@ -7,43 +7,41 @@ import { getBrandBySlug, getSubcategoriesByBrandName, getApplicationGroupsByBran
 import { getBrandPageConfig } from '@/lib/brand-content'
 
 // ─────────────────────────────────────────────────────────────────────────
-// Brand Landing Page — PFERD
-// Thin data-fetching wrapper around the shared BrandLandingTemplate — all
-// copy/structure now lives in lib/brand-content.ts (PFERD entry) and the
-// template itself (components/BrandLandingTemplate.tsx). This file used to
-// be the ~500-line original template; it's kept as the reference
-// implementation for the hand-curated (no structured `applications` field)
-// brand pattern. See app/brand/karcher for the data-driven pattern.
+// Brand Landing Page — Karcher
+// Second flagship page on the shared template (see app/brand/pferd for the
+// hand-curated pattern). This one leans on real data instead of curated
+// copy: Karcher's product rows already carry populated app_01_title values
+// from the enrichment pipeline (scripts/enrich-karcher.mjs), so the
+// "find the right tool for your job" section is driven live by
+// getApplicationGroupsByBrand() rather than a hardcoded chip list — this is
+// the concrete implementation of the application-based-discovery
+// differentiator from the brand-pages research spec.
 //
-// Deliberately left OUT of <Nav /> / sitemap for now — no entry point is
-// wired up yet. Reachable only by direct URL (/brand/pferd) until we decide
-// where it hooks into the main nav / brand index (see app/brand/page.tsx).
+// Same nav/sitemap note as PFERD: reachable only by direct URL until wired
+// into <Nav /> / app/brand/page.tsx.
 // ─────────────────────────────────────────────────────────────────────────
 
 export const revalidate = 3600
 
 export async function generateMetadata(): Promise<Metadata> {
-  const config = getBrandPageConfig('pferd')
+  const config = getBrandPageConfig('karcher')
   if (!config) return {}
   return { title: config.metaTitle, description: config.metaDescription }
 }
 
-export default async function PferdBrandPage() {
-  const config = getBrandPageConfig('pferd')
+export default async function KarcherBrandPage() {
+  const config = getBrandPageConfig('karcher')
   if (!config) return notFound()
 
   const [brand, subcategories, applicationGroups] = await Promise.all([
-    getBrandBySlug('pferd'),
+    getBrandBySlug('karcher'),
     getSubcategoriesByBrandName(config.brandName),
     config.useUseCaseCarousels ? getApplicationGroupsByBrand(config.brandName) : Promise.resolve([]),
   ])
 
   const totalProductCount = subcategories.reduce((sum, s) => sum + s.product_count, 0)
 
-  // Brand row may not exist yet in the `brands` table (slug wasn't required
-  // pre-template) — fall back to a minimal shape so the page still renders
-  // with the default accent color rather than 404-ing.
-  const brandRow = brand ?? { id: 'pferd', slug: 'pferd', name: config.brandName, logo_url: null, brand_color: '#d92c2b', country: 'Germania', short_description: null, featured: true }
+  const brandRow = brand ?? { id: 'karcher', slug: 'karcher', name: config.brandName, logo_url: null, brand_color: '#005f9e', country: 'Germania', short_description: null, featured: true }
 
   return (
     <>
