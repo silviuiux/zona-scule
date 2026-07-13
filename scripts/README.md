@@ -5,10 +5,48 @@
 ```bash
 # Adaugă în .env.local:
 ANTHROPIC_API_KEY=sk-ant-...
+SUPABASE_SERVICE_KEY=eyJ...   # service_role key din Supabase (Settings → API) — necesar pentru orice script care SCRIE în DB (products e select-only pentru anon/authenticated)
 
 # Instalează dependențele script
 npm install @anthropic-ai/sdk
+npm install csv-parse ws
 ```
+
+## sync-prices-from-og-pricelists.mjs
+
+Sincronizează `products.price` cu prețurile din listele de preț ale furnizorilor
+(`extras/OG PRICE LIST/*.csv`). Match strict pe SKU — NU pe brand, pentru că
+fișierele sunt grupate pe distribuitor/export, nu pe brandul real al produsului.
+
+Reguli:
+1. Pentru fiecare SKU găsit într-un CSV, prețul e convertit în EUR (RON ÷ 5.2337,
+   sau păstrat dacă deja e EUR) și **suprascrie** price-ul curent din DB.
+2. Produsele cu preț deja "real" în DB (≠ 1.00, valoarea placeholder) care NU
+   apar în niciun CSV sunt presupuse a fi în RON și convertite RON→EUR la fel
+   (afectează în practică aproape exclusiv Milwaukee).
+3. Conflicte (același SKU, prețuri diferite în fișiere diferite) nu sunt
+   suprascrise silențios — prima valoare câștigă, restul e logat separat.
+
+```bash
+# Preview — arată exact ce s-ar schimba, nu scrie nimic
+node --env-file=.env.local scripts/sync-prices-from-og-pricelists.mjs --dry-run
+
+# Test pe un subset mic înainte de rularea completă
+node --env-file=.env.local scripts/sync-prices-from-og-pricelists.mjs --dry-run --limit 50
+
+# Rulare completă (live) — actualizează products.price + refresh product_listing_mv
+node --env-file=.env.local scripts/sync-prices-from-og-pricelists.mjs
+
+# Sari peste conversia RON→EUR a prețurilor deja existente (regula #2)
+node --env-file=.env.local scripts/sync-prices-from-og-pricelists.mjs --skip-legacy
+
+# Alt curs valutar / alt folder sursă
+node --env-file=.env.local scripts/sync-prices-from-og-pricelists.mjs --rate 5.24 --dir "extras/OG PRICE LIST"
+```
+
+Output (în `logs/`):
+- `price-sync-report-<timestamp>.json` — raport complet: toate update-urile, conflictele, statisticile
+- `price-sync-conflicts-<timestamp>.csv` — doar dacă există conflicte de preț între fișiere, pentru verificare manuală
 
 ## enrich-karcher.mjs
 
