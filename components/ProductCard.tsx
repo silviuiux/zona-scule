@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Product } from '@/lib/supabase'
+import { stripMarkdown } from '@/lib/markdown'
 
 export default function ProductCard({ product }: { product: Product }) {
   const img = product.main_image_storage_url || product.main_image_url
@@ -73,7 +74,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <p className="pcard-brand">{product.brand_name}</p>
           )}
           <p className="pcard-model">
-            {product.name || product.model || product.short_description}
+            {product.name || product.model || stripMarkdown(product.short_description)}
           </p>
 
           {(specs.length > 0 || altSpec) && (

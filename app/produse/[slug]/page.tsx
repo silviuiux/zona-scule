@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
 import HeroImage from './HeroImage'
 import ProductNavArrows from './ProductNavArrows'
+import ShortDescription from '@/components/ShortDescription'
 import SkuCopyField from './SkuCopyField'
 import ScrollAnimations from './ScrollAnimations'
 import VariantSelector from './VariantSelector'
@@ -131,6 +132,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           font-size: 14px; color: rgba(0,0,0,0.5);
           line-height: 1.65; margin-bottom: 28px;
         }
+        .pdp-desc p { margin: 0 0 10px; }
+        .pdp-desc p:last-child { margin-bottom: 0; }
+        .pdp-desc strong { font-weight: 700; color: rgba(0,0,0,0.75); }
+        .pdp-desc em { font-style: italic; }
+        .pdp-desc ul, .pdp-desc ol {
+          margin: 8px 0 0; padding-left: 18px;
+        }
+        .pdp-desc ul { list-style: disc; }
+        .pdp-desc li { margin-bottom: 4px; }
+        .pdp-desc li:last-child { margin-bottom: 0; }
         .cere-btn {
           display: block; width: 100%; padding: 14px;
           background: rgb(217,44,43); color: rgb(255,255,255); border: none;
@@ -346,12 +357,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 {product.name || product.model || product.sku || product.slug}
               </h1>
               {product.short_description && (
-                <p
+                <ShortDescription
+                  text={product.short_description}
                   className="pdp-desc reveal"
                   style={{ transitionDelay: '210ms' }}
-                >
-                  {product.short_description}
-                </p>
+                />
               )}
               <div className="reveal" style={{ transitionDelay: '270ms' }}>
                 <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
