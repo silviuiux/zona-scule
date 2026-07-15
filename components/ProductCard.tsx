@@ -7,38 +7,16 @@ export default function ProductCard({ product }: { product: Product }) {
   const img = product.main_image_storage_url || product.main_image_url
   const hoverImg = product.gallery_url_1 || null
 
-  // Default specs (always shown, faded on hover when alt exists)
+  // Spec boxes: always st1/st2, static (no hover swap)
   const specs = [
     { label: product.st1_label, value: product.st1_value },
     { label: product.st2_label, value: product.st2_value },
   ].filter(s => s.label && s.value)
 
-  // Collect all available app specs and pick one randomly
-  const availableAppSpecs = [
-    product.app_01_title && product.app_01_details
-      ? { label: product.app_01_title, value: product.app_01_details } : null,
-    product.app_02_title && product.app_02_details
-      ? { label: product.app_02_title, value: product.app_02_details } : null,
-    product.app_03_title && product.app_03_details
-      ? { label: product.app_03_title, value: product.app_03_details } : null,
-  ].filter((s): s is { label: string; value: string } => s !== null)
-
-  const specIndex = availableAppSpecs.length > 0
-    ? Array.from(product.id || '').reduce((acc, char) => acc + char.charCodeAt(0), 0) % availableAppSpecs.length
-    : 0
-
-  const altSpec = availableAppSpecs.length > 0
-    ? availableAppSpecs[specIndex]
-    : null
-
-  const hasHoverImg = !!hoverImg
-  const hasAltSpec  = !!altSpec
-
   const linkClass = [
     'pcard-link',
-    hasHoverImg ? 'has-img-alt' : 'no-img-alt',
-    hasAltSpec  ? 'has-spec-alt' : '',
-  ].filter(Boolean).join(' ')
+    hoverImg ? 'has-img-alt' : 'no-img-alt',
+  ].join(' ')
 
   return (
     <Link href={`/produse/${product.slug}`} className={linkClass}>
@@ -81,26 +59,16 @@ export default function ProductCard({ product }: { product: Product }) {
             </p>
           )}
 
-          {(specs.length > 0 || altSpec) && (
+          {specs.length > 0 && (
             <div className="pcard-specs-wrap">
-              {specs.length > 0 && (
-                <div className={`pcard-specs pcard-specs-default${altSpec ? ' swappable' : ''}`}>
-                  {specs.map((s, i) => (
-                    <div key={i} className="pcard-spec">
-                      <span className="pcard-spec-label">{s.label}</span>
-                      <span className="pcard-spec-value">{s.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {altSpec && (
-                <div className="pcard-specs pcard-specs-alt">
-                  <div className="pcard-spec pcard-spec-wide">
-                    <span className="pcard-spec-label">{altSpec.label}</span>
-                    <span className="pcard-spec-value pcard-spec-value-clamp">{altSpec.value}</span>
+              <div className="pcard-specs">
+                {specs.map((s, i) => (
+                  <div key={i} className="pcard-spec">
+                    <span className="pcard-spec-label">{s.label}</span>
+                    <span className="pcard-spec-value">{s.value}</span>
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -173,26 +141,14 @@ export default function ProductCard({ product }: { product: Product }) {
           text-overflow: ellipsis;
         }
 
-        /* ── Spec swap ── */
+        /* ── Spec boxes (st1/st2) — static, no hover swap ── */
         .pcard-specs-wrap {
-          position: relative;
           margin-top: auto;
           padding-top: 4px;
         }
         .pcard-specs {
           display: flex; gap: 6px;
         }
-        .pcard-specs-alt {
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          opacity: 0;
-          transition: opacity 220ms ease;
-        }
-        .pcard-specs-default.swappable {
-          transition: opacity 220ms ease;
-        }
-        .pcard-link.has-spec-alt:hover .pcard-specs-default.swappable { opacity: 0; }
-        .pcard-link.has-spec-alt:hover .pcard-specs-alt { opacity: 1; }
 
         /* Fill-container: each spec box grows to share the row equally —
            full width alone, 50/50 when there are two — and never wraps to
@@ -206,8 +162,6 @@ export default function ProductCard({ product }: { product: Product }) {
           border-radius: 4px;
           padding: 8px 10px;
         }
-        /* Wide variant for app description — fills full card width */
-        .pcard-spec-wide { width: 100%; }
 
         .pcard-spec-label {
           display: block;
@@ -224,13 +178,6 @@ export default function ProductCard({ product }: { product: Product }) {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 500;
           color: rgb(0,0,0); letter-spacing: -0.02em;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        /* App description: single line, truncated */
-        .pcard-spec-value-clamp {
-          display: block;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
