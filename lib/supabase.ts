@@ -634,6 +634,56 @@ export async function getFeaturedSubcategoriesWithImage(): Promise<FeaturedSubca
   return data as FeaturedSubcategoryWithImage[]
 }
 
+export type SuperviewGroup = { category: string; products: Product[] }
+
+/**
+ * Powers /produse/superview: exactly one representative product per unique
+ * (brand, category, subcategory) combination site-wide — a "one of each"
+ * overview rather than the full catalogue. The actual dedup/selection logic
+ * (featured first, then price desc, then name — same tiebreak convention as
+ * getProducts()) lives in the `get_superview_products()` Postgres function
+ * so it's a single indexed query instead of N+1 fetches per combo.
+ *
+ * "Necategorizat" is filtered out here (not in the SQL function, to keep
+ * that function reusable/generic) — same catch-all bucket already hidden
+ * from the sidebar category list in app/produse/page.tsx.
+ */
+export async function getSuperviewProducts(): Promise<{
+  groups: SuperviewGroup[]
+  totalProducts: number
+  brandCount: number
+  categoryCount: number
+}> {
+  const { data, error } = await supabase.rpc('get_superview_products')
+  if (error || !data) return { groups: [], totalProducts: 0, brandCount: 0, categoryCount: 0 }
+
+  const products = (data as Product[]).filter(
+    p => (p.category_text ?? '').toLowerCase().trim() !== 'necategorizat'
+  )
+
+  const byCategory = new Map<string, Product[]>()
+  for (const p of products) {
+    const cat = p.category_text ?? 'Alte produse'
+    const arr = byCategory.get(cat) ?? []
+    arr.push(p)
+    byCategory.set(cat, arr)
+  }
+
+  const groups = Array.from(byCategory.entries())
+    .map(([category, prods]) => ({
+      category,
+      products: prods.sort((a, b) => (a.subcategory_text ?? '').localeCompare(b.subcategory_text ?? '')),
+    }))
+    .sort((a, b) => b.products.length - a.products.length)
+
+  return {
+    groups,
+    totalProducts: products.length,
+    brandCount: new Set(products.map(p => p.brand_name)).size,
+    categoryCount: groups.length,
+  }
+}
+
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
   // Step 1: resolve category id (and canonical name — categoryName as typed
   // in the URL may differ in case from the stored category_text values, and
