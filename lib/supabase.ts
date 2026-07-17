@@ -575,7 +575,19 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
     if (row.subcategory_text) countMap[row.subcategory_text.toLowerCase().trim()] = row.cnt
   }
 
+  // Dedupe by name — see the matching comment in getSubcategoriesByBrandName:
+  // 63 subcategory names legitimately exist as 2-3 rows (same name, different
+  // parent_category_id), and count_products_by_subcategory groups by name
+  // only, so without this every duplicate row rendered as its own identical
+  // pill in the unfiltered "Toate" bar.
+  const seen = new Set<string>()
   return (subs as Subcategory[])
+    .filter(s => {
+      const key = s.name.toLowerCase().trim()
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
     .map(s => ({ ...s, product_count: countMap[s.name.toLowerCase().trim()] ?? 0 }))
     .filter(s => s.product_count > 0)
     .sort((a, b) => b.product_count - a.product_count)
@@ -612,8 +624,26 @@ export async function getSubcategoriesByBrandName(brandName: string): Promise<Su
     if (row.subcategory_text) countMap[row.subcategory_text.toLowerCase().trim()] = row.cnt
   }
 
+  // Dedupe by name: 63 subcategory names (e.g. "Fixare", "Force Logic",
+  // "Debitare și decupare") legitimately exist as 2-3 separate rows in the
+  // `subcategories` table — same name, different parent_category_id, because
+  // that subcategory genuinely sits under more than one category (see the
+  // similar note in getSubcategoriesByCategoryName). get_subcategories_by_brand
+  // groups its counts by subcategory_text only (not per-row/per-category), so
+  // every one of those duplicate rows was getting mapped to the SAME count
+  // and rendered as a separate pill — "Fixare 650" showing twice, "Debitare
+  // și decupare 607" three times, etc. in the brand-filtered pill bar. Since
+  // the count is already a per-name total, keeping just one row per name
+  // (first hit, alphabetical from the `order('name')` above) fixes the
+  // duplicate pills without changing any counts.
+  const seen = new Set<string>()
   return (subs as Subcategory[])
-    .filter(s => (countMap[s.name.toLowerCase().trim()] ?? 0) > 0)
+    .filter(s => {
+      const key = s.name.toLowerCase().trim()
+      if (seen.has(key)) return false
+      seen.add(key)
+      return (countMap[key] ?? 0) > 0
+    })
     .map(s => ({ ...s, product_count: countMap[s.name.toLowerCase().trim()] }))
     .sort((a, b) => b.product_count - a.product_count)
 }
