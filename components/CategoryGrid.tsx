@@ -14,22 +14,33 @@ type Cat = {
 const GRID_COLS = 4
 const CARD_HEIGHT = 400
 const GAP = 16
-// Permanent per-column starting offset (px) — this IS the masonry wave, not
-// a scroll effect. Decreases left→right so col0's first card sits lowest
-// and col3's sits highest, matching the staggered reference layout. This
-// never resets/settles to 0 — it's baked into the static layout, so cards
-// are always full-size and simply live at a staggered position.
+// Permanent per-column cosmetic offset (px) — this IS the masonry wave, not
+// a scroll effect. Decreases left→right so col0 sits lowest and col3 sits
+// highest, matching the staggered reference layout.
 //
-// It's seeded directly into the packer's running column heights (below)
-// rather than added afterwards per card. Adding it afterwards was the
-// actual bug behind the overlap: a wide card spanning two columns with
-// DIFFERENT stagger amounts would render lower than its own column's raw
-// packed height accounted for, so the next card handed off into the
-// less-staggered column started before that wide card's real (staggered)
-// bottom edge. Seeding it in means every reservation the packer makes is
-// already stagger-aware, so no downstream card can ever start before the
-// previous one in its column has actually ended, however columns differ.
+// Crucially, every row shares the SAME baseline height (see buildGrid below)
+// — this offset is added on top of that shared baseline purely for looks,
+// never folded into the layout math itself. That's what guarantees the
+// de-stagger effect (below) can land same-row cards on an exact, common
+// line: subtracting a column's fixed offset from its cards always returns
+// them to the row's shared baseline, because that's what they were offset
+// from in the first place. A true greedy masonry packer (what this used to
+// be) doesn't have that property — different columns can accumulate
+// different numbers of cards by any given point, so there's no shared line
+// for "de-staggered" cards to land on, and the grid never actually lines up.
 const COLUMN_STAGGER = [180, 120, 60, 0]
+const STAGGER_MAX = Math.max(...COLUMN_STAGGER)
+// Row-to-row spacing gets padded by the full stagger range (max - min),
+// rather than just CARD_HEIGHT + GAP. Two adjacent rows only ever risk
+// overlapping where a featured/wide card touches columns with DIFFERENT
+// stagger amounts — e.g. a card spanning col2 (stagger 60) and col3
+// (stagger 0) has no single offset that's simultaneously safe against a
+// deep-staggered neighbour above and a shallow one below, when the plain
+// CARD_HEIGHT + GAP spacing is all that separates rows. Padding every row
+// gap by STAGGER_MAX - STAGGER_MIN gives enough slack to cover the worst
+// case unconditionally, however cards happen to be arranged.
+const STAGGER_RANGE = STAGGER_MAX - Math.min(...COLUMN_STAGGER)
+const ROW_HEIGHT = CARD_HEIGHT + GAP + STAGGER_RANGE
 // Small, uniform one-time entrance rise (see .in-view in page.tsx) — just
 // enough to read as a soft fade-up on first appearance. The big, columned
 // motion is owned by the continuous de-stagger effect below instead.
@@ -38,42 +49,72 @@ const ENTRANCE_TRAVEL = 24
 const easeInOut = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
-type Slot = { cat: Cat; col: number; span: number; top: number }
+// `offset` is the FULL amount this card needs to travel to reach the tight,
+// no-padding grid position: it bundles both this card's own cosmetic stagger
+// AND its row's share of the ROW_HEIGHT padding (rowIndex * STAGGER_RANGE).
+// The CSS transform subtracts offset * --destagger, so at destagger:0 the
+// card sits at `top` (padded + staggered) and at :1 it lands exactly on
+// rowIndex * (CARD_HEIGHT + GAP) — a genuinely tight grid, not just
+// destaggered-but-still-padded. See the de-stagger effect below for why the
+// padding has to unwind together with the stagger, not stay baked in.
+type Slot = { cat: Cat; col: number; span: number; top: number; offset: number }
+type RowSlot = { cat: Cat; colStart: number }
 
-// ── True masonry packer ─────────────────────────────────────────────────
-// Places each category into whichever column is currently shortest (or the
-// best pair of adjacent columns for a featured/wide card), tracking each
-// column's own running height independently. Because a card's position
-// comes from its column's actual packed height — not a fixed-height grid
-// row — cards are free to sit anywhere in the flow, which is what lets the
-// COLUMN_STAGGER wave show through with no row boundaries, no clipping, and
-// (since every reservation is already stagger-aware) no risk of overlap.
-function buildMasonry(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
-  const colHeights = [...COLUMN_STAGGER]
-  const slots: Slot[] = []
+// ── Row builder ───────────────────────────────────────────────────────────
+// Places categories left-to-right into GRID_COLS-wide rows (featured
+// categories span 2 columns, regular ones span 1) — the same packing every
+// plain CSS grid would do. This (not a greedy masonry packer) is what makes
+// the de-stagger animation actually resolve into a flush grid: every card in
+// a row shares that row's baseline height, so removing each card's cosmetic
+// COLUMN_STAGGER always lands it back on the same line as its row-mates.
+function buildRows(cats: Cat[]): RowSlot[][] {
+  const rows: RowSlot[][] = []
+  let row: RowSlot[] = []
+  let used = 0
 
   for (const cat of cats) {
     const span = cat.featured ? 2 : 1
-    if (span === 1) {
-      let col = 0
-      for (let i = 1; i < GRID_COLS; i++) if (colHeights[i] < colHeights[col]) col = i
-      slots.push({ cat, col, span, top: colHeights[col] })
-      colHeights[col] += CARD_HEIGHT + GAP
-    } else {
-      // Best adjacent pair — whichever minimises the taller of the two,
-      // so the wide card sits as low as possible without leaving a gap.
-      let bestCol = 0
-      let bestMax = Infinity
-      for (let i = 0; i <= GRID_COLS - span; i++) {
-        const m = Math.max(colHeights[i], colHeights[i + 1])
-        if (m < bestMax) { bestMax = m; bestCol = i }
-      }
-      slots.push({ cat, col: bestCol, span, top: bestMax })
-      colHeights[bestCol] = colHeights[bestCol + 1] = bestMax + CARD_HEIGHT + GAP
+    if (used + span > GRID_COLS) {
+      if (row.length) rows.push(row)
+      row = []
+      used = 0
+    }
+    row.push({ cat, colStart: used })
+    used += span
+    if (used === GRID_COLS) {
+      rows.push(row)
+      row = []
+      used = 0
     }
   }
+  if (row.length) rows.push(row)
+  return rows
+}
 
-  const totalHeight = Math.max(CARD_HEIGHT, Math.max(...colHeights) - GAP)
+// Turns rows into absolute-positioned slots: each row gets a shared padded
+// baseline top (rowIndex * ROW_HEIGHT), and a stagger is layered on top per
+// card purely for the initial staggered look. Regular cards use their own
+// column's COLUMN_STAGGER; featured/wide cards always use STAGGER_MAX
+// (rather than whichever column they happen to start in) — combined with
+// ROW_HEIGHT's extra padding, this guarantees no card can ever overlap a
+// neighbour above or below, however the columns it spans compare, at any
+// point during the de-stagger transition (not just at rest).
+function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
+  const rows = buildRows(cats)
+  const slots: Slot[] = []
+
+  rows.forEach((row, rowIndex) => {
+    const rowPadding = rowIndex * STAGGER_RANGE
+    const tightBase = rowIndex * (CARD_HEIGHT + GAP)
+    row.forEach(({ cat, colStart }) => {
+      const span = cat.featured ? 2 : 1
+      const stagger = span === 2 ? STAGGER_MAX : (COLUMN_STAGGER[colStart] ?? 0)
+      const offset = rowPadding + stagger
+      slots.push({ cat, col: colStart, span, top: tightBase + offset, offset })
+    })
+  })
+
+  const totalHeight = Math.max(CARD_HEIGHT, (rows.length - 1) * ROW_HEIGHT + STAGGER_MAX + CARD_HEIGHT)
   return { slots, totalHeight }
 }
 // Column-width expression shared by left/width below — a single column's
@@ -160,18 +201,18 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     return () => { observer.disconnect(); timeouts.forEach(clearTimeout) }
   }, [])
 
-  const { slots, totalHeight } = buildMasonry(categories)
+  const { slots, totalHeight } = buildGrid(categories)
 
   return (
     <div ref={rootRef} className="cats-masonry" style={{ height: totalHeight }}>
-      {slots.map(({ cat, col, span, top }, i) => {
+      {slots.map(({ cat, col, span, top, offset }, i) => {
         const cardStyle: CSSProperties = {
           position: 'absolute',
           top,
           left: `calc(${col} * (${COL_WIDTH_EXPR} + ${GAP}px))`,
           width: `calc(${span} * (${COL_WIDTH_EXPR}) + ${(span - 1) * GAP}px)`,
           ['--cat-enter' as string]: `${ENTRANCE_TRAVEL}px`,
-          ['--col-stagger' as string]: `${COLUMN_STAGGER[col] ?? 0}`,
+          ['--col-stagger' as string]: `${offset}`,
           ...(span === 2 ? { gridColumn: 'span 2' } : {}),
         }
 

@@ -180,20 +180,20 @@ export default async function HomePage() {
           border-radius: 8px; background: rgb(200,200,200);
           text-decoration: none; display: block;
           height: 400px;
-          /* top/left/width come from the masonry packer (CategoryGrid.tsx) —
-             a permanent, staggered position, not a fixed-height grid row, and
-             the packer's reservations already account for that stagger, so
-             no card can ever start before the one above it (in its column)
-             has actually ended.
+          /* top/left/width come from the row grid builder (CategoryGrid.tsx)
+             — a padded, staggered starting position, not the final resting
+             grid row.
              Two independent motions layer on top of that static position:
              1. De-stagger (scroll-driven, instant) — shifts the card up by
-                its own column's full stagger amount (--col-stagger, a fixed
-                px-as-a-number set per card) scaled by the section's shared
-                --destagger progress. At --destagger:0 the card sits at its
-                full staggered position (transform: 0); at :1 it's shifted
-                up by its whole stagger, landing flush — same-row cards
-                across every column arrive together since they all read the
-                same --destagger.
+                --col-stagger (a fixed px-as-a-number set per card — bundles
+                both this card's own cosmetic stagger AND its row's share of
+                the safety padding between rows) scaled by the section's
+                shared --destagger progress. At --destagger:0 the card sits
+                at its padded, staggered position (transform: 0); at :1 it's
+                shifted up by that whole amount, landing on a genuinely
+                tight grid row (no leftover padding) — same-row cards across
+                every column arrive together since they all read the same
+                --destagger.
              2. Entrance (in-view-triggered) — opacity/translate, 700ms eased
                 transition, plays once when the card first appears. */
           transform: translate3d(0, calc(var(--col-stagger, 0) * var(--destagger, 0) * -1px), 0);
