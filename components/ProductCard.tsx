@@ -6,6 +6,9 @@ import { stripMarkdown } from '@/lib/markdown'
 export default function ProductCard({ product }: { product: Product }) {
   const img = product.main_image_storage_url || product.main_image_url
   const hoverImg = product.gallery_url_1 || null
+  // Match the product detail page's title fallback chain (name -> model -> sku -> slug)
+  // so cards don't fall through to showing raw description text when `model` is empty/dirty.
+  const title = product.name || product.model || product.sku || product.slug
 
   // Spec boxes: always st1/st2, static (no hover swap)
   const specs = [
@@ -48,9 +51,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Info */}
         <div className="pcard-info">
-          {(product.brand_name || product.model) && (
+          {(product.brand_name || title) && (
             <p className="pcard-brand">
-              {[product.brand_name, product.model].filter(Boolean).join(' ')}
+              {[product.brand_name, title].filter(Boolean).join(' ')}
             </p>
           )}
           {product.short_description && (
