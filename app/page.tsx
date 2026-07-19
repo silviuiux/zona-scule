@@ -166,46 +166,38 @@ export default async function HomePage() {
           max-width: 1440px; margin: 0 auto;
           padding: 0 12px 64px;
         }
-        .cats-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-          margin-bottom: 16px;
-          /* No longer clips anything — each card reveals itself via its own
-             clip-path (see .cat-card), so there's nothing to crop at the row
-             boundary and the stagger can flow continuously across rows
-             instead of cutting off with a gap. */
-          overflow: visible;
+        .cats-masonry {
+          position: relative;
+          /* height set inline per-render (CategoryGrid.tsx) to match the
+             packed masonry content, since every child below is absolutely
+             positioned and would otherwise collapse this to 0. */
         }
         .cat-card {
-          position: relative; overflow: hidden;
+          position: absolute; overflow: hidden;
           border-radius: 8px; background: rgb(200,200,200);
           text-decoration: none; display: block;
           height: 400px;
-          /* Three independent motions on each card, all driven by the
-             card's OWN scroll position (not its row's), so the stagger is
-             one continuous motion across every row rather than resetting
-             at each row boundary:
-             1. Reveal wipe (scroll-driven, instant) — --cat-hide masks the
-                not-yet-settled part of the card via clip-path. Because this
-                *masks* rather than *moves+crops*, a still-settling card can
-                never spill into or overlap the row below it.
-             2. Drift (scroll-driven, instant) — a small parallax offset via
-                --cat-offset, purely decorative, kept low enough it can never
-                encroach on the row underneath.
-             3. Entrance (in-view-triggered) — opacity/translate, 700ms eased
-                transition, plays once when the card first appears. */
-          clip-path: inset(0 0 calc(var(--cat-hide, 0) * 100%) 0);
+          /* top/left/width come from the masonry packer (CategoryGrid.tsx) —
+             a permanent, staggered position, not a fixed-height grid row.
+             Two independent motions layer on top of that static position:
+             1. Drift (scroll-driven, instant) — a small parallax offset via
+                --cat-offset, capped low enough it can never reach a
+                neighbouring card in this column or an adjacent one.
+             2. Entrance (in-view-triggered) — opacity/translate, 700ms eased
+                transition, plays once when the card first appears.
+             Because the card is always rendered at full size in its real
+             (staggered) position — never cropped or masked — there's no
+             row boundary for it to be cut off against. */
           transform: translate3d(0, var(--cat-offset, 0px), 0);
           opacity: 0;
           translate: 0 24px;
           transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
                       translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: clip-path, transform, translate, opacity;
+          will-change: transform, translate, opacity;
         }
         .cat-card.in-view { opacity: 1; translate: 0 0; }
         @media (prefers-reduced-motion: reduce) {
-          .cat-card { opacity: 1; translate: 0 0; transition: none; clip-path: none; }
+          .cat-card { opacity: 1; translate: 0 0; transition: none; }
         }
         .cat-card-img-wrap {
           position: absolute; inset: 0; overflow: hidden;
@@ -418,13 +410,22 @@ export default async function HomePage() {
           }
 
           .cats-section { padding: 0 12px 64px; }
-          /* 2 columns instead of desktop's 4. Featured categories still
-             carry an inline gridColumn:'span 2' (see CategoryGrid.tsx), which
-             now spans the full 2-column width instead of forcing every card
-             full-width — regular cards sit two-per-row, featured ones go
-             full-width, same as the desktop pattern just narrower. */
-          .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-          .cat-card { height: 220px; }
+          /* Desktop uses an absolutely-positioned masonry (see .cat-card's
+             inline top/left/width, set in CategoryGrid.tsx). That doesn't
+             suit mobile, so drop back to a plain 2-column grid: !important
+             overrides the inline position/top/left/width per card. Featured
+             categories still carry an inline gridColumn:'span 2' — ignored
+             on desktop (position:absolute), but here it spans the full
+             2-column width instead of forcing every card full-width. */
+          .cats-masonry {
+            position: static; height: auto !important;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+          }
+          .cat-card {
+            position: static !important;
+            top: auto !important; left: auto !important; width: auto !important;
+            height: 220px;
+          }
 
           .services-section { padding: 64px 0 64px; gap: 40px; }
           .services-header { padding: 0 12px; }
