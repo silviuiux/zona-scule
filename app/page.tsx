@@ -171,31 +171,41 @@ export default async function HomePage() {
           grid-template-columns: repeat(4, 1fr);
           gap: 16px;
           margin-bottom: 16px;
-          /* Clips any still-settling (offset) card to this row's own box,
-             so it crops to a peek instead of spilling into the row below —
-             see the long settle range in CategoryGrid.tsx. */
-          overflow: hidden;
+          /* No longer clips anything — each card reveals itself via its own
+             clip-path (see .cat-card), so there's nothing to crop at the row
+             boundary and the stagger can flow continuously across rows
+             instead of cutting off with a gap. */
+          overflow: visible;
         }
         .cat-card {
           position: relative; overflow: hidden;
           border-radius: 8px; background: rgb(200,200,200);
           text-decoration: none; display: block;
           height: 400px;
-          /* Two independent vertical motions on each card:
-             1. Stagger (scroll-driven, instant) — goes on transform via
-                --cat-offset, updated every rAF, NO transition (would lag scroll)
-             2. Reveal (in-view-triggered) — goes on translate (separate CSS
-                property), has a 700ms transition so it eases in once. */
+          /* Three independent motions on each card, all driven by the
+             card's OWN scroll position (not its row's), so the stagger is
+             one continuous motion across every row rather than resetting
+             at each row boundary:
+             1. Reveal wipe (scroll-driven, instant) — --cat-hide masks the
+                not-yet-settled part of the card via clip-path. Because this
+                *masks* rather than *moves+crops*, a still-settling card can
+                never spill into or overlap the row below it.
+             2. Drift (scroll-driven, instant) — a small parallax offset via
+                --cat-offset, purely decorative, kept low enough it can never
+                encroach on the row underneath.
+             3. Entrance (in-view-triggered) — opacity/translate, 700ms eased
+                transition, plays once when the card first appears. */
+          clip-path: inset(0 0 calc(var(--cat-hide, 0) * 100%) 0);
           transform: translate3d(0, var(--cat-offset, 0px), 0);
           opacity: 0;
           translate: 0 24px;
           transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
                       translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: transform, translate, opacity;
+          will-change: clip-path, transform, translate, opacity;
         }
         .cat-card.in-view { opacity: 1; translate: 0 0; }
         @media (prefers-reduced-motion: reduce) {
-          .cat-card { opacity: 1; translate: 0 0; transition: none; }
+          .cat-card { opacity: 1; translate: 0 0; transition: none; clip-path: none; }
         }
         .cat-card-img-wrap {
           position: absolute; inset: 0; overflow: hidden;
@@ -408,13 +418,13 @@ export default async function HomePage() {
           }
 
           .cats-section { padding: 0 12px 64px; }
-          .cats-row { grid-template-columns: 1fr; gap: 10px; }
-          /* Featured categories carry an inline gridColumn:'span 2' (see
-             CategoryGrid.tsx) for the desktop 4-col layout. Left alone here,
-             a span-2 item in an otherwise 1-column grid can pull in an extra
-             implicit column, making that one card wider/narrower than its
-             siblings — force every card to the single column instead. */
-          .cat-card { height: 260px; grid-column: 1 / -1 !important; }
+          /* 2 columns instead of desktop's 4. Featured categories still
+             carry an inline gridColumn:'span 2' (see CategoryGrid.tsx), which
+             now spans the full 2-column width instead of forcing every card
+             full-width — regular cards sit two-per-row, featured ones go
+             full-width, same as the desktop pattern just narrower. */
+          .cats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .cat-card { height: 220px; }
 
           .services-section { padding: 64px 0 64px; gap: 40px; }
           .services-header { padding: 0 12px; }
@@ -442,10 +452,6 @@ export default async function HomePage() {
 
         }
 
-        @media (max-width: 480px) {
-          .cats-row { grid-template-columns: 1fr; }
-          .cat-card { height: 220px; }
-        }
       `}</style>
 
       {/* ── HERO ── */}

@@ -11,23 +11,25 @@ type Cat = {
   featured: boolean
 }
 
-// Per-column starting vertical offset (px) for the scroll-stagger animation.
-// A clean staircase that DECREASES left→right: col0 starts deepest (only
-// ~10% of its top edge peeks above the row's clipped box), col1 shows more,
-// col2 shows most, col3 (or the wide card) is already flush. All columns
-// rise together to a flush row as you scroll.
-const COL_OFFSETS = [360, 240, 120, 0]
+// Per-column starting "hidden" fraction (0–1) for the reveal-wipe animation.
+// A clean staircase that DECREASES left→right: col0 starts mostly masked
+// (only a sliver of its top visible), col1 shows more, col2 shows most,
+// col3 (or the wide card) is already fully revealed. All columns unmask
+// together to fully visible as you scroll.
+const COL_HIDE_START = [0.92, 0.62, 0.32, 0]
+// Small parallax drift (px) layered on top, scaled the same way per column.
+// Purely decorative — kept low enough it can never visually encroach on the
+// row below, unlike the old large pixel offset.
+const COL_DRIFT_MAX = 22
 const GRID_COLS = 4
-// Each row settles within a window sized off its OWN height, not the whole
-// grid's — keeping this per-row (rather than one shared progress for the
-// entire multi-row grid) means an earlier row is always settling on its own
-// timeline, independent of later rows.
-//
-// `.cats-row` clips overflow (see page.tsx), so a still-offset card is
-// simply cropped to its row's box rather than spilling into the row below —
-// that's what makes it safe to use a long, deliberate settle range here
-// instead of having to keep it short purely to dodge overlap.
-const ROW_SETTLE_RANGE = 2.2
+// Each card settles within a window sized off its OWN height, computed from
+// its OWN scroll position — not its row's. That's what makes the stagger one
+// continuous motion across every row instead of resetting at each row
+// boundary. Since the reveal is a clip-path mask rather than a position
+// offset, a still-settling card is simply masked down to a sliver — it can
+// never spill into or overlap the row below it, so there's no need to clip
+// per-row or keep the settle range short to dodge overlap.
+const CARD_SETTLE_RANGE = 1.5
 
 // easeInOutCubic — accelerate into the line-up, settle gently out of it.
 const easeInOut = (t: number) =>
@@ -75,11 +77,14 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     const root = rootRef.current
     if (!root) return
 
-    const rowEls = Array.from(root.querySelectorAll<HTMLElement>('.cats-row'))
-    if (rowEls.length === 0) return
+    const cardEls = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
+    if (cardEls.length === 0) return
 
     if (reduce || isMobile) {
-      root.querySelectorAll<HTMLElement>('.cat-card').forEach(el => el.style.setProperty('--cat-offset', '0px'))
+      cardEls.forEach(el => {
+        el.style.setProperty('--cat-offset', '0px')
+        el.style.setProperty('--cat-hide', '0')
+      })
       return
     }
 
@@ -87,26 +92,21 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     const update = () => {
       raf = 0
       const viewH = window.innerHeight
-      // Each row computes its OWN progress off its OWN viewport position —
-      // not the whole grid's. "scrolledPast" = how far this row's top has
-      // travelled above the bottom of the viewport (0 = row top just
-      // entering at viewport bottom, 1 = row fully settled). The row's own
-      // overflow:hidden means an unsettled card is just cropped to the row's
-      // box rather than bleeding into the row below, however long this takes.
-      rowEls.forEach(row => {
-        const rect = row.getBoundingClientRect()
+      // Each card computes its OWN progress off its OWN viewport position —
+      // not its row's. "scrolledPast" = how far this card's top has
+      // travelled above the bottom of the viewport (0 = card top just
+      // entering at viewport bottom, 1 = card fully settled/revealed).
+      cardEls.forEach(el => {
+        const col = Number(el.dataset.col ?? 0)
+        const hideStart = COL_HIDE_START[col] ?? 0
+        const rect = el.getBoundingClientRect()
         const scrolledPast = viewH - rect.top
-        const totalRange = Math.max(rect.height * ROW_SETTLE_RANGE, 1)
+        const totalRange = Math.max(rect.height * CARD_SETTLE_RANGE, 1)
         const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
         const progress = easeInOut(linear)
-        row.querySelectorAll<HTMLElement>('.cat-card').forEach(el => {
-          const col = Number(el.dataset.col ?? 0)
-          const base = COL_OFFSETS[col] ?? 0
-          // Shared progress within the row — every column in THIS row rises
-          // in lockstep, keeping the staircase rigid as it eases up to a
-          // flush row, independently of every other row.
-          el.style.setProperty('--cat-offset', `${base * (1 - progress)}px`)
-        })
+        const remaining = hideStart * (1 - progress)
+        el.style.setProperty('--cat-hide', `${remaining}`)
+        el.style.setProperty('--cat-offset', `${remaining * COL_DRIFT_MAX}px`)
       })
     }
     const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
@@ -160,8 +160,10 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
         <div key={rowIdx} className="cats-row">
           {row.map(({ cat, colStart }) => {
             const isWide = cat.featured
+            const hideStart = COL_HIDE_START[colStart] ?? 0
             const initialStyle = ({
-              ['--cat-offset' as string]: `${COL_OFFSETS[colStart] ?? 0}px`,
+              ['--cat-hide' as string]: `${hideStart}`,
+              ['--cat-offset' as string]: `${hideStart * COL_DRIFT_MAX}px`,
               ...(isWide ? { gridColumn: 'span 2' } : {}),
             } as CSSProperties)
 
