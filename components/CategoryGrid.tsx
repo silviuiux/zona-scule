@@ -29,18 +29,6 @@ const GAP = 16
 // different numbers of cards by any given point, so there's no shared line
 // for "de-staggered" cards to land on, and the grid never actually lines up.
 const COLUMN_STAGGER = [180, 120, 60, 0]
-const STAGGER_MAX = Math.max(...COLUMN_STAGGER)
-// Row-to-row spacing gets padded by the full stagger range (max - min),
-// rather than just CARD_HEIGHT + GAP. Two adjacent rows only ever risk
-// overlapping where a featured/wide card touches columns with DIFFERENT
-// stagger amounts — e.g. a card spanning col2 (stagger 60) and col3
-// (stagger 0) has no single offset that's simultaneously safe against a
-// deep-staggered neighbour above and a shallow one below, when the plain
-// CARD_HEIGHT + GAP spacing is all that separates rows. Padding every row
-// gap by STAGGER_MAX - STAGGER_MIN gives enough slack to cover the worst
-// case unconditionally, however cards happen to be arranged.
-const STAGGER_RANGE = STAGGER_MAX - Math.min(...COLUMN_STAGGER)
-const ROW_HEIGHT = CARD_HEIGHT + GAP + STAGGER_RANGE
 // Small, uniform one-time entrance rise (see .in-view in page.tsx) — just
 // enough to read as a soft fade-up on first appearance. The big, columned
 // motion is owned by the continuous de-stagger effect below instead.
@@ -51,12 +39,11 @@ const easeInOut = (t: number) =>
 
 // `offset` is the FULL amount this card needs to travel to reach the tight,
 // no-padding grid position: it bundles both this card's own cosmetic stagger
-// AND its row's share of the ROW_HEIGHT padding (rowIndex * STAGGER_RANGE).
-// The CSS transform subtracts offset * --destagger, so at destagger:0 the
-// card sits at `top` (padded + staggered) and at :1 it lands exactly on
-// rowIndex * (CARD_HEIGHT + GAP) — a genuinely tight grid, not just
-// destaggered-but-still-padded. See the de-stagger effect below for why the
-// padding has to unwind together with the stagger, not stay baked in.
+// AND its row's share of accumulated inter-row padding (see buildGrid's
+// per-transition padding calculation below). The CSS transform subtracts
+// offset * --destagger, so at destagger:0 the card sits at `top` (padded +
+// staggered) and at :1 it lands exactly on rowIndex * (CARD_HEIGHT + GAP) —
+// a genuinely tight grid, not just destaggered-but-still-padded.
 type Slot = { cat: Cat; col: number; span: number; top: number; offset: number }
 type RowSlot = { cat: Cat; colStart: number }
 
@@ -91,30 +78,62 @@ function buildRows(cats: Cat[]): RowSlot[][] {
   return rows
 }
 
-// Turns rows into absolute-positioned slots: each row gets a shared padded
-// baseline top (rowIndex * ROW_HEIGHT), and a stagger is layered on top per
-// card purely for the initial staggered look. Regular cards use their own
-// column's COLUMN_STAGGER; featured/wide cards always use STAGGER_MAX
-// (rather than whichever column they happen to start in) — combined with
-// ROW_HEIGHT's extra padding, this guarantees no card can ever overlap a
-// neighbour above or below, however the columns it spans compare, at any
-// point during the de-stagger transition (not just at rest).
+// Turns rows into absolute-positioned slots. Regular cards use their own
+// column's COLUMN_STAGGER; featured/wide cards use the stagger of whichever
+// column they START in (same rule as a regular card there).
+//
+// Two rows only ever risk overlapping where the SAME column holds a
+// shallower stagger in the row below than it did in the row above (e.g. a
+// wide card spanning col2 (stagger 60) sitting above col3's next card,
+// which only carries stagger 0) — a plain regular-only column transition
+// can never do this, since the same column always reuses the same
+// stagger. So rather than padding every row-to-row gap by the worst case
+// across the whole grid, this computes the *exact* extra padding each
+// specific transition needs (usually 0), by comparing, column by column,
+// what the row above leaves behind against what the row below starts with.
 function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
   const rows = buildRows(cats)
-  const slots: Slot[] = []
 
+  // Per-row, per-column stagger — a wide card's stagger fills every column
+  // it spans, so a transition check against either of its columns sees the
+  // right value.
+  const rowColStagger = rows.map(row => {
+    const arr: (number | null)[] = new Array(GRID_COLS).fill(null)
+    row.forEach(({ cat, colStart }) => {
+      const span = cat.featured ? 2 : 1
+      const stagger = COLUMN_STAGGER[colStart] ?? 0
+      for (let c = colStart; c < colStart + span; c++) arr[c] = stagger
+    })
+    return arr
+  })
+
+  // Cumulative extra padding needed by the time row i is reached — 0 unless
+  // some earlier transition needed slack, in which case every row after it
+  // carries that slack forward (rows are stacked, so padding accumulates).
+  const cumExtra = [0]
+  for (let i = 1; i < rows.length; i++) {
+    const prev = rowColStagger[i - 1]
+    const cur = rowColStagger[i]
+    let extra = 0
+    for (let c = 0; c < GRID_COLS; c++) {
+      if (prev[c] != null && cur[c] != null) extra = Math.max(extra, prev[c]! - cur[c]!)
+    }
+    cumExtra.push(cumExtra[i - 1] + extra)
+  }
+
+  const slots: Slot[] = []
   rows.forEach((row, rowIndex) => {
-    const rowPadding = rowIndex * STAGGER_RANGE
     const tightBase = rowIndex * (CARD_HEIGHT + GAP)
     row.forEach(({ cat, colStart }) => {
       const span = cat.featured ? 2 : 1
-      const stagger = span === 2 ? STAGGER_MAX : (COLUMN_STAGGER[colStart] ?? 0)
-      const offset = rowPadding + stagger
+      const stagger = COLUMN_STAGGER[colStart] ?? 0
+      const offset = cumExtra[rowIndex] + stagger
       slots.push({ cat, col: colStart, span, top: tightBase + offset, offset })
     })
   })
 
-  const totalHeight = Math.max(CARD_HEIGHT, (rows.length - 1) * ROW_HEIGHT + STAGGER_MAX + CARD_HEIGHT)
+  const lastRow = rows.length - 1
+  const totalHeight = Math.max(CARD_HEIGHT, lastRow * (CARD_HEIGHT + GAP) + cumExtra[lastRow] + Math.max(...COLUMN_STAGGER) + CARD_HEIGHT)
   return { slots, totalHeight }
 }
 // Column-width expression shared by left/width below — a single column's
