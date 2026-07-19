@@ -14,22 +14,31 @@ type Cat = {
 const GRID_COLS = 4
 const CARD_HEIGHT = 400
 const GAP = 16
-// Permanent per-column vertical offset (px) — this IS the masonry wave, not
-// a scroll effect. Decreases left→right so col0 sits lowest and col3 (or a
-// wide card) sits highest, matching the staggered reference layout. Unlike
-// the scroll drift below, this never resets/settles to 0 — it's baked into
-// the static layout, so cards are always full-size and simply live at a
-// staggered position, never clipped or masked.
+// Permanent per-column starting offset (px) — this IS the masonry wave, not
+// a scroll effect. Decreases left→right so col0's first card sits lowest
+// and col3's sits highest, matching the staggered reference layout. This
+// never resets/settles to 0 — it's baked into the static layout, so cards
+// are always full-size and simply live at a staggered position.
+//
+// It's seeded directly into the packer's running column heights (below)
+// rather than added afterwards per card. Adding it afterwards was the
+// actual bug behind the overlap: a wide card spanning two columns with
+// DIFFERENT stagger amounts would render lower than its own column's raw
+// packed height accounted for, so the next card handed off into the
+// less-staggered column started before that wide card's real (staggered)
+// bottom edge. Seeding it in means every reservation the packer makes is
+// already stagger-aware, so no downstream card can ever start before the
+// previous one in its column has actually ended, however columns differ.
 const COLUMN_STAGGER = [180, 120, 60, 0]
-// Small continuous scroll-driven drift on top of the static masonry
-// position — capped well under GAP so a still-settling card can never reach
-// into a neighbouring card, in its own column or an adjacent one.
-const DRIFT_MAX = 10
-const SETTLE_RANGE = 1.2
-
-// easeInOutCubic — accelerate into the line-up, settle gently out of it.
-const easeInOut = (t: number) =>
-  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+// How far each column's cards travel on their one-time entrance reveal
+// (see .in-view in page.tsx) — bigger for the more-staggered columns, for a
+// gentle diagonal cascade as they rise into place. This is safe at a much
+// larger size than a continuous scroll-transform would be: the card is
+// still fully transparent (opacity: 0) until it's within 15% of entering
+// the viewport, so none of this travel is ever visible overlapping a
+// neighbour — it only starts animating once revealed, easing the last
+// stretch into its exact final slot.
+const ENTRANCE_TRAVEL = [90, 65, 40, 20]
 
 type Slot = { cat: Cat; col: number; span: number; top: number }
 
@@ -40,9 +49,9 @@ type Slot = { cat: Cat; col: number; span: number; top: number }
 // comes from its column's actual packed height — not a fixed-height grid
 // row — cards are free to sit anywhere in the flow, which is what lets the
 // COLUMN_STAGGER wave show through with no row boundaries, no clipping, and
-// (since columns never share vertical space) no risk of overlap.
+// (since every reservation is already stagger-aware) no risk of overlap.
 function buildMasonry(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
-  const colHeights = new Array(GRID_COLS).fill(0)
+  const colHeights = [...COLUMN_STAGGER]
   const slots: Slot[] = []
 
   for (const cat of cats) {
@@ -66,8 +75,7 @@ function buildMasonry(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
     }
   }
 
-  const bottoms = colHeights.map((h, c) => (h > 0 ? h - GAP + (COLUMN_STAGGER[c] ?? 0) : 0))
-  const totalHeight = Math.max(CARD_HEIGHT, ...bottoms)
+  const totalHeight = Math.max(CARD_HEIGHT, Math.max(...colHeights) - GAP)
   return { slots, totalHeight }
 }
 // Column-width expression shared by left/width below — a single column's
@@ -78,50 +86,7 @@ const COL_WIDTH_EXPR = `(100% - ${(GRID_COLS - 1) * GAP}px) / ${GRID_COLS}`
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
-  // ── Effect 1: small continuous scroll drift ──
-  useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia?.('(max-width: 768px)').matches
-    const root = rootRef.current
-    if (!root) return
-
-    const cardEls = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
-    if (cardEls.length === 0) return
-
-    if (reduce || isMobile) {
-      cardEls.forEach(el => el.style.setProperty('--cat-offset', '0px'))
-      return
-    }
-
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const viewH = window.innerHeight
-      // Each card computes its OWN progress off its OWN viewport position.
-      // The permanent masonry position (top/left/width, incl. COLUMN_STAGGER)
-      // is already set via inline style below — this only adds a small,
-      // capped drift on top as the card scrolls into view.
-      cardEls.forEach(el => {
-        const rect = el.getBoundingClientRect()
-        const scrolledPast = viewH - rect.top
-        const totalRange = Math.max(rect.height * SETTLE_RANGE, 1)
-        const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
-        const progress = easeInOut(linear)
-        el.style.setProperty('--cat-offset', `${DRIFT_MAX * (1 - progress)}px`)
-      })
-    }
-    const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [])
-
-  // ── Effect 2: in-view fade + translate reveal, cascading top-to-bottom ──
+  // ── Scroll-into-view reveal: fade + rise into place, cascading top-to-bottom ──
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
@@ -157,9 +122,10 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       {slots.map(({ cat, col, span, top }, i) => {
         const cardStyle: CSSProperties = {
           position: 'absolute',
-          top: top + (COLUMN_STAGGER[col] ?? 0),
+          top,
           left: `calc(${col} * (${COL_WIDTH_EXPR} + ${GAP}px))`,
           width: `calc(${span} * (${COL_WIDTH_EXPR}) + ${(span - 1) * GAP}px)`,
+          ['--cat-enter' as string]: `${ENTRANCE_TRAVEL[col] ?? 24}px`,
           ...(span === 2 ? { gridColumn: 'span 2' } : {}),
         }
 

@@ -178,22 +178,21 @@ export default async function HomePage() {
           text-decoration: none; display: block;
           height: 400px;
           /* top/left/width come from the masonry packer (CategoryGrid.tsx) —
-             a permanent, staggered position, not a fixed-height grid row.
-             Two independent motions layer on top of that static position:
-             1. Drift (scroll-driven, instant) — a small parallax offset via
-                --cat-offset, capped low enough it can never reach a
-                neighbouring card in this column or an adjacent one.
-             2. Entrance (in-view-triggered) — opacity/translate, 700ms eased
-                transition, plays once when the card first appears.
-             Because the card is always rendered at full size in its real
-             (staggered) position — never cropped or masked — there's no
-             row boundary for it to be cut off against. */
-          transform: translate3d(0, var(--cat-offset, 0px), 0);
+             a permanent, staggered position, not a fixed-height grid row, and
+             the packer's reservations already account for that stagger, so
+             no card can ever start before the one above it (in its column)
+             has actually ended.
+             The only motion is the entrance: opacity 0→1 + a rise of
+             --cat-enter px → 0, in-view-triggered (IntersectionObserver),
+             played once. Because the card is fully transparent until it's
+             ~15% into the viewport, this rise is never visibly overlapping
+             anything — it's only revealed already most of the way eased
+             into its exact final slot. */
           opacity: 0;
-          translate: 0 24px;
+          translate: 0 var(--cat-enter, 24px);
           transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
                       translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: transform, translate, opacity;
+          will-change: translate, opacity;
         }
         .cat-card.in-view { opacity: 1; translate: 0 0; }
         @media (prefers-reduced-motion: reduce) {
