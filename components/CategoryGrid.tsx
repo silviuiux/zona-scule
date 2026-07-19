@@ -30,15 +30,13 @@ const GAP = 16
 // already stagger-aware, so no downstream card can ever start before the
 // previous one in its column has actually ended, however columns differ.
 const COLUMN_STAGGER = [180, 120, 60, 0]
-// How far each column's cards travel on their one-time entrance reveal
-// (see .in-view in page.tsx) — bigger for the more-staggered columns, for a
-// gentle diagonal cascade as they rise into place. This is safe at a much
-// larger size than a continuous scroll-transform would be: the card is
-// still fully transparent (opacity: 0) until it's within 15% of entering
-// the viewport, so none of this travel is ever visible overlapping a
-// neighbour — it only starts animating once revealed, easing the last
-// stretch into its exact final slot.
-const ENTRANCE_TRAVEL = [90, 65, 40, 20]
+// Small, uniform one-time entrance rise (see .in-view in page.tsx) — just
+// enough to read as a soft fade-up on first appearance. The big, columned
+// motion is owned by the continuous de-stagger effect below instead.
+const ENTRANCE_TRAVEL = 24
+// easeInOutCubic — accelerate into the line-up, settle gently out of it.
+const easeInOut = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 type Slot = { cat: Cat; col: number; span: number; top: number }
 
@@ -86,6 +84,50 @@ const COL_WIDTH_EXPR = `(100% - ${(GRID_COLS - 1) * GAP}px) / ${GRID_COLS}`
 export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
+  // ── De-stagger on scroll: the whole masonry straightens into a flush grid ──
+  // One progress value for the entire section (not per-card), read off the
+  // section's own bounding box, so every column unwinds in lockstep as a
+  // single continuous motion:
+  //   progress 0 → section top has just reached the bottom of the viewport
+  //                (cards sit at their full staggered masonry position)
+  //   progress 1 → the section's bottom has scrolled up to the middle of
+  //                the viewport (every column's stagger has unwound to 0,
+  //                so same-row cards line up into a flush grid)
+  // Each card just reads this one shared --destagger value (inherited from
+  // the container) against its own fixed --col-stagger amount — cheap,
+  // since only one property is written per scroll tick, not one per card.
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia?.('(max-width: 768px)').matches
+    const root = rootRef.current
+    if (!root) return
+
+    if (reduce || isMobile) {
+      root.style.setProperty('--destagger', '1')
+      return
+    }
+
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const viewH = window.innerHeight
+      const rect = root.getBoundingClientRect()
+      const scrolled = viewH - rect.top
+      const target = viewH / 2 + rect.height
+      const linear = Math.max(0, Math.min(1, scrolled / Math.max(target, 1)))
+      root.style.setProperty('--destagger', `${easeInOut(linear)}`)
+    }
+    const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
   // ── Scroll-into-view reveal: fade + rise into place, cascading top-to-bottom ──
   useEffect(() => {
     const root = rootRef.current
@@ -125,7 +167,8 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
           top,
           left: `calc(${col} * (${COL_WIDTH_EXPR} + ${GAP}px))`,
           width: `calc(${span} * (${COL_WIDTH_EXPR}) + ${(span - 1) * GAP}px)`,
-          ['--cat-enter' as string]: `${ENTRANCE_TRAVEL[col] ?? 24}px`,
+          ['--cat-enter' as string]: `${ENTRANCE_TRAVEL}px`,
+          ['--col-stagger' as string]: `${COLUMN_STAGGER[col] ?? 0}`,
           ...(span === 2 ? { gridColumn: 'span 2' } : {}),
         }
 

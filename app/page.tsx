@@ -170,7 +170,10 @@ export default async function HomePage() {
           position: relative;
           /* height set inline per-render (CategoryGrid.tsx) to match the
              packed masonry content, since every child below is absolutely
-             positioned and would otherwise collapse this to 0. */
+             positioned and would otherwise collapse this to 0.
+             --destagger (0→1) is written here once per scroll tick and
+             inherited by every card below — see CategoryGrid.tsx. */
+          --destagger: 0;
         }
         .cat-card {
           position: absolute; overflow: hidden;
@@ -182,21 +185,27 @@ export default async function HomePage() {
              the packer's reservations already account for that stagger, so
              no card can ever start before the one above it (in its column)
              has actually ended.
-             The only motion is the entrance: opacity 0→1 + a rise of
-             --cat-enter px → 0, in-view-triggered (IntersectionObserver),
-             played once. Because the card is fully transparent until it's
-             ~15% into the viewport, this rise is never visibly overlapping
-             anything — it's only revealed already most of the way eased
-             into its exact final slot. */
+             Two independent motions layer on top of that static position:
+             1. De-stagger (scroll-driven, instant) — shifts the card up by
+                its own column's full stagger amount (--col-stagger, a fixed
+                px-as-a-number set per card) scaled by the section's shared
+                --destagger progress. At --destagger:0 the card sits at its
+                full staggered position (transform: 0); at :1 it's shifted
+                up by its whole stagger, landing flush — same-row cards
+                across every column arrive together since they all read the
+                same --destagger.
+             2. Entrance (in-view-triggered) — opacity/translate, 700ms eased
+                transition, plays once when the card first appears. */
+          transform: translate3d(0, calc(var(--col-stagger, 0) * var(--destagger, 0) * -1px), 0);
           opacity: 0;
           translate: 0 var(--cat-enter, 24px);
           transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
                       translate  700ms cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: translate, opacity;
+          will-change: transform, translate, opacity;
         }
         .cat-card.in-view { opacity: 1; translate: 0 0; }
         @media (prefers-reduced-motion: reduce) {
-          .cat-card { opacity: 1; translate: 0 0; transition: none; }
+          .cat-card { opacity: 1; translate: 0 0; transition: none; transform: none; }
         }
         .cat-card-img-wrap {
           position: absolute; inset: 0; overflow: hidden;
@@ -423,6 +432,10 @@ export default async function HomePage() {
           .cat-card {
             position: static !important;
             top: auto !important; left: auto !important; width: auto !important;
+            /* The desktop de-stagger transform still applies to static-
+               positioned elements — kill it here so mobile cards don't get
+               shifted by a leftover --col-stagger amount. */
+            transform: none !important;
             height: 220px;
           }
 
