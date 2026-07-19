@@ -90,9 +90,12 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
   // single continuous motion:
   //   progress 0 → section top has just reached the bottom of the viewport
   //                (cards sit at their full staggered masonry position)
-  //   progress 1 → the section's bottom has scrolled up to the middle of
-  //                the viewport (every column's stagger has unwound to 0,
-  //                so same-row cards line up into a flush grid)
+  //   progress 1 → the section's bottom has reached the bottom of the
+  //                viewport — i.e. the moment the last row first comes
+  //                fully into sight, every column's stagger has already
+  //                unwound to 0, so same-row cards line up into a flush
+  //                grid right as they arrive, rather than still visibly
+  //                sliding into place after you can already see them.
   // Each card just reads this one shared --destagger value (inherited from
   // the container) against its own fixed --col-stagger amount — cheap,
   // since only one property is written per scroll tick, not one per card.
@@ -113,7 +116,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       const viewH = window.innerHeight
       const rect = root.getBoundingClientRect()
       const scrolled = viewH - rect.top
-      const target = viewH / 2 + rect.height
+      const target = rect.height
       const linear = Math.max(0, Math.min(1, scrolled / Math.max(target, 1)))
       root.style.setProperty('--destagger', `${easeInOut(linear)}`)
     }
