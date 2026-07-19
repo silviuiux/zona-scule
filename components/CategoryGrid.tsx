@@ -91,7 +91,7 @@ function buildRows(cats: Cat[]): RowSlot[][] {
 // across the whole grid, this computes the *exact* extra padding each
 // specific transition needs (usually 0), by comparing, column by column,
 // what the row above leaves behind against what the row below starts with.
-function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
+function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number; tightHeight: number } {
   const rows = buildRows(cats)
 
   // Per-row, per-column stagger — a wide card's stagger fills every column
@@ -132,9 +132,23 @@ function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number } {
     })
   })
 
-  const lastRow = rows.length - 1
-  const totalHeight = Math.max(CARD_HEIGHT, lastRow * (CARD_HEIGHT + GAP) + cumExtra[lastRow] + Math.max(...COLUMN_STAGGER) + CARD_HEIGHT)
-  return { slots, totalHeight }
+  // The container needs to be exactly tall enough for the deepest card
+  // actually present — not a worst-case estimate. Using Math.max(...COLUMN_
+  // STAGGER) here regardless of what the last row's real cards are was what
+  // caused a big dead gap before the next section: it always reserved room
+  // for a full 180px stagger even when the last row's actual deepest card
+  // needed far less.
+  const totalHeight = Math.max(CARD_HEIGHT, ...slots.map(s => s.top + CARD_HEIGHT))
+  // The truly flush, no-stagger height — what the grid looks like once
+  // --destagger reaches 1. The container's own height needs to animate
+  // between this and `totalHeight` in lockstep with the cards (see the
+  // calc() in the component below), or there's a mismatch either way:
+  // sized for `totalHeight` permanently and the fully-flush state leaves
+  // dead space at the bottom (the bug just fixed); sized for `tightHeight`
+  // permanently and the still-staggered state has cards visually spilling
+  // past the container into whatever section comes next.
+  const tightHeight = Math.max(CARD_HEIGHT, rows.length * (CARD_HEIGHT + GAP) - GAP)
+  return { slots, totalHeight, tightHeight }
 }
 // Column-width expression shared by left/width below — a single column's
 // width once the 3 inter-column gaps are subtracted from the container.
@@ -170,13 +184,18 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
       return
     }
 
+    // Read once, not from the live rect: the container's own height now
+    // animates with --destagger (see the render below), so sampling
+    // rect.height on every tick would feed the shrinking box size back into
+    // the progress calculation itself, distorting the easing curve.
+    const target = Number(root.dataset.totalHeight) || root.getBoundingClientRect().height
+
     let raf = 0
     const update = () => {
       raf = 0
       const viewH = window.innerHeight
       const rect = root.getBoundingClientRect()
       const scrolled = viewH - rect.top
-      const target = rect.height
       const linear = Math.max(0, Math.min(1, scrolled / Math.max(target, 1)))
       root.style.setProperty('--destagger', `${easeInOut(linear)}`)
     }
@@ -220,10 +239,16 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     return () => { observer.disconnect(); timeouts.forEach(clearTimeout) }
   }, [])
 
-  const { slots, totalHeight } = buildGrid(categories)
+  const { slots, totalHeight, tightHeight } = buildGrid(categories)
+  const shrink = totalHeight - tightHeight
+  // Animates from totalHeight (destagger:0) down to tightHeight (:1), in
+  // lockstep with the cards' own transform above.
+  const containerHeight = shrink > 0
+    ? `calc(${tightHeight}px + ${shrink}px * (1 - var(--destagger, 0)))`
+    : totalHeight
 
   return (
-    <div ref={rootRef} className="cats-masonry" style={{ height: totalHeight }}>
+    <div ref={rootRef} className="cats-masonry" style={{ height: containerHeight }} data-total-height={totalHeight}>
       {slots.map(({ cat, col, span, top, offset }, i) => {
         const cardStyle: CSSProperties = {
           position: 'absolute',
