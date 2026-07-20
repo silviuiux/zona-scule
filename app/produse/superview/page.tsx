@@ -99,8 +99,22 @@ export default async function SuperviewPage() {
            aspect-ratio it has everywhere else. Absolutely positioning the
            tag removes it from that flow entirely, so .pcard-link is again
            the single normal-flow child sizing itself exactly as it does on
-           the main catalog grid. */
-        .sv-card { position: relative; }
+           the main catalog grid.
+
+           min-width: 0 here is the actual fix for the "cards are way too
+           big" bug (verified live on production): a CSS Grid item's
+           automatic minimum width defaults to "auto", i.e. its content's
+           min-content size, UNLESS min-width is explicitly overridden ON
+           THAT DIRECT GRID ITEM. ProductCard's own .pcard-link already sets
+           min-width: 0 for exactly this reason, but that guard only applies
+           to whichever element is the grid's direct child — on /produse
+           that's .pcard-link itself, but here .sv-card sits between it and
+           the grid, so .sv-card (not .pcard-link) is what needs the
+           override. Without it, the grid falls back to sizing the column
+           after the least-shrinkable content: the product image's raw
+           intrinsic pixel size (verified in devtools: the column blew up to
+           ~6047px — the exact native width of one product photo). */
+        .sv-card { position: relative; min-width: 0; }
         .sv-subcat-tag {
           position: absolute; top: 8px; left: 8px; z-index: 2;
           font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
