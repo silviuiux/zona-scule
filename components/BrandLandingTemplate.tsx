@@ -272,7 +272,14 @@ export default function BrandLandingTemplate({
            visible closed (that's the "cheat sheet" — often enough on its
            own), the full explanation is one click away via <details> rather
            than a permanent paragraph on every card. */
-        .bp-glossary-section { background: rgb(236,236,236); padding: 56px 12px; }
+        /* No horizontal padding here deliberately — this section's gray
+           background must run full-bleed edge to edge. Horizontal
+           centering/gutter comes from the inner .bp-section wrapper divs
+           instead (same 1440px/12px convention as every other section).
+           Putting bp-section directly on THIS element (as every other
+           section does) would cap the background itself at 1440px instead
+           of the viewport — that was the full-bleed-background bug. */
+        .bp-glossary-section { background: rgb(236,236,236); padding: 56px 0; }
         .bp-glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
         .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; overflow: hidden; }
         .bp-gloss-summary {
@@ -410,13 +417,13 @@ export default function BrandLandingTemplate({
           cheat-sheet is what a professional buyer scans for before anything
           else (category browsing, curated pillars, use-case carousels). */}
       {config.glossary && (
-        <section id="ghid-tehnic" className="bp-glossary-section bp-section">
-          <div className="bp-section-head">
+        <section id="ghid-tehnic" className="bp-glossary-section">
+          <div className="bp-section bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
             <h2 className="bp-section-title">{config.glossaryTitle}</h2>
             <p className="bp-section-sub">{config.glossarySub}</p>
           </div>
-          <div className="bp-glossary-grid">
+          <div className="bp-section bp-glossary-grid">
             {config.glossary.map(g => (
               <details key={g.code} className="bp-gloss-card">
                 <summary className="bp-gloss-summary">

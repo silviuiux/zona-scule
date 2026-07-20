@@ -119,7 +119,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial PFERD',
     heroTitle: [
-      [{ text: 'Rezistență care ' }, { text: 'nu cedează.', em: true }],
+      [{ text: 'Rezistență ' }, { text: 'imbatabilă.', em: true }],
       [{ text: 'Precizie care ' }, { text: 'nu iartă.', em: true }],
     ],
     heroSub:
@@ -256,8 +256,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener autorizat Karcher',
     heroTitle: [
-      [{ text: 'Curățare la scară ' }, { text: 'industrială.', em: true }],
-      [{ text: 'Fără compromis pe ' }, { text: 'durabilitate.', em: true }],
+      [{ text: 'Curățenie ' }, { text: 'industrială.', em: true }],
+      [{ text: 'Fără ' }, { text: 'compromis.', em: true }],
     ],
     heroSub:
       'De la aeroporturi la hale de producție — curățare industrială pentru orice suprafață și volum.',
@@ -344,8 +344,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial OSBORN',
     heroTitle: [
+      [{ text: 'Precizie ' }, { text: 'germană.', em: true }],
       [{ text: 'Perii care ' }, { text: 'nu cedează.', em: true }],
-      [{ text: 'Precizie germană, ' }, { text: 'orice suprafață.', em: true }],
     ],
     heroSub:
       'Perii industriale, freze din carbură și corpuri abrazive — pentru debavurare, curățare și finisare pe orice metal.',
@@ -458,8 +458,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial Milwaukee',
     heroTitle: [
-      [{ text: 'Putere fără fir. ' }, { text: 'Fără compromis.', em: true }],
-      [{ text: 'Un ecosistem, ' }, { text: 'nu doar o sculă.', em: true }],
+      [{ text: 'Un întreg ' }, { text: 'ecosistem.', em: true }],
+      [{ text: 'Nu o ' }, { text: 'simplă sculă.', em: true }],
     ],
     heroSub:
       'De la platforma compactă M12 la echipamentele industriale MX FUEL — un singur ecosistem de acumulatori.',
@@ -540,8 +540,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial RUKO',
     heroTitle: [
-      [{ text: 'Găurire de precizie, ' }, { text: 'fără compromis.', em: true }],
-      [{ text: 'Oțel german, ' }, { text: 'acoperiri de durată.', em: true }],
+      [{ text: 'Oțel ' }, { text: 'german,', em: true }],
+      [{ text: 'găurire de ' }, { text: 'precizie.', em: true }],
     ],
     heroSub:
       'Burghie, zencuitoare, tarozi și filiere din oțel rapid sau carbură metalică, cu acoperiri TiN, TiAlN și RUnaTEC.',
