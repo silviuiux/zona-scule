@@ -55,11 +55,19 @@ export type CrossSell = {
   q: string
 }
 
+/** Static brand wordmark/icon shown above the eyebrow in the hero — files
+ *  live in public/brand-logos/. width/height are the file's own intrinsic
+ *  (post-crop) dimensions, used only so next/image can compute the correct
+ *  aspect ratio; actual rendered size is capped by CSS (see .bp-hero-logo). */
+export type BrandLogo = { src: string; width: number; height: number; alt: string }
+
 export type BrandPageConfig = {
   slug: string
   brandName: string // must match products.brand_name exactly (case-sensitive per lib/supabase.ts normalization notes)
   metaTitle: string
   metaDescription: string
+
+  logo?: BrandLogo
 
   eyebrow: string
   heroTitle: HeroLine[]
@@ -116,6 +124,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     metaTitle: 'PFERD — Scule Industriale de Precizie | Zona Scule',
     metaDescription:
       'Descoperă gama completă PFERD: pile, freze rotative, carote și corpuri abrazive pentru profesioniști și amatori pasionați.',
+
+    logo: { src: '/brand-logos/pferd.svg', width: 605, height: 520, alt: 'PFERD' },
 
     eyebrow: 'Partener oficial PFERD',
     heroTitle: [
@@ -254,6 +264,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     metaDescription:
       'Măturătoare, aparate de curățat cu presiune și echipamente industriale Karcher pentru aeroporturi, șantiere, depozite și centre de producție.',
 
+    logo: { src: '/brand-logos/karcher.png', width: 1004, height: 263, alt: 'Kärcher' },
+
     eyebrow: 'Partener autorizat Karcher',
     heroTitle: [
       [{ text: 'Curățenie ' }, { text: 'industrială.', em: true }],
@@ -341,6 +353,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     metaTitle: 'OSBORN — Perii Industriale și Freze din Carbură | Zona Scule',
     metaDescription:
       'Perii circulare, perii oală, perii de precizie, freze rotative din carbură și corpuri abrazive lamelare OSBORN pentru debavurare, curățare și finisare industrială.',
+
+    logo: { src: '/brand-logos/osborn.svg', width: 637, height: 191, alt: 'OSBORN' },
 
     eyebrow: 'Partener oficial OSBORN',
     heroTitle: [
@@ -456,6 +470,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     metaDescription:
       'Scule electrice cu acumulator Milwaukee: platformele M12, M18 și MX FUEL, tehnologie FUEL, sisteme PACKOUT și scule hidraulice FORCE LOGIC pentru profesioniști.',
 
+    logo: { src: '/brand-logos/milwaukee.svg', width: 921, height: 413, alt: 'Milwaukee' },
+
     eyebrow: 'Partener oficial Milwaukee',
     heroTitle: [
       [{ text: 'Un întreg ' }, { text: 'ecosistem.', em: true }],
@@ -537,6 +553,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     metaTitle: 'RUKO — Scule Așchietoare de Precizie | Zona Scule',
     metaDescription:
       'Burghie elicoidale și în trepte, zencuitoare, tarozi, filiere și carote RUKO — oțel rapid, cobalt și carbură metalică, cu acoperiri TiN, TiAlN și RUnaTEC.',
+
+    logo: { src: '/brand-logos/ruko.svg', width: 245, height: 62, alt: 'RUKO' },
 
     eyebrow: 'Partener oficial RUKO',
     heroTitle: [

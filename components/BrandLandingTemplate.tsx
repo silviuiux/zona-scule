@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Brand, ApplicationGroup } from '@/lib/supabase'
 import type { SubcategoryWithCount } from '@/lib/supabase'
 import type { BrandPageConfig } from '@/lib/brand-content'
@@ -100,8 +101,18 @@ export default function BrandLandingTemplate({
           overflow: hidden;
           border-bottom: 1px solid rgba(0,0,0,0.06);
         }
-        .bp-hero-inner { padding: 96px 12px 72px; max-width: 1440px; margin: 0 auto; }
+        /* Taller than a typical section hero on purpose — this is a single
+           flagship page per brand, not a dense listing, so it can afford to
+           breathe before the eyebrow/logo/title stack even starts. */
+        .bp-hero-inner { padding: 136px 12px 100px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
+        /* Brand wordmark/icon sits above the eyebrow — the visual anchor
+           that says "whose page this is" before the eyebrow says it in
+           words. Height-capped, width auto, so square icon marks (PFERD,
+           OSBORN) and wide wordmarks (Milwaukee, RUKO, Kärcher) all read at
+           a consistent visual weight regardless of their native aspect
+           ratio. */
+        .bp-hero-logo { display: block; height: clamp(30px, 3.6vw, 46px); width: auto; margin-bottom: 28px; }
         .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 22px; }
         .bp-hero-title {
           font-family: 'Bungee', sans-serif;
@@ -184,7 +195,7 @@ export default function BrandLandingTemplate({
         .bp-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; }
 
         @media (max-width: 768px) {
-          .bp-hero-inner { padding: 64px 12px 48px; }
+          .bp-hero-inner { padding: 88px 12px 64px; }
           .bp-intent-row { grid-template-columns: 1fr; }
         }
 
@@ -194,7 +205,11 @@ export default function BrandLandingTemplate({
            local copy rather than importing that (server) component here,
            since this template doesn't have an "active" subcategory to
            highlight the way a filtered listing page does. */
-        .bp-rail-section { padding: 40px 12px 8px; }
+        /* border-top marks the handoff back to white after the gray
+           glossary block — this and every other plain white section below
+           get the same thin divider so a long page reads as a stack of
+           distinct sections instead of one unbroken scroll. */
+        .bp-rail-section { padding: 48px 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-rail {
           display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
           scrollbar-width: none; -ms-overflow-style: none;
@@ -224,8 +239,8 @@ export default function BrandLandingTemplate({
         }
 
         /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
-        .bp-usecase-section { padding: 56px 12px; }
-        .bp-usecase-group { margin-bottom: 56px; }
+        .bp-usecase-section { padding: 72px 12px; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-usecase-group { margin-bottom: 64px; }
         .bp-usecase-group:last-child { margin-bottom: 0; }
         .bp-usecase-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding: 0 2px; }
         .bp-usecase-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: rgb(0,0,0); }
@@ -237,7 +252,7 @@ export default function BrandLandingTemplate({
         .bp-usecase-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
 
         /* ══════════════════ PILLARS ══════════════════ */
-        .bp-pillars-section { padding: 56px 12px; }
+        .bp-pillars-section { padding: 72px 12px; border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
         .bp-pillar-card {
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
@@ -279,8 +294,8 @@ export default function BrandLandingTemplate({
            Putting bp-section directly on THIS element (as every other
            section does) would cap the background itself at 1440px instead
            of the viewport — that was the full-bleed-background bug. */
-        .bp-glossary-section { background: rgb(236,236,236); padding: 56px 0; }
-        .bp-glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .bp-glossary-section { background: rgb(236,236,236); padding: 72px 0; }
+        .bp-glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; overflow: hidden; }
         .bp-gloss-summary {
           list-style: none; cursor: pointer; padding: 16px 18px;
@@ -298,7 +313,7 @@ export default function BrandLandingTemplate({
         @media (max-width: 640px) { .bp-glossary-grid { grid-template-columns: 1fr; } }
 
         /* ══════════════════ SPECIALIST ══════════════════ */
-        .bp-specialist-wrap { padding: 56px 12px; max-width: 1440px; margin: 0 auto; }
+        .bp-specialist-wrap { padding: 72px 12px; max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-specialist {
           background: rgb(250,250,249); border: 1px solid rgba(0,0,0,0.08); border-radius: 12px;
           padding: 40px 44px; display: flex; align-items: center; gap: 32px; justify-content: space-between; flex-wrap: wrap;
@@ -315,7 +330,7 @@ export default function BrandLandingTemplate({
         @media (max-width: 900px) { .bp-specialist { flex-direction: column; align-items: flex-start; } }
 
         /* ══════════════════ FAQ ══════════════════ */
-        .bp-faq-section { padding: 56px 12px 72px; }
+        .bp-faq-section { padding: 72px 12px 88px; border-top: 1px solid rgba(0,0,0,0.06); }
         /* Two columns on desktop — uses the full container width the way a
            single centered text column can't, without stretching each Q&A
            row to an unreadable ~1400px line length. */
@@ -354,6 +369,16 @@ export default function BrandLandingTemplate({
       <section className="bp-hero">
         <div className="bp-hero-inner">
         <div className="bp-hero-copy">
+          {config.logo && (
+            <Image
+              src={config.logo.src}
+              alt={config.logo.alt}
+              width={config.logo.width}
+              height={config.logo.height}
+              className="bp-hero-logo"
+              priority
+            />
+          )}
           <span className="bp-eyebrow">{config.eyebrow}</span>
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
