@@ -106,13 +106,14 @@ export default function BrandLandingTemplate({
            breathe before the eyebrow/logo/title stack even starts. */
         .bp-hero-inner { padding: 136px 12px 100px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
-        /* Brand wordmark/icon sits above the eyebrow — the visual anchor
-           that says "whose page this is" before the eyebrow says it in
-           words. Height-capped, width auto, so square icon marks (PFERD,
-           OSBORN) and wide wordmarks (Milwaukee, RUKO, Kärcher) all read at
-           a consistent visual weight regardless of their native aspect
-           ratio. */
-        .bp-hero-logo { display: block; height: clamp(30px, 3.6vw, 46px); width: auto; margin-bottom: 28px; }
+        /* Brand wordmark/icon sits above the eyebrow — deliberately sized to
+           dominate the top of the hero (bigger than the eyebrow, bigger
+           than a typical "as seen on" partner badge) so it reads as THE
+           visual anchor of the page, not a small credential. Height-capped,
+           width auto, so square icon marks (PFERD, OSBORN) and wide
+           wordmarks (Milwaukee, RUKO, Kärcher) all land at the same visual
+           weight regardless of native aspect ratio. */
+        .bp-hero-logo { display: block; height: clamp(64px, 9vw, 140px); width: auto; margin-bottom: 32px; }
         .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 22px; }
         .bp-hero-title {
           font-family: 'Bungee', sans-serif;
@@ -162,19 +163,9 @@ export default function BrandLandingTemplate({
         /* Anchor targets sit just behind the main site nav (top: 52px). */
         #ghid-tehnic, #categorii, #descopera, #explorare, #specialist, #faq { scroll-margin-top: 68px; }
 
-        /* Intent toggles */
-        .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .bp-intent { background: rgb(250,250,249); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
-        .bp-intent-summary {
-          list-style: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 20px 22px;
-          font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
-          letter-spacing: 0.05em; text-transform: uppercase; color: rgb(0,0,0);
-          transition: background 150ms;
-        }
-        .bp-intent-summary::-webkit-details-marker { display: none; }
-        .bp-intent-summary:hover { background: rgba(0,0,0,0.02); }
+        /* Toggle "+" icon — shared by the glossary and FAQ <details> toggles
+           (no brand currently uses hero-level intent chips, so only those
+           two consumers remain). */
         .bp-intent-plus {
           width: 22px; height: 22px; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
@@ -182,21 +173,9 @@ export default function BrandLandingTemplate({
           color: rgba(0,0,0,0.6);
           transition: transform 220ms cubic-bezier(0.22,1,0.36,1), background 150ms;
         }
-        .bp-intent[open] .bp-intent-plus { transform: rotate(45deg); background: var(--brand-accent); border-color: var(--brand-accent); color: rgb(255,255,255); }
-        .bp-intent-body { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 20px; }
-        .bp-chip {
-          font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 500;
-          color: rgb(0,0,0); text-decoration: none; padding: 8px 14px;
-          border: 1px solid rgba(0,0,0,0.14); border-radius: 100px;
-          display: inline-flex; align-items: center; gap: 7px;
-          transition: border-color 150ms, background-color 150ms;
-        }
-        .bp-chip:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
-        .bp-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; }
 
         @media (max-width: 768px) {
           .bp-hero-inner { padding: 88px 12px 64px; }
-          .bp-intent-row { grid-template-columns: 1fr; }
         }
 
         /* ══════════════════ CATEGORY RAIL ══════════════════ */
@@ -343,6 +322,7 @@ export default function BrandLandingTemplate({
           display: flex; align-items: center; justify-content: space-between; gap: 12px;
         }
         .bp-faq-q::-webkit-details-marker { display: none; }
+        .bp-faq-item[open] .bp-intent-plus { transform: rotate(45deg); }
         .bp-faq-a { padding: 0 20px 18px; font-family: 'Recursive', sans-serif; font-size: 13.5px; line-height: 1.6; color: rgba(0,0,0,0.6); }
 
         /* ══════════════════ CROSS-SELL ══════════════════ */
@@ -412,27 +392,6 @@ export default function BrandLandingTemplate({
             </div>
           </div>
 
-          {config.intentGroups && (
-            <div className="bp-intent-row">
-              {config.intentGroups.map(group => (
-                <details key={group.label} className="bp-intent">
-                  <summary className="bp-intent-summary">
-                    {group.label}
-                    <span className="bp-intent-plus">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                    </span>
-                  </summary>
-                  <div className="bp-intent-body">
-                    {group.chips.map(c => (
-                      <Link key={c.q} href={`${catalogHref}&q=${encodeURIComponent(c.q)}`} className="bp-chip">
-                        <span className="dot" />{c.label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-              ))}
-            </div>
-          )}
         </div>
         </div>
       </section>
@@ -443,12 +402,23 @@ export default function BrandLandingTemplate({
           else (category browsing, curated pillars, use-case carousels). */}
       {config.glossary && (
         <section id="ghid-tehnic" className="bp-glossary-section">
-          <div className="bp-section bp-section-head">
+          {/* Single bp-section wrapper around BOTH the head and the grid —
+              not one bp-section per child. Stacking bp-section (which sets
+              margin: 0 auto) with bp-section-head (which overrides
+              max-width to 900px but doesn't touch margin) on the SAME
+              element let bp-section-head's narrower max-width win while
+              bp-section's auto margins still applied, centering the
+              section head as a 900px island instead of left-aligning it
+              like every other section's head. Applying bp-section exactly
+              once, as a pure wrapper, avoids that clash — head/grid below
+              are plain children with no competing margin rules. */}
+          <div className="bp-section">
+          <div className="bp-section-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
             <h2 className="bp-section-title">{config.glossaryTitle}</h2>
             <p className="bp-section-sub">{config.glossarySub}</p>
           </div>
-          <div className="bp-section bp-glossary-grid">
+          <div className="bp-glossary-grid">
             {config.glossary.map(g => (
               <details key={g.code} className="bp-gloss-card">
                 <summary className="bp-gloss-summary">
@@ -470,6 +440,7 @@ export default function BrandLandingTemplate({
                 <p className="bp-gloss-desc">{g.desc}</p>
               </details>
             ))}
+          </div>
           </div>
         </section>
       )}

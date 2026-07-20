@@ -135,30 +135,6 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     heroSub:
       'Peste 150 de ani de inginerie germană — pile, freze, carote și corpuri abrazive pentru orice atelier.',
 
-    intentGroups: [
-      {
-        label: 'Caută după Aplicație',
-        chips: [
-          { label: 'Ascuțire lanț drujbă', q: 'ascutire lant drujba' },
-          { label: 'Debavurare', q: 'debavurare' },
-          { label: 'Finisare', q: 'finisare' },
-          { label: 'Găurire / Carote', q: 'carote' },
-          { label: 'Șlefuire', q: 'slefuire' },
-          { label: 'Perii industriale', q: 'perii industriale' },
-        ],
-      },
-      {
-        label: 'Caută după Material',
-        chips: [
-          { label: 'Inox', q: 'inox' },
-          { label: 'Oțel / Steel', q: 'otel' },
-          { label: 'Aluminiu', q: 'aluminiu' },
-          { label: 'Fontă / Cast', q: 'fonta' },
-          { label: 'Lemn', q: 'lemn' },
-        ],
-      },
-    ],
-
     pillars: [
       {
         code: '01',
