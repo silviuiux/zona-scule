@@ -8,6 +8,17 @@ import { Analytics } from '@vercel/analytics/next'
 export const metadata: Metadata = {
   title: 'Zona Scule — Scule și Echipamente Profesionale',
   description: 'Distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.',
+  // app/favicon.ico is picked up automatically by Next's file convention;
+  // these cover the sizes/formats that convention doesn't reach (multi-size
+  // PNG favicons, iOS home-screen icon, Android/PWA manifest icons).
+  icons: {
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
