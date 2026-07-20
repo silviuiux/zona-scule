@@ -85,15 +85,30 @@ export default async function SuperviewPage() {
            itself said whether a given "Accesorii" product represented
            "Pile Rotunde" or "Discuri Abrazive" or "Force Logic". This small
            tag makes the actual dedup key (subcategory) visible per card
-           without exploding the page into 100+ tiny sub-sections. */
-        .sv-card { display: flex; flex-direction: column; gap: 8px; }
+           without exploding the page into 100+ tiny sub-sections.
+           .sv-card is JUST a positioning context (position: relative) for
+           the tag overlay — it deliberately has no flex/height rules of its
+           own. ProductCard's internal .pcard-link is hard-coded to
+           height: 100% (it's normally a direct grid item on /produse,
+           where CSS Grid's default stretch gives it a definite row height to
+           resolve that against). Stacking the tag as a NORMAL-FLOW sibling
+           above it in a flex column (an earlier version of this) made the
+           card fight the tag for 100% of a container that also had to fit
+           the tag — the classic flex-column + height:100%-child conflict —
+           and the card blew up to a runaway height instead of the square
+           aspect-ratio it has everywhere else. Absolutely positioning the
+           tag removes it from that flow entirely, so .pcard-link is again
+           the single normal-flow child sizing itself exactly as it does on
+           the main catalog grid. */
+        .sv-card { position: relative; }
         .sv-subcat-tag {
-          align-self: flex-start;
+          position: absolute; top: 8px; left: 8px; z-index: 2;
           font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
           letter-spacing: 0.04em; text-transform: uppercase;
-          color: rgba(0,0,0,0.55); background: rgba(0,0,0,0.05);
-          padding: 4px 8px; border-radius: 4px; max-width: 100%;
+          color: rgb(255,255,255); background: rgba(0,0,0,0.7);
+          padding: 4px 8px; border-radius: 4px; max-width: calc(100% - 16px);
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+          pointer-events: none;
         }
       `}</style>
 
