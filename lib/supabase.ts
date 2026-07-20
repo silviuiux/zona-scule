@@ -665,6 +665,7 @@ export async function getFeaturedSubcategoriesWithImage(): Promise<FeaturedSubca
 }
 
 export type SuperviewGroup = { category: string; products: Product[] }
+export type SuperviewFilterOption = { name: string; count: number }
 
 /**
  * Powers /produse/superview: exactly one representative product per unique
@@ -677,18 +678,82 @@ export type SuperviewGroup = { category: string; products: Product[] }
  * "Necategorizat" is filtered out here (not in the SQL function, to keep
  * that function reusable/generic) — same catch-all bucket already hidden
  * from the sidebar category list in app/produse/page.tsx.
+ *
+ * Filters (brandName/categoryText/subcategoryText) narrow the SAME
+ * already-deduped superview set — e.g. picking a brand shows one product
+ * per category/subcategory *within that brand only*, not a re-run of the
+ * dedup against the brand's full catalogue. The whole ~500-row set is small
+ * enough that this filters in memory rather than adding filter params to the
+ * SQL function; no extra round trip.
  */
-export async function getSuperviewProducts(): Promise<{
+export async function getSuperviewProducts({
+  brandName,
+  categoryText,
+  subcategoryText,
+}: {
+  brandName?: string
+  categoryText?: string
+  subcategoryText?: string
+} = {}): Promise<{
   groups: SuperviewGroup[]
   totalProducts: number
   brandCount: number
   categoryCount: number
+  filters: {
+    brands: SuperviewFilterOption[]
+    categories: SuperviewFilterOption[]
+    subcategories: SuperviewFilterOption[]
+  }
 }> {
+  const empty = {
+    groups: [], totalProducts: 0, brandCount: 0, categoryCount: 0,
+    filters: { brands: [], categories: [], subcategories: [] },
+  }
   const { data, error } = await supabase.rpc('get_superview_products')
-  if (error || !data) return { groups: [], totalProducts: 0, brandCount: 0, categoryCount: 0 }
+  if (error || !data) return empty
 
-  const products = (data as Product[]).filter(
+  const allProducts = (data as Product[]).filter(
     p => (p.category_text ?? '').toLowerCase().trim() !== 'necategorizat'
+  )
+
+  // Dropdown option lists always come from the FULL unfiltered superview set
+  // (picking a brand shouldn't make other brands vanish from the brand
+  // dropdown) — subcategory options are the one exception: scoped to
+  // whichever brand/category is currently selected, matching the cascading
+  // convention the main /produse dropdowns already use (CategoryPillBar.tsx).
+  const countByKey = (key: 'brand_name' | 'category_text', products: Product[]): SuperviewFilterOption[] => {
+    const counts = new Map<string, number>()
+    for (const p of products) {
+      const val = p[key]
+      if (!val) continue
+      counts.set(val, (counts.get(val) ?? 0) + 1)
+    }
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+  }
+
+  const subScope = allProducts.filter(p =>
+    (!brandName || p.brand_name === brandName) && (!categoryText || p.category_text === categoryText)
+  )
+  const subCounts = new Map<string, number>()
+  for (const p of subScope) {
+    if (!p.subcategory_text) continue
+    subCounts.set(p.subcategory_text, (subCounts.get(p.subcategory_text) ?? 0) + 1)
+  }
+
+  const filters = {
+    brands: countByKey('brand_name', allProducts),
+    categories: countByKey('category_text', allProducts),
+    subcategories: Array.from(subCounts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count),
+  }
+
+  const products = allProducts.filter(p =>
+    (!brandName || p.brand_name === brandName) &&
+    (!categoryText || p.category_text === categoryText) &&
+    (!subcategoryText || p.subcategory_text === subcategoryText)
   )
 
   const byCategory = new Map<string, Product[]>()
@@ -711,6 +776,7 @@ export async function getSuperviewProducts(): Promise<{
     totalProducts: products.length,
     brandCount: new Set(products.map(p => p.brand_name)).size,
     categoryCount: groups.length,
+    filters,
   }
 }
 

@@ -3,6 +3,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getSuperviewProducts } from '@/lib/supabase'
+import SuperviewFilters from './SuperviewFilters'
 
 // ─────────────────────────────────────────────────────────────────────────
 // /produse/superview — "one of each" overview: exactly one representative
@@ -22,7 +23,10 @@ import { getSuperviewProducts } from '@/lib/supabase'
 // landing pages under app/brand/.
 // ─────────────────────────────────────────────────────────────────────────
 
-export const revalidate = 3600
+// Filters live in the URL (?brand=&categorie=&subcategorie=), so this page
+// now needs to render per-request rather than on the old fixed 1h ISR
+// schedule — same reasoning/pattern as app/produse/page.tsx.
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Superview — Câte un produs din fiecare | Zona Scule',
@@ -30,8 +34,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function SuperviewPage() {
-  const { groups, totalProducts, brandCount, categoryCount } = await getSuperviewProducts()
+type SP = { brand?: string; categorie?: string; subcategorie?: string }
+
+export default async function SuperviewPage({ searchParams }: { searchParams: Promise<SP> }) {
+  const sp = await searchParams
+  const { groups, totalProducts, brandCount, categoryCount, filters } = await getSuperviewProducts({
+    brandName: sp.brand,
+    categoryText: sp.categorie,
+    subcategoryText: sp.subcategorie,
+  })
+  const isFiltered = !!(sp.brand || sp.categorie || sp.subcategorie)
 
   return (
     <>
@@ -131,8 +143,9 @@ export default async function SuperviewPage() {
           <span className="sv-eyebrow">Vizualizare Catalog</span>
           <h1 className="sv-title">Superview — câte unul din fiecare</h1>
           <p className="sv-desc">
-            Un produs reprezentativ pentru fiecare combinație brand + categorie + subcategorie din catalog.
-            Dacă mai multe branduri vând în aceeași subcategorie, fiecare apare cu propriul produs.
+            {isFiltered
+              ? 'Rezultate filtrate — tot un produs reprezentativ per categorie/subcategorie, dar doar din selecția de mai jos.'
+              : 'Un produs reprezentativ pentru fiecare combinație brand + categorie + subcategorie din catalog. Dacă mai multe branduri vând în aceeași subcategorie, fiecare apare cu propriul produs.'}
           </p>
           <div className="sv-stats">
             <div className="sv-stat">
@@ -155,6 +168,21 @@ export default async function SuperviewPage() {
 
       <div className="sv-page">
         <div className="sv-body">
+          <SuperviewFilters
+            brands={filters.brands}
+            categories={filters.categories}
+            subcategories={filters.subcategories}
+            activeBrand={sp.brand}
+            activeCategory={sp.categorie}
+            activeSub={sp.subcategorie}
+          />
+
+          {groups.length === 0 && (
+            <p style={{ fontFamily: 'Recursive, sans-serif', fontSize: 14, color: 'rgba(0,0,0,0.5)' }}>
+              Nicio combinație brand/categorie/subcategorie nu se potrivește cu filtrele selectate.
+            </p>
+          )}
+
           {groups.map(group => (
             <section key={group.category} className="sv-cat-section">
               <div className="sv-cat-head">
