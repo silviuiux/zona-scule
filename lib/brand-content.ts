@@ -129,7 +129,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial PFERD',
     heroTitle: [
-      [{ text: 'Rezistență ' }, { text: 'imbatabilă.', em: true }],
+      [{ text: 'Rezistență imbatabilă.' }],
       [{ text: 'Precizie care ' }, { text: 'nu iartă.', em: true }],
     ],
     heroSub:
@@ -244,7 +244,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener autorizat Karcher',
     heroTitle: [
-      [{ text: 'Curățenie ' }, { text: 'industrială.', em: true }],
+      [{ text: 'Curățenie industrială.' }],
       [{ text: 'Fără ' }, { text: 'compromis.', em: true }],
     ],
     heroSub:
@@ -334,7 +334,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial OSBORN',
     heroTitle: [
-      [{ text: 'Precizie ' }, { text: 'germană.', em: true }],
+      [{ text: 'Precizie germană.' }],
       [{ text: 'Perii care ' }, { text: 'nu cedează.', em: true }],
     ],
     heroSub:
@@ -451,7 +451,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     eyebrow: 'Partener oficial Milwaukee',
     heroTitle: [
       [{ text: 'Un întreg ' }, { text: 'ecosistem.', em: true }],
-      [{ text: 'Nu o ' }, { text: 'simplă sculă.', em: true }],
+      [{ text: 'Nu o simplă sculă.' }],
     ],
     heroSub:
       'De la platforma compactă M12 la echipamentele industriale MX FUEL — un singur ecosistem de acumulatori.',
@@ -534,7 +534,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial RUKO',
     heroTitle: [
-      [{ text: 'Oțel ' }, { text: 'german,', em: true }],
+      [{ text: 'Oțel german,' }],
       [{ text: 'găurire de ' }, { text: 'precizie.', em: true }],
     ],
     heroSub:

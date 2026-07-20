@@ -103,9 +103,26 @@ export default function BrandLandingTemplate({
         }
         /* Taller than a typical section hero on purpose — this is a single
            flagship page per brand, not a dense listing, so it can afford to
-           breathe before the eyebrow/logo/title stack even starts. */
-        .bp-hero-inner { padding: 136px 12px 100px; max-width: 1440px; margin: 0 auto; }
+           breathe before the eyebrow/logo/title stack even starts.
+           position:relative + z-index:1 keeps this content stacked above
+           the absolutely-positioned watermark logo below (positioned
+           elements paint above static ones regardless of DOM order, so
+           without this the watermark — despite coming first in markup —
+           would sit on top of and obscure the actual copy). */
+        .bp-hero-inner { position: relative; z-index: 1; padding: 136px 12px 100px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
+        /* Giant, near-invisible echo of the brand mark bleeding off the
+           right edge — fills the empty white space in the hero without
+           competing with the sharp, small logo above the headline or the
+           copy itself (z-index below .bp-hero-inner, pointer-events off).
+           Hidden below ~900px where there's no spare width for it anyway. */
+        .bp-hero-watermark {
+          position: absolute; top: 50%; right: -6%; transform: translateY(-50%);
+          width: clamp(320px, 36vw, 620px); opacity: 0.05; pointer-events: none;
+          user-select: none;
+        }
+        .bp-hero-watermark img { width: 100%; height: auto; display: block; }
+        @media (max-width: 900px) { .bp-hero-watermark { display: none; } }
         /* Brand wordmark/icon sits above the eyebrow — deliberately sized to
            dominate the top of the hero (bigger than the eyebrow, bigger
            than a typical "as seen on" partner badge) so it reads as THE
@@ -114,20 +131,30 @@ export default function BrandLandingTemplate({
            wordmarks (Milwaukee, RUKO, Kärcher) all land at the same visual
            weight regardless of native aspect ratio. */
         .bp-hero-logo { display: block; height: clamp(64px, 9vw, 140px); width: auto; margin-bottom: 32px; }
-        .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); margin-bottom: 22px; }
+        /* Eyebrow + S.E.A.P. badge share one row — the badge is a
+           credential ("this page is legit"), not a third call to action, so
+           it sits quietly next to "Partener oficial X" instead of in the
+           button row where it competed visually with the two real CTAs. */
+        .bp-hero-eyebrow-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+        .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); }
         .bp-hero-title {
           font-family: 'Bungee', sans-serif;
           font-size: clamp(38px, 5.6vw, 74px);
-          line-height: 1.02; text-transform: uppercase; color: rgb(0,0,0);
+          line-height: 1.02; text-transform: uppercase; color: rgb(20,20,20);
           margin-bottom: 20px;
         }
         .bp-hero-title em { color: var(--brand-accent); font-style: normal; }
+        /* Darker + slightly heavier than a typical body paragraph — this is
+           reading against a busy dot-grid hero background, not a plain
+           white card, so it needs the extra contrast to stay legible. */
         .bp-hero-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.6);
+          font-family: 'Recursive', sans-serif; font-weight: 500;
+          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.72);
           max-width: 620px; margin-bottom: 32px;
         }
-        .bp-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+        /* Two primary actions only now (S.E.A.P. moved up to the eyebrow
+           row) — tighter gap groups them as one clear "next step" cluster. */
+        .bp-hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
         .bp-btn-primary, .bp-btn-secondary {
           display: inline-flex; align-items: center; gap: 8px;
           font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
@@ -139,17 +166,6 @@ export default function BrandLandingTemplate({
         .bp-btn-primary:hover { filter: brightness(0.9); }
         .bp-btn-secondary { color: rgb(0,0,0); border: 1px solid rgba(0,0,0,0.18); }
         .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
-        /* Same size/shape as the two CTA buttons, keeping the green trust-
-           badge tint rather than the brand accent — it's a credential, not
-           an action. */
-        .bp-btn-seap {
-          display: inline-flex; align-items: center;
-          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          padding: 13px 24px; border-radius: 4px;
-          background: rgba(21,128,61,0.08); color: rgb(21,128,61);
-          border: 1px solid rgba(21,128,61,0.22);
-        }
 
         /* Trust bar — plain number+label stats separated by a thin divider,
            matching the site's other hero stat rows (see .sv-stat on
@@ -275,14 +291,30 @@ export default function BrandLandingTemplate({
            of the viewport — that was the full-bleed-background bug. */
         .bp-glossary-section { background: rgb(236,236,236); padding: 72px 0; }
         .bp-glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .bp-gloss-card { background: rgb(255,255,255); border-radius: 10px; overflow: hidden; }
+        /* Subtle counter-rotate + lift + border reveal on hover — makes the
+           grid feel alive without disturbing the underlying layout (the
+           card's own box model doesn't change, just its transform/shadow). */
+        .bp-gloss-card {
+          background: rgb(255,255,255); border-radius: 10px; overflow: hidden;
+          border: 1px solid transparent;
+          transition: transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms, border-color 220ms;
+        }
+        .bp-gloss-card:hover {
+          transform: rotate(-1deg) translateY(-3px);
+          box-shadow: 0 16px 36px rgba(0,0,0,0.09);
+          border-color: rgba(0,0,0,0.1);
+        }
         .bp-gloss-summary {
           list-style: none; cursor: pointer; padding: 16px 18px;
-          display: flex; flex-direction: column; gap: 8px;
+          display: flex; flex-direction: column; justify-content: center; gap: 10px;
+          min-height: 92px;
         }
         .bp-gloss-summary::-webkit-details-marker { display: none; }
         .bp-gloss-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(0,0,0); padding: 4px 9px; border-radius: 4px; }
+        /* Softened from solid black — the code pill is a label, not the
+           focal point, and pure black was pulling more visual weight than
+           the title beneath it. */
+        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(42,42,42); padding: 4px 9px; border-radius: 4px; }
         .bp-gloss-badges { display: flex; gap: 6px; flex-wrap: wrap; }
         .bp-gloss-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .bp-gloss-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13.5px; color: rgb(0,0,0); }
@@ -347,6 +379,11 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="bp-hero">
+        {config.logo && (
+          <div className="bp-hero-watermark" aria-hidden="true">
+            <Image src={config.logo.src} alt="" width={config.logo.width} height={config.logo.height} />
+          </div>
+        )}
         <div className="bp-hero-inner">
         <div className="bp-hero-copy">
           {config.logo && (
@@ -359,7 +396,12 @@ export default function BrandLandingTemplate({
               priority
             />
           )}
-          <span className="bp-eyebrow">{config.eyebrow}</span>
+          <div className="bp-hero-eyebrow-row">
+            <span className="bp-eyebrow">{config.eyebrow}</span>
+            {config.seapEligible && (
+              <span className="badge badge-seap">Eligibil S.E.A.P.</span>
+            )}
+          </div>
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
               <span key={i}>
@@ -375,9 +417,6 @@ export default function BrandLandingTemplate({
           <div className="bp-hero-ctas">
             <Link href={catalogHref} className="bp-btn-primary">Vezi Catalogul</Link>
             <Link href={contactHref} className="bp-btn-secondary">Vorbește cu un Specialist</Link>
-            {config.seapEligible && (
-              <span className="bp-btn-seap">Eligibil S.E.A.P.</span>
-            )}
           </div>
 
           <div className="bp-trust">
