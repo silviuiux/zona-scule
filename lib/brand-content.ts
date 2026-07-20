@@ -76,6 +76,11 @@ export type BrandPageConfig = {
   useCaseSectionTitle: string
   useCaseSectionSub: string
 
+  /** Whether to render "browse by subcategory" carousels from subcategory_text data (see getSubcategoryGroupsByBrand) — the universal counterpart to useUseCaseCarousels, since every brand has subcategory_text populated. */
+  useSubcategoryCarousels: boolean
+  subcategorySectionTitle?: string
+  subcategorySectionSub?: string
+
   /** Technical glossary / code cheat-sheet — optional, PFERD-style nomenclature brands only. */
   glossary?: GlossaryItem[]
   glossaryTitle?: string
@@ -179,6 +184,10 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
     useCaseSectionSub: 'Produse PFERD grupate după aplicația reală, nu după codul din catalog.',
 
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Descoperă gama PFERD pe subcategorii',
+    subcategorySectionSub: 'Pile, freze, carote și corpuri abrazive — organizate exact cum le găsești în catalog.',
+
     glossaryTitle: 'Descifrează codul PFERD',
     glossarySub: 'Cheat-sheet rapid pentru codurile de pe etichetă — fără să deschizi catalogul.',
     glossary: [
@@ -261,6 +270,10 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     useCaseSectionSub:
       'Produse Karcher grupate după domeniul real de utilizare — exact cum întreabă un procurement manager, nu cum e organizat un catalog.',
 
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Explorează gama Karcher pe subcategorii',
+    subcategorySectionSub: 'De la aspiratoare industriale la mașini de spălat cu presiune — organizate pe tip de echipament.',
+
     specialist: {
       name: 'Echipa tehnică Karcher',
       role: 'Consultanță echipamente industriale de curățare',
@@ -277,6 +290,315 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       {
         q: 'Oferiți piese de schimb și consumabile pentru echipamentele Karcher?',
         a: 'Da, ca partener autorizat avem acces la piese originale Karcher și la rețeaua de service a producătorului — contactați-ne cu seria echipamentului pentru disponibilitate și termen.',
+      },
+    ],
+  },
+
+  // ── OSBORN ─────────────────────────────────────────────────────────────
+  // No app_01_title data at all (0/131 rows) — leans entirely on curated
+  // pillars/glossary from the nomenclature blueprint, same pattern as PFERD.
+  // Subcategory spread is thin (6 subcategories, "Perii Industriale" alone is
+  // ~75% of the catalog) so useSubcategoryCarousels is enabled but won't
+  // carry the page on its own — the pillars + glossary do the heavy lifting.
+  osborn: {
+    slug: 'osborn',
+    brandName: 'Osborn',
+    metaTitle: 'OSBORN — Perii Industriale și Freze din Carbură | Zona Scule',
+    metaDescription:
+      'Perii circulare, perii oală, perii de precizie, freze rotative din carbură și corpuri abrazive lamelare OSBORN pentru debavurare, curățare și finisare industrială.',
+
+    eyebrow: 'Partener oficial OSBORN',
+    heroTitle: [
+      [{ text: 'Perii industriale care ' }, { text: 'nu cedează sub presiune.', em: true }],
+      [{ text: 'Precizie germană pe ' }, { text: 'fiecare suprafață.', em: true }],
+    ],
+    heroSub:
+      'Perii circulare, perii oală și perii de precizie în sârmă ondulată sau împletită, plus freze rotative din carbură și corpuri abrazive lamelare — pentru debavurare, curățare de zgură și finisare, pe orice metal.',
+
+    pillars: [
+      {
+        code: '01',
+        title: 'Perii Circulare & Perii Oală',
+        desc: 'Montate pe polizoare unghiulare sau de banc — pentru curățare rapidă a suprafețelor mari sau acces în colțuri și canale de sudură.',
+        bullets: ['Sârmă ondulată (crimped)', 'Sârmă împletită (knotted)', 'Miez ranforsat Ringlock'],
+        q: 'perie circulara',
+      },
+      {
+        code: '02',
+        title: 'Perii de Precizie & Perii pentru Interior',
+        desc: 'Perii pe tijă (6mm) pentru mașini de găurit și polizoare drepte, plus perii tip țevară pentru curățarea interioară a alezajelor.',
+        bullets: ['Perie tip pensulă (End Brush)', 'Perie cilindrică interior (Tube Brush)', 'Situft & Helituf'],
+        q: 'perie de precizie',
+      },
+      {
+        code: '03',
+        title: 'Freze Rotative din Carbură',
+        desc: 'Debavurare și prelucrare de detaliu pe orice material, cu geometrii standardizate german pentru fiecare formă de tăiș.',
+        bullets: ['Forme ZYA, WRC, KUD, TRE', 'Forme SKM, KEL, SPG', 'Carbură metalică sinterizată'],
+        q: 'freza rotativa',
+      },
+      {
+        code: '04',
+        title: 'Corpuri Abrazive Lamelare & Fetru',
+        desc: 'Discuri lamelare, filamente abrazive Novofil și produse din fetru pentru finisare și lustruire controlată.',
+        bullets: ['Discuri lamelare (Flap Wheel)', 'Filamente Novofil SIC / AO', 'Produse din fetru & paste de lustruit'],
+        q: 'disc lamelar',
+      },
+    ],
+
+    useUseCaseCarousels: false,
+    useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
+    useCaseSectionSub: 'Produse OSBORN grupate după aplicația reală.',
+
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Explorează gama OSBORN pe subcategorii',
+    subcategorySectionSub: 'Perii industriale, freze din carbură, discuri lamelare și produse din fetru — organizate exact cum sunt în catalog.',
+
+    glossaryTitle: 'Descifrează codul OSBORN',
+    glossarySub: 'Sârmă, geometrie și acoperire — cheat-sheet rapid pentru eticheta periei sau frezei.',
+    glossary: [
+      {
+        code: 'crimped / knotted',
+        title: 'Dispunerea sârmei',
+        desc: 'Ondulată (crimped) — flexibilă, pentru curățare fină și debavurare ușoară. Împletită/torsionată (knotted) — agresivă, pentru zgură de sudură, rugină severă și decopertări masive.',
+      },
+      {
+        code: 'steel / brass coated / inox',
+        title: 'Compoziția sârmei',
+        desc: 'Oțel carbon pentru uz universal, oțel alămit (anticorosiv, rezistență la tracțiune mărită), alamă pură pentru piese moi fără zgâriere, inox pentru evitarea contaminării feroase încrucișate.',
+        badges: [{ label: 'INOX', cls: 'badge-inox' }],
+      },
+      {
+        code: 'ZYA / WRC / KUD / TRE',
+        title: 'Geometrie freză',
+        desc: 'Cod german standardizat pentru forma capului: ZYA cilindrică, WRC cilindro-sferică, KUD sferică (bilă), TRE formă de picătură.',
+      },
+      {
+        code: 'SKM / KEL / SPG',
+        title: 'Geometrie conică/parabolică',
+        desc: 'SKM conică cu cap ascuțit, KEL conică cu cap rotund, SPG parabolică cu cap ascuțit — pentru acces în unghiuri și cavități înguste.',
+      },
+      {
+        code: 'Novofil SIC / AO',
+        title: 'Filament abraziv',
+        desc: 'Filamente de nylon încărcate cu granule abrazive — Carbură de Siliciu (SIC) sau Oxid de Aluminiu (AO) — pentru perii abrazive Novomaster.',
+      },
+      {
+        code: 'GL',
+        title: 'Lungime totală',
+        desc: 'Gesamtlänge — lungimea totală a frezei (cap + gât + tijă), esențială pentru verificarea accesului în alezaje adânci.',
+      },
+    ],
+
+    specialist: {
+      name: 'Echipa tehnică OSBORN',
+      role: 'Consultanță alegere perie/freză după material și agresivitate',
+      note: 'Vă ajutăm să alegeți între sârmă ondulată sau împletită, și între oțel, alamă sau inox, în funcție de material și de cât de agresivă trebuie să fie curățarea.',
+    },
+    seapEligible: true,
+    faq: [
+      SHARED_SEAP_FAQ,
+      SHARED_WARRANTY_FAQ,
+      {
+        q: 'Ce diferență e între sârma ondulată (crimped) și cea împletită (knotted)?',
+        a: 'Sârma ondulată e mai flexibilă și potrivită pentru curățare fină, debavurare ușoară și suprafețe neregulate. Sârma împletită (torsionată) e mult mai agresivă și rezistentă la forțe centrifuge — se folosește la îndepărtarea zgurii de sudură, ruginii severe și decopertări masive pe șantier.',
+      },
+    ],
+  },
+
+  // ── MILWAUKEE ──────────────────────────────────────────────────────────
+  // The one brand with BOTH rich app_01_title data (3597/4669 rows) AND a
+  // wide subcategory spread (~100 distinct subcategories) — so it's the only
+  // brand config with useUseCaseCarousels AND useSubcategoryCarousels both
+  // true. Glossary covers the platform/tech-ecosystem vocabulary from the
+  // nomenclature blueprint (M12/M18/MX FUEL, FUEL/PACKOUT/ONE-KEY etc.) since
+  // that's real differentiation a buyer needs decoded, not something a
+  // product-grid carousel communicates on its own.
+  milwaukee: {
+    slug: 'milwaukee',
+    brandName: 'Milwaukee',
+    metaTitle: 'Milwaukee — Scule Electrice cu Acumulator Profesionale | Zona Scule',
+    metaDescription:
+      'Scule electrice cu acumulator Milwaukee: platformele M12, M18 și MX FUEL, tehnologie FUEL, sisteme PACKOUT și scule hidraulice FORCE LOGIC pentru profesioniști.',
+
+    eyebrow: 'Partener oficial Milwaukee',
+    heroTitle: [
+      [{ text: 'Putere fără fir. ' }, { text: 'Fără compromis.', em: true }],
+      [{ text: 'Un ecosistem, ' }, { text: 'nu doar o sculă.', em: true }],
+    ],
+    heroSub:
+      'De la platforma compactă M12 la echipamentele industriale MX FUEL — scule electrice, hidraulice și de organizare a atelierului, toate pe același ecosistem de acumulatori.',
+
+    useUseCaseCarousels: true,
+    useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
+    useCaseSectionSub: 'Produse Milwaukee grupate după aplicația reală de pe șantier sau din atelier.',
+
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Explorează gama Milwaukee pe subcategorii',
+    subcategorySectionSub: 'De la scule de găurit și înșurubat la organizare PACKOUT — organizate exact cum sunt în catalog.',
+
+    glossaryTitle: 'Descifrează ecosistemul Milwaukee',
+    glossarySub: 'Platforme, tehnologii și sub-branduri — ce înseamnă codurile de pe cutie.',
+    glossary: [
+      {
+        code: 'M12 / M18 / MX FUEL',
+        title: 'Platforme de tensiune',
+        desc: 'M12 — platforma compactă de 12V pentru precizie și spații înguste. M18 — standardul industrial de 18V pentru putere și autonomie. MX FUEL — platforma industrială grea, pentru echipamente ce înlocuiesc utilaje pe benzină sau aer comprimat.',
+      },
+      {
+        code: 'FUEL™',
+        title: 'Tehnologie premium',
+        desc: 'Combină motorul fără perii POWERSTATE™, acumulatorii REDLITHIUM™ și electronica inteligentă REDLINK PLUS™ — indică gama premium de top, cu performanță și durabilitate maxime.',
+      },
+      {
+        code: 'HIGH OUTPUT (HO)',
+        title: 'Celule acumulator avansate',
+        desc: 'Livrează până la 50% mai multă putere și rulează cu 50% mai rece comparativ cu acumulatorii REDLITHIUM™ standard.',
+      },
+      {
+        code: 'FORCE LOGIC™',
+        title: 'Scule hidraulice inteligente',
+        desc: 'Sertizatoare, pompe și tăietoare de cabluri de înaltă presiune, cu monitorizare electronică a ciclului de presiune.',
+      },
+      {
+        code: 'PACKOUT™',
+        title: 'Sistem de organizare',
+        desc: 'Sistemul modular de depozitare, organizare și transport, rezistent la impact — cutii, sertare și rucsacuri compatibile între ele.',
+      },
+      {
+        code: 'ONE-KEY™',
+        title: 'Platformă digitală',
+        desc: 'Urmărire, securizare și calibrare electronică a sculelor prin Bluetooth, direct din aplicația ONE-KEY.',
+      },
+    ],
+
+    specialist: {
+      name: 'Echipa tehnică Milwaukee',
+      role: 'Consultanță alegere platformă (M12 / M18 / MX FUEL)',
+      note: 'Vă ajutăm să alegeți platforma potrivită pentru volumul de lucru — de la precizia M12 la autonomia M18 FUEL sau puterea industrială MX FUEL.',
+    },
+    seapEligible: true,
+    faq: [
+      SHARED_SEAP_FAQ,
+      SHARED_WARRANTY_FAQ,
+      {
+        q: 'Acumulatorii M18 sunt compatibili cu toate sculele M18?',
+        a: 'Da — orice acumulator M18™ (inclusiv HIGH OUTPUT™) funcționează cu orice sculă M18™, indiferent de generație. M12™ și MX FUEL™ sunt platforme separate, cu acumulatori dedicați, necompatibili între ele sau cu M18.',
+      },
+    ],
+  },
+
+  // ── RUKO ───────────────────────────────────────────────────────────────
+  // Subcategory data is essentially flat (the "Burghie" subcategory alone
+  // covers virtually the entire catalog), and app_01_title coverage is thin
+  // (47/470) — so this page leans on curated pillars built from real product-
+  // name patterns (burghie elicoidale, zencuitoare, tarozi, carote) rather
+  // than either data-driven section carrying the page. useSubcategoryCarousels
+  // stays enabled per the "all brand pages" instruction, it just won't have
+  // much to show beyond the one dominant subcategory.
+  ruko: {
+    slug: 'ruko',
+    brandName: 'Ruko',
+    metaTitle: 'RUKO — Scule Așchietoare de Precizie | Zona Scule',
+    metaDescription:
+      'Burghie elicoidale și în trepte, zencuitoare, tarozi, filiere și carote RUKO — oțel rapid, cobalt și carbură metalică, cu acoperiri TiN, TiAlN și RUnaTEC.',
+
+    eyebrow: 'Partener oficial RUKO',
+    heroTitle: [
+      [{ text: 'Găurire de precizie, ' }, { text: 'fără compromis.', em: true }],
+      [{ text: 'Oțel german, ' }, { text: 'acoperiri de durată.', em: true }],
+    ],
+    heroSub:
+      'Burghie elicoidale și în trepte, zencuitoare, tarozi și filiere din oțel rapid, cobalt sau carbură metalică, cu acoperiri TiN, TiAlN sau RUnaTEC pentru performanță în inox și oțeluri aliate.',
+
+    pillars: [
+      {
+        code: '01',
+        title: 'Burghie Elicoidale & în Trepte',
+        desc: 'Găurire universală sau centrată, cu debavurare simultană — în HSS standard sau HSS-Co5 pentru inox.',
+        bullets: ['HSS / HSS-Co 5', 'FLOWSTEP® pentru trepte', 'Versiuni TiN / TiAlN'],
+        q: 'burghie elicoidale',
+      },
+      {
+        code: '02',
+        title: 'Zencuitoare & Freze Biax',
+        desc: 'Teșire și îngropare șuruburi, plus freze biax din carbură pentru debavurare de detaliu.',
+        bullets: ['ULTIMATECUT 4S', 'Unghiuri 75°/90°/120°', 'Forme C, D (biax)'],
+        q: 'zencuitor',
+      },
+      {
+        code: '03',
+        title: 'Tarozi & Filiere (Filetare)',
+        desc: 'Filetare de mașină sau manuală, în seturi complete sau ca scule individuale.',
+        bullets: ['DIN 371 / DIN 376 / DIN 2182', 'HSS / HSSE-Co 5', 'Seturi complete de filetat'],
+        q: 'tarod',
+      },
+      {
+        code: '04',
+        title: 'Carote & Seturi Accesorii',
+        desc: 'Carote bimetal și din carbură pentru tablă și profile, cu suporturi și accesorii compatibile.',
+        bullets: ['Carote bimetal HSS-Co 8', 'Carote pentru tablă (carbură)', 'Suporturi multigrad'],
+        q: 'carote',
+      },
+    ],
+
+    useUseCaseCarousels: false,
+    useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
+    useCaseSectionSub: 'Produse RUKO grupate după aplicația reală.',
+
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Explorează gama RUKO',
+    subcategorySectionSub: 'Scule așchietoare organizate exact cum sunt în catalog.',
+
+    glossaryTitle: 'Descifrează codul RUKO',
+    glossarySub: 'Material, acoperire și abreviere ERP — cheat-sheet rapid pentru eticheta sculei.',
+    glossary: [
+      {
+        code: 'HSS',
+        title: 'Oțel rapid superior',
+        desc: 'Destinat găuririi și prelucrării universale în metale neferoase, oțeluri moi și materiale plastice.',
+      },
+      {
+        code: 'HSS-Co 5 / HSSE',
+        title: 'Oțel rapid cu Cobalt',
+        desc: 'Rezistență termică la cald excepțională și duritate ridicată — strict obligatoriu pentru inox, oțeluri aliate de mare rezistență și materiale turnate.',
+        badges: [{ label: 'INOX', cls: 'badge-inox' }],
+      },
+      {
+        code: 'TCT',
+        title: 'Carbură de Tungsten (Vidiam)',
+        desc: 'Dinți placați cu carbură metalică pentru performanțe de străpungere extremă în materiale puternic abrazive și oțeluri dure structurale.',
+        badges: [{ label: 'STEEL', cls: 'badge-steel' }],
+      },
+      {
+        code: 'TiN',
+        title: 'Acoperire Nitrură de Titan',
+        desc: 'Strat protector auriu — mărește duritatea la suprafață și rezistența la temperatură, crescând viteza de avans cu până la 50%.',
+      },
+      {
+        code: 'TiAlN',
+        title: 'Acoperire Titan-Aluminiu-Nitrură',
+        desc: 'Strat violet-negru, ideal pentru așchiere uscată sau materiale ultra-dure, cu izolare termică superioară.',
+      },
+      {
+        code: 'RUnaTEC',
+        title: 'Acoperire brevetată RUKO',
+        desc: 'Coeficient de frecare minim și rezistență la uzură extremă — acoperire de înaltă performanță proprie RUKO.',
+      },
+    ],
+
+    specialist: {
+      name: 'Echipa tehnică RUKO',
+      role: 'Consultanță alegere material și acoperire sculă așchietoare',
+      note: 'Vă ajutăm să alegeți între HSS, HSS-Co5 și TCT, și între acoperirile TiN, TiAlN sau RUnaTEC, în funcție de materialul prelucrat.',
+    },
+    seapEligible: true,
+    faq: [
+      SHARED_SEAP_FAQ,
+      SHARED_WARRANTY_FAQ,
+      {
+        q: 'Ce diferență e între HSS, HSS-Co5 și TCT?',
+        a: 'HSS e oțelul rapid standard, potrivit pentru metale neferoase și oțeluri moi. HSS-Co5 adaugă 5% cobalt pentru rezistență termică și duritate mărite — obligatoriu pentru inox și oțeluri aliate. TCT (carbură de tungsten) e cea mai dură variantă, pentru materiale puternic abrazive și oțeluri structurale dure.',
       },
     ],
   },

@@ -465,6 +465,43 @@ export async function getApplicationGroupsByBrand(
     .slice(0, maxGroups)
 }
 
+/**
+ * Groups a brand's products by `subcategory_text` — the universal counterpart
+ * to getApplicationGroupsByBrand() above. Every brand has subcategory_text
+ * populated (it's a core catalog field, not an enrichment extra like
+ * app_01_title), so this is what powers the "Descoperă pe subcategorii"
+ * carousel section on brand pages that lack rich application data — which is
+ * most of them (Osborn has 0/131 app_01_title rows, Ruko only 47/470, PFERD's
+ * enrichment predates that field entirely). Karcher and Milwaukee have both
+ * app_01_title AND diverse subcategories; useUseCaseCarousels (job-based) and
+ * useSubcategoryCarousels (catalog-structure-based) are independent flags in
+ * BrandPageConfig so a brand can show either, both, or neither.
+ *
+ * Same sampling caveat as getApplicationGroupsByBrand: groups/counts reflect
+ * one brand-scoped fetch (sampleSize rows), not a true brand-wide count.
+ */
+export async function getSubcategoryGroupsByBrand(
+  brandName: string,
+  { maxGroups = 6, perGroup = 10, sampleSize = 500 }:
+    { maxGroups?: number; perGroup?: number; sampleSize?: number } = {}
+): Promise<ApplicationGroup[]> {
+  const { products } = await getProducts({ brandName, pageSize: sampleSize })
+
+  const byTitle = new Map<string, Product[]>()
+  for (const p of products) {
+    const title = p.subcategory_text?.trim()
+    if (!title) continue
+    const arr = byTitle.get(title) ?? []
+    arr.push(p)
+    byTitle.set(title, arr)
+  }
+
+  return Array.from(byTitle.entries())
+    .map(([title, all]) => ({ title, count: all.length, products: all.slice(0, perGroup) }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, maxGroups)
+}
+
 export type BrandWithCount = Brand & { product_count: number }
 
 /** Returns all brands with at least 1 product across the whole catalogue. */

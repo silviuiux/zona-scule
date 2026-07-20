@@ -31,6 +31,7 @@ type Props = {
   config: BrandPageConfig
   subcategories: SubcategoryWithCount[]
   applicationGroups: ApplicationGroup[]
+  subcategoryGroups: ApplicationGroup[]
   totalProductCount: number
 }
 
@@ -38,6 +39,7 @@ export default function BrandLandingTemplate({
   config,
   subcategories,
   applicationGroups,
+  subcategoryGroups,
   totalProductCount,
 }: Props) {
   // Accent is the site's own red, not brand.brand_color — brand pages stay
@@ -65,6 +67,7 @@ export default function BrandLandingTemplate({
   if (subcategories.length > 0) quickNav.push({ label: 'Categorii', href: '#categorii' })
   if (config.useUseCaseCarousels && applicationGroups.length > 0) quickNav.push({ label: 'Recomandări', href: '#descopera' })
   if (config.pillars) quickNav.push({ label: 'Gama de produse', href: '#descopera' })
+  if (config.useSubcategoryCarousels && subcategoryGroups.length > 0) quickNav.push({ label: 'Explorează', href: '#explorare' })
   if (config.glossary) quickNav.push({ label: 'Ghid tehnic', href: '#ghid-tehnic' })
   quickNav.push({ label: 'Specialist', href: '#specialist' })
   if (config.faq.length > 0) quickNav.push({ label: 'Întrebări', href: '#faq' })
@@ -180,7 +183,7 @@ export default function BrandLandingTemplate({
 
         /* Anchor targets sit behind the main nav + quick-nav strip unless
            offset — clears both (52px + ~58px). */
-        #categorii, #descopera, #ghid-tehnic, #specialist, #faq { scroll-margin-top: 112px; }
+        #categorii, #descopera, #explorare, #ghid-tehnic, #specialist, #faq { scroll-margin-top: 112px; }
 
         /* Intent toggles */
         .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
@@ -528,6 +531,41 @@ export default function BrandLandingTemplate({
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* ══════════════════ SUBCATEGORY CAROUSELS ══════════════════ */}
+      {/* Same visual pattern as the use-case carousels above (reuses the
+          .bp-usecase-* CSS as-is), but grouped by subcategory_text instead
+          of app_01_title — see getSubcategoryGroupsByBrand in lib/supabase.ts.
+          Every brand has subcategory_text populated, so this section is the
+          universal "browse by catalog structure" counterpart to the
+          job-based use-case carousels, which only a couple of enriched
+          brands (Karcher, Milwaukee) have real data for. A brand can render
+          both, either, or neither. */}
+      {config.useSubcategoryCarousels && subcategoryGroups.length > 0 && (
+        <section id="explorare" className="bp-usecase-section bp-section">
+          <div className="bp-section-head">
+            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Explorează gama</span>
+            <h2 className="bp-section-title">{config.subcategorySectionTitle ?? 'Descoperă pe subcategorii'}</h2>
+            <p className="bp-section-sub">{config.subcategorySectionSub ?? 'Produsele grupate exact cum sunt organizate în catalog.'}</p>
+          </div>
+          {subcategoryGroups.map(group => (
+            <div key={group.title} className="bp-usecase-group">
+              <div className="bp-usecase-head">
+                <span className="bp-usecase-title">{group.title}</span>
+                <Link
+                  href={`/produse?brand=${encodeURIComponent(config.brandName)}&subcategorie=${encodeURIComponent(group.title)}`}
+                  className="bp-usecase-count"
+                >
+                  {group.count} produse →
+                </Link>
+              </div>
+              <div className="bp-usecase-scroll">
+                {group.products.map(p => <ProductCard key={p.id} product={p} />)}
+              </div>
+            </div>
+          ))}
         </section>
       )}
 

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import BrandLandingTemplate from '@/components/BrandLandingTemplate'
-import { getBrandBySlug, getSubcategoriesByBrandName, getApplicationGroupsByBrand } from '@/lib/supabase'
+import { getBrandBySlug, getSubcategoriesByBrandName, getApplicationGroupsByBrand, getSubcategoryGroupsByBrand } from '@/lib/supabase'
 import { getBrandPageConfig } from '@/lib/brand-content'
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -32,10 +32,11 @@ export default async function PferdBrandPage() {
   const config = getBrandPageConfig('pferd')
   if (!config) return notFound()
 
-  const [brand, subcategories, applicationGroups] = await Promise.all([
+  const [brand, subcategories, applicationGroups, subcategoryGroups] = await Promise.all([
     getBrandBySlug('pferd'),
     getSubcategoriesByBrandName(config.brandName),
     config.useUseCaseCarousels ? getApplicationGroupsByBrand(config.brandName) : Promise.resolve([]),
+    config.useSubcategoryCarousels ? getSubcategoryGroupsByBrand(config.brandName) : Promise.resolve([]),
   ])
 
   const totalProductCount = subcategories.reduce((sum, s) => sum + s.product_count, 0)
@@ -53,6 +54,7 @@ export default async function PferdBrandPage() {
         config={config}
         subcategories={subcategories}
         applicationGroups={applicationGroups}
+        subcategoryGroups={subcategoryGroups}
         totalProductCount={totalProductCount}
       />
       <Footer />
