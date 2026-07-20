@@ -3,7 +3,8 @@ import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
 import SmoothScroll from '@/components/SmoothScroll'
 import { NavigationProgressProvider } from '@/components/NavigationProgress'
-import { Analytics } from '@vercel/analytics/next'
+import AnalyticsGate from '@/components/AnalyticsGate'
+import CookieConsent from '@/components/CookieConsent'
 
 export const metadata: Metadata = {
   title: 'Zona Scule — Scule și Echipamente Profesionale',
@@ -40,7 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NavigationProgressProvider>
           {children}
         </NavigationProgressProvider>
-        <Analytics />
+        <CookieConsent />
+        <AnalyticsGate />
       </body>
     </html>
   )

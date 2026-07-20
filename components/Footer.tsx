@@ -1,3 +1,7 @@
+import Link from 'next/link'
+import CookieSettingsButton from '@/components/CookieSettingsButton'
+import { LEGAL_PAGES, ANPC_SAL_URL } from '@/lib/legal-nav'
+
 export default function Footer() {
   return (
     <>
@@ -61,6 +65,12 @@ export default function Footer() {
         }
         .footer-link:hover { color: rgb(255,255,255); }
         a.footer-link:hover { color: rgb(237,90,89); }
+        .footer-link-btn {
+          background: none; border: none; padding: 0;
+          text-align: left; cursor: pointer;
+          font: inherit;
+        }
+        .footer-link-btn:hover { color: rgb(237,90,89); }
 
         .footer-vat {
           font-family: 'Recursive', monospace;
@@ -105,9 +115,12 @@ export default function Footer() {
           </div>
           <div>
             <p className="footer-col-title">Informatii</p>
-            {['Termene si conditii', 'Politica de retur', 'Achizitii S.E.A.P.', 'ANPC SAL'].map(l => (
-              <a key={l} href="#" className="footer-link">{l}</a>
+            {LEGAL_PAGES.map(l => (
+              <Link key={l.href} href={l.href} className="footer-link">{l.label}</Link>
             ))}
+            <a href="#" className="footer-link">Achizitii S.E.A.P.</a>
+            <a href={ANPC_SAL_URL} target="_blank" rel="noopener noreferrer" className="footer-link">ANPC SAL</a>
+            <CookieSettingsButton />
           </div>
           <div>
             <p className="footer-col-title">Contact</p>
