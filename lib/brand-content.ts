@@ -112,7 +112,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
   // ── PFERD ──────────────────────────────────────────────────────────────
   pferd: {
     slug: 'pferd',
-    brandName: 'Pferd',
+    brandName: 'PFERD',
     metaTitle: 'PFERD — Scule Industriale de Precizie | Zona Scule',
     metaDescription:
       'Descoperă gama completă PFERD: pile, freze rotative, carote și corpuri abrazive pentru profesioniști și amatori pasionați.',
