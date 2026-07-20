@@ -59,19 +59,6 @@ export default function BrandLandingTemplate({
     })),
   }
 
-  // In-page quick nav — lets someone landing on a long, section-heavy page
-  // jump straight to the part they need instead of scrolling past
-  // everything else. Built conditionally so it never links to a section a
-  // given brand doesn't render (see file header: sections are optional).
-  const quickNav: { label: string; href: string }[] = []
-  if (subcategories.length > 0) quickNav.push({ label: 'Categorii', href: '#categorii' })
-  if (config.useUseCaseCarousels && applicationGroups.length > 0) quickNav.push({ label: 'Recomandări', href: '#descopera' })
-  if (config.pillars) quickNav.push({ label: 'Gama de produse', href: '#descopera' })
-  if (config.useSubcategoryCarousels && subcategoryGroups.length > 0) quickNav.push({ label: 'Explorează', href: '#explorare' })
-  if (config.glossary) quickNav.push({ label: 'Ghid tehnic', href: '#ghid-tehnic' })
-  quickNav.push({ label: 'Specialist', href: '#specialist' })
-  if (config.faq.length > 0) quickNav.push({ label: 'Întrebări', href: '#faq' })
-
   return (
     <div style={{ ['--brand-accent' as string]: accent }}>
       <style>{`
@@ -140,50 +127,29 @@ export default function BrandLandingTemplate({
         .bp-btn-primary:hover { filter: brightness(0.9); }
         .bp-btn-secondary { color: rgb(0,0,0); border: 1px solid rgba(0,0,0,0.18); }
         .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
-
-        /* Trust bar — icon + number pairs read as a glance-able strip rather
-           than a sentence; the icon gives each stat a distinct silhouette
-           so the row scans instantly instead of needing to be read word by
-           word. */
-        .bp-trust { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
-        .bp-trust-stat { display: flex; align-items: center; gap: 10px; }
-        .bp-trust-icon {
-          width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
-          display: flex; align-items: center; justify-content: center;
-          background: color-mix(in srgb, var(--brand-accent) 8%, transparent);
-          color: var(--brand-accent);
+        /* Same size/shape as the two CTA buttons, keeping the green trust-
+           badge tint rather than the brand accent — it's a credential, not
+           an action. */
+        .bp-btn-seap {
+          display: inline-flex; align-items: center;
+          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          padding: 13px 24px; border-radius: 4px;
+          background: rgba(21,128,61,0.08); color: rgb(21,128,61);
+          border: 1px solid rgba(21,128,61,0.22);
         }
-        .bp-trust-text { display: flex; flex-direction: column; gap: 0; }
+
+        /* Trust bar — plain number+label stats separated by a thin divider,
+           matching the site's other hero stat rows (see .sv-stat on
+           /produse/superview) rather than an icon-led card style. */
+        .bp-trust { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+        .bp-trust-stat { display: flex; align-items: baseline; gap: 8px; }
+        .bp-trust-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
         .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 20px; line-height: 1.1; color: rgb(0,0,0); }
         .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
 
-        /* ══════════════════ QUICK NAV ══════════════════ */
-        /* Sticky in-page contents strip — sits right under the main site
-           nav (top: 52px, same offset SubcategoryBar.tsx uses) so a visitor
-           can jump straight to the section they need on a long page instead
-           of scrolling past everything else. */
-        .bp-quicknav-wrap {
-          position: sticky; top: 52px; z-index: 40;
-          background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
-          border-bottom: 1px solid rgba(0,0,0,0.07);
-        }
-        .bp-quicknav {
-          display: flex; gap: 8px; overflow-x: auto; padding: 12px 12px;
-          max-width: 1440px; margin: 0 auto;
-          scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .bp-quicknav::-webkit-scrollbar { display: none; }
-        .bp-quicknav-link {
-          font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
-          color: rgba(0,0,0,0.65); text-decoration: none; flex-shrink: 0; white-space: nowrap;
-          padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.1);
-          transition: border-color 150ms, background-color 150ms, color 150ms;
-        }
-        .bp-quicknav-link:hover { border-color: var(--brand-accent); color: rgb(0,0,0); background: color-mix(in srgb, var(--brand-accent) 6%, transparent); }
-
-        /* Anchor targets sit behind the main nav + quick-nav strip unless
-           offset — clears both (52px + ~58px). */
-        #categorii, #descopera, #explorare, #ghid-tehnic, #specialist, #faq { scroll-margin-top: 112px; }
+        /* Anchor targets sit just behind the main site nav (top: 52px). */
+        #ghid-tehnic, #categorii, #descopera, #explorare, #specialist, #faq { scroll-margin-top: 68px; }
 
         /* Intent toggles */
         .bp-intent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
@@ -397,30 +363,21 @@ export default function BrandLandingTemplate({
           <div className="bp-hero-ctas">
             <Link href={catalogHref} className="bp-btn-primary">Vezi Catalogul</Link>
             <Link href={contactHref} className="bp-btn-secondary">Vorbește cu un Specialist</Link>
+            {config.seapEligible && (
+              <span className="bp-btn-seap">Eligibil S.E.A.P.</span>
+            )}
           </div>
 
           <div className="bp-trust">
             <div className="bp-trust-stat">
-              <span className="bp-trust-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-              </span>
-              <span className="bp-trust-text">
-                <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
-                <span className="bp-trust-l">Produse</span>
-              </span>
+              <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
+              <span className="bp-trust-l">Produse</span>
             </div>
+            <div className="bp-trust-div" />
             <div className="bp-trust-stat">
-              <span className="bp-trust-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-              </span>
-              <span className="bp-trust-text">
-                <span className="bp-trust-n">{subcategories.length}</span>
-                <span className="bp-trust-l">Subcategorii</span>
-              </span>
+              <span className="bp-trust-n">{subcategories.length}</span>
+              <span className="bp-trust-l">Subcategorii</span>
             </div>
-            {config.seapEligible && (
-              <span className="badge badge-seap">Eligibil S.E.A.P.</span>
-            )}
           </div>
 
           {config.intentGroups && (
@@ -448,15 +405,41 @@ export default function BrandLandingTemplate({
         </div>
       </section>
 
-      {/* ══════════════════ QUICK NAV ══════════════════ */}
-      {quickNav.length > 0 && (
-        <div className="bp-quicknav-wrap">
-          <nav className="bp-quicknav" aria-label="Navigare rapidă în pagină">
-            {quickNav.map(item => (
-              <a key={item.label + item.href} href={item.href} className="bp-quicknav-link">{item.label}</a>
+      {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
+      {/* First section after the hero on every brand page — the technical
+          cheat-sheet is what a professional buyer scans for before anything
+          else (category browsing, curated pillars, use-case carousels). */}
+      {config.glossary && (
+        <section id="ghid-tehnic" className="bp-glossary-section bp-section">
+          <div className="bp-section-head">
+            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
+            <h2 className="bp-section-title">{config.glossaryTitle}</h2>
+            <p className="bp-section-sub">{config.glossarySub}</p>
+          </div>
+          <div className="bp-glossary-grid">
+            {config.glossary.map(g => (
+              <details key={g.code} className="bp-gloss-card">
+                <summary className="bp-gloss-summary">
+                  <div className="bp-gloss-top">
+                    <span className="bp-gloss-code">{g.code}</span>
+                    {g.badges && (
+                      <div className="bp-gloss-badges">
+                        {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="bp-gloss-bottom">
+                    <span className="bp-gloss-title">{g.title}</span>
+                    <span className="bp-intent-plus bp-gloss-plus" style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'rgba(0,0,0,0.5)' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    </span>
+                  </div>
+                </summary>
+                <p className="bp-gloss-desc">{g.desc}</p>
+              </details>
             ))}
-          </nav>
-        </div>
+          </div>
+        </section>
       )}
 
       {/* ══════════════════ CATEGORY / SUBCATEGORY RAIL ══════════════════ */}
@@ -566,40 +549,6 @@ export default function BrandLandingTemplate({
               </div>
             </div>
           ))}
-        </section>
-      )}
-
-      {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
-      {config.glossary && (
-        <section id="ghid-tehnic" className="bp-glossary-section">
-          <div className="bp-section bp-section-head">
-            <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Ghid tehnic</span>
-            <h2 className="bp-section-title">{config.glossaryTitle}</h2>
-            <p className="bp-section-sub">{config.glossarySub}</p>
-          </div>
-          <div className="bp-section bp-glossary-grid">
-            {config.glossary.map(g => (
-              <details key={g.code} className="bp-gloss-card">
-                <summary className="bp-gloss-summary">
-                  <div className="bp-gloss-top">
-                    <span className="bp-gloss-code">{g.code}</span>
-                    {g.badges && (
-                      <div className="bp-gloss-badges">
-                        {g.badges.map(b => <span key={b.label} className={`badge ${b.cls}`}>{b.label}</span>)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="bp-gloss-bottom">
-                    <span className="bp-gloss-title">{g.title}</span>
-                    <span className="bp-intent-plus bp-gloss-plus" style={{ borderColor: 'rgba(0,0,0,0.15)', color: 'rgba(0,0,0,0.5)' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                    </span>
-                  </div>
-                </summary>
-                <p className="bp-gloss-desc">{g.desc}</p>
-              </details>
-            ))}
-          </div>
         </section>
       )}
 

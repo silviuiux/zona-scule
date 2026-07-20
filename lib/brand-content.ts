@@ -123,7 +123,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Precizie care ' }, { text: 'nu iartă.', em: true }],
     ],
     heroSub:
-      'Peste 150 de ani de inginerie germană — pile, freze, carote și corpuri abrazive pentru orice atelier, de la primul șantier la flux industrial continuu.',
+      'Peste 150 de ani de inginerie germană — pile, freze, carote și corpuri abrazive pentru orice atelier.',
 
     intentGroups: [
       {
@@ -260,7 +260,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Fără compromis pe ' }, { text: 'durabilitate.', em: true }],
     ],
     heroSub:
-      'De la aeroporturi și porturi la turnătorii și hale de producție — gama Karcher acoperă orice suprafață, orice volum, orice murdărie industrială.',
+      'De la aeroporturi la hale de producție — curățare industrială pentru orice suprafață și volum.',
 
     // No hand-curated intent chips for Karcher — the real app_01_title data
     // (already populated by scripts/enrich-karcher.mjs) drives discovery
@@ -273,6 +273,41 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     useSubcategoryCarousels: true,
     subcategorySectionTitle: 'Explorează gama Karcher pe subcategorii',
     subcategorySectionSub: 'De la aspiratoare industriale la mașini de spălat cu presiune — organizate pe tip de echipament.',
+
+    glossaryTitle: 'Descifrează codul Karcher',
+    glossarySub: 'Ce înseamnă literele de pe carcasă — cheat-sheet rapid înainte de a alege modelul.',
+    glossary: [
+      {
+        code: 'Bp / D / LPG',
+        title: 'Sursă de alimentare',
+        desc: 'Bp rulează pe acumulator (fără emisii, potrivit pentru spații închise), D pe motorină (autonomie mare, exterior), LPG pe gaz petrolier lichefiat (echilibru între autonomie și emisii reduse).',
+      },
+      {
+        code: 'HD / HDS',
+        title: 'Aparate de curățat cu presiune',
+        desc: 'HD lucrează cu apă rece — pentru curățare generală de murdărie și noroi. HDS încălzește apa — necesar pentru grăsimi, uleiuri și dezinfectare.',
+      },
+      {
+        code: 'NT / T',
+        title: 'Aspiratoare industriale',
+        desc: 'NT (umed-uscat) aspiră atât lichide cât și praf/moloz. T (uscat) e destinat exclusiv prafului și resturilor solide.',
+      },
+      {
+        code: 'KM',
+        title: 'Măturătoare (Kehrmaschine)',
+        desc: 'Măturătoare industriale cu condus manual sau cu conducător la bord, pentru hale, depozite și spații exterioare mari.',
+      },
+      {
+        code: 'BD / BR',
+        title: 'Mașini de spălat pardoseli',
+        desc: 'BD — mașini cu condus manual (walk-behind), pentru suprafețe medii. BR — mașini cu conducător la bord (ride-on), pentru suprafețe industriale foarte mari.',
+      },
+      {
+        code: 'eco!efficiency',
+        title: 'Mod economic',
+        desc: 'Setare care reduce consumul de apă și energie fără o pierdere semnificativă a puterii de curățare — util pentru volum mare de utilizare zilnică.',
+      },
+    ],
 
     specialist: {
       name: 'Echipa tehnică Karcher',
@@ -309,11 +344,11 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 
     eyebrow: 'Partener oficial OSBORN',
     heroTitle: [
-      [{ text: 'Perii industriale care ' }, { text: 'nu cedează sub presiune.', em: true }],
-      [{ text: 'Precizie germană pe ' }, { text: 'fiecare suprafață.', em: true }],
+      [{ text: 'Perii care ' }, { text: 'nu cedează.', em: true }],
+      [{ text: 'Precizie germană, ' }, { text: 'orice suprafață.', em: true }],
     ],
     heroSub:
-      'Perii circulare, perii oală și perii de precizie în sârmă ondulată sau împletită, plus freze rotative din carbură și corpuri abrazive lamelare — pentru debavurare, curățare de zgură și finisare, pe orice metal.',
+      'Perii industriale, freze din carbură și corpuri abrazive — pentru debavurare, curățare și finisare pe orice metal.',
 
     pillars: [
       {
@@ -427,7 +462,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Un ecosistem, ' }, { text: 'nu doar o sculă.', em: true }],
     ],
     heroSub:
-      'De la platforma compactă M12 la echipamentele industriale MX FUEL — scule electrice, hidraulice și de organizare a atelierului, toate pe același ecosistem de acumulatori.',
+      'De la platforma compactă M12 la echipamentele industriale MX FUEL — un singur ecosistem de acumulatori.',
 
     useUseCaseCarousels: true,
     useCaseSectionTitle: 'Găsește scula potrivită pentru lucrarea ta',
@@ -509,7 +544,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       [{ text: 'Oțel german, ' }, { text: 'acoperiri de durată.', em: true }],
     ],
     heroSub:
-      'Burghie elicoidale și în trepte, zencuitoare, tarozi și filiere din oțel rapid, cobalt sau carbură metalică, cu acoperiri TiN, TiAlN sau RUnaTEC pentru performanță în inox și oțeluri aliate.',
+      'Burghie, zencuitoare, tarozi și filiere din oțel rapid sau carbură metalică, cu acoperiri TiN, TiAlN și RUnaTEC.',
 
     pillars: [
       {
