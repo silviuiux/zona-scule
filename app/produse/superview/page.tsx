@@ -14,7 +14,10 @@ import { getSuperviewProducts } from '@/lib/supabase'
 // All the real work (dedup + representative pick: featured first, then
 // price desc, then name) happens in the get_superview_products() Postgres
 // function (see migration add_get_superview_products_function) — this page
-// just groups the ~500 resulting rows by category for a scannable layout.
+// just groups the ~500 resulting rows by category for a scannable layout,
+// with a small subcategory tag on each card (see .sv-subcat-tag) since
+// category alone stopped being descriptive enough once "Accesorii" absorbed
+// the old "Consumabile" category and grew a very long subcategory tail.
 // Not linked from nav/sitemap — direct-URL only, same pattern as the brand
 // landing pages under app/brand/.
 // ─────────────────────────────────────────────────────────────────────────
@@ -73,6 +76,25 @@ export default async function SuperviewPage() {
         }
         @media (max-width: 1024px) { .sv-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 640px) { .sv-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .sv-hero-inner { padding: 56px 12px 32px; } }
+
+        /* A category can now hold a lot of very specific subcategories (e.g.
+           "Accesorii" absorbed everything formerly under "Consumabile" plus
+           its own long tail — 100+ distinct subcategories in that one
+           category alone). A flat card grid with only a category heading
+           stopped being legible at that granularity: nothing on the card
+           itself said whether a given "Accesorii" product represented
+           "Pile Rotunde" or "Discuri Abrazive" or "Force Logic". This small
+           tag makes the actual dedup key (subcategory) visible per card
+           without exploding the page into 100+ tiny sub-sections. */
+        .sv-card { display: flex; flex-direction: column; gap: 8px; }
+        .sv-subcat-tag {
+          align-self: flex-start;
+          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+          letter-spacing: 0.04em; text-transform: uppercase;
+          color: rgba(0,0,0,0.55); background: rgba(0,0,0,0.05);
+          padding: 4px 8px; border-radius: 4px; max-width: 100%;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
       `}</style>
 
       <div className="sv-hero">
@@ -111,7 +133,12 @@ export default async function SuperviewPage() {
                 <span className="sv-cat-count">{group.products.length} produse</span>
               </div>
               <div className="sv-grid">
-                {group.products.map(p => <ProductCard key={p.id} product={p} />)}
+                {group.products.map(p => (
+                  <div key={p.id} className="sv-card">
+                    <span className="sv-subcat-tag">{p.subcategory_text ?? 'Diverse'}</span>
+                    <ProductCard product={p} />
+                  </div>
+                ))}
               </div>
             </section>
           ))}
