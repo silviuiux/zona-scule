@@ -20,18 +20,18 @@ export const revalidate = 3600
 // card's text color (dark on the white card, white on the red/black ones).
 const IconChat = (
   <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    <path pathLength={100} d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
   </svg>
 )
 const IconWrench = (
   <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L2 19l3 3 7.1-7.1a4 4 0 0 0 5.6-5.6l-2.8 2.8-2-2z" />
+    <path pathLength={100} d="M14.7 6.3a4 4 0 0 0-5.6 5.6L2 19l3 3 7.1-7.1a4 4 0 0 0 5.6-5.6l-2.8 2.8-2-2z" />
   </svg>
 )
 const IconShield = (
   <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3z" />
-    <path d="m9 12 2 2 4-4" />
+    <path pathLength={100} d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3z" />
+    <path pathLength={100} d="m9 12 2 2 4-4" />
   </svg>
 )
 
@@ -291,13 +291,20 @@ export default async function HomePage() {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
           /* Clips any still-settling (offset) card to the grid's own box,
              so it crops to a peek instead of spilling into the carousel
-             section below — see the long settle range in ServicesGrid.tsx. */
+             section below — see the long settle range in ServicesGrid.tsx.
+             The padding+negative-margin pair below cancels itself out for
+             layout purposes (siblings see the same effective box) but
+             gives the hover scale() on .service-card room to grow into
+             without its rounded corners getting guillotined flat against
+             this clip boundary. */
           overflow: hidden;
+          padding: 20px;
+          margin: -20px;
         }
         .service-card {
           border-radius: 4px; overflow: hidden;
           display: flex; flex-direction: column;
-          height: 340px;
+          aspect-ratio: 3 / 4;
           padding: 36px;
           position: relative; isolation: isolate;
           /* Scroll-stagger (continuous, no transition — would lag the scroll)
@@ -312,6 +319,24 @@ export default async function HomePage() {
           display: flex; align-items: center; justify-content: center;
           margin-bottom: auto;
           opacity: 0.92;
+        }
+        /* Icon "draw-in": paths use pathLength="100" so a flat 100/100
+           dasharray works regardless of each icon's actual geometry.
+           Undrawn by default; .revealed (added once the card has mostly
+           settled into place, see ServicesGrid.tsx) plays the reveal.
+           Multi-stroke icons (the shield's checkmark) draw second, once
+           the outline is mostly done, so it reads as one continuous stroke
+           rather than everything snapping in at once. */
+        .service-icon svg path,
+        .service-icon svg circle {
+          stroke-dasharray: 100;
+          stroke-dashoffset: 100;
+          transition: stroke-dashoffset 800ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .service-icon svg path:nth-of-type(2) { transition-delay: 350ms; }
+        .service-card.revealed .service-icon svg path,
+        .service-card.revealed .service-icon svg circle {
+          stroke-dashoffset: 0;
         }
         .service-title {
           font-family: 'Bungee', sans-serif;
@@ -334,10 +359,13 @@ export default async function HomePage() {
           scale: 1.025;
           box-shadow: 0 24px 64px rgba(0,0,0,0.18);
         }
-        .services-grid a:hover .service-icon { transform: translateY(-2px); }
+        .services-grid a:hover .service-icon { transform: translateY(-3px) scale(1.06); }
         .service-icon { transition: transform 300ms cubic-bezier(0.22,1,0.36,1); }
         @media (prefers-reduced-motion: reduce) {
           .service-card { transform: none; }
+          .service-icon svg path, .service-icon svg circle {
+            transition: none; stroke-dashoffset: 0;
+          }
         }
 
         .service-cta {
@@ -478,7 +506,7 @@ export default async function HomePage() {
           }
           .services-grid::-webkit-scrollbar { display: none; }
           .services-grid > a { flex-shrink: 0; width: 75vw; align-self: stretch; }
-          .service-card { height: 300px; width: 100%; padding: 28px; }
+          .service-card { aspect-ratio: 3 / 4; height: auto; width: 100%; padding: 28px; }
           .service-desc { margin-bottom: 16px; }
 
           .carousel-section { padding: 64px 0 64px; }

@@ -42,7 +42,12 @@ export default function ServicesGrid({ items }: { items: ServiceItem[] }) {
     if (cards.length === 0) return
 
     if (reduce || isMobile) {
-      cards.forEach(el => el.style.setProperty('--svc-offset', '0px'))
+      // No scroll-stagger here, so reveal the icons immediately too —
+      // otherwise they'd stay permanently un-drawn (see .revealed below).
+      cards.forEach(el => {
+        el.style.setProperty('--svc-offset', '0px')
+        el.classList.add('revealed')
+      })
       return
     }
 
@@ -58,6 +63,10 @@ export default function ServicesGrid({ items }: { items: ServiceItem[] }) {
       cards.forEach((el, i) => {
         const base = OFFSETS[i] ?? 0
         el.style.setProperty('--svc-offset', `${base * (1 - progress)}px`)
+        // Draw the icon in once the card is most of the way settled —
+        // ties the "drawn" micro-interaction to the same scroll-in the
+        // card itself already animates on, instead of a separate trigger.
+        el.classList.toggle('revealed', progress > 0.6)
       })
     }
     const onScroll = () => { if (raf) return; raf = requestAnimationFrame(update) }
@@ -80,7 +89,11 @@ export default function ServicesGrid({ items }: { items: ServiceItem[] }) {
 
         return (
           <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
-            <div className="service-card noise-card" style={{ ...initialStyle, background: s.bg }}>
+            {/* "revealed" starts present in SSR markup so the icon is fully
+                drawn if JS is slow/disabled; the effect above removes it on
+                mount and re-adds it once the card scrolls into place, which
+                is what actually plays the draw-in animation. */}
+            <div className="service-card revealed noise-card" style={{ ...initialStyle, background: s.bg }}>
               <div className="service-icon" style={{ color: s.color }}>{s.icon}</div>
               <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
               <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
