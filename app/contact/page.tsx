@@ -95,11 +95,38 @@ export default function ContactPage({
           position: relative; overflow: hidden;
           background: rgb(220,218,214);
         }
-        .contact-photo img {
+        .contact-photo iframe {
           width: 100%; height: 100%;
-          object-fit: cover; object-position: center top;
-          display: block;
+          display: block; border: 0;
+          /* Slight desaturation so the map sits quietly behind the badge
+             rather than competing with the red/black brand palette. */
+          filter: grayscale(0.15) contrast(1.02);
         }
+        .contact-map-badge {
+          position: absolute; left: 16px; bottom: 16px;
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.08);
+          padding: 12px 18px;
+          border-radius: 4px;
+          text-decoration: none;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+          transition: color 150ms, border-color 150ms;
+        }
+        .contact-map-badge:hover { border-color: rgba(217,44,43,0.3); }
+        .contact-map-badge-text { display: flex; flex-direction: column; gap: 2px; }
+        .contact-map-badge-label {
+          font-family: 'Inter', sans-serif;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(0,0,0,0.4);
+        }
+        .contact-map-badge-action {
+          font-family: 'Inter', sans-serif;
+          font-size: 12px; font-weight: 600;
+          color: rgb(0,0,0);
+        }
+        .contact-map-badge:hover .contact-map-badge-action { color: rgb(217,44,43); }
 
         @media (max-width: 768px) {
           .contact-inner { padding: 48px 12px 64px; }
@@ -148,7 +175,24 @@ export default function ContactPage({
           <div className="contact-bottom">
             <ContactForm searchParams={searchParams} />
             <div className="contact-photo">
-              <img src="/service-garantie.avif" alt="Zona Scule" />
+              <iframe
+                src="https://www.google.com/maps?q=44.8576673,24.8794647&z=17&output=embed"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                title="Zona Scule — Strada Sfânta Vineri 28, Pitești"
+              />
+              <a
+                href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z/data=!4m6!3m5!1s0x40b2bc886b7beedf:0xf306c5b64dd18ca6!8m2!3d44.8576673!4d24.8794647!16s%2Fg%2F11hht09gys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-map-badge"
+              >
+                <div className="contact-map-badge-text">
+                  <span className="contact-map-badge-label">Sfanta Vineri 28, Pitesti</span>
+                  <span className="contact-map-badge-action">Deschide în Google Maps ↗</span>
+                </div>
+              </a>
             </div>
           </div>
 
