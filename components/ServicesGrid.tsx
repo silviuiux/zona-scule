@@ -1,7 +1,6 @@
 'use client'
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 type ServiceItem = {
   bg: string
@@ -11,7 +10,7 @@ type ServiceItem = {
   cta: string
   ctaColor: string
   href: string
-  img: string
+  icon: ReactNode
 }
 
 // Same continuous scroll-driven stagger technique as CategoryGrid's
@@ -81,18 +80,14 @@ export default function ServicesGrid({ items }: { items: ServiceItem[] }) {
 
         return (
           <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>
-            <div className="service-card" style={initialStyle}>
-              <div className="service-img">
-                <Image src={s.img} alt={s.title} fill style={{ objectFit: 'cover', objectPosition: 'center top' }} sizes="(max-width: 768px) 100vw, 33vw" />
-              </div>
-              <div className="service-body noise-card" style={{ background: s.bg }}>
-                <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
-                <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
-                <span className="service-cta" style={{ color: s.ctaColor }}>
-                  <span>{s.cta}</span>
-                  <span className="service-cta-arrow">→</span>
-                </span>
-              </div>
+            <div className="service-card noise-card" style={{ ...initialStyle, background: s.bg }}>
+              <div className="service-icon" style={{ color: s.color }}>{s.icon}</div>
+              <h3 className="service-title" style={{ color: s.color }}>{s.title}</h3>
+              <p className="service-desc" style={{ color: s.color === 'rgb(30,30,30)' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)' }}>{s.body}</p>
+              <span className="service-cta" style={{ color: s.ctaColor }}>
+                <span>{s.cta}</span>
+                <span className="service-cta-arrow">→</span>
+              </span>
             </div>
           </Link>
         )

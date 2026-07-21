@@ -14,6 +14,27 @@ import ServicesGrid from '@/components/ServicesGrid'
 // also call revalidatePath('/') for instant refresh.
 export const revalidate = 3600
 
+// Services section icons — replace the old photo tiles with a plain-color
+// card + line icon, so the section reads "friendly/informational" instead
+// of relying on stock photography. currentColor so each icon inherits its
+// card's text color (dark on the white card, white on the red/black ones).
+const IconChat = (
+  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+)
+const IconWrench = (
+  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L2 19l3 3 7.1-7.1a4 4 0 0 0 5.6-5.6l-2.8 2.8-2-2z" />
+  </svg>
+)
+const IconShield = (
+  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+)
+
 
 export default async function HomePage() {
   const [categoriesRaw, brands, featuredSubs, totalCount] = await Promise.all([
@@ -275,26 +296,34 @@ export default async function HomePage() {
         }
         .service-card {
           border-radius: 4px; overflow: hidden;
-          display: flex; flex-direction: column; height: 707px;
+          display: flex; flex-direction: column;
+          height: 340px;
+          padding: 36px;
+          position: relative; isolation: isolate;
           /* Scroll-stagger (continuous, no transition — would lag the scroll)
              lives on transform/--svc-offset. Hover lift lives on the separate
              scale property below, so the two never fight over transform. */
           transform: translate3d(0, var(--svc-offset, 0px), 0);
           will-change: transform;
         }
-        .service-img { flex: 1; position: relative; background: rgb(220,218,214); overflow: hidden; }
-        .service-body { padding: 24px; flex-shrink: 0; display: flex; flex-direction: column; position: relative; isolation: isolate; }
-        .service-body > * { position: relative; z-index: 2; }
+        .service-card > * { position: relative; z-index: 2; }
+        .service-icon {
+          width: 44px; height: 44px;
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: auto;
+          opacity: 0.92;
+        }
         .service-title {
           font-family: 'Bungee', sans-serif;
           font-size: 28px; text-transform: uppercase;
-          line-height: 1; margin-bottom: 12px;
+          line-height: 1; margin-top: 28px; margin-bottom: 12px;
         }
         .service-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 13px; line-height: 1.65; margin-bottom: 0;
+          max-width: 34ch;
         }
-        /* Service card hover — whole card grows + image zooms in.
+        /* Service card hover — whole card grows a touch.
            Uses the standalone scale property (not transform) so it can
            have its own transition without animating the scroll-stagger. */
         .service-card {
@@ -305,13 +334,11 @@ export default async function HomePage() {
           scale: 1.025;
           box-shadow: 0 24px 64px rgba(0,0,0,0.18);
         }
+        .services-grid a:hover .service-icon { transform: translateY(-2px); }
+        .service-icon { transition: transform 300ms cubic-bezier(0.22,1,0.36,1); }
         @media (prefers-reduced-motion: reduce) {
           .service-card { transform: none; }
         }
-        .service-img img {
-          transition: transform 600ms cubic-bezier(0.22,1,0.36,1);
-        }
-        .services-grid a:hover .service-img img { transform: scale(1.07); }
 
         .service-cta {
           font-family: 'Recursive', sans-serif;
@@ -320,7 +347,7 @@ export default async function HomePage() {
           text-decoration: none;
           display: flex; align-items: center; justify-content: space-between;
           width: 100%;
-          margin-top: auto;
+          margin-top: 24px;
           padding-top: 20px;
         }
         .service-cta-arrow {
@@ -451,9 +478,7 @@ export default async function HomePage() {
           }
           .services-grid::-webkit-scrollbar { display: none; }
           .services-grid > a { flex-shrink: 0; width: 75vw; align-self: stretch; }
-          .service-card { height: 100%; width: 100%; }
-          .service-img { flex: none; height: auto; aspect-ratio: 2/3; }
-          .service-body { flex: 1; }
+          .service-card { height: 300px; width: 100%; padding: 28px; }
           .service-desc { margin-bottom: 16px; }
 
           .carousel-section { padding: 64px 0 64px; }
@@ -505,9 +530,9 @@ export default async function HomePage() {
         </div>
         <ServicesGrid
           items={[
-            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', img: '/service-consultanta.avif' },
-            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-service.avif' },
-            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', img: '/service-garantie.avif' },
+            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', icon: IconChat },
+            { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', icon: IconWrench },
+            { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', icon: IconShield },
           ]}
         />
       </section>
