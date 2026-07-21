@@ -293,13 +293,14 @@ export default async function HomePage() {
              so it crops to a peek instead of spilling into the carousel
              section below — see the long settle range in ServicesGrid.tsx.
              The padding+negative-margin pair below cancels itself out for
-             layout purposes (siblings see the same effective box) but
-             gives the hover scale() on .service-card room to grow into
-             without its rounded corners getting guillotined flat against
-             this clip boundary. */
+             layout purposes (siblings see the exact same effective box —
+             margin fully offsets the padding, so nothing shifts) but gives
+             the clip boundary enough room that the hover scale() AND its
+             box-shadow (offset 20px + blur 48px ≈ 68px reach) don't get
+             guillotined against it. 80px comfortably covers both. */
           overflow: hidden;
-          padding: 20px;
-          margin: -20px;
+          padding: 80px;
+          margin: -80px;
         }
         .service-card {
           border-radius: 4px; overflow: hidden;
@@ -323,17 +324,22 @@ export default async function HomePage() {
         /* Icon "draw-in": paths use pathLength="100" so a flat 100/100
            dasharray works regardless of each icon's actual geometry.
            Undrawn by default; .revealed (added once the card has mostly
-           settled into place, see ServicesGrid.tsx) plays the reveal.
-           Multi-stroke icons (the shield's checkmark) draw second, once
-           the outline is mostly done, so it reads as one continuous stroke
-           rather than everything snapping in at once. */
+           settled into place, see ServicesGrid.tsx) flips all three at
+           once, but each card's icon carries its own transition-delay so
+           they draw in sequence left→right instead of simultaneously —
+           first card earliest, third card latest. Multi-stroke icons (the
+           shield's checkmark) draw their second stroke a beat after their
+           own card's delay, once the outline is mostly done. */
         .service-icon svg path,
         .service-icon svg circle {
           stroke-dasharray: 100;
           stroke-dashoffset: 100;
           transition: stroke-dashoffset 800ms cubic-bezier(0.22,1,0.36,1);
         }
-        .service-icon svg path:nth-of-type(2) { transition-delay: 350ms; }
+        .services-grid > a:nth-child(1) .service-icon svg path { transition-delay: 0ms; }
+        .services-grid > a:nth-child(2) .service-icon svg path { transition-delay: 350ms; }
+        .services-grid > a:nth-child(3) .service-icon svg path { transition-delay: 700ms; }
+        .services-grid > a:nth-child(3) .service-icon svg path:nth-of-type(2) { transition-delay: 1000ms; }
         .service-card.revealed .service-icon svg path,
         .service-card.revealed .service-icon svg circle {
           stroke-dashoffset: 0;
