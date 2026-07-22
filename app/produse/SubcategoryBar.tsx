@@ -72,10 +72,19 @@ export default async function SubcategoryBar({
              box. */
           margin: 0 0 16px;
           padding: 16px 0;
-          /* Matches .catalog-page's own gray exactly (not a distinct "card"
-             color) so the pinned bar blends with the listing background
-             instead of showing scrolling content through it while stuck. */
-          background: rgb(244, 244, 244);
+          /* Transparent by default — while merely in normal flow (not yet
+             pinned) this should read as part of the page, not a card. Only
+             .stuck (applied by SubcategoryPillScroller.tsx via an
+             IntersectionObserver once the row is actually pinned under the
+             navbar) gives it a distinct look — see below. Without this
+             split the bar always matched .catalog-page's own gray exactly,
+             so pinning was invisible: there was nothing to tell "stuck" and
+             "normal flow" apart. */
+          background: transparent;
+        }
+        .subcat-bar.is-sticky.stuck {
+          background: rgb(255, 255, 255);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
         .subcat-pill {

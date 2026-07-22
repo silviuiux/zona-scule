@@ -23,6 +23,10 @@ export default function SubcategoryPillScroller({
   const scrollRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
+  // Only the sticky variant of this bar ever needs stuck-detection — the
+  // non-sticky "Toate" row (sticky={false} in SubcategoryBar) has nothing to
+  // detect and should never gain the stuck-only white card treatment below.
+  const isSticky = className.includes('is-sticky')
 
   useEffect(() => {
     const el = scrollRef.current
@@ -52,6 +56,10 @@ export default function SubcategoryPillScroller({
   // leaving the row transparent (blending with the gray listing background)
   // the rest of the time.
   useEffect(() => {
+    if (!isSticky) {
+      setStuck(false)
+      return
+    }
     const sentinel = sentinelRef.current
     if (!sentinel) return
     const observer = new IntersectionObserver(
@@ -60,7 +68,7 @@ export default function SubcategoryPillScroller({
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [])
+  }, [isSticky])
 
   const scrollByAmount = (dir: 1 | -1) => {
     const el = scrollRef.current
@@ -69,10 +77,32 @@ export default function SubcategoryPillScroller({
   }
 
   return (
-    <div className="subcat-scroller">
+    <div className={`subcat-scroller${stuck ? ' stuck' : ''}`}>
       <style>{`
         .subcat-scroller {
           position: relative;
+        }
+
+        /* Only visible while .stuck is applied (actually pinned under the
+           navbar, per the IntersectionObserver above) — gives the whole
+           wrapper, arrow gutters included, the same white card + shadow as
+           the pinned pill row (see SubcategoryBar.tsx's .subcat-bar.is-
+           sticky.stuck) so the arrows read as part of that pinned card
+           instead of floating loose over the gray page background. */
+        .subcat-scroller.stuck {
+          background: rgb(255, 255, 255);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 1px, non-interactive — sits in normal flow at the very top of
+           this (non-sticky) wrapper so it scrolls with the page while the
+           pill row inside pins in place. Once it crosses the rootMargin
+           threshold above and leaves the viewport, the row must be stuck. */
+        .subcat-sentinel {
+          position: absolute;
+          top: 0; left: 0;
+          width: 1px; height: 1px;
+          pointer-events: none;
         }
 
         /* Side padding insets the pill row so the arrows have dedicated
@@ -121,6 +151,8 @@ export default function SubcategoryPillScroller({
         }
       `}</style>
 
+      <div ref={sentinelRef} className="subcat-sentinel" aria-hidden="true" />
+
       <button
         type="button"
         className="subcat-arrow subcat-arrow-left"
@@ -132,7 +164,7 @@ export default function SubcategoryPillScroller({
         </svg>
       </button>
 
-      <div ref={scrollRef} className={className}>
+      <div ref={scrollRef} className={`${className}${stuck ? ' stuck' : ''}`}>
         {children}
       </div>
 
