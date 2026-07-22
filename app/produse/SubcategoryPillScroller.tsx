@@ -121,12 +121,18 @@ export default function SubcategoryPillScroller({
         }
 
         /* Only visible while .stuck is applied (actually pinned under the
-           navbar, per the IntersectionObserver above) — white card +
-           shadow, arrow gutters included, so the arrows read as part of
-           the pinned bar instead of floating loose over the gray page. */
+           navbar, per the IntersectionObserver above). The 100vmax spread
+           is a full-bleed trick: this element is only as wide as the
+           content column (max-width: 1440px, centered), but the box-shadow
+           isn't clipped to the element's own box, so a huge spread radius
+           paints solid white all the way to the real viewport edges behind
+           it — html/body's overflow-x: clip (see app/globals.css) then
+           clips that spread exactly at the viewport boundary instead of
+           letting it cause horizontal scroll. The second shadow layer is
+           the actual drop shadow, unaffected by the first. */
         .subcat-scroller.is-sticky.stuck {
           background: rgb(255, 255, 255);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 0 0 100vmax rgb(255, 255, 255), 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
         /* Mobile always keeps the pill bar pinned under the navbar,
