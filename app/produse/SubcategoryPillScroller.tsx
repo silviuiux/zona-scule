@@ -52,13 +52,19 @@ export default function SubcategoryPillScroller({
       <style>{`
         .subcat-scroller {
           position: relative;
-          /* Side padding makes room for the arrows to sit fully outside the
-             pill row itself (not overlapping any pill). Unlike the homepage
-             carousel this component isn't a full-bleed breakout, so this
-             padding isn't canceled with a negative margin — it just trims
-             the row's own width slightly, which is fine since .products-main
-             has plenty of spare width to give up. */
-          padding: 0 44px;
+        }
+
+        /* Side padding insets the pill row so the arrows have dedicated
+           space to sit in — fully clear of every pill, not overlapping the
+           first/last one. Applied only at the width the arrows actually
+           render (≥1024px, see below) so mobile/tablet don't lose width to
+           an inset with nothing occupying it. Absolute-positioned children
+           offset from a padding-box edge (left/right: 0 below), so this is
+           enough on its own — no negative-margin breakout needed since we
+           want the row to shrink into the existing footprint, not for the
+           wrapper to grow past it. */
+        @media (min-width: 1024px) {
+          .subcat-scroller { padding: 0 48px; }
         }
 
         .subcat-arrow {
@@ -86,8 +92,8 @@ export default function SubcategoryPillScroller({
           background: rgb(255,255,255);
           box-shadow: 0 10px 24px rgba(0,0,0,0.16);
         }
-        .subcat-arrow-left { left: 0; }
-        .subcat-arrow-right { right: 0; }
+        .subcat-arrow-left { left: 4px; }
+        .subcat-arrow-right { right: 4px; }
 
         @media (min-width: 1024px) {
           .subcat-arrow { display: flex; }

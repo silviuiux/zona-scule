@@ -72,6 +72,10 @@ export default async function SubcategoryBar({
              box. */
           margin: 0 0 16px;
           padding: 16px 0;
+          /* Matches .catalog-page's own gray exactly (not a distinct "card"
+             color) so the pinned bar blends with the listing background
+             instead of showing scrolling content through it while stuck. */
+          background: rgb(244, 244, 244);
         }
 
         .subcat-pill {
@@ -117,6 +121,7 @@ export default async function SubcategoryBar({
             top: 52px;
             margin: -20px 0 20px;
             padding: 32px 0;
+            background: rgb(244, 244, 244);
           }
         }
       `}</style>
