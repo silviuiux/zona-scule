@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, type ReactNode } from 'react'
+import { useRef, useEffect, useState, type ReactNode } from 'react'
 
 /**
  * Client-only scroll behavior wrapper around SubcategoryBar's pill row.
@@ -21,6 +21,8 @@ export default function SubcategoryPillScroller({
   children: ReactNode
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [stuck, setStuck] = useState(false)
 
   useEffect(() => {
     const el = scrollRef.current
@@ -39,6 +41,25 @@ export default function SubcategoryPillScroller({
 
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
+  }, [])
+
+  // Detects whether the (position: sticky) row is actually pinned right now
+  // — CSS alone can't tell "sticky in normal flow" from "currently stuck",
+  // so a 1px sentinel just above the row is watched via IntersectionObserver:
+  // once it scrolls past the sticky offset (52px navbar height) and leaves
+  // the viewport, the row itself must be pinned. Drives the `.stuck` class
+  // that swaps in a white backdrop + shadow only while actually pinned,
+  // leaving the row transparent (blending with the gray listing background)
+  // the rest of the time.
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setStuck(!entry.isIntersecting),
+      { rootMargin: '-53px 0px 0px 0px', threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
   }, [])
 
   const scrollByAmount = (dir: 1 | -1) => {
