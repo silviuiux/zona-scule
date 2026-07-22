@@ -1,11 +1,18 @@
 /**
  * Skeleton loading UI for /produse.
  * Next.js App Router shows this automatically while page.tsx is fetching data.
- * Mirrors the new layout: white hero section + gray sidebar/grid section.
+ *
+ * Mirrors the CURRENT default layout — CatalogLayout's "pills" mode
+ * (ViewModeContext defaults to 'pills' for anyone without a saved
+ * preference in localStorage): a filter row of 4 equal cells (view
+ * switcher + brand/category/subcategory dropdowns) and a 4-column product
+ * grid, no persistent sidebar. The old vertical Sidebar.tsx list is still
+ * available behind the view-switcher toggle, but is no longer the default
+ * — this skeleton previously mirrored that legacy sidebar layout, which
+ * made the loading preview mismatch what most visitors actually land on.
  */
 export default function Loading() {
-  const SIDEBAR_ROWS = 14
-  const CARD_COUNT   = 9   // 3 rows of 3
+  const CARD_COUNT = 12 // 3 rows of 4, matching the pills-mode grid
 
   return (
     <>
@@ -89,24 +96,26 @@ export default function Loading() {
           min-height: 60vh;
         }
         .skel-layout {
-          display: flex;
           max-width: 1440px;
           margin: 0 auto;
           padding: 0 12px;
         }
 
-        /* ── Sidebar ── */
-        .skel-sidebar {
-          width: 280px; flex-shrink: 0;
-          padding: 32px 16px 40px 24px;
+        /* ── Filter row — view switcher + 3 dropdowns, 4 equal cells,
+             matches CatalogLayout's ".filter-row" grid exactly. ── */
+        .skel-filter-row {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin: 32px 0 16px;
         }
-        .skel-sidebar-row {
-          display: flex; align-items: center; gap: 10px;
-          padding: 10px 0;
+        .skel-filter-cell {
+          height: 40px;
+          border-radius: 8px;
         }
 
         /* ── Main ── */
-        .skel-main { flex: 1; padding: 32px 32px 80px; min-width: 0; }
+        .skel-main { padding: 0 0 80px; min-width: 0; }
 
         /* Subcategory pill bar placeholder */
         .skel-pills {
@@ -115,10 +124,10 @@ export default function Loading() {
           overflow: hidden;
         }
 
-        /* ── Product card skeleton ── */
+        /* ── Product card skeleton — 4 columns, matching pills-mode ── */
         .skel-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(4, 1fr);
           gap: 16px;
           margin-bottom: 40px;
         }
@@ -148,9 +157,11 @@ export default function Loading() {
         @media (max-width: 768px) {
           .skel-hero { min-height: auto; }
           .skel-hero-inner { padding: 24px 12px 40px; }
-          .skel-sidebar { display: none; }
-          .skel-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          /* Dropdown filter row is desktop-only in reality — mobile always
+             uses the drawer + pill bar regardless of stored view mode. */
+          .skel-filter-row { display: none; }
           .skel-main { padding: 20px 12px 60px; }
+          .skel-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
       `}</style>
 
@@ -196,21 +207,14 @@ export default function Loading() {
       {/* ── Gray listing skeleton ── */}
       <div className="skel-page">
         <div className="skel-layout">
-          {/* ── Sidebar skeleton ── */}
-          <aside className="skel-sidebar">
-            {Array.from({ length: SIDEBAR_ROWS }).map((_, i) => (
-              <div key={i} className="skel-sidebar-row">
-                <div className="skel" style={{ width: 14, height: 14, flexShrink: 0 }} />
-                <div
-                  className="skel"
-                  style={{ height: 14, width: `${55 + (i * 17) % 35}%` }}
-                />
-              </div>
-            ))}
-          </aside>
-
-          {/* ── Main content skeleton ── */}
           <main className="skel-main">
+            {/* Filter row — view switcher + brand/category/subcategory dropdowns */}
+            <div className="skel-filter-row">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="skel skel-filter-cell" />
+              ))}
+            </div>
+
             {/* Subcategory pills */}
             <div className="skel-pills">
               {[88, 140, 120, 100, 130].map((w, i) => (

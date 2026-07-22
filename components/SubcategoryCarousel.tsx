@@ -3,14 +3,23 @@ import Link from 'next/link'
 import { useRef, useEffect } from 'react'
 import type { FeaturedSubcategoryWithImage } from '@/lib/supabase'
 
+// easeOutCubic — used for both the arrow-click jump and the wheel-scroll's
+// momentary "settle" back to the ambient auto-scroll.
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+
 export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategoryWithImage[] }) {
   const doubled = [...subs, ...subs]
+  const outerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const hasDragged = useRef(false)
+  // Exposed so the arrow buttons (rendered outside the effect) can trigger
+  // an eased jump without re-running the whole setup effect.
+  const jumpRef = useRef<(dir: 1 | -1) => void>(() => {})
 
   useEffect(() => {
+    const outer = outerRef.current
     const track = trackRef.current
-    if (!track || subs.length === 0) return
+    if (!outer || !track || subs.length === 0) return
 
     const SPEED = 0.7  // px per rAF tick ≈ 42 px/s @ 60 fps
     let x = 0
@@ -19,23 +28,65 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
     let startX = 0
     let raf: number
 
+    // Paused (no ambient auto-scroll) until this timestamp — set whenever
+    // the visitor actively drives the carousel themselves (wheel or arrow
+    // click), so their input doesn't immediately get fought by the
+    // constant auto-advance.
+    let pausedUntil = 0
+
+    // Eased jump state — driven by the arrow buttons. Runs alongside the
+    // rAF tick loop instead of a CSS transition, since transform is also
+    // being set imperatively every frame for the ambient auto-scroll.
+    let jump: { from: number; to: number; start: number; duration: number } | null = null
+
     const cardW = () => window.innerWidth <= 768 ? 192 + 12 : 284 + 12
     const totalW = () => subs.length * cardW()
+    const wrap = () => {
+      const tw = totalW()
+      if (x < -tw * 1.5) x += tw
+      if (x > tw * 0.5) x -= tw
+    }
 
     const tick = () => {
-      if (!isDragging) {
+      const now = performance.now()
+      if (jump) {
+        const t = Math.min(1, (now - jump.start) / jump.duration)
+        x = jump.from + (jump.to - jump.from) * easeOutCubic(t)
+        if (t >= 1) { jump = null; wrap() }
+      } else if (!isDragging && now > pausedUntil) {
         x -= SPEED
-        const tw = totalW()
-        if (x <= -tw) x += tw
+        wrap()
       }
       track.style.transform = `translateX(${x}px)`
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
 
+    // ── Arrow buttons — jump ~85% of the visible (viewport) width ───────────
+    jumpRef.current = (dir: 1 | -1) => {
+      const visible = outer.clientWidth
+      // dir=1 (right arrow) advances the same direction as the ambient
+      // auto-scroll (x decreasing); dir=-1 (left arrow) reverses it.
+      const to = x - visible * 0.85 * dir
+      jump = { from: x, to, start: performance.now(), duration: 450 }
+      pausedUntil = performance.now() + 450 + 400
+    }
+
+    // ── Wheel — vertical (or trackpad horizontal) scroll drives the
+    //     carousel instead of the page, for as long as the cursor is over it.
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+      x -= delta
+      wrap()
+      jump = null
+      pausedUntil = performance.now() + 500
+    }
+
     // ── Mouse drag ──────────────────────────────────────────────────────────
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true
+      jump = null
       hasDragged.current = false
       startClientX = e.clientX
       startX = x
@@ -45,19 +96,19 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       if (!isDragging) return
       const delta = e.clientX - startClientX
       if (Math.abs(delta) > 4) hasDragged.current = true
-      const tw = totalW()
       x = startX + delta
-      if (x < -tw * 1.5) x += tw
-      if (x > tw * 0.5) x -= tw
+      wrap()
     }
     const onMouseUp = () => {
       isDragging = false
+      pausedUntil = performance.now() + 300
       track.style.cursor = 'grab'
     }
 
     // ── Touch drag ───────────────────────────────────────────────────────────
     const onTouchStart = (e: TouchEvent) => {
       isDragging = true
+      jump = null
       hasDragged.current = false
       startClientX = e.touches[0].clientX
       startX = x
@@ -66,12 +117,13 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       if (!isDragging) return
       const delta = e.touches[0].clientX - startClientX
       if (Math.abs(delta) > 4) hasDragged.current = true
-      const tw = totalW()
       x = startX + delta
-      if (x < -tw * 1.5) x += tw
-      if (x > tw * 0.5) x -= tw
+      wrap()
     }
-    const onTouchEnd = () => { isDragging = false }
+    const onTouchEnd = () => {
+      isDragging = false
+      pausedUntil = performance.now() + 300
+    }
 
     // Block link navigation after a real drag
     const onClickCapture = (e: MouseEvent) => {
@@ -85,6 +137,7 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
     window.addEventListener('touchmove', onTouchMove, { passive: true })
     window.addEventListener('touchend', onTouchEnd)
     track.addEventListener('click', onClickCapture, true)
+    outer.addEventListener('wheel', onWheel, { passive: false })
 
     return () => {
       cancelAnimationFrame(raf)
@@ -95,6 +148,7 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
       track.removeEventListener('click', onClickCapture, true)
+      outer.removeEventListener('wheel', onWheel)
     }
   }, [subs.length])
 
@@ -161,13 +215,56 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
           color: rgb(255,255,255); line-height: 1.3; display: block;
         }
 
+        /* ── Arrows — subtle, desktop-only, sit in the gutter between the
+             readable content edge and the viewport edge, vertically
+             centered against the (desktop) card height. ── */
+        .sub-carousel-arrow {
+          display: none;
+          position: absolute;
+          top: 50%; transform: translateY(-50%);
+          z-index: 3;
+          width: 44px; height: 44px;
+          align-items: center; justify-content: center;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.85);
+          -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+          border: 1px solid rgba(0,0,0,0.08);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+          color: rgba(0,0,0,0.55);
+          cursor: pointer;
+          transition: color 150ms, background 150ms, box-shadow 150ms;
+        }
+        .sub-carousel-arrow:hover {
+          color: rgb(0,0,0);
+          background: rgb(255,255,255);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.16);
+        }
+        .sub-carousel-arrow-left { left: max(24px, calc(50vw - 720px)); }
+        .sub-carousel-arrow-right { right: max(24px, calc(50vw - 720px)); }
+
+        @media (min-width: 1024px) {
+          .sub-carousel-arrow { display: flex; }
+        }
+
         @media (max-width: 768px) {
           .sub-carousel-track { padding-left: 12px; }
           .sub-card { width: 192px; height: 269px; }
         }
       `}</style>
 
-      <div className="sub-carousel-outer">
+      <div className="sub-carousel-outer" ref={outerRef}>
+        <button
+          type="button"
+          className="sub-carousel-arrow sub-carousel-arrow-left"
+          onClick={() => jumpRef.current(-1)}
+          aria-label="Derulează spre stânga"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+
         <div className="sub-carousel-track" ref={trackRef}>
           {doubled.map((s, i) => (
             <Link
@@ -190,6 +287,17 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
             </Link>
           ))}
         </div>
+
+        <button
+          type="button"
+          className="sub-carousel-arrow sub-carousel-arrow-right"
+          onClick={() => jumpRef.current(1)}
+          aria-label="Derulează spre dreapta"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
       </div>
     </>
   )
