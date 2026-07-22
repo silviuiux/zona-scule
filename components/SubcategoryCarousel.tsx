@@ -72,17 +72,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       pausedUntil = performance.now() + 450 + 400
     }
 
-    // ── Wheel — vertical (or trackpad horizontal) scroll drives the
-    //     carousel instead of the page, for as long as the cursor is over it.
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
-      x -= delta
-      wrap()
-      jump = null
-      pausedUntil = performance.now() + 500
-    }
-
     // ── Mouse drag ──────────────────────────────────────────────────────────
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true
@@ -137,7 +126,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
     window.addEventListener('touchmove', onTouchMove, { passive: true })
     window.addEventListener('touchend', onTouchEnd)
     track.addEventListener('click', onClickCapture, true)
-    outer.addEventListener('wheel', onWheel, { passive: false })
 
     return () => {
       cancelAnimationFrame(raf)
@@ -148,7 +136,6 @@ export default function SubcategoryCarousel({ subs }: { subs: FeaturedSubcategor
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
       track.removeEventListener('click', onClickCapture, true)
-      outer.removeEventListener('wheel', onWheel)
     }
   }, [subs.length])
 

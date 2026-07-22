@@ -1,6 +1,7 @@
 import { TransitionLink as Link } from '@/components/NavigationProgress'
 import type { ReactNode } from 'react'
 import { getSubcategoriesByCategoryName, SubcategoryWithCount } from '@/lib/supabase'
+import SubcategoryPillScroller from './SubcategoryPillScroller'
 
 export default async function SubcategoryBar({
   categoryName,
@@ -124,7 +125,7 @@ export default async function SubcategoryBar({
         }
       `}</style>
 
-      <div className={`subcat-bar${sticky ? ' is-sticky' : ''}`}>
+      <SubcategoryPillScroller className={`subcat-bar${sticky ? ' is-sticky' : ''}`}>
         {toggle}
         <Link
           href={allHref}
@@ -145,7 +146,7 @@ export default async function SubcategoryBar({
             <span className="subcat-count">{s.product_count.toLocaleString('ro')}</span>
           </Link>
         ))}
-      </div>
+      </SubcategoryPillScroller>
     </>
   )
 }
