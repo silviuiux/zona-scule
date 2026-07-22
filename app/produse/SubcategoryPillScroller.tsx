@@ -12,6 +12,18 @@ import { useRef, useEffect, useState, type ReactNode } from 'react'
  *   short pill list that fits don't swallow page-scroll for no reason.
  * - Arrow buttons: desktop-only (matches the homepage subcategory carousel),
  *   jump 85% of the visible row width per click via native smooth scrollBy.
+ * - Sticky: `position: sticky` lives on THIS wrapper (.subcat-scroller), not
+ *   on the inner pill row. A sticky element can't stay pinned past the
+ *   bottom edge of its own parent's box — and the pill row's actual parent
+ *   here would otherwise be tiny (auto-height, ~71px, exactly the row's own
+ *   height), so it would immediately run out of room and fall back into
+ *   normal scroll after ~71px, looking "not sticky" for the rest of the
+ *   page. This wrapper's real parent is <main class="products-main">
+ *   (thousands of px tall, spans the whole grid), so putting position:
+ *   sticky here instead gives the row a properly tall containing block to
+ *   stay pinned within for the rest of the scroll. Confirmed live on
+ *   production via getBoundingClientRect() before this fix: the row's own
+ *   sticky top drifted to -472px at scrollY 1200 instead of clamping at 52.
  */
 export default function SubcategoryPillScroller({
   className,
@@ -47,14 +59,16 @@ export default function SubcategoryPillScroller({
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
-  // Detects whether the (position: sticky) row is actually pinned right now
-  // — CSS alone can't tell "sticky in normal flow" from "currently stuck",
-  // so a 1px sentinel just above the row is watched via IntersectionObserver:
-  // once it scrolls past the sticky offset (52px navbar height) and leaves
-  // the viewport, the row itself must be pinned. Drives the `.stuck` class
-  // that swaps in a white backdrop + shadow only while actually pinned,
-  // leaving the row transparent (blending with the gray listing background)
-  // the rest of the time.
+  // Detects whether the (position: sticky) wrapper is actually pinned right
+  // now — CSS alone can't tell "sticky in normal flow" from "currently
+  // stuck", so a 1px sentinel immediately BEFORE the wrapper (a normal-flow
+  // sibling, not a child of it — it must move independently of the sticky
+  // box to be useful) is watched via IntersectionObserver: once it scrolls
+  // past the sticky offset (52px navbar height) and leaves the viewport,
+  // the wrapper itself must be pinned. Drives the `.stuck` class that swaps
+  // in a white backdrop + shadow only while actually pinned, leaving it
+  // transparent (blending with the gray listing background) the rest of
+  // the time.
   useEffect(() => {
     if (!isSticky) {
       setStuck(false)
@@ -77,45 +91,72 @@ export default function SubcategoryPillScroller({
   }
 
   return (
-    <div className={`subcat-scroller${stuck ? ' stuck' : ''}`}>
+    <>
       <style>{`
+        /* In normal flow, zero footprint (height:1px cancelled by the
+           negative margin) — exists purely so its position tracks exactly
+           where .subcat-scroller begins, independent of whether the
+           scroller itself is currently pinned. */
+        .subcat-sentinel {
+          height: 1px;
+          margin-bottom: -1px;
+          pointer-events: none;
+        }
+
         .subcat-scroller {
           position: relative;
         }
 
+        .subcat-scroller.is-sticky {
+          position: sticky;
+          top: 52px;
+          z-index: 50;
+          margin: 0 0 16px;
+          padding-top: 16px;
+          padding-bottom: 16px;
+          /* Transparent until actually pinned (see .stuck below) — so it
+             reads as part of the page while merely passing through, not a
+             floating card the whole time. */
+          background: transparent;
+        }
+
         /* Only visible while .stuck is applied (actually pinned under the
-           navbar, per the IntersectionObserver above) — gives the whole
-           wrapper, arrow gutters included, the same white card + shadow as
-           the pinned pill row (see SubcategoryBar.tsx's .subcat-bar.is-
-           sticky.stuck) so the arrows read as part of that pinned card
-           instead of floating loose over the gray page background. */
-        .subcat-scroller.stuck {
+           navbar, per the IntersectionObserver above) — white card +
+           shadow, arrow gutters included, so the arrows read as part of
+           the pinned bar instead of floating loose over the gray page. */
+        .subcat-scroller.is-sticky.stuck {
           background: rgb(255, 255, 255);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
-        /* 1px, non-interactive — sits in normal flow at the very top of
-           this (non-sticky) wrapper so it scrolls with the page while the
-           pill row inside pins in place. Once it crosses the rootMargin
-           threshold above and leaves the viewport, the row must be stuck. */
-        .subcat-sentinel {
-          position: absolute;
-          top: 0; left: 0;
-          width: 1px; height: 1px;
-          pointer-events: none;
+        /* Mobile always keeps the pill bar pinned under the navbar,
+           regardless of the desktop-only sticky/non-sticky split above —
+           matches SubcategoryBar.tsx's prior intent, moved here since this
+           wrapper (not the inner row) is what now carries position:sticky. */
+        @media (max-width: 768px) {
+          .subcat-scroller {
+            position: sticky;
+            top: 52px;
+            z-index: 50;
+            margin: -20px 0 20px;
+            padding: 32px 0;
+            background: rgb(244, 244, 244);
+          }
         }
 
         /* Side padding insets the pill row so the arrows have dedicated
            space to sit in — fully clear of every pill, not overlapping the
            first/last one. Applied only at the width the arrows actually
            render (≥1024px, see below) so mobile/tablet don't lose width to
-           an inset with nothing occupying it. Absolute-positioned children
-           offset from a padding-box edge (left/right: 0 below), so this is
-           enough on its own — no negative-margin breakout needed since we
-           want the row to shrink into the existing footprint, not for the
-           wrapper to grow past it. */
+           an inset with nothing occupying it. Left/right only (not
+           shorthand) so it doesn't clobber the top/bottom padding set by
+           .is-sticky above. Absolute-positioned children offset from a
+           padding-box edge (left/right: 0 below), so this is enough on its
+           own — no negative-margin breakout needed since we want the row
+           to shrink into the existing footprint, not for the wrapper to
+           grow past it. */
         @media (min-width: 1024px) {
-          .subcat-scroller { padding: 0 48px; }
+          .subcat-scroller { padding-left: 48px; padding-right: 48px; }
         }
 
         .subcat-arrow {
@@ -153,31 +194,33 @@ export default function SubcategoryPillScroller({
 
       <div ref={sentinelRef} className="subcat-sentinel" aria-hidden="true" />
 
-      <button
-        type="button"
-        className="subcat-arrow subcat-arrow-left"
-        onClick={() => scrollByAmount(-1)}
-        aria-label="Derulează spre stânga"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
+      <div className={`subcat-scroller${isSticky ? ' is-sticky' : ''}${stuck ? ' stuck' : ''}`}>
+        <button
+          type="button"
+          className="subcat-arrow subcat-arrow-left"
+          onClick={() => scrollByAmount(-1)}
+          aria-label="Derulează spre stânga"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
 
-      <div ref={scrollRef} className={`${className}${stuck ? ' stuck' : ''}`}>
-        {children}
+        <div ref={scrollRef} className={className}>
+          {children}
+        </div>
+
+        <button
+          type="button"
+          className="subcat-arrow subcat-arrow-right"
+          onClick={() => scrollByAmount(1)}
+          aria-label="Derulează spre dreapta"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
       </div>
-
-      <button
-        type="button"
-        className="subcat-arrow subcat-arrow-right"
-        onClick={() => scrollByAmount(1)}
-        aria-label="Derulează spre dreapta"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-      </button>
-    </div>
+    </>
   )
 }

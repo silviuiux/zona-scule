@@ -60,32 +60,14 @@ export default async function SubcategoryBar({
           scrollbar-width: none; -ms-overflow-style: none;
         }
         .subcat-bar::-webkit-scrollbar { display: none; }
-        .subcat-bar.is-sticky {
-          position: sticky;
-          top: 52px;
-          z-index: 50;
-          /* No negative top margin here — this bar is never the first child
-             of .products-main (the filter-row always precedes it), so
-             pulling it up to cancel main's own padding would just overlap
-             whatever's rendered above it instead. Plain padding gives it
-             the same "stuck" breathing room without reaching past its own
-             box. */
-          margin: 0 0 16px;
-          padding: 16px 0;
-          /* Transparent by default — while merely in normal flow (not yet
-             pinned) this should read as part of the page, not a card. Only
-             .stuck (applied by SubcategoryPillScroller.tsx via an
-             IntersectionObserver once the row is actually pinned under the
-             navbar) gives it a distinct look — see below. Without this
-             split the bar always matched .catalog-page's own gray exactly,
-             so pinning was invisible: there was nothing to tell "stuck" and
-             "normal flow" apart. */
-          background: transparent;
-        }
-        .subcat-bar.is-sticky.stuck {
-          background: rgb(255, 255, 255);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
+        /* position: sticky (and the stuck-only white card/shadow) live on
+           the OUTER .subcat-scroller wrapper now, not here — see
+           SubcategoryPillScroller.tsx for why: this row's real parent when
+           sticky lived here was only ~71px tall (auto-height, exactly the
+           row's own height), so the sticky row ran out of containing-block
+           room and fell back into normal scroll almost immediately. The
+           scroller's actual parent (<main class="products-main">) is
+           thousands of px tall, so it has real room to stay pinned. */
 
         .subcat-pill {
           display: inline-flex; align-items: center; gap: 8px;
@@ -118,21 +100,6 @@ export default async function SubcategoryBar({
         }
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
 
-        @media (max-width: 768px) {
-          /* Mobile always keeps the pill bar pinned under the navbar,
-             regardless of the desktop-only sticky/non-sticky split above —
-             the .is-sticky compound selector is included here purely so
-             this wins on specificity over the desktop-only .is-sticky rule
-             above (not to gate the behavior on that class). */
-          .subcat-bar,
-          .subcat-bar.is-sticky {
-            position: sticky;
-            top: 52px;
-            margin: -20px 0 20px;
-            padding: 32px 0;
-            background: rgb(244, 244, 244);
-          }
-        }
       `}</style>
 
       <SubcategoryPillScroller className={`subcat-bar${sticky ? ' is-sticky' : ''}`}>
