@@ -41,3 +41,5 @@ yarn-error.log*
 next-env.d.ts
 images-backup/
 WAREHOUSE_EXPERIENCE_PROMPT.md
+/extras
+public/brand-logos/_check_milwaukee.png
