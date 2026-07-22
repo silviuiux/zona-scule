@@ -217,10 +217,9 @@ export default function CookieConsent() {
           <div className="cc-text-row">
             <span className="cc-icon">{CookieIcon}</span>
             <p className="cc-text">
-              <strong>Cookie-uri</strong>{' — '}
-              Folosim cookie-uri necesare pentru funcționarea site-ului și, doar cu acordul tău,
-              cookie-uri de analiză (Vercel Analytics) pentru a înțelege cum este folosit site-ul.
-              Detalii complete în{' '}
+              <strong>Accepti cookies?</strong>{' — '}
+              Unele cookie-uri sunt necesare. Cu voia ta tinem site-ul ca uns cu ajutorul
+              cookie-urilor de analiza.{' '}
               <Link href="/politica-de-cookie-uri">Politica de cookie-uri</Link>.
             </p>
           </div>
