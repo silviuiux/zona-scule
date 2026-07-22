@@ -30,7 +30,10 @@ export default function SubcategoryPillScroller({
       if (el.scrollWidth <= el.clientWidth) return // nothing to scroll — let the page handle it
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
       if (delta === 0) return
+      // Stop this from also scrolling the page (both as the native wheel
+      // action and as a bubbled scroll-chain once the row hits either end).
       e.preventDefault()
+      e.stopPropagation()
       el.scrollLeft += delta
     }
 
@@ -47,17 +50,29 @@ export default function SubcategoryPillScroller({
   return (
     <div className="subcat-scroller">
       <style>{`
-        .subcat-scroller { position: relative; }
+        .subcat-scroller {
+          position: relative;
+          /* Side padding makes room for the arrows to sit fully outside the
+             pill row itself (not overlapping any pill). Unlike the homepage
+             carousel this component isn't a full-bleed breakout, so this
+             padding isn't canceled with a negative margin — it just trims
+             the row's own width slightly, which is fine since .products-main
+             has plenty of spare width to give up. */
+          padding: 0 44px;
+        }
 
         .subcat-arrow {
           display: none;
           position: absolute;
           top: 50%; transform: translateY(-50%);
-          z-index: 4;
+          /* Above both this row's own sticky z-index (50) and the filter
+             row's (51) — otherwise the sticky pill row painted on top of it
+             and the arrows looked like they were sitting "behind" the pills. */
+          z-index: 60;
           width: 36px; height: 36px;
           align-items: center; justify-content: center;
           border-radius: 50%;
-          background: rgba(255,255,255,0.92);
+          background: rgba(255,255,255,0.95);
           -webkit-backdrop-filter: blur(4px);
           backdrop-filter: blur(4px);
           border: 1px solid rgba(0,0,0,0.08);
@@ -71,8 +86,8 @@ export default function SubcategoryPillScroller({
           background: rgb(255,255,255);
           box-shadow: 0 10px 24px rgba(0,0,0,0.16);
         }
-        .subcat-arrow-left { left: -14px; }
-        .subcat-arrow-right { right: -14px; }
+        .subcat-arrow-left { left: 0; }
+        .subcat-arrow-right { right: 0; }
 
         @media (min-width: 1024px) {
           .subcat-arrow { display: flex; }

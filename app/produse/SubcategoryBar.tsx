@@ -72,8 +72,6 @@ export default async function SubcategoryBar({
              box. */
           margin: 0 0 16px;
           padding: 16px 0;
-          background: rgb(244, 244, 244);
-          border-bottom: 1px solid rgba(0,0,0,0.07);
         }
 
         .subcat-pill {
@@ -119,8 +117,6 @@ export default async function SubcategoryBar({
             top: 52px;
             margin: -20px 0 20px;
             padding: 32px 0;
-            background: rgb(244, 244, 244);
-            border-bottom: 1px solid rgba(0,0,0,0.07);
           }
         }
       `}</style>
