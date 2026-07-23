@@ -121,18 +121,34 @@ export default function SubcategoryPillScroller({
         }
 
         /* Only visible while .stuck is applied (actually pinned under the
-           navbar, per the IntersectionObserver above). The 100vmax spread
-           is a full-bleed trick: this element is only as wide as the
-           content column (max-width: 1440px, centered), but the box-shadow
-           isn't clipped to the element's own box, so a huge spread radius
-           paints solid white all the way to the real viewport edges behind
-           it — html/body's overflow-x: clip (see app/globals.css) then
-           clips that spread exactly at the viewport boundary instead of
-           letting it cause horizontal scroll. The second shadow layer is
-           the actual drop shadow, unaffected by the first. */
+           navbar, per the IntersectionObserver above). Full-bleed white via
+           a ::before instead of a box-shadow spread — an earlier attempt
+           used box-shadow: 0 0 0 100vmax white, but shadow spread grows
+           equally in EVERY direction, not just sideways: it also bled
+           ~100vmax below (and above) the bar and painted over the entire
+           product grid, making every card vanish the instant the bar
+           stuck. This pseudo-element is instead pinned to top:0/bottom:0
+           of the bar's own box (so its height always matches the bar,
+           never bleeding vertically) and only escapes horizontally via
+           100vw + centering, clipped at the real viewport edge by html/
+           body's overflow-x: clip (see app/globals.css). Sits behind this
+           element's own content in paint order (pseudo-elements render
+           before their element's children) so the pills/arrows stay on
+           top of it without needing an explicit z-index. */
         .subcat-scroller.is-sticky.stuck {
           background: rgb(255, 255, 255);
-          box-shadow: 0 0 0 100vmax rgb(255, 255, 255), 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .subcat-scroller.is-sticky.stuck::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 50%;
+          width: 100vw;
+          transform: translateX(-50%);
+          background: rgb(255, 255, 255);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          pointer-events: none;
         }
 
         /* Mobile always keeps the pill bar pinned under the navbar,
