@@ -1,8 +1,16 @@
 import Link from 'next/link'
-import CookieSettingsButton from '@/components/CookieSettingsButton'
 import { LEGAL_PAGES, ANPC_SAL_URL } from '@/lib/legal-nav'
+import { getCategoriesWithCount } from '@/lib/supabase'
 
-export default function Footer() {
+export default async function Footer() {
+  // Top 5 by product count, not sort_order — the footer is a quick-nav
+  // shortcut to the site's biggest categories, not the full curated
+  // category ordering used in the sidebar/dropdowns elsewhere.
+  const categories = (await getCategoriesWithCount())
+    .slice()
+    .sort((a, b) => b.product_count - a.product_count)
+    .slice(0, 5)
+
   return (
     <>
       <style>{`
@@ -21,7 +29,7 @@ export default function Footer() {
         .footer-grid {
           max-width: 1440px; margin: 0 auto;
           padding: 80px 12px 56px;
-          display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 56px;
+          display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 56px;
         }
 
         /* Logo mark — same inline SVG as the nav, scaled up slightly so it
@@ -114,13 +122,24 @@ export default function Footer() {
             </p>
           </div>
           <div>
+            <p className="footer-col-title">Categorii</p>
+            {categories.map(c => (
+              <Link
+                key={c.id}
+                href={`/produse?categorie=${encodeURIComponent(c.name)}`}
+                className="footer-link"
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+          <div>
             <p className="footer-col-title">Informatii</p>
             {LEGAL_PAGES.map(l => (
               <Link key={l.href} href={l.href} className="footer-link">{l.label}</Link>
             ))}
             <a href="#" className="footer-link">Achizitii S.E.A.P.</a>
             <a href={ANPC_SAL_URL} target="_blank" rel="noopener noreferrer" className="footer-link">ANPC SAL</a>
-            <CookieSettingsButton />
           </div>
           <div>
             <p className="footer-col-title">Contact</p>
