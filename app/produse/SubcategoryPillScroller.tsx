@@ -149,6 +149,18 @@ export default function SubcategoryPillScroller({
           background: rgb(255, 255, 255);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
           pointer-events: none;
+          /* Without this, an absolutely-positioned element with the default
+             z-index: auto still paints AFTER plain in-flow, non-positioned
+             content in stacking order (see CSS2.1 Appendix E) — regardless
+             of DOM order. The pill links are plain in-flow content (no
+             position of their own), so this ::before was painting on top
+             of and completely hiding them; only the arrow buttons stayed
+             visible since they have their own explicit z-index: 60.
+             Negative z-index here pushes it behind everything else within
+             .subcat-scroller's own stacking context (established by its
+             position + z-index: 50 above) — scoped locally, doesn't affect
+             anything outside this component. */
+          z-index: -1;
         }
 
         /* Mobile always keeps the pill bar pinned under the navbar,
