@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { unstable_cache } from 'next/cache'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -149,7 +150,18 @@ export async function getProducts({
   // used to be here). `name` is just the tiebreak for equal/NULL prices.
   let query = supabase
     .from('product_listing_mv')
-    .select('*', { count: 'exact' })
+    // Narrowed from select('*') 2026-07-29: the grid only ever renders
+    // ProductCard, which reads exactly these columns (id is needed for the
+    // React `key`). This view has ~65 columns incl. long_description,
+    // specs/axes jsonb, and datasheet URLs that a 24-row listing page never
+    // touches — those are still fetched in full on the product detail page.
+    // Still count: 'exact', deliberately not 'estimated' — see the note
+    // above this function; estimates on a filtered materialized-view query
+    // are unreliable.
+    .select(
+      'id, slug, name, model, sku, brand_name, short_description, main_image_storage_url, main_image_url, gallery_url_1, st1_label, st1_value, st2_label, st2_value, price, featured, category_text, subcategory_text',
+      { count: 'exact' }
+    )
     .not('slug', 'is', null)
     .order('price', { ascending: false, nullsFirst: false })
     .order('name')
@@ -573,7 +585,12 @@ export async function getSubcategoriesByCategory(categoryId: string) {
 
 export type CategoryWithCount = Category & { product_count: number }
 
-export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
+// 2026-07-29: wrapped in a 60s cache — this is fetched unconditionally on
+// every single /produse and homepage load regardless of filters, but the
+// category list + per-category counts only actually change a few times a
+// day (catalog imports / product_listing_mv refresh), not per-request.
+export const getCategoriesWithCount = unstable_cache(
+  async (): Promise<CategoryWithCount[]> => {
   // Use rpc to get counts directly in DB — avoids 1000-row Supabase default limit
   const [{ data: cats, error }, { data: counts, error: cErr }] = await Promise.all([
     supabase.from('categories').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
@@ -596,11 +613,17 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
     ...c,
     product_count: countMap[c.name.toLowerCase().trim()] ?? 0,
   }))
-}
+  },
+  ['get-categories-with-count'],
+  { revalidate: 60, tags: ['catalog'] }
+)
 
 export type SubcategoryWithCount = Subcategory & { product_count: number }
 
-export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCount[]> {
+// 2026-07-29: same reasoning/cache window as getCategoriesWithCount above —
+// fetched unconditionally on every /produse load, changes rarely.
+export const getAllSubcategoriesWithCount = unstable_cache(
+  async (): Promise<SubcategoryWithCount[]> => {
   const [{ data: subs, error }, { data: counts }] = await Promise.all([
     supabase.from('subcategories').select('*').order('name'),
     supabase.rpc('count_products_by_subcategory'),
@@ -628,7 +651,10 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
     .map(s => ({ ...s, product_count: countMap[s.name.toLowerCase().trim()] ?? 0 }))
     .filter(s => s.product_count > 0)
     .sort((a, b) => b.product_count - a.product_count)
-}
+  },
+  ['get-all-subcategories-with-count'],
+  { revalidate: 60, tags: ['catalog'] }
+)
 
 /**
  * Site-wide "total produse" figure shown in the homepage hero, the /produse
@@ -642,12 +668,23 @@ export async function getAllSubcategoriesWithCount(): Promise<SubcategoryWithCou
  * number, consistently, everywhere — not a number that depends on which
  * page happens to query which table.
  */
-export async function getRawProductCount(): Promise<number> {
-  const { count } = await supabase
-    .from('products')
-    .select('*', { count: 'exact', head: true })
-  return count ?? 0
-}
+// 2026-07-29: was a plain, uncached `count(*) from products` run fresh on
+// every /produse + homepage hit — measured at 3.36s live (visibility-map
+// bloat, fixed separately with a VACUUM). Even vacuumed, this is a full-
+// table count for a number that's purely decorative and doesn't need to
+// be exact to the row, so: 'estimated' (planner stats, not a real scan)
+// plus a 60s cache so at most one request a minute actually reaches
+// Postgres for it, no matter how much traffic hits the page.
+export const getRawProductCount = unstable_cache(
+  async (): Promise<number> => {
+    const { count } = await supabase
+      .from('products')
+      .select('*', { count: 'estimated', head: true })
+    return count ?? 0
+  },
+  ['get-raw-product-count'],
+  { revalidate: 60, tags: ['catalog'] }
+)
 
 export async function getSubcategoriesByBrandName(brandName: string): Promise<SubcategoryWithCount[]> {
   const [{ data: subs, error }, { data: counts }] = await Promise.all([
