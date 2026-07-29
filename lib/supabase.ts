@@ -669,18 +669,26 @@ export const getAllSubcategoriesWithCount = unstable_cache(
  * page happens to query which table.
  */
 // 2026-07-29: was a plain, uncached `count(*) from products` run fresh on
-// every /produse + homepage hit — measured at 3.36s live (visibility-map
-// bloat, fixed separately with a VACUUM). Even vacuumed, this is a full-
-// table count for a number that's purely decorative and doesn't need to
-// be exact to the row, so: 'estimated' (planner stats, not a real scan)
-// plus a 60s cache so at most one request a minute actually reaches
-// Postgres for it, no matter how much traffic hits the page.
+// every /produse + homepage hit — measured at 3.36s live (index-only scan
+// still has to read cold pages off disk; a VACUUM didn't fix it). This is
+// a full-table count for a number that's purely decorative and doesn't
+// need to be exact to the row.
+//
+// First attempt used supabase-js's `count: 'estimated'`, which asks
+// PostgREST to estimate via EXPLAIN. That relies on the `db-plan-enabled`
+// setting, which is OFF by default on Supabase projects — so the estimate
+// silently came back null and `count ?? 0` rendered "0 produse" in prod.
+//
+// 2026-07-30: switched to an RPC (get_estimated_row_count, see migration
+// add_estimated_row_count_fn) that reads pg_class.reltuples directly —
+// sub-millisecond regardless of table size, no EXPLAIN required, updated
+// by every autovacuum/autoanalyze. Still wrapped in the 60s cache so at
+// most one request a minute reaches Postgres for it either way.
 export const getRawProductCount = unstable_cache(
   async (): Promise<number> => {
-    const { count } = await supabase
-      .from('products')
-      .select('*', { count: 'estimated', head: true })
-    return count ?? 0
+    const { data, error } = await supabase.rpc('get_estimated_row_count', { table_name: 'products' })
+    if (error || data == null) return 0
+    return Number(data)
   },
   ['get-raw-product-count'],
   { revalidate: 60, tags: ['catalog'] }
