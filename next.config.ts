@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'm.media-amazon.com' },
       { protocol: 'https', hostname: 'www.boschtools.com' },
       { protocol: 'https', hostname: 'www.bosch-professional.com' },
+      { protocol: 'https', hostname: 'pt-media.bosch-pt.com' },
       { protocol: 'https', hostname: '*.s3.amazonaws.com' },
     ],
     // Only generate the breakpoints we actually request via `sizes=` in the app
