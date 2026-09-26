@@ -41,7 +41,7 @@ html.lenis, html.lenis body { height: auto; }
   html { scroll-behavior: smooth; }
 }
 body {
-  background-color: rgb(244, 244, 244);
+  background-color: var(--white);
   color: var(--black);
   font-family: 'Recursive', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -49,19 +49,22 @@ body {
   overflow-x: clip; /* see html rule above — clip, not hidden, preserves position:sticky */
 }
 
-/* Dot pattern — kept but hidden. --dot-y is updated by <DotsParallax /> on scroll.
-   To re-enable: remove the `display: none` line. */
+/* Dot pattern — light gray polka dots, 16px apart, on the white body background.
+   --dot-y is the scroll-parallax offset (updated by <DotsParallax /> on scroll).
+   --dot-tx/--dot-ty/--dot-scale drift the whole layer toward the cursor and add
+   a faint "closer/farther" scale, eased continuously in JS for an organic feel
+   rather than snapping straight to the pointer. */
 body::before {
-  display: none; /* hidden — replaced by noise texture */
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
   background-size: 16px 16px;
   background-position: 0 var(--dot-y, 0px);
-  will-change: background-position;
+  transform: translate3d(var(--dot-tx, 0px), var(--dot-ty, 0px), 0) scale(var(--dot-scale, 1));
+  will-change: background-position, transform;
 }
 
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────

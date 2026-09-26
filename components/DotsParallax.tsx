@@ -18,11 +18,22 @@ import { useEffect } from 'react'
  *                     foreground → background depth). At scrollY=100, the
  *                     image translates DOWN 60px so it appears to scroll up
  *                     only 40px → 40% effective.
+ *
+ * Also drifts the dot layer toward the cursor across the whole viewport:
+ *
+ *   --dot-tx/--dot-ty : subtle translate toward the pointer (± a few px).
+ *   --dot-scale       : subtle scale-up as the pointer moves off-center, read
+ *                        as the dot plane drifting closer on the z-axis.
+ *
+ * Both are eased toward their target every frame (lerp, not snapped) so the
+ * motion settles like a slow-drifting plane rather than tracking the cursor
+ * directly — the "organic" part of the effect. The easing loop only runs
+ * while the values are still moving; it stops once they settle and restarts
+ * on the next pointer movement.
  */
 export default function DotsParallax() {
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return
 
     const root = document.documentElement
     let raf = 0
@@ -42,9 +53,65 @@ export default function DotsParallax() {
     }
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
+
+    if (reduce) {
+      return () => {
+        window.removeEventListener('scroll', onScroll)
+        if (raf) cancelAnimationFrame(raf)
+      }
+    }
+
+    // Pointer-driven drift for the dot layer, in normalized 0..1 viewport
+    // coordinates, resting at the center (0.5, 0.5) when idle.
+    const DOT_TX_RANGE = 6 // px, at full ±1 offset from center
+    const DOT_TY_RANGE = 6 // px
+    const DOT_SCALE_RANGE = 0.015 // added scale at full offset
+    const EASE = 0.04
+    const EPSILON = 0.0004
+
+    let targetX = 0.5
+    let targetY = 0.5
+    let curX = 0.5
+    let curY = 0.5
+    let hoverRaf = 0
+
+    const tick = () => {
+      curX += (targetX - curX) * EASE
+      curY += (targetY - curY) * EASE
+      const nx = (curX - 0.5) * 2 // -1..1
+      const ny = (curY - 0.5) * 2
+      root.style.setProperty('--dot-tx', `${(nx * DOT_TX_RANGE).toFixed(2)}px`)
+      root.style.setProperty('--dot-ty', `${(ny * DOT_TY_RANGE).toFixed(2)}px`)
+      root.style.setProperty('--dot-scale', `${(1 + (Math.abs(nx) + Math.abs(ny)) * 0.5 * DOT_SCALE_RANGE).toFixed(4)}`)
+
+      if (Math.abs(targetX - curX) < EPSILON && Math.abs(targetY - curY) < EPSILON) {
+        hoverRaf = 0
+        return
+      }
+      hoverRaf = requestAnimationFrame(tick)
+    }
+    const kick = () => {
+      if (!hoverRaf) hoverRaf = requestAnimationFrame(tick)
+    }
+    const onMouseMove = (e: MouseEvent) => {
+      targetX = e.clientX / window.innerWidth
+      targetY = e.clientY / window.innerHeight
+      kick()
+    }
+    const onMouseLeave = () => {
+      targetX = 0.5
+      targetY = 0.5
+      kick()
+    }
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    window.addEventListener('mouseleave', onMouseLeave)
+
     return () => {
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseleave', onMouseLeave)
       if (raf) cancelAnimationFrame(raf)
+      if (hoverRaf) cancelAnimationFrame(hoverRaf)
     }
   }, [])
   return null
