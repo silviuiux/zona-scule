@@ -37,17 +37,6 @@ export default function HeroSearch({ totalCount }: { totalCount?: number }) {
         /* Left icon flips search → clear once the field has content */
         .hero-search-clear { color: rgba(0,0,0,0.4); }
         .hero-search-clear:hover { color: rgb(217,44,43); }
-
-        /* Right-side "go" affordance — always present as a subtle CTA hint,
-           lights up red + nudges right once there's a query to run. */
-        .hero-search-go {
-          flex-shrink: 0; background: none; border: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          padding: 0 2px; color: rgba(0,0,0,0.22);
-          transition: color 150ms, transform 220ms cubic-bezier(0.22,1,0.36,1);
-        }
-        .hero-search-go:hover { color: rgb(217,44,43); }
-        .hero-search-go.active { color: rgb(217,44,43); transform: translateX(3px); }
       `}</style>
 
       {/* Left icon: search when empty (submits), clear-X when active */}
@@ -89,17 +78,10 @@ export default function HeroSearch({ totalCount }: { totalCount?: number }) {
         )}
       </div>
 
-      {/* Right-side CTA arrow — signals "search" */}
-      <button
-        type="submit"
-        className={`hero-search-go${active ? ' active' : ''}`}
-        aria-label="Cauta"
-        tabIndex={-1}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </button>
+      {/* Red CTA — submits the typed query when there is one, otherwise
+          just opens the full catalog. Lives in the same <form> as the
+          input so Enter and a click behave identically. */}
+      <button type="submit" className="hero-catalog-cta">Vezi catalog</button>
     </form>
   )
 }

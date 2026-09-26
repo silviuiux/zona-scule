@@ -128,18 +128,19 @@ export default async function HomePage() {
           display: flex; align-items: stretch; gap: 0;
           width: 50%;
           min-width: 320px;
-          border: 1px solid rgba(0,0,0,0.12);
-          border-radius: 4px;
+          border: 1px solid rgba(0,0,0,0.06);
+          border-radius: 10px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.06);
           overflow: hidden;
         }
         /* ── Hero search input ── */
         .hero-search-box {
-          display: flex; align-items: center; gap: 16px;
+          display: flex; align-items: center; gap: 14px;
           background: rgb(255,255,255);
-          padding: 0 12px;
+          padding: 0 20px;
           flex: 1;
           min-width: 0;
-          height: 44px;
+          height: 56px;
         }
         .hero-search-icon {
           background: none; border: none; cursor: pointer;
@@ -157,7 +158,7 @@ export default async function HomePage() {
           width: 100%; border: none; outline: none;
           background: transparent;
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgb(0,0,0);
+          font-size: 14px; color: rgb(0,0,0);
           text-align: left;
         }
         .hero-search-placeholder {
@@ -165,19 +166,18 @@ export default async function HomePage() {
           pointer-events: none; white-space: nowrap;
           overflow: hidden; max-width: 100%;
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.35);
+          font-size: 14px; color: rgba(0,0,0,0.35);
         }
         .hero-search-placeholder-count { color: rgb(0,0,0); }
         .hero-catalog-cta {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 36px; height: 44px;
+          padding: 0 32px; height: 56px;
           font-family: 'Inter', sans-serif;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
-          text-decoration: none; white-space: nowrap;
+          border: none; white-space: nowrap;
           transition: background 150ms;
-          border-left: 1px solid rgba(0,0,0,0.1);
         }
         .hero-catalog-cta:hover { background: rgb(190, 35, 34); }
 
@@ -462,20 +462,20 @@ export default async function HomePage() {
           .hero-inner { gap: 20px; padding: 0 12px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
-            border: none; border-radius: 0;
-            gap: 16px;
+            border: none; border-radius: 0; box-shadow: none;
+            gap: 12px;
           }
           .hero-search-box {
             min-width: 0; width: 100%;
-            height: auto; padding: 8px 12px;
-            border: 1px solid rgba(0,0,0,0.12);
-            border-radius: 3px;
+            height: auto; padding: 12px 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.06);
           }
           .hero-catalog-cta {
             justify-content: center;
-            height: auto; padding: 8px 24px;
-            border-left: none; border-top: none;
-            border-radius: 3px;
+            height: auto; padding: 12px 24px;
+            border-radius: 8px;
           }
 
           .cats-section { padding: 0 12px 64px; }
@@ -533,7 +533,6 @@ export default async function HomePage() {
           <p className="hero-sub">Lider in furnizarea de scule electrice<br />industriale si de constructii de peste 26 de ani</p>
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
-            <Link href="/produse" className="hero-catalog-cta">CATALOG</Link>
           </div>
         </div>
       </section>

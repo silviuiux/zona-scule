@@ -1,30 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { getBrandHref } from '@/lib/brand-content'
 
 const WORDS = [
-  { text: 'SCULELE',       href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
-  { text: 'ACCESORIILE',   href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
-  { text: 'APARATELE',     href: '/produse?categorie=Aparate%20de%20Masura' },
+  { text: 'sculele',       href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
+  { text: 'accesoriile',   href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
+  { text: 'aparatele',     href: '/produse?categorie=Aparate%20de%20Masura' },
 ]
 
 type Brand = { name: string; product_count: number }
-
-// Brands with a dedicated landing page (app/brand/[slug]) — pills for these
-// link straight to the brand page instead of the filtered product listing.
-const BRAND_PAGE_SLUGS: Record<string, string> = {
-  karcher: 'karcher',
-  milwaukee: 'milwaukee',
-  pferd: 'pferd',
-  osborn: 'osborn',
-  ruko: 'ruko',
-  bosch: 'bosch',
-}
-
-function brandHref(name: string) {
-  const slug = BRAND_PAGE_SLUGS[name.toLowerCase()]
-  return slug ? `/brand/${slug}` : `/produse?brand=${encodeURIComponent(name)}`
-}
 
 export default function AnimatedHero({ brands }: { brands: Brand[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
@@ -94,32 +79,30 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         }
 
         .hero-word-toate {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
-          text-transform: uppercase;
+          font-family: 'Neuton', serif;
+          font-weight: 400;
+          font-size: 128px;
+          line-height: 96px;
           color: rgb(0,0,0);
-          letter-spacing: 0.01em;
-          line-height: 1;
           flex-shrink: 0;
         }
 
-        /* Fixed height container matching Framer's 96px — clips slide animation */
+        /* Fixed height container matching the title's line-height — clips slide animation */
         .hero-word-clip {
-          height: clamp(52px, 6.5vw, 96px);
+          height: 96px;
           overflow: hidden;
           display: flex;
           align-items: flex-start;
         }
 
         .hero-animated-word {
-          font-family: 'Bungee Inline', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
-          text-transform: uppercase;
+          font-family: 'Neuton', serif;
+          font-weight: 400;
+          font-size: 128px;
+          line-height: 96px;
           color: rgb(217,44,43);
-          letter-spacing: 0.01em;
           text-decoration: none;
           display: block;
-          line-height: 1;
           white-space: nowrap;
           /* starts hidden above */
           transform: translateY(-110%);
@@ -136,14 +119,26 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           transition: transform 300ms cubic-bezier(0.55, 0, 1, 0.45), opacity 200ms ease;
         }
 
-        /* Line 2: DE CARE AI NEVOIE */
+        /* Line 2: de care ai nevoie */
         .hero-line2 {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 6.5vw, 96px);
-          text-transform: uppercase;
+          font-family: 'Neuton', serif;
+          font-weight: 400;
+          font-size: 128px;
+          line-height: 96px;
           color: rgb(0,0,0);
-          letter-spacing: 0.01em;
-          line-height: 1;
+        }
+
+        /* 128px/96px is the Neuton title's intended desktop size — step it
+           down on narrower viewports so it doesn't overflow before the
+           mobile breakpoint takes over. */
+        @media (max-width: 1100px) {
+          .hero-word-toate,
+          .hero-animated-word,
+          .hero-line2 {
+            font-size: 80px;
+            line-height: 72px;
+          }
+          .hero-word-clip { height: 72px; }
         }
 
         /* On mobile, stack the animated word below TOATE so it doesn't overflow */
@@ -153,27 +148,24 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
             align-items: flex-start;
             gap: 0;
           }
-          /* The clamp() floor (52px) never actually kicks in below its vw
-             value on phone-width screens, so the title rendered at its
-             biggest, most awkward size right where space is tightest.
-             Fixed, smaller size for mobile instead. */
           .hero-word-toate,
           .hero-animated-word,
           .hero-line2 {
             font-size: 36px;
+            line-height: 1.05;
           }
-          .hero-word-clip { height: 36px; }
+          .hero-word-clip { height: 38px; }
         }
       `}</style>
 
       {/* Brand chips */}
       <div className="brand-chips">
         {topBrands.length > 0 ? topBrands.map(b => (
-          <Link key={b.name} href={brandHref(b.name)} className="brand-chip">
+          <Link key={b.name} href={getBrandHref(b.name)} className="brand-chip">
             {b.name.toUpperCase()}
           </Link>
         )) : ['Bosch', 'Karcher', 'Milwaukee', 'Pferd', 'FFGroup'].map(n => (
-          <Link key={n} href={brandHref(n)} className="brand-chip">{n.toUpperCase()}</Link>
+          <Link key={n} href={getBrandHref(n)} className="brand-chip">{n.toUpperCase()}</Link>
         ))}
 
       </div>
@@ -182,7 +174,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
       <div className="hero-title">
         {/* Line 1: TOATE [animated] */}
         <div className="hero-line1">
-          <span className="hero-word-toate">TOATE</span>
+          <span className="hero-word-toate">Toate</span>
           <div className="hero-word-clip">
             <Link
               href={WORDS[activeIdx].href}
@@ -194,7 +186,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         </div>
 
         {/* Line 2 */}
-        <span className="hero-line2">DE CARE AI NEVOIE</span>
+        <span className="hero-line2">de care ai nevoie</span>
       </div>
     </>
   )

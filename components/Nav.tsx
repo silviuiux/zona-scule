@@ -32,12 +32,16 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // ── click-outside → close dropdown ────────────────────────────────────────
+  // ── click-outside → close dropdown, and collapse an empty expanded search ──
   useEffect(() => {
     const fn = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setDropOpen(false)
         setActiveIdx(-1)
+        setQ(q => {
+          if (!q.trim()) setSearchOpen(false)
+          return q
+        })
       }
     }
     document.addEventListener('mousedown', fn)
@@ -74,7 +78,10 @@ export default function Nav() {
 
   // ── keyboard navigation ────────────────────────────────────────────────────
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!dropOpen) return
+    if (!dropOpen) {
+      if (e.key === 'Escape' && !q.trim()) setSearchOpen(false)
+      return
+    }
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActiveIdx(i => Math.min(i + 1, suggestions.length - 1))
@@ -84,6 +91,7 @@ export default function Nav() {
     } else if (e.key === 'Escape') {
       setDropOpen(false)
       setActiveIdx(-1)
+      if (!q.trim()) setSearchOpen(false)
     } else if (e.key === 'Enter' && activeIdx >= 0) {
       e.preventDefault()
       navigateTo(suggestions[activeIdx].slug)
@@ -123,7 +131,7 @@ export default function Nav() {
         .nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           height: 52px;
-          background: rgb(244, 244, 244);
+          background: rgb(255,255,255);
           border-bottom: 1px solid rgba(0,0,0,0.08);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms;
@@ -140,20 +148,37 @@ export default function Nav() {
           display: flex; align-items: center;
           text-decoration: none; flex-shrink: 0;
           padding-right: 20px;
-          border-right: 1px solid rgba(0,0,0,0.1);
           height: 100%;
         }
 
-        /* Search wrap — relative so dropdown anchors to it */
+        /* Search wrap — relative so dropdown anchors to it. Collapsed by
+           default (margin-left: auto hugs it + everything after it to the
+           right, next to the logo's empty space); .open drops the auto
+           margin and grows to fill that space with the full input row. */
         .nav-search-wrap {
-          flex: 1; min-width: 0;
+          flex: 0 0 auto;
+          margin-left: auto;
           position: relative;
-          border-right: 1px solid rgba(0,0,0,0.1);
           display: flex; align-items: stretch;
         }
+        .nav-search-wrap.open {
+          flex: 1 1 auto; min-width: 0; margin-left: 0;
+        }
+        .nav-search-trigger {
+          display: flex; align-items: center; gap: 8px;
+          background: none; border: none; cursor: pointer;
+          padding: 8px 14px; white-space: nowrap;
+        }
+        .nav-search-wrap.open .nav-search-trigger { display: none; }
         .nav-search-form {
-          flex: 1; display: flex; align-items: center;
+          display: none;
+          flex: 1; align-items: center;
           height: 100%; padding: 0 14px; gap: 16px;
+          min-width: 0;
+        }
+        .nav-search-wrap.open .nav-search-form {
+          display: flex;
+          border-bottom: 1px solid rgba(0,0,0,0.18);
         }
         .nav-search-input {
           flex: 1; min-width: 0;
@@ -170,15 +195,17 @@ export default function Nav() {
         }
         .nav-search-btn:hover { color: rgb(217,44,43); }
 
-        /* Right-side "go" affordance — subtle at rest, red once there's a query */
+        /* Right-side submit label — "CAUTA", static regardless of what's
+           typed (per the reference design); red once there's a query. */
         .nav-search-go {
           flex-shrink: 0; background: none; border: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          padding: 4px; color: rgba(0,0,0,0.22);
-          transition: color 150ms, transform 220ms cubic-bezier(0.22,1,0.36,1);
+          font-family: 'Inter', sans-serif;
+          font-size: 11px; font-weight: 600;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: rgba(0,0,0,0.32);
+          transition: color 150ms;
         }
-        .nav-search-go:hover { color: rgb(217,44,43); }
-        .nav-search-go.active { color: rgb(217,44,43); transform: translateX(2px); }
+        .nav-search-go:hover, .nav-search-go.active { color: rgb(217,44,43); }
 
         /* ── Suggestions dropdown ── */
         .nav-suggestions {
@@ -296,18 +323,29 @@ export default function Nav() {
 
         /* Right-side links */
         .nav-links {
-          display: flex; align-items: center; gap: 8px;
+          display: flex; align-items: center; gap: 4px;
           flex-shrink: 0; padding-left: 12px;
         }
-        .nav-catalog-link {
-          flex-shrink: 0; padding: 8px 18px;
-          background: transparent; color: rgba(0,0,0,0.45);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
+        /* Text links (Catalog, Branduri, Despre noi + the collapsed search
+           trigger) — thin underline sweeps in under the label on hover. */
+        .nav-link {
+          position: relative;
+          flex-shrink: 0; padding: 8px 14px;
+          background: transparent; color: rgba(0,0,0,0.55);
+          font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           text-decoration: none; transition: color 150ms; white-space: nowrap;
         }
-        .nav-catalog-link:hover { color: rgb(217,44,43); }
+        .nav-link::after {
+          content: '';
+          position: absolute; left: 14px; right: 14px; bottom: 5px;
+          height: 1px; background: currentColor;
+          transform: scaleX(0); transform-origin: left;
+          transition: transform 200ms ease;
+        }
+        .nav-link:hover { color: rgb(0,0,0); }
+        .nav-link:hover::after { transform: scaleX(1); }
         .nav-contact {
           flex-shrink: 0; padding: 8px 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
@@ -320,16 +358,16 @@ export default function Nav() {
 
         /* ── Mobile ── */
         @media (max-width: 768px) {
+          .nav-search-trigger { display: none; }
           .nav-search-wrap {
             display: none;
             position: absolute; top: 52px; left: 0; right: 0;
-            border-right: none;
             border-bottom: 1px solid rgba(0,0,0,0.1);
-            background: rgb(244,244,244);
+            background: rgb(255,255,255);
             z-index: 99;
           }
-          .nav-search-wrap.open { display: flex; flex-direction: column; }
-          .nav-search-form { height: 48px; }
+          .nav-search-wrap.open { display: flex; flex-direction: column; margin-left: 0; }
+          .nav-search-wrap.open .nav-search-form { height: 48px; border-bottom: none; }
           .nav-suggestions { border-radius: 0 0 6px 6px; }
           .nav-search-toggle {
             display: flex; align-items: center; justify-content: center;
@@ -337,7 +375,7 @@ export default function Nav() {
             background: none; border: none; cursor: pointer;
             color: rgba(0,0,0,0.5); margin-left: auto;
           }
-          .nav-catalog-link { display: none; }
+          .nav-link { display: none; }
           .nav-contact { padding: 7px 12px; font-size: 10px; }
         }
         @media (min-width: 769px) {
@@ -359,6 +397,16 @@ export default function Nav() {
 
           {/* Search + dropdown — wrap is relative so dropdown anchors here */}
           <div ref={wrapRef} className={`nav-search-wrap${searchOpen ? ' open' : ''}`}>
+            <button
+              type="button"
+              className="nav-link nav-search-trigger"
+              onClick={() => { setSearchOpen(true); setTimeout(() => inputRef.current?.focus(), 50) }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              Cauta
+            </button>
             <form className="nav-search-form" onSubmit={handleSubmit}>
               {q ? (
                 <button className="nav-search-btn" type="button" onClick={clearSearch} aria-label="Sterge cautarea">
@@ -387,12 +435,8 @@ export default function Nav() {
               <button
                 className={`nav-search-go${q.trim() ? ' active' : ''}`}
                 type="submit"
-                aria-label="Cauta"
-                tabIndex={-1}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M13 6l6 6-6 6"/>
-                </svg>
+                Cauta
               </button>
             </form>
 
@@ -468,8 +512,9 @@ export default function Nav() {
 
           {/* Right links */}
           <div className="nav-links">
-            <Link href="/produse" className="nav-catalog-link">Catalog</Link>
-            {/* "Zona Soluții" temporarily removed from nav — pages/entries stay live, just unlinked for now */}
+            <Link href="/produse" className="nav-link">Catalog</Link>
+            <Link href="/branduri" className="nav-link">Branduri</Link>
+            <Link href="/despre-noi" className="nav-link">Despre noi</Link>
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>
         </div>

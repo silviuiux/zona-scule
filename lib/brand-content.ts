@@ -711,3 +711,16 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
 export function getBrandPageConfig(slug: string): BrandPageConfig | null {
   return BRAND_PAGES[slug] ?? null
 }
+
+/**
+ * Brand-name → dedicated landing page href, for anywhere a brand list needs
+ * to prefer /brand/[slug] over the filtered product listing (hero pills,
+ * /branduri index). Falls back to /produse?brand=X for brands without a
+ * flagship page yet.
+ */
+export function getBrandHref(brandName: string): string {
+  const config = Object.values(BRAND_PAGES).find(
+    c => c.brandName.toLowerCase() === brandName.toLowerCase()
+  )
+  return config ? `/brand/${config.slug}` : `/produse?brand=${encodeURIComponent(brandName)}`
+}
