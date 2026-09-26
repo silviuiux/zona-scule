@@ -631,6 +631,81 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       },
     ],
   },
+
+  // ── BOSCH ──────────────────────────────────────────────────────────────
+  // Accessories/consumables catalog (burghie, pânze, discuri, corpuri
+  // abrazive) rather than power tools — no app_01_title data (0/11633 rows),
+  // so this leans on curated pillars from the real subcategory_text
+  // distribution, same pattern as OSBORN/RUKO/PFERD.
+  bosch: {
+    slug: 'bosch',
+    brandName: 'BOSCH',
+    metaTitle: 'BOSCH — Accesorii Profesionale pentru Scule Electrice | Zona Scule',
+    metaDescription:
+      'Burghie, pânze de ferăstrău, discuri de șlefuit și corpuri abrazive BOSCH pentru zidărie, metal și lemn — accesorii profesionale pentru orice sculă electrică.',
+
+    eyebrow: 'Partener oficial BOSCH',
+    heroTitle: [
+      [{ text: 'Accesoriul potrivit,' }],
+      [{ text: 'pentru fiecare ' }, { text: 'material.', em: true }],
+    ],
+    heroSub:
+      'Burghie, pânze de ferăstrău, discuri de șlefuit și corpuri abrazive BOSCH — pentru zidărie, metal, lemn și inox.',
+
+    pillars: [
+      {
+        code: '01',
+        title: 'Burghie și Carote',
+        desc: 'Găurire în zidărie, beton, metal sau lemn — plus carote pentru găuri de diametru mare.',
+        bullets: ['Burghie pentru zidărie și beton', 'Burghie pentru metal', 'Burghie pentru lemn'],
+        q: 'burghie',
+      },
+      {
+        code: '02',
+        title: 'Pânze de Ferăstrău',
+        desc: 'Debitare de precizie cu ferăstrăul circular, vertical sau sabie, pe orice material.',
+        bullets: ['Pânze ferăstrău circular', 'Pânze ferăstrău vertical', 'Pânze ferăstrău sabie'],
+        q: 'panze ferastrau',
+      },
+      {
+        code: '03',
+        title: 'Discuri și Corpuri Abrazive',
+        desc: 'Șlefuire, tăiere și finisare, cu granulație și liant potrivite pentru fiecare suprafață.',
+        bullets: ['Discuri de șlefuit', 'Discuri de tăiere cu diamant', 'Foaie abrazivă'],
+        q: 'discuri slefuit',
+      },
+      {
+        code: '04',
+        title: 'Accesorii pentru Scule Electrice',
+        desc: 'Capete de șurubelniță, discuri suport și accesorii de montaj pentru polizoare și șlefuitoare.',
+        bullets: ['Capete de șurubelniță', 'Disc-suport șlefuitor orbital', 'Accesorii pentru mașini'],
+        q: 'accesorii masini',
+      },
+    ],
+
+    useUseCaseCarousels: false,
+    useCaseSectionTitle: 'Găsește accesoriul potrivit pentru lucrarea ta',
+    useCaseSectionSub: 'Produse BOSCH grupate după aplicația reală.',
+
+    useSubcategoryCarousels: true,
+    subcategorySectionTitle: 'Explorează gama BOSCH pe subcategorii',
+    subcategorySectionSub: 'Burghie, pânze, discuri și corpuri abrazive — organizate exact cum sunt în catalog.',
+
+    specialist: {
+      name: 'Echipa tehnică BOSCH',
+      role: 'Consultanță alegere accesoriu după material și sculă',
+      note: 'Vă ajutăm să alegeți accesoriul potrivit — de la burghie și carote la pânze și discuri abrazive — în funcție de material și de scula electrică folosită.',
+    },
+    seapEligible: true,
+    faq: [
+      SHARED_SEAP_FAQ,
+      SHARED_WARRANTY_FAQ,
+      {
+        q: 'Accesoriile BOSCH sunt compatibile cu scule electrice de alte mărci?',
+        a: 'Majoritatea accesoriilor BOSCH (burghie, pânze, discuri) folosesc prinderi standardizate (SDS-plus, SDS-max, prindere hexagonală etc.) și sunt compatibile cu scule electrice de orice marcă ce respectă același standard de prindere. Contactați-ne cu modelul sculei dacă nu sunteți sigur de compatibilitate.',
+      },
+    ],
+  },
 }
 
 export function getBrandPageConfig(slug: string): BrandPageConfig | null {

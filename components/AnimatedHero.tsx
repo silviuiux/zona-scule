@@ -10,6 +10,22 @@ const WORDS = [
 
 type Brand = { name: string; product_count: number }
 
+// Brands with a dedicated landing page (app/brand/[slug]) — pills for these
+// link straight to the brand page instead of the filtered product listing.
+const BRAND_PAGE_SLUGS: Record<string, string> = {
+  karcher: 'karcher',
+  milwaukee: 'milwaukee',
+  pferd: 'pferd',
+  osborn: 'osborn',
+  ruko: 'ruko',
+  bosch: 'bosch',
+}
+
+function brandHref(name: string) {
+  const slug = BRAND_PAGE_SLUGS[name.toLowerCase()]
+  return slug ? `/brand/${slug}` : `/produse?brand=${encodeURIComponent(name)}`
+}
+
 export default function AnimatedHero({ brands }: { brands: Brand[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [phase, setPhase] = useState<'visible' | 'exiting'>('visible')
@@ -25,7 +41,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
     return () => clearInterval(t)
   }, [])
 
-  const topBrands = ['Karcher', 'Milwaukee', 'Makita', 'Pferd', 'FFGroup']
+  const topBrands = ['Bosch', 'Karcher', 'Milwaukee', 'Makita', 'Pferd', 'FFGroup']
     .map(name => brands.find(b => b.name.toLowerCase() === name.toLowerCase()))
     .filter((b): b is Brand => !!b && b.product_count > 0)
 
@@ -41,21 +57,18 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         }
         /* Brand pill: name + count inside a rounded pill chip. */
         .brand-chip {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px; font-weight: 500;
           color: rgb(0,0,0);
           text-decoration: none;
           padding: 6px 14px;
-          border: 1px solid rgba(0,0,0,0.14);
           border-radius: 4px;
-          background: rgba(0,0,0,0.03);
+          background: #f4f4f4;
           display: inline-flex; align-items: baseline; gap: 5px;
-          transition: color 150ms, border-color 150ms, background-color 150ms;
+          transition: color 150ms, background-color 150ms;
         }
         .brand-chip:hover {
           color: rgb(217, 44, 43);
-          border-color: rgba(217, 44, 43, 0.35);
-          background: rgba(217, 44, 43, 0.06);
         }
         /* Count rides along inside the same pill, slightly smaller */
         .brand-chip-count {
@@ -156,11 +169,11 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
       {/* Brand chips */}
       <div className="brand-chips">
         {topBrands.length > 0 ? topBrands.map(b => (
-          <Link key={b.name} href={`/produse?brand=${encodeURIComponent(b.name)}`} className="brand-chip">
+          <Link key={b.name} href={brandHref(b.name)} className="brand-chip">
             {b.name.toUpperCase()}
           </Link>
-        )) : ['KARCHER', 'MILWAUKEE', 'PFERD', 'FFGROUP'].map(n => (
-          <Link key={n} href={`/produse?brand=${encodeURIComponent(n)}`} className="brand-chip">{n}</Link>
+        )) : ['Bosch', 'Karcher', 'Milwaukee', 'Pferd', 'FFGroup'].map(n => (
+          <Link key={n} href={brandHref(n)} className="brand-chip">{n.toUpperCase()}</Link>
         ))}
 
       </div>
