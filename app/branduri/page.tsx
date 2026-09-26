@@ -3,7 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getBrands } from '@/lib/supabase'
+import ProductCard from '@/components/ProductCard'
+import { getBrands, getRandomExpensiveProductsByBrand } from '@/lib/supabase'
 import { getBrandHref, getBrandLogo } from '@/lib/brand-content'
 
 export const revalidate = 3600
@@ -13,8 +14,21 @@ export const metadata: Metadata = {
   description: 'Toate brandurile disponibile în catalogul Zona Scule — de la Bosch și Milwaukee la Karcher, PFERD, Osborn și RUKO.',
 }
 
+// Featured brands get their own "premium picks" row — a random sample of
+// each brand's most expensive products (see getRandomExpensiveProductsByBrand).
+// `name` must match products.brand_name exactly (case-sensitive).
+const PROMOTED_BRANDS = [
+  { name: 'BOSCH', label: 'Bosch' },
+  { name: 'Milwaukee', label: 'Milwaukee' },
+  { name: 'Karcher', label: 'Karcher' },
+  { name: 'KRAUSE', label: 'Krause' },
+]
+
 export default async function BranduriPage() {
-  const brands = await getBrands()
+  const [brands, promotedGroups] = await Promise.all([
+    getBrands(),
+    Promise.all(PROMOTED_BRANDS.map(b => getRandomExpensiveProductsByBrand(b.name))),
+  ])
 
   return (
     <>
@@ -72,12 +86,55 @@ export default async function BranduriPage() {
           font-family: 'Recursive', sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.4);
         }
+
+        /* ── Promoted brand rows ── */
+        .branduri-promoted { margin-bottom: 64px; }
+        .branduri-promoted-head {
+          display: flex; align-items: baseline; justify-content: space-between;
+          margin-bottom: 14px;
+        }
+        .branduri-promoted-title {
+          font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+          color: rgb(0,0,0);
+        }
+        .branduri-promoted-link {
+          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+          letter-spacing: 0.06em; text-transform: uppercase;
+          color: rgba(0,0,0,0.4); text-decoration: none;
+        }
+        .branduri-promoted-link:hover { color: rgb(217,44,43); }
+        .branduri-promoted-scroll {
+          display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
+          scroll-snap-type: x mandatory; scrollbar-width: thin;
+        }
+        .branduri-promoted-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
+
+        .branduri-grid-title {
+          font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+          color: rgb(0,0,0); margin-bottom: 14px;
+        }
       `}</style>
 
       <div className="branduri-page">
         <div className="branduri-inner">
           <h1 className="branduri-title">Branduri</h1>
           <p className="branduri-sub">{brands.length} producători disponibili în catalog.</p>
+
+          {PROMOTED_BRANDS.map((b, i) => (
+            promotedGroups[i].length > 0 && (
+              <div key={b.name} className="branduri-promoted">
+                <div className="branduri-promoted-head">
+                  <span className="branduri-promoted-title">{b.label} — selecție premium</span>
+                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot →</Link>
+                </div>
+                <div className="branduri-promoted-scroll">
+                  {promotedGroups[i].map(p => <ProductCard key={p.id} product={p} />)}
+                </div>
+              </div>
+            )
+          ))}
+
+          <h2 className="branduri-grid-title">Toate brandurile</h2>
           <div className="branduri-grid">
             {brands.map(b => {
               const logo = getBrandLogo(b.name)

@@ -196,6 +196,23 @@ export async function getProducts({
   return { products: data as Product[], total: count ?? 0 }
 }
 
+/**
+ * A random sample of a brand's most expensive products — powers the
+ * promoted-brand carousels on /branduri. getProducts() already sorts by
+ * price descending, so fetching `poolSize` rows gives the top N most
+ * expensive; sampling `count` of those (rather than always the flat top N)
+ * keeps the row from looking identical between hourly ISR revalidations
+ * while still guaranteeing every pick is a genuinely premium item.
+ */
+export async function getRandomExpensiveProductsByBrand(
+  brandName: string,
+  { poolSize = 20, count = 6 }: { poolSize?: number; count?: number } = {}
+): Promise<Product[]> {
+  const { products } = await getProducts({ brandName, pageSize: poolSize })
+  const shuffled = [...products].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count)
+}
+
 // ─── "Toate" merchandising order (SUPERSEDED 2026-07-11) ──────────────────
 // getHomeProducts() below is no longer called anywhere — the fully-
 // unfiltered "Toate" view now goes through plain getProducts() like every
