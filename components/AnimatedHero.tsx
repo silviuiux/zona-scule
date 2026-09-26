@@ -87,9 +87,12 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           flex-shrink: 0;
         }
 
-        /* Fixed height container matching the title's line-height — clips slide animation */
+        /* Clips the slide animation. Sized to the font-size, not the
+           tighter line-height above — Neuton's glyphs at 128px are taller
+           than the 96px line box, and matching the clip height to that
+           line-height was cropping the tops of the animated word's letters. */
         .hero-word-clip {
-          height: 96px;
+          height: 128px;
           overflow: hidden;
           display: flex;
           align-items: flex-start;
@@ -138,7 +141,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
             font-size: 80px;
             line-height: 72px;
           }
-          .hero-word-clip { height: 72px; }
+          .hero-word-clip { height: 88px; }
         }
 
         /* On mobile, stack the animated word below TOATE so it doesn't overflow */
@@ -154,7 +157,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
             font-size: 36px;
             line-height: 1.05;
           }
-          .hero-word-clip { height: 38px; }
+          .hero-word-clip { height: 44px; }
         }
       `}</style>
 

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { getBrands } from '@/lib/supabase'
-import { getBrandHref } from '@/lib/brand-content'
+import { getBrandHref, getBrandLogo } from '@/lib/brand-content'
 
 export const revalidate = 3600
 
@@ -57,6 +58,11 @@ export default async function BranduriPage() {
           border-color: rgba(217,44,43,0.3);
           box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
+        .branduri-card-logo {
+          display: block; height: 28px; width: auto;
+          object-fit: contain; object-position: left center;
+          margin-bottom: 4px;
+        }
         .branduri-card-name {
           font-family: 'Inter', sans-serif;
           font-size: 15px; font-weight: 600;
@@ -73,12 +79,24 @@ export default async function BranduriPage() {
           <h1 className="branduri-title">Branduri</h1>
           <p className="branduri-sub">{brands.length} producători disponibili în catalog.</p>
           <div className="branduri-grid">
-            {brands.map(b => (
-              <Link key={b.id} href={getBrandHref(b.name)} className="branduri-card">
-                <span className="branduri-card-name">{b.name}</span>
-                <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
-              </Link>
-            ))}
+            {brands.map(b => {
+              const logo = getBrandLogo(b.name)
+              return (
+                <Link key={b.id} href={getBrandHref(b.name)} className="branduri-card">
+                  {logo && (
+                    <Image
+                      src={logo.src}
+                      alt=""
+                      width={logo.width}
+                      height={logo.height}
+                      className="branduri-card-logo"
+                    />
+                  )}
+                  <span className="branduri-card-name">{b.name}</span>
+                  <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </div>

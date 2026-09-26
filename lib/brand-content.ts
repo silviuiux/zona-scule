@@ -724,3 +724,17 @@ export function getBrandHref(brandName: string): string {
   )
   return config ? `/brand/${config.slug}` : `/produse?brand=${encodeURIComponent(brandName)}`
 }
+
+/**
+ * Brand-name → its flagship page's logo asset, for anywhere a brand list
+ * wants to show the mark (e.g. /branduri cards). Returns null for brands
+ * without a dedicated page yet, or whose page has no logo configured — the
+ * `brands` table itself has no logo_url populated for any brand today, so
+ * this config is the only real source.
+ */
+export function getBrandLogo(brandName: string): BrandLogo | null {
+  const config = Object.values(BRAND_PAGES).find(
+    c => c.brandName.toLowerCase() === brandName.toLowerCase()
+  )
+  return config?.logo ?? null
+}

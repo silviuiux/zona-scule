@@ -130,7 +130,6 @@ export default async function HomePage() {
           min-width: 320px;
           border: 1px solid rgba(0,0,0,0.06);
           border-radius: 10px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.06);
           overflow: hidden;
         }
         /* ── Hero search input ── */
@@ -470,7 +469,6 @@ export default async function HomePage() {
             height: auto; padding: 12px 16px;
             border: 1px solid rgba(0,0,0,0.08);
             border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.06);
           }
           .hero-catalog-cta {
             justify-content: center;

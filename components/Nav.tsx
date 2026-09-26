@@ -132,11 +132,11 @@ export default function Nav() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           height: 52px;
           background: rgb(255,255,255);
-          border-bottom: 1px solid rgba(0,0,0,0.08);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms;
         }
-        .nav.scrolled { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .nav.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.09); }
 
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
