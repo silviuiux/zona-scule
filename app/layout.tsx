@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import DotsParallax from '@/components/DotsParallax'
-import SmoothScroll from '@/components/SmoothScroll'
 import { NavigationProgressProvider } from '@/components/NavigationProgress'
 import AnalyticsGate from '@/components/AnalyticsGate'
 import CookieConsent from '@/components/CookieConsent'
@@ -36,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body style={{ fontFamily: "'Recursive', system-ui, sans-serif" }}>
-        <SmoothScroll />
+        {/* <SmoothScroll /> — disabled for now, see components/SmoothScroll.tsx */}
         <DotsParallax />
         <NavigationProgressProvider>
           {children}
