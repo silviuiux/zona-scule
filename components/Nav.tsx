@@ -132,22 +132,22 @@ export default function Nav() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           height: 52px;
           background: rgb(255,255,255);
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms;
         }
-        .nav.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.09); }
+        .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
 
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
-          display: flex; align-items: stretch; padding: 0 12px;
+          display: flex; align-items: stretch; padding: 0 32px;
         }
 
         /* Logo */
         .nav-logo {
           display: flex; align-items: center;
           text-decoration: none; flex-shrink: 0;
-          padding-right: 20px;
+          padding-right: 32px;
           height: 100%;
         }
 
@@ -323,8 +323,8 @@ export default function Nav() {
 
         /* Right-side links */
         .nav-links {
-          display: flex; align-items: center; gap: 4px;
-          flex-shrink: 0; padding-left: 12px;
+          display: flex; align-items: center; gap: 8px;
+          flex-shrink: 0; padding-left: 32px;
         }
         /* Text links (Catalog, Branduri, Despre noi + the collapsed search
            trigger) — thin underline sweeps in under the label on hover. */

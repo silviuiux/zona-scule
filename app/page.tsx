@@ -136,7 +136,7 @@ export default async function HomePage() {
         .hero-search-box {
           display: flex; align-items: center; gap: 14px;
           background: rgb(255,255,255);
-          padding: 0 20px;
+          padding: 0 1px 0 32px;
           flex: 1;
           min-width: 0;
           height: 56px;
@@ -172,9 +172,9 @@ export default async function HomePage() {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
           padding: 0 32px; height: 56px;
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px; font-weight: 500;
+          text-transform: uppercase;
           border: none; white-space: nowrap;
           transition: background 150ms;
         }

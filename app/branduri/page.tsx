@@ -14,9 +14,10 @@ export const metadata: Metadata = {
   description: 'Toate brandurile disponibile în catalogul Zona Scule — de la Bosch și Milwaukee la Karcher, PFERD, Osborn și RUKO.',
 }
 
-// Featured brands get their own "premium picks" row — a random sample of
-// each brand's most expensive products (see getRandomExpensiveProductsByBrand).
-// `name` must match products.brand_name exactly (case-sensitive).
+// Featured brands get their own "premium picks" widget — a banner image
+// above a random sample of that brand's most expensive products (see
+// getRandomExpensiveProductsByBrand). `name` must match products.brand_name
+// exactly (case-sensitive).
 const PROMOTED_BRANDS = [
   { name: 'BOSCH', label: 'Bosch' },
   { name: 'Milwaukee', label: 'Milwaukee' },
@@ -58,6 +59,7 @@ export default async function BranduriPage() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
           gap: 12px;
+          margin-bottom: 72px;
         }
         .branduri-card {
           display: flex; flex-direction: column; gap: 6px;
@@ -87,8 +89,13 @@ export default async function BranduriPage() {
           font-size: 12px; color: rgba(0,0,0,0.4);
         }
 
-        /* ── Promoted brand rows ── */
+        /* ── Promoted brand widgets (banner + carousel) ── */
         .branduri-promoted { margin-bottom: 64px; }
+        .branduri-promoted-banner {
+          position: relative; width: 100%; height: 25vh; min-height: 200px; max-height: 340px;
+          border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+          background: rgb(238,238,238);
+        }
         .branduri-promoted-head {
           display: flex; align-items: baseline; justify-content: space-between;
           margin-bottom: 14px;
@@ -120,20 +127,6 @@ export default async function BranduriPage() {
           <h1 className="branduri-title">Branduri</h1>
           <p className="branduri-sub">{brands.length} producători disponibili în catalog.</p>
 
-          {PROMOTED_BRANDS.map((b, i) => (
-            promotedGroups[i].length > 0 && (
-              <div key={b.name} className="branduri-promoted">
-                <div className="branduri-promoted-head">
-                  <span className="branduri-promoted-title">{b.label} — selecție premium</span>
-                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot →</Link>
-                </div>
-                <div className="branduri-promoted-scroll">
-                  {promotedGroups[i].map(p => <ProductCard key={p.id} product={p} />)}
-                </div>
-              </div>
-            )
-          ))}
-
           <h2 className="branduri-grid-title">Toate brandurile</h2>
           <div className="branduri-grid">
             {brands.map(b => {
@@ -155,6 +148,38 @@ export default async function BranduriPage() {
               )
             })}
           </div>
+
+          {PROMOTED_BRANDS.map((b, i) => {
+            const group = promotedGroups[i]
+            if (group.length === 0) return null
+            // Banner is deliberately NOT the main product shot — the first
+            // gallery/alt image found among the sampled products, closer to
+            // an in-context/application photo than a plain catalog cutout.
+            // Skips the banner (keeps the carousel) if none of them have one.
+            const bannerProduct = group.find(p => p.gallery_url_1)
+            return (
+              <div key={b.name} className="branduri-promoted">
+                {bannerProduct?.gallery_url_1 && (
+                  <div className="branduri-promoted-banner">
+                    <Image
+                      src={bannerProduct.gallery_url_1}
+                      alt=""
+                      fill
+                      sizes="100vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
+                <div className="branduri-promoted-head">
+                  <span className="branduri-promoted-title">{b.label} — selecție premium</span>
+                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot →</Link>
+                </div>
+                <div className="branduri-promoted-scroll">
+                  {group.map(p => <ProductCard key={p.id} product={p} />)}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
       <Footer />

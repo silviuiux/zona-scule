@@ -90,12 +90,18 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         /* Clips the slide animation. Sized to the font-size, not the
            tighter line-height above — Neuton's glyphs at 128px are taller
            than the 96px line box, and matching the clip height to that
-           line-height was cropping the tops of the animated word's letters. */
+           line-height was cropping the tops of the animated word's letters.
+           align-items: center (not flex-start) matters just as much: "Toate"
+           is a plain inline span, so the flex row centers its shorter 96px
+           line box within the row's 128px height automatically. The clip
+           div is already 128px tall itself, so flex-start pinned its 96px
+           line box to the very top — sitting visibly higher than "Toate".
+           Centering it here lands both words on the same baseline. */
         .hero-word-clip {
           height: 128px;
           overflow: hidden;
           display: flex;
-          align-items: flex-start;
+          align-items: center;
         }
 
         .hero-animated-word {
