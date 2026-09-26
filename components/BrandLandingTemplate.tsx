@@ -50,6 +50,21 @@ export default function BrandLandingTemplate({
   const contactHref = `/contact?brand=${encodeURIComponent(config.brandName)}`
   const catalogHref = `/produse?brand=${encodeURIComponent(config.brandName)}`
 
+  // Top 6 subcategories by product count, for the short pill row in the
+  // hero (the full list still gets its own scrollable rail further down).
+  const heroPills = [...subcategories]
+    .sort((a, b) => b.product_count - a.product_count)
+    .slice(0, 6)
+
+  // Full-bleed hero image — no dedicated photography per brand yet, so this
+  // reuses a real product image already fetched for the carousels below
+  // (first product of the first subcategory/use-case group) instead of
+  // hotlinking a stock photo. Renders nothing if neither group has one.
+  const heroImageProduct = subcategoryGroups[0]?.products[0] ?? applicationGroups[0]?.products[0] ?? null
+  const heroImageUrl = heroImageProduct
+    ? (heroImageProduct.main_image_storage_url || heroImageProduct.main_image_url)
+    : null
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -90,91 +105,71 @@ export default function BrandLandingTemplate({
         .badge-seap  { background: rgba(21,128,61,0.08); color: rgb(21,128,61); border-color: rgba(21,128,61,0.22); }
 
         /* ══════════════════ HERO ══════════════════ */
-        .bp-hero {
-          position: relative;
-          background-color: rgb(255,255,255);
-          background-image:
-            radial-gradient(circle at 92% -10%, color-mix(in srgb, var(--brand-accent) 8%, transparent), transparent 42%),
-            radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
-          background-size: auto, 27px 27px;
-          padding-top: 52px;
-          overflow: hidden;
-          border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-        /* Taller than a typical section hero on purpose — this is a single
-           flagship page per brand, not a dense listing, so it can afford to
-           breathe before the eyebrow/logo/title stack even starts.
-           position:relative + z-index:1 keeps this content stacked above
-           the absolutely-positioned watermark logo below (positioned
-           elements paint above static ones regardless of DOM order, so
-           without this the watermark — despite coming first in markup —
-           would sit on top of and obscure the actual copy). */
-        .bp-hero-inner { position: relative; z-index: 1; padding: 136px 12px 100px; max-width: 1440px; margin: 0 auto; }
+        /* Plain white hero — logo, title, subtitle, one CTA, subcategory
+           pills. No watermark/dot-grid/badges; the brand's own photography
+           (the full-bleed section right after) carries the visual weight
+           now instead of a decorative hero background. */
+        .bp-hero { background: rgb(255,255,255); padding-top: 52px; }
+        .bp-hero-inner { padding: 96px 12px 56px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
-        /* Giant, near-invisible echo of the brand mark bleeding off the
-           right edge — fills the empty white space in the hero without
-           competing with the sharp, small logo above the headline or the
-           copy itself (z-index below .bp-hero-inner, pointer-events off).
-           Hidden below ~900px where there's no spare width for it anyway. */
-        .bp-hero-watermark {
-          position: absolute; top: 50%; right: -6%; transform: translateY(-50%);
-          width: clamp(320px, 36vw, 620px); opacity: 0.05; pointer-events: none;
-          user-select: none;
-        }
-        .bp-hero-watermark img { width: 100%; height: auto; display: block; }
-        @media (max-width: 900px) { .bp-hero-watermark { display: none; } }
-        /* Brand wordmark/icon sits above the eyebrow — deliberately sized to
-           dominate the top of the hero (bigger than the eyebrow, bigger
-           than a typical "as seen on" partner badge) so it reads as THE
-           visual anchor of the page, not a small credential. Height-capped,
-           width auto, so square icon marks (PFERD, OSBORN) and wide
-           wordmarks (Milwaukee, RUKO, Kärcher) all land at the same visual
-           weight regardless of native aspect ratio. */
-        .bp-hero-logo { display: block; height: clamp(64px, 9vw, 140px); width: auto; margin-bottom: 32px; }
-        /* Eyebrow + S.E.A.P. badge share one row — the badge is a
-           credential ("this page is legit"), not a third call to action, so
-           it sits quietly next to "Partener oficial X" instead of in the
-           button row where it competed visually with the two real CTAs. */
-        .bp-hero-eyebrow-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
-        .bp-hero .bp-eyebrow { color: rgba(0,0,0,0.5); }
+        /* Fixed height (not clamped) per spec — every brand mark, square or
+           wide, lands at the same visual weight. */
+        .bp-hero-logo { display: block; height: 160px; width: auto; margin-bottom: 32px; }
         .bp-hero-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(38px, 5.6vw, 74px);
-          line-height: 1.02; text-transform: uppercase; color: rgb(20,20,20);
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(40px, 5.5vw, 80px);
+          line-height: 1.05; color: rgb(0,0,0);
           margin-bottom: 20px;
         }
         .bp-hero-title em { color: var(--brand-accent); font-style: normal; }
-        /* Darker + slightly heavier than a typical body paragraph — this is
-           reading against a busy dot-grid hero background, not a plain
-           white card, so it needs the extra contrast to stay legible. */
         .bp-hero-sub {
-          font-family: 'Recursive', sans-serif; font-weight: 500;
-          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.72);
+          font-family: 'Recursive', sans-serif; font-weight: 400;
+          font-size: 18px; line-height: 1.4; color: rgba(0,0,0,0.5);
           max-width: 620px; margin-bottom: 32px;
         }
-        /* Two primary actions only now (S.E.A.P. moved up to the eyebrow
-           row) — tighter gap groups them as one clear "next step" cluster. */
-        .bp-hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
-        .bp-btn-primary, .bp-btn-secondary {
+        /* Single black CTA — full catalog for this brand, product count
+           riding along on the right like the /produse superview search. */
+        .bp-hero-cta {
+          display: inline-flex; align-items: center; gap: 24px;
+          background: rgb(0,0,0); color: rgb(255,255,255);
+          padding: 14px 28px; border-radius: 4px; text-decoration: none;
+          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          transition: background 150ms;
+        }
+        .bp-hero-cta:hover { background: var(--brand-accent); }
+        .bp-hero-cta-count { color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.02em; }
+
+        /* Gray pill row — top subcategories by product count, same flat
+           #f4f4f4/black-text pill used for the homepage hero brand chips. */
+        .bp-hero-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+        .bp-hero-pill {
+          font-family: 'Recursive', sans-serif; font-size: 13px; color: rgb(0,0,0);
+          background: rgb(244,244,244); padding: 10px 18px; border-radius: 4px;
+          text-decoration: none; white-space: nowrap;
+          transition: color 150ms, background-color 150ms;
+        }
+        .bp-hero-pill:hover { color: var(--brand-accent); }
+
+        @media (max-width: 640px) {
+          .bp-hero-logo { height: 96px; }
+        }
+
+        /* Still used by the "Ask a Specialist" section's CTA further down
+           the page (the hero itself only uses .bp-hero-cta now). */
+        .bp-btn-primary {
           display: inline-flex; align-items: center; gap: 8px;
           font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
           padding: 13px 24px; border-radius: 4px; text-decoration: none;
-          transition: background 150ms, border-color 150ms;
+          background: var(--brand-accent); color: rgb(255,255,255);
+          transition: filter 150ms;
         }
-        .bp-btn-primary { background: var(--brand-accent); color: rgb(255,255,255); }
         .bp-btn-primary:hover { filter: brightness(0.9); }
-        .bp-btn-secondary { color: rgb(0,0,0); border: 1px solid rgba(0,0,0,0.18); }
-        .bp-btn-secondary:hover { border-color: var(--brand-accent); background: color-mix(in srgb, var(--brand-accent) 8%, transparent); }
 
-        /* Trust bar — plain number+label stats separated by a thin divider,
-           matching the site's other hero stat rows (see .sv-stat on
-           /produse/superview) rather than an icon-led card style. */
-        .bp-trust { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
-        .bp-trust-stat { display: flex; align-items: baseline; gap: 8px; }
-        .bp-trust-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
-        .bp-trust-n { font-family: 'Bungee', sans-serif; font-size: 20px; line-height: 1.1; color: rgb(0,0,0); }
-        .bp-trust-l { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+        /* ══════════════════ FULL-BLEED IMAGE ══════════════════ */
+        .bp-hero-image { position: relative; width: 100%; height: 62vh; min-height: 420px; max-height: 720px; overflow: hidden; }
+        @media (max-width: 640px) { .bp-hero-image { height: 40vh; min-height: 280px; } }
 
         /* Anchor targets sit just behind the main site nav (top: 52px). */
         #ghid-tehnic, #categorii, #descopera, #explorare, #specialist, #faq { scroll-margin-top: 68px; }
@@ -379,11 +374,6 @@ export default function BrandLandingTemplate({
 
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="bp-hero">
-        {config.logo && (
-          <div className="bp-hero-watermark" aria-hidden="true">
-            <Image src={config.logo.src} alt="" width={config.logo.width} height={config.logo.height} />
-          </div>
-        )}
         <div className="bp-hero-inner">
         <div className="bp-hero-copy">
           {config.logo && (
@@ -396,12 +386,6 @@ export default function BrandLandingTemplate({
               priority
             />
           )}
-          <div className="bp-hero-eyebrow-row">
-            <span className="bp-eyebrow">{config.eyebrow}</span>
-            {config.seapEligible && (
-              <span className="badge badge-seap">Eligibil S.E.A.P.</span>
-            )}
-          </div>
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
               <span key={i}>
@@ -414,26 +398,40 @@ export default function BrandLandingTemplate({
           </h1>
           <p className="bp-hero-sub">{config.heroSub}</p>
 
-          <div className="bp-hero-ctas">
-            <Link href={catalogHref} className="bp-btn-primary">Vezi Catalogul</Link>
-            <Link href={contactHref} className="bp-btn-secondary">Vorbește cu un Specialist</Link>
-          </div>
+          <Link href={catalogHref} className="bp-hero-cta">
+            <span>Toate produsele {config.brandName.toUpperCase()}</span>
+            <span className="bp-hero-cta-count">{totalProductCount.toLocaleString('ro-RO')}</span>
+          </Link>
 
-          <div className="bp-trust">
-            <div className="bp-trust-stat">
-              <span className="bp-trust-n">{totalProductCount.toLocaleString('ro-RO')}</span>
-              <span className="bp-trust-l">Produse</span>
+          {heroPills.length > 0 && (
+            <div className="bp-hero-pills">
+              {heroPills.map(s => (
+                <Link
+                  key={s.id}
+                  href={`/produse?brand=${encodeURIComponent(config.brandName)}&subcategorie=${encodeURIComponent(s.name)}`}
+                  className="bp-hero-pill"
+                >
+                  {s.name}
+                </Link>
+              ))}
             </div>
-            <div className="bp-trust-div" />
-            <div className="bp-trust-stat">
-              <span className="bp-trust-n">{subcategories.length}</span>
-              <span className="bp-trust-l">Subcategorii</span>
-            </div>
-          </div>
-
+          )}
         </div>
         </div>
       </section>
+
+      {/* ══════════════════ FULL-BLEED IMAGE ══════════════════ */}
+      {heroImageUrl && (
+        <section className="bp-hero-image">
+          <Image
+            src={heroImageUrl}
+            alt={`${config.brandName} — produse profesionale`}
+            fill
+            sizes="100vw"
+            style={{ objectFit: 'cover' }}
+          />
+        </section>
+      )}
 
       {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
       {/* First section after the hero on every brand page — the technical
