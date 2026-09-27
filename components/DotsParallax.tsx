@@ -107,56 +107,63 @@ export default function DotsParallax() {
     }
 
     // ── Cross-line laser ──
-    // Each beam is a damped spring chasing its snapped dot row/column, so a
-    // move overshoots and wobbles briefly before settling — like a
-    // self-levelling laser's pendulum. Tuned so a one-row (16px) jump
-    // overshoots ~5px, swings back ~1.7px, and settles in ~0.6s.
-    const SPRING_K = 0.12
-    const SPRING_DAMP = 0.8
-    const IDLE_MS = 7000
-    const IDLE_KICK = 3 // px/step → a ~5px wobble around the resting line
-    const STEP_MS = 1000 / 60 // fixed-rate spring steps, same feel at 60/120Hz
-    // A beam never trails its target by more than MAX_LAG or moves faster
-    // than MAX_VEL, so every move — a one-row nudge or a full-screen flick —
-    // ends in the same small ~4-5px wobble instead of a big whip.
-    const MAX_LAG = 24
-    const MAX_VEL = 3
+    // The beams glide (no overshoot) onto the snapped dot row/column, while
+    // the cross as a whole hangs on a damped angular spring — like the
+    // pendulum of a self-levelling laser. Moving the cursor swings it a
+    // degree or two; it rocks back and forth and settles level.
+    const GLIDE = 0.3 // share of the remaining distance covered per step
+    const ROT_K = 0.07
+    const ROT_DAMP = 0.9
+    const ROT_PUSH = 0.012 // deg/step of angular velocity per px of cursor travel
+    const ROT_MAX_VEL = 0.35 // deg/step
+    const ROT_MAX = 2.5 // deg
+    const IDLE_KICK = 0.3 // deg/step → a ~1.5° rock around level
+    const IDLE_WIGGLE_MS = 7000 // still cursor → the cross rocks once more
+    const IDLE_FADE_MS = 10000 // still cursor → the laser fades out
+    const STEP_MS = 1000 / 60 // fixed-rate steps, same feel at 60/120Hz
     const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows
 
     let mouseX = -1
     let mouseY = -1
+    let overEmpty = false
+    let awake = false
     let laserOn = false
-    const beamX = { pos: 0, vel: 0, target: 0 }
-    const beamY = { pos: 0, vel: 0, target: 0 }
+    const beamX = { pos: 0, target: 0 }
+    const beamY = { pos: 0, target: 0 }
+    const rot = { angle: 0, vel: 0 }
     let springRaf = 0
     let lastT = 0
-    let idleTimer = 0
+    let wiggleTimer = 0
+    let fadeTimer = 0
     let colIdx = NaN // current dot column/row the beams sit on (NaN = unset)
     let rowIdx = NaN
 
     const writeBeams = () => {
       root.style.setProperty('--laser-x', `${beamX.pos.toFixed(2)}px`)
       root.style.setProperty('--laser-y', `${beamY.pos.toFixed(2)}px`)
+      root.style.setProperty('--laser-rot', `${rot.angle.toFixed(3)}deg`)
     }
     const springFrame = (now: number) => {
       const steps = Math.min(4, Math.max(1, Math.round((now - lastT) / STEP_MS)))
       lastT = now
       for (let i = 0; i < steps; i++) {
-        for (const b of [beamX, beamY]) {
-          const gap = b.target - b.pos
-          if (Math.abs(gap) > MAX_LAG) b.pos = b.target - Math.sign(gap) * MAX_LAG
-          b.vel = (b.vel + (b.target - b.pos) * SPRING_K) * SPRING_DAMP
-          b.vel = Math.max(-MAX_VEL, Math.min(MAX_VEL, b.vel))
-          b.pos += b.vel
-        }
+        beamX.pos += (beamX.target - beamX.pos) * GLIDE
+        beamY.pos += (beamY.target - beamY.pos) * GLIDE
+        rot.vel = (rot.vel - rot.angle * ROT_K) * ROT_DAMP
+        rot.angle = Math.max(-ROT_MAX, Math.min(ROT_MAX, rot.angle + rot.vel))
       }
-      writeBeams()
-      const moving = [beamX, beamY].some(b => Math.abs(b.vel) > 0.01 || Math.abs(b.target - b.pos) > 0.05)
+      const moving =
+        Math.abs(beamX.target - beamX.pos) > 0.05 ||
+        Math.abs(beamY.target - beamY.pos) > 0.05 ||
+        Math.abs(rot.vel) > 0.002 ||
+        Math.abs(rot.angle) > 0.01
       if (moving) {
+        writeBeams()
         springRaf = requestAnimationFrame(springFrame)
       } else {
         beamX.pos = beamX.target
         beamY.pos = beamY.target
+        rot.angle = rot.vel = 0
         writeBeams()
         springRaf = 0
       }
@@ -165,6 +172,10 @@ export default function DotsParallax() {
       if (springRaf) return
       lastT = performance.now()
       springRaf = requestAnimationFrame(springFrame)
+    }
+    const pushRotation = (dv: number) => {
+      rot.vel = Math.max(-ROT_MAX_VEL, Math.min(ROT_MAX_VEL, rot.vel + dv))
+      runSpring()
     }
 
     if (finePointer) {
@@ -196,33 +207,34 @@ export default function DotsParallax() {
         runSpring()
       }
     }
-    const setLaserOn = (on: boolean) => {
+    // Visible only while the cursor is over empty space AND has moved within
+    // the last IDLE_FADE_MS.
+    const syncLaser = () => {
+      const on = overEmpty && awake
       if (on === laserOn) return
       laserOn = on
       root.style.setProperty('--laser-on', on ? '1' : '0')
       if (on) {
-        // Appear already on the cursor, not springing in from a stale spot.
+        // Appear already on the cursor and level, not gliding in from a
+        // stale spot.
         renderLaser()
         beamX.pos = beamX.target
         beamY.pos = beamY.target
-        beamX.vel = beamY.vel = 0
+        rot.angle = rot.vel = 0
         writeBeams()
       }
     }
 
-    // After IDLE_MS without mouse movement, knock the beams so they wobble
-    // and resettle — then again every IDLE_MS for as long as it stays idle.
-    const idleWiggle = () => {
-      if (laserOn) {
-        beamX.vel -= IDLE_KICK
-        beamY.vel += IDLE_KICK
-        runSpring()
-      }
-      idleTimer = window.setTimeout(idleWiggle, IDLE_MS)
-    }
     const resetIdle = () => {
-      window.clearTimeout(idleTimer)
-      idleTimer = window.setTimeout(idleWiggle, IDLE_MS)
+      window.clearTimeout(wiggleTimer)
+      window.clearTimeout(fadeTimer)
+      wiggleTimer = window.setTimeout(() => {
+        if (laserOn) pushRotation(IDLE_KICK)
+      }, IDLE_WIGGLE_MS)
+      fadeTimer = window.setTimeout(() => {
+        awake = false
+        syncLaser()
+      }, IDLE_FADE_MS)
     }
 
     const tick = () => {
@@ -246,20 +258,27 @@ export default function DotsParallax() {
     const onMouseMove = (e: MouseEvent) => {
       targetX = e.clientX / window.innerWidth
       targetY = e.clientY / window.innerHeight
+      const dx = mouseX < 0 ? 0 : e.clientX - mouseX
       mouseX = e.clientX
       mouseY = e.clientY
       if (finePointer) {
         const t = e.target as Element | null
-        setLaserOn(!!t && !t.closest(CONTENT_SELECTOR))
+        overEmpty = !!t && !t.closest(CONTENT_SELECTOR)
+        awake = true
+        syncLaser()
         resetIdle()
+        // Sideways travel swings the cross, as if the laser were carried.
+        if (laserOn && dx) pushRotation(-dx * ROT_PUSH)
       }
       kick()
     }
     const onMouseLeave = () => {
       targetX = 0.5
       targetY = 0.5
-      setLaserOn(false)
-      window.clearTimeout(idleTimer)
+      overEmpty = false
+      syncLaser()
+      window.clearTimeout(wiggleTimer)
+      window.clearTimeout(fadeTimer)
       kick()
     }
     window.addEventListener('mousemove', onMouseMove, { passive: true })
@@ -272,7 +291,8 @@ export default function DotsParallax() {
       if (raf) cancelAnimationFrame(raf)
       if (hoverRaf) cancelAnimationFrame(hoverRaf)
       if (springRaf) cancelAnimationFrame(springRaf)
-      window.clearTimeout(idleTimer)
+      window.clearTimeout(wiggleTimer)
+      window.clearTimeout(fadeTimer)
     }
   }, [])
 

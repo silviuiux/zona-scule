@@ -74,19 +74,22 @@ body::before {
    .laser shares body::before's transform (cursor drift) so the beams stay
    registered on the dot grid. <DotsParallax /> writes the variables in this
    layer's own (pre-transform) coordinates:
-     --laser-x / --laser-y   beam positions (spring-animated: they overshoot
-                             and wiggle before settling on the snapped row/column)
+     --laser-x / --laser-y   beam positions (glide onto the snapped row/column)
+     --laser-rot             tilt of the whole cross about its intersection —
+                             spring-animated, so it rocks and settles level
      --laser-cx / --laser-cy cursor position (centre of each beam's falloff)
      --laser-on              0/1, cross-fades the whole thing */
 .laser {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   transform: translate3d(var(--dot-tx, 0px), var(--dot-ty, 0px), 0) scale(var(--dot-scale, 1));
   opacity: var(--laser-on, 0);
-  transition: opacity 350ms ease;
+  transition: opacity 600ms ease;
 }
 .laser-h, .laser-v {
   position: absolute; inset: 0;
   background-repeat: no-repeat;
+  transform-origin: var(--laser-x, 0px) var(--laser-y, 0px);
+  transform: rotate(var(--laser-rot, 0deg));
 }
 .laser-h {
   background-image: linear-gradient(to bottom,
