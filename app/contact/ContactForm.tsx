@@ -59,17 +59,17 @@ export default function ContactForm({
     <section className="cf" aria-labelledby="cf-title">
       <style>{`
         .cf { padding: var(--space-section) 0; border-bottom: 1px solid rgba(0,0,0,0.12); }
-        /* Compact letter in a white panel on the left 60% — the rest of the
-           full-width section is left as open space, so the form reads as
-           the focal point. */
+        /* Compact letter on the left 60% — the rest of the full-width
+           section is open space. No panel by default; a hairline outline
+           frames it only while a field is being filled in. */
         .cf-panel {
           width: 60%;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          border: 1px solid transparent;
           border-radius: 4px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 24px 64px rgba(0,0,0,0.06);
           padding: clamp(32px, 4vw, 56px);
+          transition: border-color 250ms ease;
         }
+        .cf-panel:focus-within { border-color: rgba(0,0,0,0.12); }
         .cf-eyebrow { margin-bottom: 16px; }
         .cf-title {
           font-family: 'Neuton', serif; font-weight: 400;
