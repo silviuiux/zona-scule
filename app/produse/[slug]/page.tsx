@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
         .pdp-top-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 40px 12px 60px;
+          padding: 40px var(--gutter) 60px;
           display: grid; grid-template-columns: 1fr 1fr;
           gap: 80px;
           /* #6: vertically center left content */
@@ -156,7 +156,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         /* #9: padding 96px top/bottom for sections */
         .pdp-specs { background: rgb(30,30,30); }
         .pdp-specs-inner {
-          max-width: 1440px; margin: 0 auto; padding: 96px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 96px var(--gutter);
         }
         .specs-label {
           font-family: 'Inter', sans-serif;
@@ -189,7 +189,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         /* ── INFO CARDS ── */
         /* #9: section padding 96px */
         .info-section {
-          max-width: 1440px; margin: 0 auto; padding: 96px 12px;
+          max-width: 1440px; margin: 0 auto; padding: 96px var(--gutter);
         }
         .info-section-label {
           font-family: 'Inter', sans-serif;
@@ -219,7 +219,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         }
 
         /* ── CTA BANNER ── */
-        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 72px 12px; }
+        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 72px var(--gutter); }
         .cta-banner-inner {
           background: rgb(30,30,30); border-radius: 4px;
           padding: 32px 40px;
@@ -303,7 +303,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         @media (max-width: 768px) {
           .pdp-top-inner {
             grid-template-columns: 1fr !important;
-            gap: 32px; padding: 32px 12px 40px;
+            gap: 32px; padding: 32px var(--gutter) 40px;
           }
           .pdp-top-inner > :last-child { order: -1; }
           .pdp-sku { font-size: clamp(30px, 8vw, 44px); }
@@ -312,9 +312,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             overflow-x: auto; gap: 10px; padding-bottom: 8px;
           }
           .spec-card { min-width: 220px; padding: 40px 20px 24px; }
-          .pdp-specs-inner { padding: 48px 12px; }
+          .pdp-specs-inner { padding: 48px var(--gutter); }
           .info-grid { grid-template-columns: 1fr !important; }
-          .info-section { padding: 48px 12px; }
+          .info-section { padding: 48px var(--gutter); }
           .cta-banner-inner {
             flex-direction: column; align-items: flex-start;
             padding: 24px 20px; gap: 16px;

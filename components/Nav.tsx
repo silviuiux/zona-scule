@@ -134,13 +134,21 @@ export default function Nav() {
           background: rgb(255,255,255);
           box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
-          transition: box-shadow 200ms;
+          /* Footer easter egg (FooterBlueprint sets --egg 0 → 1 on <html>):
+             the nav stops being sticky and slides up out of view. */
+          transform: translateY(calc((-100% - 40px) * var(--egg, 0))); /* + clear its shadow */
+          transition: box-shadow 200ms, transform 250ms ease-out;
         }
         .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
 
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
           display: flex; align-items: stretch; padding: 0 32px;
+        }
+        /* Laptops / iPads / phones: same side gutter as the page content, so
+           the logo and the Contact button line up with everything below. */
+        @media (max-width: 1366px) {
+          .nav-inner { padding: 0 var(--gutter); }
         }
 
         /* Logo */
@@ -323,16 +331,10 @@ export default function Nav() {
         }
 
         /* Right-side links */
-        /* A hairline divider separates the search trigger from the links. */
         .nav-links {
           display: flex; align-items: center; gap: 20px;
-          flex-shrink: 0; margin-left: 20px; padding-left: 20px;
+          flex-shrink: 0; margin-left: 20px;
           position: relative;
-        }
-        .nav-links::before {
-          content: ''; position: absolute; left: 0; top: 50%;
-          width: 1px; height: 16px; transform: translateY(-50%);
-          background: rgba(0,0,0,0.12);
         }
         /* Text links (Catalog, Branduri + the collapsed search
            trigger) — thin underline sweeps in under the label on hover. */
@@ -387,8 +389,7 @@ export default function Nav() {
             color: rgba(0,0,0,0.5); margin-left: auto;
           }
           .nav-link { display: none; }
-          .nav-links { margin-left: 0; padding-left: 0; }
-          .nav-links::before { display: none; }
+          .nav-links { margin-left: 0; }
           .nav-contact { padding: 7px 12px; font-size: 10px; }
         }
         @media (min-width: 769px) {

@@ -81,7 +81,7 @@ export default async function HomePage() {
         }
         .hero-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px;
+          padding: 0 var(--gutter);
           width: 100%;
           display: flex; flex-direction: column;
           gap: 26px;
@@ -125,7 +125,7 @@ export default async function HomePage() {
            heads, so the band's edges and the first label line up with them. */
         .stats-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px var(--space-section);
+          padding: 0 var(--gutter) var(--space-section);
         }
         .stats-grid {
           display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -236,7 +236,7 @@ export default async function HomePage() {
         .cats-section {
           background: transparent;
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px var(--space-section);
+          padding: 0 var(--gutter) var(--space-section);
         }
         .cats-masonry {
           position: relative;
@@ -341,7 +341,7 @@ export default async function HomePage() {
         /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
-          padding: var(--space-section) 12px;
+          padding: var(--space-section) var(--gutter);
           display: flex; flex-direction: column; gap: var(--space-section);
         }
         /* Section head: mono numbered eyebrow → Neuton title → muted sub.
@@ -462,7 +462,7 @@ export default async function HomePage() {
           padding: var(--space-section) 0;
         }
         .carousel-inner {
-          max-width: 1440px; margin: 0 auto; padding: 0 12px;
+          max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter);
         }
         .carousel-header { margin-bottom: var(--space-section); }
         .carousel-sub {
@@ -471,7 +471,7 @@ export default async function HomePage() {
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
-          padding: 0 12px var(--space-section);
+          padding: 0 var(--gutter) var(--space-section);
           max-width: 1440px; margin: 0 auto;
         }
         .contact-banner {
@@ -512,12 +512,22 @@ export default async function HomePage() {
         /* footer styles live in components/Footer.tsx */
 
         /* ══ RESPONSIVE ══ */
+        /* Laptops / iPads: the hero hugs its (smaller) content instead of
+           filling the fold, so more of the category bento shows above it. */
+        @media (min-width: 769px) and (max-width: 1366px) {
+          .hero {
+            min-height: 0;
+            padding-top: calc(var(--nav-h) + clamp(32px, 7vh, 72px));
+            padding-bottom: clamp(56px, 8vh, 88px);
+          }
+          .hero-inner { gap: 22px; }
+        }
         @media (max-width: 768px) {
           /* Nav is fixed at --nav-h tall — padding-top must clear it before
              adding the actual breathing room, or content sits flush/under
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: calc(var(--nav-h) + 32px); }
-          .hero-inner { gap: 20px; padding: 0 12px; }
+          .hero-inner { gap: 20px; padding: 0 var(--gutter); }
           .stats-grid { grid-template-columns: 1fr; min-height: 0; }
           .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }
           .stat-cell:last-child { border-bottom: none; }
@@ -560,12 +570,12 @@ export default async function HomePage() {
           }
 
           .services-section { padding-left: 0; padding-right: 0; }
-          .services-section .section-head { padding: 0 12px; }
+          .services-section .section-head { padding: 0 var(--gutter); }
           .services-grid {
             display: flex;
             overflow-x: auto;
             gap: 12px;
-            padding: 0 12px;
+            padding: 0 var(--gutter);
             margin: 0;
             scrollbar-width: none; -ms-overflow-style: none;
           }
@@ -574,7 +584,7 @@ export default async function HomePage() {
           .service-card { aspect-ratio: 3 / 4; height: auto; width: 100%; padding: 28px; }
           .service-desc { margin-bottom: 16px; }
 
-          .carousel-inner { padding: 0 12px; }
+          .carousel-inner { padding: 0 var(--gutter); }
 
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
           .contact-banner-btn { width: 100%; justify-content: center; }

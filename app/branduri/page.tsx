@@ -41,7 +41,7 @@ export default async function BranduriPage() {
         }
         .branduri-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px 12px 96px;
+          padding: 64px var(--gutter) 96px;
         }
         .branduri-title {
           font-family: 'Neuton', serif;

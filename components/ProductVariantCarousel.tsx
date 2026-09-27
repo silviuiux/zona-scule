@@ -135,7 +135,7 @@ export default function ProductVariantCarousel({
         }
         .variant-carousel-label {
           max-width: 1440px; margin: 0 auto 24px;
-          padding: 0 12px;
+          padding: 0 var(--gutter);
           font-family: 'Inter', sans-serif;
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.1em; text-transform: uppercase;
@@ -168,7 +168,7 @@ export default function ProductVariantCarousel({
 
         @media (max-width: 768px) {
           .variant-carousel-section { padding: 48px 0; }
-          .variant-carousel-track { padding-left: 12px; }
+          .variant-carousel-track { padding-left: var(--gutter); }
           .variant-card-slot { width: 200px; margin-right: 12px; }
         }
       `}</style>

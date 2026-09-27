@@ -16,6 +16,9 @@
   /* Height of the fixed site nav; everything that clears or sticks under
      it (page top paddings, sticky bars, full-height footer) uses this. */
   --nav-h: 68px;
+  /* Side gutter of every 1440px content container (and the nav). Tight on
+     wide desktops, roomier on laptops / iPads, a bit less on phones. */
+  --gutter: 12px;
 
   /*
     Noise texture — matches Figma Noise plugin settings:
@@ -28,8 +31,14 @@
   --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncG type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncB type='linear' slope='4' intercept='-1.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+@media (max-width: 1366px) {
+  :root { --gutter: 32px; }
+}
 @media (max-width: 768px) {
   :root { --space-section: 64px; --nav-h: 56px; }
+}
+@media (max-width: 600px) {
+  :root { --gutter: 20px; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

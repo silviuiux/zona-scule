@@ -54,7 +54,7 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
           padding-top: var(--nav-h);
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }
-        .sv-hero-inner { max-width: 1440px; margin: 0 auto; padding: 72px 12px 40px; }
+        .sv-hero-inner { max-width: 1440px; margin: 0 auto; padding: 72px var(--gutter) 40px; }
         .sv-eyebrow {
           font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
@@ -77,7 +77,7 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
         .sv-stat-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
 
         .sv-page { background: rgb(244,244,244); min-height: 60vh; }
-        .sv-body { max-width: 1440px; margin: 0 auto; padding: 40px 12px 80px; }
+        .sv-body { max-width: 1440px; margin: 0 auto; padding: 40px var(--gutter) 80px; }
         .sv-cat-section { margin-bottom: 48px; }
         .sv-cat-section:last-child { margin-bottom: 0; }
         .sv-cat-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
@@ -87,7 +87,7 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
           display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
         }
         @media (max-width: 1024px) { .sv-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 640px) { .sv-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .sv-hero-inner { padding: 56px 12px 32px; } }
+        @media (max-width: 640px) { .sv-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .sv-hero-inner { padding: 56px var(--gutter) 32px; } }
 
         /* A category can now hold a lot of very specific subcategories (e.g.
            "Accesorii" absorbed everything formerly under "Consumabile" plus

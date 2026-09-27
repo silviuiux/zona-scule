@@ -23,11 +23,12 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           position: relative;
           background-color: rgb(255,255,255);
           border-top: 1px solid rgba(0,0,0,0.12);
-          /* 80vh by default; the homepage easter egg (FooterBlueprint)
-             drives --footer-grow 0 → 1 to expand it to the full viewport
-             below the fixed nav (--nav-h). */
-          min-height: calc(80vh + (20vh - var(--nav-h)) * var(--footer-grow, 0));
+          /* 80vh by default; the easter egg (FooterBlueprint) drives
+             --footer-grow 0 → 1 to expand it to the full viewport — the nav
+             slides away at the same time, so nothing sits on top of it. */
+          min-height: calc(80vh + 20vh * var(--footer-grow, 0));
           display: flex; flex-direction: column;
+          overflow: clip; /* the copyright bar slides out through the bottom edge */
         }
 
         /* Logo row and link columns with equal space above the logo,
@@ -38,16 +39,18 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           position: relative;
           flex: 1;
           width: 100%; max-width: 1440px; margin: 0 auto;
-          padding: 96px 12px;
+          padding: 96px var(--gutter) calc(96px - 56px * var(--footer-grow, 0));
           display: flex; flex-direction: column; justify-content: space-evenly; gap: 96px;
         }
         .footer-logo {
           position: relative; z-index: 1;
           display: flex; align-items: center; gap: 64px;
-          /* The easter egg's growth goes here only: the logo rises while the
-             columns and copyright bar stay pinned to the bottom, and the
-             space-evenly top/bottom gaps don't change. */
-          margin-bottom: calc((20vh - var(--nav-h)) * var(--footer-grow, 0));
+          /* The easter egg's growth goes here only, so the space-evenly
+             gaps don't change: the logo rises with the footer's top edge,
+             and the columns sink toward the bottom edge into the room left
+             by the copyright bar and the trimmed bottom padding — clearing
+             the middle for the drawing. */
+          margin-bottom: calc((20vh + var(--bp-bar, 57px) + 56px) * var(--footer-grow, 0));
         }
         .footer-logo-icon, .footer-logo-word { display: block; height: 64px; width: auto; }
 
@@ -101,8 +104,11 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           position: relative;
           width: 100%; box-sizing: border-box;
           border-top: 1px solid rgba(0,0,0,0.12);
-          padding: 18px 12px;
+          padding: 18px var(--gutter);
           max-width: 1440px; margin: 0 auto;
+          /* Easter egg: a negative margin pulls it out of the footer's
+             height, so it slides down through the clipped bottom edge. */
+          margin-bottom: calc(-1 * var(--bp-bar, 57px) * var(--footer-grow, 0));
           display: flex; justify-content: space-between; align-items: center;
         }
         .footer-bottom span {
@@ -113,11 +119,11 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
 
         @media (max-width: 768px) {
           .footer { min-height: 0; }
-          .footer-main { padding: 56px 12px 40px; gap: 56px; }
+          .footer-main { padding: 56px var(--gutter) 40px; gap: 56px; }
           .footer-logo { gap: 24px; }
           .footer-logo-icon, .footer-logo-word { height: 40px; }
           .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-          .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px 12px; }
+          .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px var(--gutter); }
         }
       `}</style>
 

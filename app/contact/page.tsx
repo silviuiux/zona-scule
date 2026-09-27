@@ -34,9 +34,9 @@ export default function ContactPage({
              (Nav.tsx .nav-inner) — was 102px, way more inset than the nav,
              which is why this page read as noticeably narrower. */
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px;
+          padding: 0 var(--gutter);
         }
-        .contact-inner.after-map { padding: 0 12px var(--space-section); }
+        .contact-inner.after-map { padding: 0 var(--gutter) var(--space-section); }
         .section-head { display: flex; flex-direction: column; gap: 14px; }
         .contact-section { margin-top: var(--space-section); scroll-margin-top: 96px; }
 
@@ -90,7 +90,7 @@ export default function ContactPage({
         }
         .contact-map-badge {
           position: absolute; bottom: 24px;
-          left: max(12px, calc((100% - 1440px) / 2 + 12px)); /* aligned with the content container */
+          left: max(var(--gutter), calc((100% - 1440px) / 2 + var(--gutter))); /* aligned with the content container */
           display: inline-flex; align-items: center; gap: 8px;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);

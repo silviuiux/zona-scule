@@ -79,7 +79,7 @@ export default function BrandLandingTemplate({
     <div style={{ ['--brand-accent' as string]: accent }}>
       <style>{`
         /* ══════════════════ SHARED ══════════════════ */
-        .bp-section { max-width: 1440px; margin: 0 auto; padding: 0 12px; }
+        .bp-section { max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter); }
         .bp-eyebrow {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
           font-size: 11px; font-weight: 500;
@@ -110,7 +110,7 @@ export default function BrandLandingTemplate({
            (the full-bleed section right after) carries the visual weight
            now instead of a decorative hero background. */
         .bp-hero { background: rgb(255,255,255); padding-top: var(--nav-h); }
-        .bp-hero-inner { padding: 96px 12px 56px; max-width: 1440px; margin: 0 auto; }
+        .bp-hero-inner { padding: 96px var(--gutter) 56px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
         /* Fixed height (not clamped) per spec — every brand mark, square or
            wide, lands at the same visual weight. */
@@ -186,7 +186,7 @@ export default function BrandLandingTemplate({
         }
 
         @media (max-width: 768px) {
-          .bp-hero-inner { padding: 88px 12px 64px; }
+          .bp-hero-inner { padding: 88px var(--gutter) 64px; }
         }
 
         /* ══════════════════ CATEGORY RAIL ══════════════════ */
@@ -199,7 +199,7 @@ export default function BrandLandingTemplate({
            glossary block — this and every other plain white section below
            get the same thin divider so a long page reads as a stack of
            distinct sections instead of one unbroken scroll. */
-        .bp-rail-section { padding: 48px 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-rail-section { padding: 48px var(--gutter) 16px; border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-rail {
           display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
           scrollbar-width: none; -ms-overflow-style: none;
@@ -226,7 +226,7 @@ export default function BrandLandingTemplate({
         .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 15px; line-height: 1.5; color: rgba(0,0,0,0.5); text-align: left; }
 
         /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
-        .bp-usecase-section { padding: 72px 12px 0; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-usecase-section { padding: 72px var(--gutter) 0; border-top: 1px solid rgba(0,0,0,0.06); }
         /* Each carousel is its own band; odd ones get a full-bleed light
            gray background (box-shadow spread sideways, clip-path trims it
            to the band's own height), so consecutive groups alternate
@@ -256,7 +256,7 @@ export default function BrandLandingTemplate({
         .bp-usecase-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
 
         /* ══════════════════ PILLARS ══════════════════ */
-        .bp-pillars-section { padding: 72px 12px; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-pillars-section { padding: 72px var(--gutter); border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
         .bp-pillar-card {
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
@@ -333,7 +333,7 @@ export default function BrandLandingTemplate({
         @media (max-width: 640px) { .bp-glossary-grid { grid-template-columns: 1fr; } }
 
         /* ══════════════════ SPECIALIST ══════════════════ */
-        .bp-specialist-wrap { padding: 72px 12px; max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-specialist-wrap { padding: 72px var(--gutter); max-width: 1440px; margin: 0 auto; border-top: 1px solid rgba(0,0,0,0.06); }
         .bp-specialist {
           background: rgb(250,250,249); border: 1px solid rgba(0,0,0,0.08); border-radius: 12px;
           padding: 40px 44px; display: flex; align-items: center; gap: 32px; justify-content: space-between; flex-wrap: wrap;
@@ -359,7 +359,7 @@ export default function BrandLandingTemplate({
         @media (max-width: 900px) { .bp-specialist { flex-direction: column; align-items: flex-start; } }
 
         /* ══════════════════ FAQ ══════════════════ */
-        .bp-faq-section { padding: 72px 12px 88px; border-top: 1px solid rgba(0,0,0,0.06); }
+        .bp-faq-section { padding: 72px var(--gutter) 88px; border-top: 1px solid rgba(0,0,0,0.06); }
         /* Two columns on desktop — uses the full container width the way a
            single centered text column can't, without stretching each Q&A
            row to an unreadable ~1400px line length. */
@@ -375,7 +375,7 @@ export default function BrandLandingTemplate({
         .bp-faq-a { padding: 0 20px 18px; font-family: 'Recursive', sans-serif; font-size: 13.5px; line-height: 1.6; color: rgba(0,0,0,0.6); }
 
         /* ══════════════════ CROSS-SELL ══════════════════ */
-        .bp-crosssell-wrap { padding: 56px 12px; max-width: 1440px; margin: 0 auto; }
+        .bp-crosssell-wrap { padding: 56px var(--gutter); max-width: 1440px; margin: 0 auto; }
         .bp-crosssell {
           position: relative; background-color: rgb(17,17,17);
           background-image: radial-gradient(circle at 6% 110%, color-mix(in srgb, var(--brand-accent) 20%, transparent), transparent 45%), radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);

@@ -46,7 +46,7 @@ export default function Loading() {
         }
         .pdp-skel-top-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 40px 12px 60px;
+          padding: 40px var(--gutter) 60px;
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 80px;
@@ -81,7 +81,7 @@ export default function Loading() {
         }
         .pdp-skel-specs-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px;
+          padding: 0 var(--gutter);
         }
         .pdp-skel-specs-label { margin-bottom: 40px; }
         .pdp-skel-specs-grid {
@@ -100,7 +100,7 @@ export default function Loading() {
           .pdp-skel-top-inner {
             grid-template-columns: 1fr;
             gap: 32px;
-            padding: 24px 12px 40px;
+            padding: 24px var(--gutter) 40px;
           }
           .pdp-skel-specs-grid { grid-template-columns: 1fr; }
           .pdp-skel-img-wrap { order: -1; }

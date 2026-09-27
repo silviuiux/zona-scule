@@ -33,7 +33,7 @@ export default function LegalLayout({
         }
         .legal-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px 12px 96px;
+          padding: 64px var(--gutter) 96px;
         }
 
         /* ── Header ── */
@@ -187,7 +187,7 @@ export default function LegalLayout({
           .legal-sidebar-block { flex: 1 1 220px; }
         }
         @media (max-width: 768px) {
-          .legal-inner { padding: 40px 12px 64px; }
+          .legal-inner { padding: 40px var(--gutter) 64px; }
         }
       `}</style>
 

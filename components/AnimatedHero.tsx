@@ -140,14 +140,25 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         /* 128px/96px is the Neuton title's intended desktop size — step it
            down on narrower viewports so it doesn't overflow before the
            mobile breakpoint takes over. */
+        /* Laptops / iPads: still big, but small enough that the category
+           bento climbs into the first fold. */
+        @media (max-width: 1366px) {
+          .hero-word-toate,
+          .hero-animated-word,
+          .hero-line2 {
+            font-size: 88px;
+            line-height: 70px;
+          }
+          .hero-word-clip { height: 92px; }
+        }
         @media (max-width: 1100px) {
           .hero-word-toate,
           .hero-animated-word,
           .hero-line2 {
-            font-size: 80px;
-            line-height: 72px;
+            font-size: 68px;
+            line-height: 58px;
           }
-          .hero-word-clip { height: 88px; }
+          .hero-word-clip { height: 74px; }
         }
 
         /* On mobile, stack the animated word below TOATE so it doesn't overflow */

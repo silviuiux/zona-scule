@@ -81,7 +81,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-inner {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 112px 12px 56px;
+          padding: 112px var(--gutter) 56px;
           width: 100%;
         }
 
@@ -213,7 +213,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
            (that's what was pushing the sidebar/grid inward past the 12px
            mark and making this container read as narrower than the nav). */
         .catalog-layout {
-          display: flex; max-width: 1440px; margin: 0 auto; padding: 0 12px; gap: 32px;
+          display: flex; max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter); gap: 32px;
         }
         .sidebar {
           width: 280px; flex-shrink: 0;
@@ -247,7 +247,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
-          .cat-hero-inner { padding: 80px 12px 40px; }
+          .cat-hero-inner { padding: 80px var(--gutter) 40px; }
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
 
@@ -317,7 +317,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             flex: 1;
             aspect-ratio: auto;
           }
-          .products-main { padding: 20px 12px 60px; }
+          .products-main { padding: 20px var(--gutter) 60px; }
         }
       `}</style>
 

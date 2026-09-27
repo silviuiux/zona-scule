@@ -499,7 +499,7 @@ export default function FooterBlueprint() {
     const doc = document.documentElement
 
     const bar = footer?.querySelector<HTMLElement>('.footer-bottom')
-    if (bar) layer.style.setProperty('--bp-bar', `${bar.offsetHeight}px`)
+    if (bar && footer) footer.style.setProperty('--bp-bar', `${bar.offsetHeight}px`)
 
     const d = new Date()
     const pad = (n: number) => String(n).padStart(2, '0')
@@ -623,6 +623,7 @@ export default function FooterBlueprint() {
       if (footer && grow !== lastGrow) {
         lastGrow = grow
         footer.style.setProperty('--footer-grow', grow.toFixed(4))
+        doc.style.setProperty('--egg', grow.toFixed(4)) // Nav slides up by this
         window.scrollTo(0, doc.scrollHeight)
       }
       placeTitle()
@@ -765,7 +766,17 @@ export default function FooterBlueprint() {
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchmove', onTouchMove, { passive: true })
     window.addEventListener('resize', placeTitle)
+    // The nav is only away while the drawing is in view: scrolling back up
+    // brings it back, returning to the bottom hides it again.
+    const onScroll = () => {
+      if (!lastGrow) return
+      const atEnd = window.scrollY + window.innerHeight >= doc.scrollHeight - 2
+      doc.style.setProperty('--egg', atEnd ? lastGrow.toFixed(4) : '0')
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
+      window.removeEventListener('scroll', onScroll)
+      doc.style.removeProperty('--egg')
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
@@ -786,26 +797,26 @@ export default function FooterBlueprint() {
         .bp-blade {
           overflow: visible;
           width: 280mm; height: 264mm;
-          right: calc(12px - 24mm);
-          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 132mm);
+          right: calc(var(--gutter) - 24mm);
+          bottom: calc(50vh - 132mm);
         }
         .bp-nail {
           overflow: hidden; /* frames the camera move */
           width: 180mm; height: 200mm;
-          right: 12px;
-          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 100mm);
+          right: var(--gutter);
+          bottom: calc(50vh - 100mm);
         }
         .bp-drill {
           overflow: hidden;
           width: 200mm; height: 180mm;
-          right: 12px;
-          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 90mm);
+          right: var(--gutter);
+          bottom: calc(50vh - 90mm);
         }
         .bp-art .hole { fill: #fff; stroke: rgba(0,0,0,0.34); stroke-width: 0.3; }
         .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
         .bp-art text.mono-s { font-size: 2.3px; }
-        .bp-title { width: 460px; height: 96px; left: 12px; top: 0; overflow: visible; }
+        .bp-title { width: 460px; height: 96px; left: var(--gutter); top: 0; overflow: visible; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings
            (0.265mm ≈ 1px, scaled by --sw during the camera zoom), px on the

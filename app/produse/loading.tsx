@@ -46,7 +46,7 @@ export default function Loading() {
         .skel-hero-inner {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 40px 12px 56px;
+          padding: 40px var(--gutter) 56px;
           width: 100%;
           display: flex;
           flex-direction: column;
@@ -97,7 +97,7 @@ export default function Loading() {
         .skel-layout {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 0 12px;
+          padding: 0 var(--gutter);
         }
 
         /* ── Filter rows — category + brand pill carousels, each led by
@@ -150,11 +150,11 @@ export default function Loading() {
 
         @media (max-width: 768px) {
           .skel-hero { min-height: auto; }
-          .skel-hero-inner { padding: 24px 12px 40px; }
+          .skel-hero-inner { padding: 24px var(--gutter) 40px; }
           /* Dropdown filter row is desktop-only in reality — mobile always
              uses the drawer + pill bar regardless of stored view mode. */
           .skel-filter-row { display: none; }
-          .skel-main { padding: 20px 12px 60px; }
+          .skel-main { padding: 20px var(--gutter) 60px; }
           .skel-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
       `}</style>
