@@ -121,12 +121,12 @@ export default async function HomePage() {
         /* Same 1440px/12px container as the category grid and section
            heads, so the band's edges and the first label line up with them. */
         .stats-section {
-          max-width: 1440px; margin: 56px auto 0;
-          padding: 0 12px;
+          max-width: 1440px; margin: 0 auto;
+          padding: 64px 12px;
         }
         .stats-grid {
           display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-          min-height: 50vh;
+          min-height: 25vh;
           border-top: 1px solid rgba(0,0,0,0.08);
           border-bottom: 1px solid rgba(0,0,0,0.08);
         }
@@ -515,7 +515,7 @@ export default async function HomePage() {
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
-          .stats-section { margin-top: 32px; }
+          .stats-section { padding: 48px 12px; }
           .stats-grid { grid-template-columns: 1fr; min-height: 0; }
           .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }
           .stat-cell:last-child { border-bottom: none; }
