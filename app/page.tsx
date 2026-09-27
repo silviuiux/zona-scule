@@ -242,6 +242,22 @@ export default async function HomePage() {
         @media (prefers-reduced-motion: reduce) {
           .cat-card-img-wrap { transition: none; }
         }
+        /* Hover video — sits over the static image, only visible (and only
+           playing, via CategoryGrid.tsx's mouseenter/leave handlers) once
+           hovered. Categories without a hero_video_url yet just never
+           render this element, so nothing changes for them. */
+        .cat-card-video {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          object-fit: cover; object-position: center; display: block;
+          opacity: 0;
+          transition: opacity 300ms ease;
+          pointer-events: none;
+        }
+        .cat-card:hover .cat-card-video { opacity: 1; }
+        @media (prefers-reduced-motion: reduce) {
+          .cat-card-video { display: none; }
+        }
         .cat-card-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 75%);

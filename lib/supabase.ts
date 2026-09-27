@@ -93,6 +93,7 @@ export type Category = {
   slug: string | null
   name: string
   hero_image_url: string | null
+  hero_video_url: string | null
   description: string | null
   featured: boolean
   sort_order: number | null

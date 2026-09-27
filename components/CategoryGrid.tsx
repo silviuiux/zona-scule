@@ -6,6 +6,7 @@ type Cat = {
   id: string
   name: string
   hero_image_url: string | null
+  hero_video_url: string | null
   description: string | null
   product_count: number
   featured: boolean
@@ -261,30 +262,80 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
         }
 
         return (
-          <Link
+          <CategoryCard
             key={cat.id}
-            href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-            className="cat-card"
+            cat={cat}
+            fallbackColor={`hsl(${(col * 90 + i * 22) % 360}, 6%, 74%)`}
             style={cardStyle}
-          >
-            <div className="cat-card-img-wrap">
-              {cat.hero_image_url ? (
-                <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
-              ) : (
-                <div style={{ position: 'absolute', inset: 0, background: `hsl(${(col * 90 + i * 22) % 360}, 6%, 74%)` }} />
-              )}
-            </div>
-            <div className="cat-card-overlay" />
-            <div className="cat-card-bottom">
-              <span className="cat-card-count">
-                {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
-              </span>
-              <span className="cat-card-label">{cat.name}</span>
-              {cat.description && <span className="cat-card-desc">{cat.description}</span>}
-            </div>
-          </Link>
+          />
         )
       })}
     </div>
+  )
+}
+
+// Separate component (not inlined in the .map() above) so each card owns its
+// own <video> ref/hover state independently — the video only starts
+// downloading on first hover (preload="none"), and is muted + playsInline so
+// the browser allows the play() call without a user gesture on the video
+// itself. Cards without hero_video_url yet (most of them, until the videos
+// are in) just render the plain image, unchanged.
+function CategoryCard({
+  cat,
+  fallbackColor,
+  style,
+}: {
+  cat: Cat
+  fallbackColor: string
+  style: CSSProperties
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleEnter = () => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    videoRef.current?.play().catch(() => {})
+  }
+  const handleLeave = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.pause()
+    v.currentTime = 0
+  }
+
+  return (
+    <Link
+      href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
+      className="cat-card"
+      style={style}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <div className="cat-card-img-wrap">
+        {cat.hero_image_url ? (
+          <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
+        ) : (
+          <div style={{ position: 'absolute', inset: 0, background: fallbackColor }} />
+        )}
+        {cat.hero_video_url && (
+          <video
+            ref={videoRef}
+            className="cat-card-video"
+            src={cat.hero_video_url}
+            muted
+            loop
+            playsInline
+            preload="none"
+          />
+        )}
+      </div>
+      <div className="cat-card-overlay" />
+      <div className="cat-card-bottom">
+        <span className="cat-card-count">
+          {cat.product_count > 0 ? cat.product_count.toLocaleString('ro') : '—'} produse
+        </span>
+        <span className="cat-card-label">{cat.name}</span>
+        {cat.description && <span className="cat-card-desc">{cat.description}</span>}
+      </div>
+    </Link>
   )
 }
