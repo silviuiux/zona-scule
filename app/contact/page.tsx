@@ -25,36 +25,24 @@ export default function ContactPage({
           /* Transparent over the white body, so the dot grid and laser show
              through; positioned so content paints above body::before. */
           position: relative; z-index: 1;
+          /* Roomier rhythm than the rest of the site: every gap on this page
+             (hero top, between sections, heading → content) uses this. */
+          --space-section: clamp(120px, 11vw, 168px);
         }
         .contact-inner {
           /* Same max-width + 12px side padding as the nav's own container
              (Nav.tsx .nav-inner) — was 102px, way more inset than the nav,
              which is why this page read as noticeably narrower. */
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 12px 0;
+          padding: 0 12px;
         }
         .contact-inner.after-map { padding: 0 12px var(--space-section); }
         .section-head { display: flex; flex-direction: column; gap: 14px; }
         .contact-section { margin-top: var(--space-section); scroll-margin-top: 96px; }
 
-        /* ── Header ── */
-        .contact-location { margin-bottom: 20px; }
-        .contact-title {
-          font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(56px, 7.5vw, 112px);
-          line-height: 0.92; letter-spacing: -0.015em;
-          margin-bottom: 24px;
-        }
-        .contact-title .red { color: rgb(217,44,43); }
-        .contact-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
-          line-height: 1.6; max-width: 420px;
-          margin-bottom: 64px;
-        }
-
         /* ── Info bar ── */
         .contact-info-bar {
+          margin-top: var(--space-section);
           display: grid; grid-template-columns: repeat(3, 1fr);
           gap: 0;
           background: rgb(255,255,255);
@@ -160,7 +148,7 @@ export default function ContactPage({
         }
 
         @media (max-width: 768px) {
-          .contact-inner { padding: 48px 12px 0; }
+          .contact-page { --space-section: 88px; }
           .about-grid { grid-template-columns: 1fr; gap: 24px; }
           .about-facts { grid-template-columns: 1fr; }
           .about-fact { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
@@ -175,16 +163,8 @@ export default function ContactPage({
       <div className="contact-page">
         <div className="contact-inner">
 
-          {/* Header */}
-          <p className="contact-location eyebrow-mono">Pitești, Argeș, România</p>
-          <h1 className="contact-title">
-            <span className="red">Contact</span><br />
-            Zona Scule
-          </h1>
-          <p className="contact-sub">
-            Completati formularul si va raspundem in cel mai scurt
-            timp cu o oferta personalizata nevoilor dumneavoastra.
-          </p>
+          {/* Hero: the quote-request form */}
+          <ContactForm searchParams={searchParams} />
 
           {/* Info bar */}
           <div className="contact-info-bar">
@@ -204,8 +184,6 @@ export default function ContactPage({
               <span className="info-note">Luni – Vineri</span>
             </div>
           </div>
-
-          <ContactForm searchParams={searchParams} />
         </div>
 
         {/* Map — full-bleed */}

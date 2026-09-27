@@ -147,7 +147,7 @@ export default function ContactForm({
 
       <div className="cf-panel">
         <p className="eyebrow-mono cf-eyebrow">Cerere de ofertă</p>
-        <h2 id="cf-title" className="cf-title">Hai să vorbim</h2>
+        <h1 id="cf-title" className="cf-title">Hai să vorbim</h1>
 
         {sent ? (
           <p className="cf-thanks">
