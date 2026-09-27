@@ -51,7 +51,7 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
       <style>{`
         .sv-hero {
           background: rgb(255,255,255);
-          padding-top: 52px;
+          padding-top: 96px;
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }
         .sv-hero-inner { max-width: 1440px; margin: 0 auto; padding: 72px 12px 40px; }

@@ -130,7 +130,7 @@ export default function Nav() {
       <style>{`
         .nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          height: 52px;
+          height: 96px;
           background: rgb(255,255,255);
           box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
@@ -361,7 +361,7 @@ export default function Nav() {
           .nav-search-trigger { display: none; }
           .nav-search-wrap {
             display: none;
-            position: absolute; top: 52px; left: 0; right: 0;
+            position: absolute; top: 96px; left: 0; right: 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
             background: rgb(255,255,255);
             z-index: 99;

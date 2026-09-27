@@ -109,7 +109,7 @@ export default function BrandLandingTemplate({
            pills. No watermark/dot-grid/badges; the brand's own photography
            (the full-bleed section right after) carries the visual weight
            now instead of a decorative hero background. */
-        .bp-hero { background: rgb(255,255,255); padding-top: 52px; }
+        .bp-hero { background: rgb(255,255,255); padding-top: 96px; }
         .bp-hero-inner { padding: 96px 12px 56px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
         /* Fixed height (not clamped) per spec — every brand mark, square or
@@ -171,8 +171,8 @@ export default function BrandLandingTemplate({
         .bp-hero-image { position: relative; width: 100%; height: 62vh; min-height: 420px; max-height: 720px; overflow: hidden; }
         @media (max-width: 640px) { .bp-hero-image { height: 40vh; min-height: 280px; } }
 
-        /* Anchor targets sit just behind the main site nav (top: 52px). */
-        #ghid-tehnic, #categorii, #descopera, #explorare, #specialist, #faq { scroll-margin-top: 68px; }
+        /* Anchor targets sit just behind the main site nav (top: 96px). */
+        #ghid-tehnic, #categorii, #descopera, #explorare, #specialist, #faq { scroll-margin-top: 112px; }
 
         /* Toggle "+" icon — shared by the glossary and FAQ <details> toggles
            (no brand currently uses hero-level intent chips, so only those
