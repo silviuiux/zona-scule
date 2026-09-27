@@ -63,13 +63,13 @@ export default async function HomePage() {
         /* ─── HERO ─────────────────────────────── */
         .hero {
           /* Viewport-height responsive top padding. The non-padding hero
-             content (chips + title + subtitle + search row + stat band) is
-             ~480px tall, so pinning padding-top to (100vh - ~610px) keeps
+             content (chips + title + subtitle + search row) is
+             ~410px tall, so pinning padding-top to (100vh - ~540px) keeps
              the hero bottom ~130px short of the fold — guaranteeing a peek
              of the first category row on short/laptop screens (fixes cards
              not showing at all). Capped at 280px so tall screens keep the
              roomy composition and simply reveal MORE of the cards below. */
-          padding-top: clamp(88px, calc(100vh - 610px), 280px);
+          padding-top: clamp(88px, calc(100vh - 540px), 280px);
           padding-bottom: 24px;
           background: transparent;
           min-height: max(320px, calc(100vh - 395px));
@@ -97,8 +97,7 @@ export default async function HomePage() {
         .hero-inner .brand-chips,
         .hero-inner .hero-title,
         .hero-inner .hero-sub,
-        .hero-inner .hero-cta-row,
-        .hero-inner .hero-stats {
+        .hero-inner .hero-cta-row {
           opacity: 0;
           animation: hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
@@ -106,53 +105,55 @@ export default async function HomePage() {
         .hero-inner .hero-title   { animation-delay: 220ms; }
         .hero-inner .hero-sub     { animation-delay: 360ms; }
         .hero-inner .hero-cta-row { animation-delay: 500ms; }
-        /* Must stay later than CountUp's own start delay (600ms) so the
-           numbers are already ticking from ~0 by the time this fades in. */
-        .hero-inner .hero-stats   { animation-delay: 640ms; }
         @media (prefers-reduced-motion: reduce) {
           .hero-inner .brand-chips,
           .hero-inner .hero-title,
           .hero-inner .hero-sub,
-          .hero-inner .hero-cta-row,
-          .hero-inner .hero-stats {
+          .hero-inner .hero-cta-row {
             animation: none; opacity: 1;
           }
         }
 
-        /* ── Hero stat band — instrument-style readouts (mono numbers that
-           tick up via CountUp), divided by hairlines. ── */
-        .hero-stats {
-          display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
-          margin-top: 8px;
+        /* ─── STATS — full-width instrument band after the category bento:
+           three equal cells split by hairlines, a mono label on top and a
+           huge mono readout at the bottom (ticks up via CountUp once in
+           view). ── */
+        .stats-section {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          min-height: 50vh;
+          border-top: 1px solid rgba(0,0,0,0.08);
+          border-bottom: 1px solid rgba(0,0,0,0.08);
+          margin: 56px 0 0;
         }
-        .hero-stat { display: flex; flex-direction: column; gap: 6px; }
-        .hero-stat-n {
+        .stat-cell {
+          display: flex; flex-direction: column; justify-content: space-between;
+          gap: 48px;
+          padding: 40px clamp(20px, 3vw, 48px) 48px;
+          border-right: 1px solid rgba(0,0,0,0.08);
+        }
+        .stat-cell:last-child { border-right: none; }
+        .stat-n {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 22px; font-weight: 500; line-height: 1;
-          color: rgb(0,0,0); letter-spacing: -0.02em;
+          font-size: clamp(56px, 7.5vw, 128px); font-weight: 500; line-height: 0.9;
+          color: rgb(0,0,0); letter-spacing: -0.05em;
           font-variant-numeric: tabular-nums;
+          white-space: nowrap;
         }
-        .hero-stat-l {
-          font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.45);
-        }
-        .hero-stat-div { width: 1px; height: 36px; background: rgba(0,0,0,0.12); }
         /* Live-dot beside the product count — a quiet "this is real,
            current data" signal, pulsing slowly like a status LED. */
-        .hero-stat-live {
-          display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-          background: var(--red); margin-right: 8px; vertical-align: middle;
+        .stat-live {
+          display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+          background: var(--red); margin-left: 4px; vertical-align: middle;
           box-shadow: 0 0 0 0 rgba(217,44,43,0.5);
-          animation: hero-live 2.4s ease-out infinite;
+          animation: stat-live 2.4s ease-out infinite;
         }
-        @keyframes hero-live {
+        @keyframes stat-live {
           0%   { box-shadow: 0 0 0 0 rgba(217,44,43,0.45); }
-          70%  { box-shadow: 0 0 0 7px rgba(217,44,43,0); }
+          70%  { box-shadow: 0 0 0 8px rgba(217,44,43,0); }
           100% { box-shadow: 0 0 0 0 rgba(217,44,43,0); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .hero-stat-live { animation: none; }
+          .stat-live { animation: none; }
         }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
@@ -508,9 +509,9 @@ export default async function HomePage() {
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
-          .hero-stats { gap: 16px; }
-          .hero-stat-n { font-size: 18px; }
-          .hero-stat-div { height: 30px; }
+          .stats-section { grid-template-columns: 1fr; min-height: 0; margin-top: 32px; }
+          .stat-cell { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 12px 32px; }
+          .stat-cell:last-child { border-bottom: none; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
             border: none; border-radius: 0; box-shadow: none;
@@ -584,24 +585,6 @@ export default async function HomePage() {
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
           </div>
-          {totalCount > 0 && (
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <span className="hero-stat-n"><span className="hero-stat-live" aria-hidden="true" /><CountUp value={totalCount} /></span>
-                <span className="hero-stat-l">Produse în catalog</span>
-              </div>
-              <span className="hero-stat-div" aria-hidden="true" />
-              <div className="hero-stat">
-                <span className="hero-stat-n"><CountUp value={brands.length} /></span>
-                <span className="hero-stat-l">Branduri</span>
-              </div>
-              <span className="hero-stat-div" aria-hidden="true" />
-              <div className="hero-stat">
-                <span className="hero-stat-n"><CountUp value={26} suffix="+" /></span>
-                <span className="hero-stat-l">Ani de experiență</span>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
@@ -609,6 +592,24 @@ export default async function HomePage() {
       <section className="cats-section">
         <CategoryGrid categories={categories} />
       </section>
+
+      {/* ── STATS ── */}
+      {totalCount > 0 && (
+        <section className="stats-section" aria-label="Zona Scule în cifre">
+          <div className="stat-cell">
+            <span className="eyebrow-mono">Produse în catalog<span className="stat-live" aria-hidden="true" /></span>
+            <span className="stat-n"><CountUp value={totalCount} onView delay={0} /></span>
+          </div>
+          <div className="stat-cell">
+            <span className="eyebrow-mono">Branduri</span>
+            <span className="stat-n"><CountUp value={brands.length} onView delay={150} /></span>
+          </div>
+          <div className="stat-cell">
+            <span className="eyebrow-mono">Ani de experiență</span>
+            <span className="stat-n"><CountUp value={26} suffix="+" onView delay={300} /></span>
+          </div>
+        </section>
+      )}
 
       {/* ── CAROUSEL — Featured subcategories (before services) ── */}
       {enrichedSubs.length > 0 && (
@@ -633,7 +634,7 @@ export default async function HomePage() {
         </div>
         <ServicesGrid
           items={[
-            { bg: 'rgb(255,255,255)', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', icon: IconChat },
+            { bg: '#f4f4f4', color: 'rgb(30,30,30)', title: 'Consultanta', body: 'Expertiză tehnică pentru alegerea sculei potrivite proiectului tău. Intri cu întrebări, pleci cu soluții', cta: 'HAI IN SHOWROOM', ctaColor: 'rgb(30,30,30)', href: '/contact', icon: IconChat },
             { bg: 'rgb(217,44,43)', color: 'rgb(255,255,255)', title: 'Service', body: 'Echipa noastră de tehnicieni menține motoarele turate. Intervenții prompte pentru ca tu să nu te oprești din lucru.', cta: 'SOLICITA O REPARATIE', ctaColor: 'rgb(255,255,255)', href: '/contact', icon: IconWrench },
             { bg: 'rgb(30,30,30)', color: 'rgb(255,255,255)', title: 'Garantie', body: 'Acoperire extinsă și proceduri simplificate. Prioritatea noastră este funcționarea echipamentului tău.', cta: 'VEZI ACOPERIREA', ctaColor: 'rgb(255,255,255)', href: '/contact', icon: IconShield },
           ]}

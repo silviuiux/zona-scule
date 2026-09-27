@@ -15,15 +15,14 @@ type ServiceItem = {
 
 // Same continuous scroll-driven stagger technique as CategoryGrid's
 // COL_OFFSETS, but mirrored: left card starts nearly in place (first to
-// settle), center a bit deeper, right deepest — they all rise to a flush
-// row once the section scrolls into view.
+// settle), center a bit deeper, right deepest — they rise to a flush row
+// as the section scrolls in, finishing by the time the section's top edge
+// reaches the top of the viewport.
 //
 // `.services-grid` clips overflow (see page.tsx), so an unsettled card is
-// cropped to the grid's own box rather than bleeding into the carousel
-// section below — same safety net as CategoryGrid's rows, which is what
-// lets the settle window below be long enough to actually be visible.
+// cropped to the grid's own box rather than bleeding into the section
+// below — same safety net as CategoryGrid's rows.
 const OFFSETS = [0, 220, 420]
-const ROW_SETTLE_RANGE = 2.2
 
 // easeInOutCubic — same curve used for the category grid stagger.
 const easeInOut = (t: number) =>
@@ -54,10 +53,15 @@ export default function ServicesGrid({ items }: { items: ServiceItem[] }) {
     let raf = 0
     const update = () => {
       raf = 0
+      // Starts as the grid's top enters the viewport; done (progress 1)
+      // once the section's top — the grid top minus the heading above it —
+      // reaches the top of the viewport.
       const rect = root.getBoundingClientRect()
+      const section = root.closest('section') ?? root
+      const headOffset = rect.top - section.getBoundingClientRect().top
       const viewH = window.innerHeight
       const scrolledPast = viewH - rect.top
-      const totalRange = Math.max(rect.height * ROW_SETTLE_RANGE, 1)
+      const totalRange = Math.max(viewH - headOffset, 1)
       const linear = Math.max(0, Math.min(1, scrolledPast / totalRange))
       const progress = easeInOut(linear)
       cards.forEach((el, i) => {
