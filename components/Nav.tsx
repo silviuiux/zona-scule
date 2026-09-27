@@ -143,12 +143,9 @@ export default function Nav() {
 
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
-          display: flex; align-items: stretch; padding: 0 32px;
-        }
-        /* Laptops / iPads / phones: same side gutter as the page content, so
-           the logo and the Contact button line up with everything below. */
-        @media (max-width: 1366px) {
-          .nav-inner { padding: 0 var(--gutter); }
+          /* Same side gutter as the page content, so the logo and the
+             Contact button line up with everything below. */
+          display: flex; align-items: stretch; padding: 0 var(--gutter);
         }
 
         /* Logo */
