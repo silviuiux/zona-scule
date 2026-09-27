@@ -81,8 +81,8 @@ export default function BrandLandingTemplate({
         /* ══════════════════ SHARED ══════════════════ */
         .bp-section { max-width: 1440px; margin: 0 auto; padding: 0 12px; }
         .bp-eyebrow {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 11px; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
           display: inline-flex; align-items: center; gap: 8px;
         }
@@ -133,12 +133,12 @@ export default function BrandLandingTemplate({
           display: inline-flex; align-items: center; gap: 24px;
           background: rgb(0,0,0); color: rgb(255,255,255);
           padding: 14px 28px; border-radius: 4px; text-decoration: none;
-          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
+          font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500;
+          text-transform: uppercase;
           transition: background 150ms;
         }
         .bp-hero-cta:hover { background: var(--brand-accent); }
-        .bp-hero-cta-count { color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.02em; }
+        .bp-hero-cta-count { font-family: 'JetBrains Mono', ui-monospace, monospace; color: rgba(255,255,255,0.5); font-weight: 500; font-variant-numeric: tabular-nums; }
 
         /* Gray pill row — top subcategories by product count, same flat
            #f4f4f4/black-text pill used for the homepage hero brand chips. */
@@ -217,16 +217,13 @@ export default function BrandLandingTemplate({
         .bp-rail-chip .cnt { color: rgba(0,0,0,0.4); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
 
         /* ══════════════════ SECTION HEADS ══════════════════ */
-        .bp-section-head { margin-bottom: 28px; max-width: 900px; text-align: left; }
+        .bp-section-head { margin-bottom: 36px; max-width: 900px; text-align: left; }
         .bp-section-title {
-          font-family: 'Bungee', sans-serif; font-size: clamp(22px, 2.6vw, 34px);
-          text-transform: uppercase; line-height: 1.1; color: rgb(0,0,0); margin: 10px 0 10px;
-          white-space: nowrap; text-align: left;
+          font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(32px, 3.6vw, 52px);
+          letter-spacing: -0.01em; line-height: 1.02; color: rgb(0,0,0); margin: 14px 0 12px;
+          text-align: left;
         }
-        .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 14px; color: rgba(0,0,0,0.5); text-align: left; }
-        @media (max-width: 640px) {
-          .bp-section-title { white-space: normal; }
-        }
+        .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 15px; line-height: 1.5; color: rgba(0,0,0,0.5); text-align: left; }
 
         /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
         .bp-usecase-section { padding: 72px 12px; border-top: 1px solid rgba(0,0,0,0.06); }
@@ -250,7 +247,7 @@ export default function BrandLandingTemplate({
           transition: box-shadow 220ms, transform 220ms, border-color 220ms;
         }
         .bp-pillar-card:hover { box-shadow: 0 20px 48px rgba(0,0,0,0.1); transform: translateY(-3px); border-color: color-mix(in srgb, var(--brand-accent) 25%, transparent); }
-        .bp-pillar-code { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; color: rgba(0,0,0,0.22); letter-spacing: 0.08em; }
+        .bp-pillar-code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 12px; color: var(--brand-accent); letter-spacing: 0.1em; }
         .bp-pillar-title { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.01em; color: rgb(0,0,0); }
         .bp-pillar-desc { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.5; color: rgba(0,0,0,0.5); }
         /* Compact tags instead of a bulleted sentence list — same
@@ -309,7 +306,7 @@ export default function BrandLandingTemplate({
         /* Softened from solid black — the code pill is a label, not the
            focal point, and pure black was pulling more visual weight than
            the title beneath it. */
-        .bp-gloss-code { font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; color: rgb(255,255,255); background: rgb(42,42,42); padding: 4px 9px; border-radius: 4px; }
+        .bp-gloss-code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; font-weight: 500; letter-spacing: 0.02em; color: rgb(255,255,255); background: rgb(42,42,42); padding: 4px 9px; border-radius: 4px; }
         .bp-gloss-badges { display: flex; gap: 6px; flex-wrap: wrap; }
         .bp-gloss-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .bp-gloss-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13.5px; color: rgb(0,0,0); }
@@ -328,7 +325,7 @@ export default function BrandLandingTemplate({
           width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
           background: color-mix(in srgb, var(--brand-accent) 14%, transparent);
           display: flex; align-items: center; justify-content: center;
-          color: var(--brand-accent); font-family: 'Bungee', sans-serif; font-size: 20px;
+          color: var(--brand-accent); font-family: 'Neuton', serif; font-size: 26px;
         }
         .bp-specialist-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: rgb(0,0,0); }
         .bp-specialist-role { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-accent); margin: 2px 0 8px; }
@@ -360,7 +357,7 @@ export default function BrandLandingTemplate({
           background-size: auto, 27px 27px; border-radius: 12px; padding: 48px 52px;
           display: flex; align-items: center; gap: 40px; justify-content: space-between; flex-wrap: wrap;
         }
-        .bp-crosssell-title { font-family: 'Bungee', sans-serif; font-size: clamp(20px, 2.4vw, 30px); text-transform: uppercase; line-height: 1.15; color: rgb(255,255,255); margin-bottom: 10px; }
+        .bp-crosssell-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(28px, 3vw, 42px); letter-spacing: -0.01em; line-height: 1.05; color: rgb(255,255,255); margin-bottom: 10px; }
         .bp-crosssell-body { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.55); max-width: 640px; }
         .bp-crosssell-btn {
           flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px;

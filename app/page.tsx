@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
+import CountUp from '@/components/CountUp'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
 import ServicesGrid from '@/components/ServicesGrid'
@@ -62,13 +63,13 @@ export default async function HomePage() {
         /* ─── HERO ─────────────────────────────── */
         .hero {
           /* Viewport-height responsive top padding. The non-padding hero
-             content (chips + title + subtitle + search row) is ~410px tall,
-             so pinning padding-top to (100vh - ~540px) keeps the hero bottom
-             ~130px short of the fold — guaranteeing a peek of the first
-             category row on short/laptop screens (fixes cards not showing at
-             all). Capped at 280px so tall screens keep the roomy composition
-             and simply reveal MORE of the cards below. */
-          padding-top: clamp(88px, calc(100vh - 540px), 280px);
+             content (chips + title + subtitle + search row + stat band) is
+             ~480px tall, so pinning padding-top to (100vh - ~610px) keeps
+             the hero bottom ~130px short of the fold — guaranteeing a peek
+             of the first category row on short/laptop screens (fixes cards
+             not showing at all). Capped at 280px so tall screens keep the
+             roomy composition and simply reveal MORE of the cards below. */
+          padding-top: clamp(88px, calc(100vh - 610px), 280px);
           padding-bottom: 24px;
           background: transparent;
           min-height: max(320px, calc(100vh - 395px));
@@ -96,7 +97,8 @@ export default async function HomePage() {
         .hero-inner .brand-chips,
         .hero-inner .hero-title,
         .hero-inner .hero-sub,
-        .hero-inner .hero-cta-row {
+        .hero-inner .hero-cta-row,
+        .hero-inner .hero-stats {
           opacity: 0;
           animation: hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
         }
@@ -104,13 +106,53 @@ export default async function HomePage() {
         .hero-inner .hero-title   { animation-delay: 220ms; }
         .hero-inner .hero-sub     { animation-delay: 360ms; }
         .hero-inner .hero-cta-row { animation-delay: 500ms; }
+        /* Must stay later than CountUp's own start delay (600ms) so the
+           numbers are already ticking from ~0 by the time this fades in. */
+        .hero-inner .hero-stats   { animation-delay: 640ms; }
         @media (prefers-reduced-motion: reduce) {
           .hero-inner .brand-chips,
           .hero-inner .hero-title,
           .hero-inner .hero-sub,
-          .hero-inner .hero-cta-row {
+          .hero-inner .hero-cta-row,
+          .hero-inner .hero-stats {
             animation: none; opacity: 1;
           }
+        }
+
+        /* ── Hero stat band — instrument-style readouts (mono numbers that
+           tick up via CountUp), divided by hairlines. ── */
+        .hero-stats {
+          display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+          margin-top: 8px;
+        }
+        .hero-stat { display: flex; flex-direction: column; gap: 6px; }
+        .hero-stat-n {
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 22px; font-weight: 500; line-height: 1;
+          color: rgb(0,0,0); letter-spacing: -0.02em;
+          font-variant-numeric: tabular-nums;
+        }
+        .hero-stat-l {
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(0,0,0,0.45);
+        }
+        .hero-stat-div { width: 1px; height: 36px; background: rgba(0,0,0,0.12); }
+        /* Live-dot beside the product count — a quiet "this is real,
+           current data" signal, pulsing slowly like a status LED. */
+        .hero-stat-live {
+          display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+          background: var(--red); margin-right: 8px; vertical-align: middle;
+          box-shadow: 0 0 0 0 rgba(217,44,43,0.5);
+          animation: hero-live 2.4s ease-out infinite;
+        }
+        @keyframes hero-live {
+          0%   { box-shadow: 0 0 0 0 rgba(217,44,43,0.45); }
+          70%  { box-shadow: 0 0 0 7px rgba(217,44,43,0); }
+          100% { box-shadow: 0 0 0 0 rgba(217,44,43,0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-stat-live { animation: none; }
         }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
@@ -266,16 +308,16 @@ export default async function HomePage() {
           position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
         }
         .cat-card-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-          text-transform: uppercase; color: rgba(255,255,255,0.55);
-          display: block; margin-bottom: 5px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; font-weight: 500; letter-spacing: 0.12em;
+          text-transform: uppercase; color: rgba(255,255,255,0.6);
+          display: block; margin-bottom: 6px;
         }
         .cat-card-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 15px; font-weight: 500;
-          color: rgb(255,255,255); letter-spacing: -0.01em;
-          line-height: 1.3; display: block;
+          font-family: 'Neuton', serif;
+          font-size: 26px; font-weight: 400;
+          color: rgb(255,255,255); letter-spacing: -0.005em;
+          line-height: 1.05; display: block;
         }
         .cat-card-desc {
           font-family: 'Recursive', sans-serif;
@@ -289,18 +331,16 @@ export default async function HomePage() {
         /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px 12px 64px;
+          padding: 120px 12px 64px;
           display: flex; flex-direction: column; gap: 64px;
         }
-        .services-header { display: flex; flex-direction: column; gap: 8px; }
-        .section-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(32px, 4vw, 56px);
-          color: rgb(0,0,0); line-height: 1; text-transform: uppercase;
-        }
+        /* Section head: mono numbered eyebrow → Neuton title → muted sub.
+           Shared .eyebrow-mono/.display-title live in globals.css. */
+        .section-head { display: flex; flex-direction: column; gap: 14px; }
         .section-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5); font-weight: 500;
+          font-size: 16px; color: rgba(0,0,0,0.5); line-height: 1.5;
+          max-width: 52ch;
         }
         .services-grid {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
@@ -360,8 +400,8 @@ export default async function HomePage() {
           stroke-dashoffset: 0;
         }
         .service-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: 28px; text-transform: uppercase;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: 40px; letter-spacing: -0.01em;
           line-height: 1; margin-top: 28px; margin-bottom: 12px;
         }
         .service-desc {
@@ -390,9 +430,9 @@ export default async function HomePage() {
         }
 
         .service-cta {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; font-weight: 600;
-          letter-spacing: 0.06em; text-transform: uppercase;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 11px; font-weight: 500;
+          letter-spacing: 0.12em; text-transform: uppercase;
           text-decoration: none;
           display: flex; align-items: center; justify-content: space-between;
           width: 100%;
@@ -409,25 +449,19 @@ export default async function HomePage() {
           background-color: rgb(18, 18, 18);
           background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
           background-size: 28px 28px;
-          padding: 64px 0 64px;
+          padding: 120px 0 120px;
         }
         .carousel-inner {
           max-width: 1440px; margin: 0 auto; padding: 0 12px;
         }
-        .carousel-header { margin-bottom: 40px; }
-        .carousel-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 4vw, 48px);
-          color: rgb(255,255,255); text-transform: uppercase;
-          line-height: 1; margin-bottom: 8px;
-        }
+        .carousel-header { margin-bottom: 48px; }
         .carousel-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(255,255,255,0.35);
+          font-size: 16px; color: rgba(255,255,255,0.4); line-height: 1.5;
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
-          padding: 64px 12px;
+          padding: 64px 12px 120px;
           max-width: 1440px; margin: 0 auto;
         }
         .contact-banner {
@@ -439,32 +473,31 @@ export default async function HomePage() {
           display: flex; align-items: center;
           justify-content: space-between; gap: 40px;
         }
-        .contact-banner-eyebrow {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
-          margin-bottom: 14px; display: block;
-        }
+        .contact-banner .eyebrow-mono { margin-bottom: 18px; }
         .contact-banner-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(22px, 2.8vw, 38px);
-          color: rgb(255,255,255); text-transform: uppercase;
-          line-height: 1.1; margin-bottom: 10px;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(32px, 3.6vw, 52px); letter-spacing: -0.01em;
+          color: rgb(255,255,255);
+          line-height: 1.02; margin-bottom: 14px;
         }
+        .contact-banner-title em { font-style: normal; color: rgb(237,90,89); }
         .contact-banner-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
+          font-size: 15px; color: rgba(255,255,255,0.45);
         }
         .contact-banner-btn {
-          display: inline-flex; align-items: center; gap: 8px;
+          display: inline-flex; align-items: center; gap: 12px;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 16px 36px; border-radius: 4px;
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          padding: 18px 32px; border-radius: 4px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 12px; font-weight: 500;
           text-transform: uppercase; text-decoration: none;
           white-space: nowrap; flex-shrink: 0;
           transition: background 150ms;
         }
         .contact-banner-btn:hover { background: rgb(190, 35, 34); }
+        .contact-banner-btn-arrow { transition: transform 250ms cubic-bezier(0.22,1,0.36,1); }
+        .contact-banner-btn:hover .contact-banner-btn-arrow { transform: translateX(4px); }
 
         /* footer styles live in components/Footer.tsx */
 
@@ -475,6 +508,9 @@ export default async function HomePage() {
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
+          .hero-stats { gap: 16px; }
+          .hero-stat-n { font-size: 18px; }
+          .hero-stat-div { height: 30px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
             border: none; border-radius: 0; box-shadow: none;
@@ -515,7 +551,7 @@ export default async function HomePage() {
           }
 
           .services-section { padding: 64px 0 64px; gap: 40px; }
-          .services-header { padding: 0 12px; }
+          .services-section .section-head { padding: 0 12px; }
           .services-grid {
             display: flex;
             overflow-x: auto;
@@ -548,6 +584,24 @@ export default async function HomePage() {
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
           </div>
+          {totalCount > 0 && (
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <span className="hero-stat-n"><span className="hero-stat-live" aria-hidden="true" /><CountUp value={totalCount} /></span>
+                <span className="hero-stat-l">Produse în catalog</span>
+              </div>
+              <span className="hero-stat-div" aria-hidden="true" />
+              <div className="hero-stat">
+                <span className="hero-stat-n"><CountUp value={brands.length} /></span>
+                <span className="hero-stat-l">Branduri</span>
+              </div>
+              <span className="hero-stat-div" aria-hidden="true" />
+              <div className="hero-stat">
+                <span className="hero-stat-n"><CountUp value={26} suffix="+" /></span>
+                <span className="hero-stat-l">Ani de experiență</span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -560,8 +614,9 @@ export default async function HomePage() {
       {enrichedSubs.length > 0 && (
         <section className="carousel-section noise-dark">
           <div className="carousel-inner">
-            <div className="carousel-header">
-              <h2 className="carousel-title">EXPLOREAZA</h2>
+            <div className="carousel-header section-head on-dark">
+              <span className="eyebrow-mono"><span className="idx">01</span><span className="sep">/</span>Subcategorii</span>
+              <h2 className="display-title">Explorează catalogul</h2>
               <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
             </div>
           </div>
@@ -571,8 +626,9 @@ export default async function HomePage() {
 
       {/* ── SERVICES ── */}
       <section className="services-section">
-        <div className="services-header">
-          <h2 className="section-title">SERVICII COMPLETE</h2>
+        <div className="section-head">
+          <span className="eyebrow-mono"><span className="idx">02</span><span className="sep">/</span>Servicii</span>
+          <h2 className="display-title">Servicii complete</h2>
           <p className="section-sub">Scule profesionale, consultanta, achizitii, garantie si service</p>
         </div>
         <ServicesGrid
@@ -587,12 +643,15 @@ export default async function HomePage() {
       {/* ── CONTACT BANNER ── */}
       <div className="contact-banner-wrap">
         <div className="contact-banner noise-dark">
-          <div>
-            <span className="contact-banner-eyebrow">Hai sa vorbim</span>
-            <h2 className="contact-banner-title">RĂSPUNDEM RAPID.<br />LIVRĂM ÎN TOATĂ ȚARA.</h2>
+          <div className="on-dark">
+            <span className="eyebrow-mono"><span className="idx">03</span><span className="sep">/</span>Hai să vorbim</span>
+            <h2 className="contact-banner-title">Răspundem rapid.<br /><em>Livrăm în toată țara.</em></h2>
             <p className="contact-banner-sub">Consultanța specializata</p>
           </div>
-          <Link href="/contact" className="contact-banner-btn">CONTACT</Link>
+          <Link href="/contact" className="contact-banner-btn">
+            Contact
+            <svg className="contact-banner-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </Link>
         </div>
       </div>
 

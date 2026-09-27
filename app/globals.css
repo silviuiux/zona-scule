@@ -129,6 +129,29 @@ body::before {
 }
 .noise-dark > * { position: relative; z-index: 2; }
 
+/* ─── SHARED TYPE SYSTEM ──────────────────────────────────────────────────
+   Two voices: Neuton for display headings (the hero's voice), JetBrains
+   Mono for small data/wayfinding labels — the tension between the two is
+   the point. `.eyebrow-mono` takes an optional `.idx` child for numbered
+   section markers ("01 / Servicii"); `.on-dark` flips both for dark bands. */
+.eyebrow-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(0,0,0,0.45);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.eyebrow-mono .idx { color: var(--red); }
+.eyebrow-mono .sep { opacity: 0.35; }
+.display-title {
+  font-family: 'Neuton', serif; font-weight: 400;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1; letter-spacing: -0.01em;
+  color: var(--black);
+}
+.on-dark.eyebrow-mono, .on-dark .eyebrow-mono { color: rgba(255,255,255,0.45); }
+.on-dark.display-title, .on-dark .display-title { color: rgb(255,255,255); }
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
