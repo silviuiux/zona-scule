@@ -125,7 +125,7 @@ export default async function HomePage() {
           padding: 64px 12px;
         }
         .stats-grid {
-          display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
           min-height: 25vh;
           border-top: 1px solid rgba(0,0,0,0.08);
           border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -140,7 +140,7 @@ export default async function HomePage() {
         .stat-cell:last-child { border-right: none; }
         .stat-n {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: clamp(56px, 7.5vw, 128px); font-weight: 500; line-height: 0.9;
+          font-size: clamp(44px, 5vw, 88px); font-weight: 500; line-height: 0.9;
           color: rgb(0,0,0); letter-spacing: -0.05em;
           font-variant-numeric: tabular-nums;
           white-space: nowrap;
@@ -484,10 +484,10 @@ export default async function HomePage() {
         .contact-banner-title {
           font-family: 'Neuton', serif; font-weight: 400;
           font-size: clamp(32px, 3.6vw, 52px); letter-spacing: -0.01em;
-          color: rgb(255,255,255);
+          color: rgba(255,255,255,0.5);
           line-height: 1.02; margin-bottom: 14px;
         }
-        .contact-banner-title em { font-style: normal; color: rgb(237,90,89); }
+        .contact-banner-title em { font-style: normal; color: rgb(255,255,255); }
         .contact-banner-sub {
           font-family: 'Recursive', sans-serif;
           font-size: 15px; color: rgba(255,255,255,0.45);
@@ -615,6 +615,10 @@ export default async function HomePage() {
             <div className="stat-cell">
               <span className="eyebrow-mono">Ani de experiență</span>
               <span className="stat-n"><CountUp value={26} suffix="+" onView delay={300} /></span>
+            </div>
+            <div className="stat-cell">
+              <span className="eyebrow-mono">Clienți mulțumiți</span>
+              <span className="stat-n"><CountUp value={3210} onView delay={450} tickEvery={5000} /></span>
             </div>
           </div>
         </section>
