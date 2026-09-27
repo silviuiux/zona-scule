@@ -188,7 +188,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
           color: rgb(0,0,0); text-decoration: none;
-          border: 1.5px solid rgba(0,0,0,0.3); border-radius: 2px; padding: 10px 24px;
+          border: 1.5px solid rgba(0,0,0,0.3); border-radius: 2px; padding: 7px 24px;
           transition: background 150ms, color 150ms, border-color 150ms;
         }
         .art-products-link:hover {

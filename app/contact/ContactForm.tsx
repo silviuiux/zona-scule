@@ -146,7 +146,7 @@ export default function ContactForm({
         /* Footer / submit */
         .cf-footer { padding: 64px 32px 32px; }
         .cf-submit {
-          width: 100%; padding: 18px;
+          width: 100%; padding: 13px;
           background: rgb(0,0,0); color: rgb(255,255,255);
           border: none;
           font-family: 'Inter', sans-serif;

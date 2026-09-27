@@ -132,7 +132,7 @@ export default function BrandLandingTemplate({
         .bp-hero-cta {
           display: inline-flex; align-items: center; gap: 24px;
           background: rgb(0,0,0); color: rgb(255,255,255);
-          padding: 14px 28px; border-radius: 4px; text-decoration: none;
+          padding: 10px 28px; border-radius: 4px; text-decoration: none;
           font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500;
           text-transform: uppercase;
           transition: background 150ms;
@@ -161,7 +161,7 @@ export default function BrandLandingTemplate({
           display: inline-flex; align-items: center; gap: 8px;
           font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
-          padding: 13px 24px; border-radius: 4px; text-decoration: none;
+          padding: 9px 24px; border-radius: 4px; text-decoration: none;
           background: var(--brand-accent); color: rgb(255,255,255);
           transition: filter 150ms;
         }
@@ -361,7 +361,7 @@ export default function BrandLandingTemplate({
         .bp-crosssell-body { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.55); max-width: 640px; }
         .bp-crosssell-btn {
           flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px;
-          background: var(--brand-accent); color: rgb(255,255,255); padding: 15px 32px; border-radius: 4px;
+          background: var(--brand-accent); color: rgb(255,255,255); padding: 11px 32px; border-radius: 4px;
           font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
           text-transform: uppercase; text-decoration: none; white-space: nowrap; transition: filter 150ms;
         }

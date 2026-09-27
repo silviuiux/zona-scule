@@ -109,17 +109,17 @@ export default function DotsParallax() {
     // ── Cross-line laser ──
     // The beams glide (no overshoot) onto the snapped dot row/column, while
     // the cross as a whole hangs on a damped angular spring — like the
-    // pendulum of a self-levelling laser. Moving the cursor swings it a
-    // degree or two; it rocks back and forth and settles level.
+    // pendulum of a self-levelling laser. Moving the cursor tips it a
+    // fraction of a degree; it rocks back and forth and settles level.
     const GLIDE = 0.3 // share of the remaining distance covered per step
     const ROT_K = 0.07
     const ROT_DAMP = 0.9
-    const ROT_PUSH = 0.012 // deg/step of angular velocity per px of cursor travel
-    const ROT_MAX_VEL = 0.35 // deg/step
-    const ROT_MAX = 2.5 // deg
-    const IDLE_KICK = 0.3 // deg/step → a ~1.5° rock around level
-    const IDLE_WIGGLE_MS = 7000 // still cursor → the cross rocks once more
-    const IDLE_FADE_MS = 10000 // still cursor → the laser fades out
+    const ROT_PUSH = 0.004 // deg/step of angular velocity per px of cursor travel
+    const ROT_MAX_VEL = 0.12 // deg/step
+    const ROT_MAX = 0.8 // deg
+    const IDLE_FADE_MS = 4000 // still cursor → the laser fades out…
+    const FADE_OUT_MS = 2000 // …slowly; other on/off changes stay quick
+    const FADE_QUICK_MS = 300
     const STEP_MS = 1000 / 60 // fixed-rate steps, same feel at 60/120Hz
     const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows
 
@@ -133,7 +133,6 @@ export default function DotsParallax() {
     const rot = { angle: 0, vel: 0 }
     let springRaf = 0
     let lastT = 0
-    let wiggleTimer = 0
     let fadeTimer = 0
     let colIdx = NaN // current dot column/row the beams sit on (NaN = unset)
     let rowIdx = NaN
@@ -209,10 +208,11 @@ export default function DotsParallax() {
     }
     // Visible only while the cursor is over empty space AND has moved within
     // the last IDLE_FADE_MS.
-    const syncLaser = () => {
+    const syncLaser = (fadeMs = FADE_QUICK_MS) => {
       const on = overEmpty && awake
       if (on === laserOn) return
       laserOn = on
+      root.style.setProperty('--laser-fade', `${fadeMs}ms`)
       root.style.setProperty('--laser-on', on ? '1' : '0')
       if (on) {
         // Appear already on the cursor and level, not gliding in from a
@@ -226,14 +226,10 @@ export default function DotsParallax() {
     }
 
     const resetIdle = () => {
-      window.clearTimeout(wiggleTimer)
       window.clearTimeout(fadeTimer)
-      wiggleTimer = window.setTimeout(() => {
-        if (laserOn) pushRotation(IDLE_KICK)
-      }, IDLE_WIGGLE_MS)
       fadeTimer = window.setTimeout(() => {
         awake = false
-        syncLaser()
+        syncLaser(FADE_OUT_MS)
       }, IDLE_FADE_MS)
     }
 
@@ -277,7 +273,6 @@ export default function DotsParallax() {
       targetY = 0.5
       overEmpty = false
       syncLaser()
-      window.clearTimeout(wiggleTimer)
       window.clearTimeout(fadeTimer)
       kick()
     }
@@ -291,7 +286,6 @@ export default function DotsParallax() {
       if (raf) cancelAnimationFrame(raf)
       if (hoverRaf) cancelAnimationFrame(hoverRaf)
       if (springRaf) cancelAnimationFrame(springRaf)
-      window.clearTimeout(wiggleTimer)
       window.clearTimeout(fadeTimer)
     }
   }, [])

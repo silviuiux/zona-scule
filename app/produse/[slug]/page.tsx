@@ -143,7 +143,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .pdp-desc li { margin-bottom: 4px; }
         .pdp-desc li:last-child { margin-bottom: 0; }
         .cere-btn {
-          display: block; width: 100%; padding: 14px;
+          display: block; width: 100%; padding: 10px;
           background: rgb(217,44,43); color: rgb(255,255,255); border: none;
           border-radius: 3px; font-family: 'Inter', sans-serif;
           font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
@@ -238,7 +238,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .cta-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
         .cta-primary {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 11px 20px; background: rgb(217,44,43); color: rgb(255,255,255);
+          padding: 8px 20px; background: rgb(217,44,43); color: rgb(255,255,255);
           border-radius: 3px; font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
           text-transform: uppercase; text-decoration: none; white-space: nowrap;
@@ -247,7 +247,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .cta-primary:hover { background: rgb(190,35,34); }
         .cta-secondary {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 11px 20px;
+          padding: 8px 20px;
           border: 1px solid rgba(255,255,255,0.2); color: rgb(255,255,255);
           border-radius: 3px; font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600; letter-spacing: 0.07em;

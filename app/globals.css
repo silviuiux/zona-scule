@@ -68,42 +68,42 @@ body::before {
 }
 
 /* ─── CROSS-LINE LASER ─────────────────────────────────────────────────────
-   While the cursor rests on empty page space, two hairline red beams cross
-   at it, running along the dot row and dot column through the cursor and
-   fading out ~420px along each line — the dots themselves stay untouched.
-   .laser shares body::before's transform (cursor drift) so the beams stay
-   registered on the dot grid. <DotsParallax /> writes the variables in this
-   layer's own (pre-transform) coordinates:
+   While the cursor rests on empty page space, two faint green hairlines
+   cross at it, running edge to edge along the dot row and dot column
+   through the cursor — the dots themselves stay untouched. .laser shares
+   body::before's transform (cursor drift) so the beams stay registered on
+   the dot grid. <DotsParallax /> writes the variables in this layer's own
+   (pre-transform) coordinates:
      --laser-x / --laser-y   beam positions (glide onto the snapped row/column)
      --laser-rot             tilt of the whole cross about its intersection —
                              spring-animated, so it rocks and settles level
-     --laser-cx / --laser-cy cursor position (centre of each beam's falloff)
-     --laser-on              0/1, cross-fades the whole thing */
+     --laser-on              0/1, cross-fades the whole thing
+     --laser-fade            fade duration (slow when fading out on idle)
+   The beam layers overhang the viewport by --laser-bleed so neither the
+   drift translate nor the tilt can pull a line's end inside the screen. */
 .laser {
+  --laser-bleed: 64px;
+  --laser-color: rgba(22,163,74,0.35);
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   transform: translate3d(var(--dot-tx, 0px), var(--dot-ty, 0px), 0) scale(var(--dot-scale, 1));
   opacity: var(--laser-on, 0);
-  transition: opacity 600ms ease;
+  transition: opacity var(--laser-fade, 300ms) ease;
 }
 .laser-h, .laser-v {
-  position: absolute; inset: 0;
+  position: absolute; inset: calc(-1 * var(--laser-bleed));
   background-repeat: no-repeat;
-  transform-origin: var(--laser-x, 0px) var(--laser-y, 0px);
+  transform-origin: calc(var(--laser-x, 0px) + var(--laser-bleed)) calc(var(--laser-y, 0px) + var(--laser-bleed));
   transform: rotate(var(--laser-rot, 0deg));
 }
 .laser-h {
   background-image: linear-gradient(to bottom,
-    transparent calc(var(--laser-y, -99px) - 0.5px), rgba(217,44,43,0.5) calc(var(--laser-y, -99px) - 0.5px),
-    rgba(217,44,43,0.5) calc(var(--laser-y, -99px) + 0.5px), transparent calc(var(--laser-y, -99px) + 0.5px));
-  -webkit-mask-image: linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
-  mask-image: linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
+    transparent calc(var(--laser-y, -999px) + var(--laser-bleed) - 0.5px), var(--laser-color) calc(var(--laser-y, -999px) + var(--laser-bleed) - 0.5px),
+    var(--laser-color) calc(var(--laser-y, -999px) + var(--laser-bleed) + 0.5px), transparent calc(var(--laser-y, -999px) + var(--laser-bleed) + 0.5px));
 }
 .laser-v {
   background-image: linear-gradient(to right,
-    transparent calc(var(--laser-x, -99px) - 0.5px), rgba(217,44,43,0.5) calc(var(--laser-x, -99px) - 0.5px),
-    rgba(217,44,43,0.5) calc(var(--laser-x, -99px) + 0.5px), transparent calc(var(--laser-x, -99px) + 0.5px));
-  -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
-  mask-image: linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
+    transparent calc(var(--laser-x, -999px) + var(--laser-bleed) - 0.5px), var(--laser-color) calc(var(--laser-x, -999px) + var(--laser-bleed) - 0.5px),
+    var(--laser-color) calc(var(--laser-x, -999px) + var(--laser-bleed) + 0.5px), transparent calc(var(--laser-x, -999px) + var(--laser-bleed) + 0.5px));
 }
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .laser { display: none; }

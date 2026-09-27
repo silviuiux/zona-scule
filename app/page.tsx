@@ -181,7 +181,7 @@ export default async function HomePage() {
           padding: 0 1px 0 32px;
           flex: 1;
           min-width: 0;
-          height: 56px;
+          height: 48px;
         }
         .hero-search-icon {
           background: none; border: none; cursor: pointer;
@@ -213,7 +213,7 @@ export default async function HomePage() {
         .hero-catalog-cta {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 32px; height: 56px;
+          padding: 0 32px; height: 48px;
           font-family: 'Montserrat', sans-serif;
           font-size: 12px; font-weight: 500;
           text-transform: uppercase;
@@ -488,7 +488,7 @@ export default async function HomePage() {
         .contact-banner-btn {
           display: inline-flex; align-items: center; gap: 12px;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 18px 32px; border-radius: 4px;
+          padding: 13px 32px; border-radius: 4px;
           font-family: 'Montserrat', sans-serif;
           font-size: 12px; font-weight: 500;
           text-transform: uppercase; text-decoration: none;
@@ -518,13 +518,13 @@ export default async function HomePage() {
           }
           .hero-search-box {
             min-width: 0; width: 100%;
-            height: auto; padding: 12px 16px;
+            height: auto; padding: 9px 16px;
             border: 1px solid rgba(0,0,0,0.08);
             border-radius: 8px;
           }
           .hero-catalog-cta {
             justify-content: center;
-            height: auto; padding: 12px 24px;
+            height: auto; padding: 9px 24px;
             border-radius: 8px;
           }
 
