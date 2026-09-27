@@ -514,7 +514,7 @@ export default function Nav() {
           <div className="nav-links">
             <Link href="/produse" className="nav-link">Catalog</Link>
             <Link href="/branduri" className="nav-link">Branduri</Link>
-            <Link href="/despre-noi" className="nav-link">Despre noi</Link>
+            <Link href="/contact#despre-noi" className="nav-link">Despre noi</Link>
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>
         </div>

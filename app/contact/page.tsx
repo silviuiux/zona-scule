@@ -1,6 +1,14 @@
+import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
+import TestimonialsCarousel from '@/components/TestimonialsCarousel'
+import { TESTIMONIALS } from '@/lib/testimonials'
 import ContactForm from './ContactForm'
+
+export const metadata: Metadata = {
+  title: 'Contact — Zona Scule',
+  description: 'Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.',
+}
 
 export default function ContactPage({
   searchParams,
@@ -14,15 +22,19 @@ export default function ContactPage({
         .contact-page {
           padding-top: 52px;
           min-height: 100vh;
-          background: rgb(244,244,244);
+          /* Transparent over the white body, so the dot grid and laser show
+             through; positioned so content paints above body::before. */
+          position: relative; z-index: 1;
         }
         .contact-inner {
           /* Same max-width + 12px side padding as the nav's own container
              (Nav.tsx .nav-inner) — was 102px, way more inset than the nav,
              which is why this page read as noticeably narrower. */
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 12px 96px;
+          padding: 80px 12px 120px;
         }
+        .section-head { display: flex; flex-direction: column; gap: 14px; }
+        .contact-section { margin-top: 160px; scroll-margin-top: 96px; }
 
         /* ── Header ── */
         .contact-location { margin-bottom: 20px; }
@@ -118,8 +130,45 @@ export default function ContactPage({
         }
         .contact-map-badge:hover .contact-map-badge-action { color: rgb(217,44,43); }
 
+        /* ── Despre noi ── */
+        .about-grid {
+          display: grid; grid-template-columns: 7fr 5fr; gap: 64px;
+          align-items: end; margin-bottom: 48px;
+        }
+        .about-title .red { color: rgb(217,44,43); }
+        .about-lead {
+          font-family: 'Recursive', sans-serif;
+          font-size: 17px; line-height: 1.6; color: rgba(0,0,0,0.6);
+          max-width: 56ch;
+        }
+        .about-facts {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.08);
+        }
+        .about-fact {
+          padding: 32px;
+          border-right: 1px solid rgba(0,0,0,0.08);
+          display: flex; flex-direction: column; gap: 12px;
+        }
+        .about-fact:last-child { border-right: none; }
+        .about-fact-value {
+          font-family: 'Neuton', serif;
+          font-size: 48px; line-height: 1; color: rgb(217,44,43);
+        }
+        .about-fact-label {
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+          line-height: 1.6; color: rgba(0,0,0,0.5);
+        }
+
         @media (max-width: 768px) {
           .contact-inner { padding: 48px 12px 64px; }
+          .contact-section { margin-top: 96px; }
+          .about-grid { grid-template-columns: 1fr; gap: 24px; }
+          .about-facts { grid-template-columns: 1fr; }
+          .about-fact { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
+          .about-fact:last-child { border-bottom: none; }
           .contact-info-bar { grid-template-columns: 1fr; }
           .info-card { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
           .info-card:last-child { border-bottom: none; }
@@ -185,6 +234,41 @@ export default function ContactPage({
               </a>
             </div>
           </div>
+
+          {/* Despre noi (was /despre-noi, which now redirects here) */}
+          <section id="despre-noi" className="contact-section">
+            <div className="about-grid">
+              <div className="section-head">
+                <span className="eyebrow-mono">Despre noi</span>
+                <h2 className="display-title about-title">
+                  Distribuitor autorizat de <span className="red">scule profesionale</span>, de peste 26 de ani.
+                </h2>
+              </div>
+              <p className="about-lead">
+                Technology Production SRL (Zona Scule) furnizează scule electrice, industriale
+                și de construcții pentru profesioniști și ateliere din toată țara.
+              </p>
+            </div>
+            <div className="about-facts">
+              <div className="about-fact">
+                <span className="about-fact-value">26+</span>
+                <span className="about-fact-label">Ani de experiență pe piața din România</span>
+              </div>
+              <div className="about-fact">
+                <span className="about-fact-value">S.E.A.P.</span>
+                <span className="about-fact-label">Furnizor înregistrat pentru achiziții publice</span>
+              </div>
+              <div className="about-fact">
+                <span className="about-fact-value">08:30–17:00</span>
+                <span className="about-fact-label">Luni – Vineri, Strada Sfânta Vineri 28, Pitești</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Testimoniale — last section before the footer */}
+          <section className="contact-section">
+            <TestimonialsCarousel items={TESTIMONIALS} />
+          </section>
 
         </div>
       </div>
