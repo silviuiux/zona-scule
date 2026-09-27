@@ -31,10 +31,11 @@ export default function ContactPage({
              (Nav.tsx .nav-inner) — was 102px, way more inset than the nav,
              which is why this page read as noticeably narrower. */
           max-width: 1440px; margin: 0 auto;
-          padding: 80px 12px 120px;
+          padding: 80px 12px 0;
         }
+        .contact-inner.after-map { padding: 0 12px var(--space-section); }
         .section-head { display: flex; flex-direction: column; gap: 14px; }
-        .contact-section { margin-top: 160px; scroll-margin-top: 96px; }
+        .contact-section { margin-top: var(--space-section); scroll-margin-top: 96px; }
 
         /* ── Header ── */
         .contact-location { margin-bottom: 20px; }
@@ -58,7 +59,6 @@ export default function ContactPage({
           gap: 0;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
-          margin-bottom: 96px;
         }
         .info-card {
           padding: 32px;
@@ -86,18 +86,14 @@ export default function ContactPage({
           font-size: 12px; color: rgba(0,0,0,0.4);
         }
 
-        /* ── Form + Photo ── */
-        .contact-bottom {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          align-items: stretch;
-        }
-        .contact-photo {
+        /* ── Map — full-bleed band under the form ── */
+        .contact-map {
           position: relative; overflow: hidden;
+          margin-top: var(--space-section);
+          height: clamp(420px, 62vh, 720px);
           background: rgb(220,218,214);
         }
-        .contact-photo iframe {
+        .contact-map iframe {
           width: 100%; height: 100%;
           display: block; border: 0;
           /* Slight desaturation so the map sits quietly behind the badge
@@ -105,7 +101,8 @@ export default function ContactPage({
           filter: grayscale(0.15) contrast(1.02);
         }
         .contact-map-badge {
-          position: absolute; left: 16px; bottom: 16px;
+          position: absolute; bottom: 24px;
+          left: max(12px, calc((100% - 1440px) / 2 + 12px)); /* aligned with the content container */
           display: inline-flex; align-items: center; gap: 8px;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
@@ -163,8 +160,7 @@ export default function ContactPage({
         }
 
         @media (max-width: 768px) {
-          .contact-inner { padding: 48px 12px 64px; }
-          .contact-section { margin-top: 96px; }
+          .contact-inner { padding: 48px 12px 0; }
           .about-grid { grid-template-columns: 1fr; gap: 24px; }
           .about-facts { grid-template-columns: 1fr; }
           .about-fact { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
@@ -172,8 +168,7 @@ export default function ContactPage({
           .contact-info-bar { grid-template-columns: 1fr; }
           .info-card { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
           .info-card:last-child { border-bottom: none; }
-          .contact-bottom { grid-template-columns: 1fr; }
-          .contact-photo { min-height: 300px; }
+          .contact-map { height: 360px; }
         }
       `}</style>
 
@@ -210,30 +205,32 @@ export default function ContactPage({
             </div>
           </div>
 
-          {/* Form + Photo */}
-          <div className="contact-bottom">
-            <ContactForm searchParams={searchParams} />
-            <div className="contact-photo">
-              <iframe
-                src="https://www.google.com/maps?q=44.8576673,24.8794647&z=17&output=embed"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-                title="Zona Scule — Strada Sfânta Vineri 28, Pitești"
-              />
-              <a
-                href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z/data=!4m6!3m5!1s0x40b2bc886b7beedf:0xf306c5b64dd18ca6!8m2!3d44.8576673!4d24.8794647!16s%2Fg%2F11hht09gys"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-map-badge"
-              >
-                <div className="contact-map-badge-text">
-                  <span className="contact-map-badge-label">Sfanta Vineri 28, Pitesti</span>
-                  <span className="contact-map-badge-action">Deschide în Google Maps ↗</span>
-                </div>
-              </a>
+          <ContactForm searchParams={searchParams} />
+        </div>
+
+        {/* Map — full-bleed */}
+        <div className="contact-map">
+          <iframe
+            src="https://www.google.com/maps?q=44.8576673,24.8794647&z=17&output=embed"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+            title="Zona Scule — Strada Sfânta Vineri 28, Pitești"
+          />
+          <a
+            href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z/data=!4m6!3m5!1s0x40b2bc886b7beedf:0xf306c5b64dd18ca6!8m2!3d44.8576673!4d24.8794647!16s%2Fg%2F11hht09gys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-map-badge"
+          >
+            <div className="contact-map-badge-text">
+              <span className="contact-map-badge-label">Sfanta Vineri 28, Pitesti</span>
+              <span className="contact-map-badge-action">Deschide în Google Maps ↗</span>
             </div>
-          </div>
+          </a>
+        </div>
+
+        <div className="contact-inner after-map">
 
           {/* Despre noi (was /despre-noi, which now redirects here) */}
           <section id="despre-noi" className="contact-section">

@@ -181,17 +181,17 @@ export default async function HomePage() {
           width: 50%;
           min-width: 320px;
           border: 1px solid rgba(0,0,0,0.06);
-          border-radius: 10px;
+          border-radius: 4px;
           overflow: hidden;
         }
         /* ── Hero search input ── */
         .hero-search-box {
           display: flex; align-items: center; gap: 14px;
           background: rgb(255,255,255);
-          padding: 0 1px 0 32px;
+          /* 1px inset all round for the button; height follows the button */
+          padding: 1px 1px 1px 32px;
           flex: 1;
           min-width: 0;
-          height: 48px;
         }
         .hero-search-icon {
           background: none; border: none; cursor: pointer;
@@ -223,7 +223,7 @@ export default async function HomePage() {
         .hero-catalog-cta {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
-          padding: 0 32px; height: 48px;
+          padding: 12px 32px; border-radius: 3px;
           font-family: 'Montserrat', sans-serif;
           font-size: 12px; font-weight: 500;
           text-transform: uppercase;
@@ -530,12 +530,12 @@ export default async function HomePage() {
             min-width: 0; width: 100%;
             height: auto; padding: 9px 16px;
             border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 8px;
+            border-radius: 4px;
           }
           .hero-catalog-cta {
             justify-content: center;
-            height: auto; padding: 9px 24px;
-            border-radius: 8px;
+            height: auto; padding: 12px 24px;
+            border-radius: 3px;
           }
 
           /* Desktop uses an absolutely-positioned masonry (see .cat-card's

@@ -2,6 +2,14 @@
 import { useState, use } from 'react'
 import { submitContactMessage } from './actions'
 
+/**
+ * "Fill-in-the-sentence" contact form: the request reads as one letter —
+ * "Mă numesc ___ și sunt interesat să obțin o ofertă personalizată pentru
+ * ___. Vă rog să mă contactați la ___ / ___" — with the inputs sitting on
+ * the text's underlines, typed values in red Neuton. The sentence itself
+ * becomes the message sent through submitContactMessage (same pipeline as
+ * before: contact_messages row + office email).
+ */
 export default function ContactForm({
   searchParams,
 }: {
@@ -14,220 +22,159 @@ export default function ContactForm({
 
   const [form, setForm] = useState({
     nume: '',
-    email: '',
-    telefon: '',
-    companie: '',
     produs: prefilledProduct,
-    mesaj: prefilledProduct
-      ? `Buna ziua, doresc o oferta pentru: ${prefilledProduct}.`
-      : '',
+    telefon: '',
+    email: '',
   })
-  const [focused, setFocused] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const set = (k: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm(f => ({ ...f, [k]: e.target.value }))
+    (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (sending) return
+    if (!form.produs.trim()) {
+      setError('Spuneți-ne pentru ce doriți oferta.')
+      return
+    }
     setSending(true)
     setError(null)
+    const contact = [form.telefon.trim(), form.email.trim()].filter(Boolean).join(' / ')
     const res = await submitContactMessage({
       nume: form.nume,
       email: form.email,
       telefon: form.telefon,
-      companie: form.companie,
       produs: form.produs,
-      mesaj: form.mesaj,
+      mesaj: `Mă numesc ${form.nume.trim()} și sunt interesat să obțin o ofertă personalizată pentru ${form.produs.trim()}. Vă rog să mă contactați la ${contact}.`,
     })
     setSending(false)
     if (res.ok) setSent(true)
     else setError(res.error ?? 'A apărut o eroare. Încercați din nou.')
   }
 
-  if (sent) {
-    return (
-      <>
-        <style>{`
-          .cf-success {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 64px 32px;
-            background: rgb(255,255,255);
-            border: 1px solid rgba(0,0,0,0.08);
-            text-align: center; gap: 12px;
-          }
-          .cf-success-title {
-            font-family: 'Neuton', serif; font-weight: 400;
-            font-size: 44px; line-height: 1; color: rgb(0,0,0);
-          }
-          .cf-success-sub {
-            font-family: 'Recursive', sans-serif;
-            font-size: 14px; color: rgba(0,0,0,0.5); line-height: 1.6;
-          }
-        `}</style>
-        <div className="cf-success">
-          <p className="cf-success-title">Mesaj trimis!</p>
-          <p className="cf-success-sub">Va contactam in cel mai scurt timp.</p>
-        </div>
-      </>
-    )
-  }
-
   return (
-    <>
+    <section className="cf" aria-labelledby="cf-title">
       <style>{`
-        .cf-wrap {
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
-          display: flex; flex-direction: column;
-        }
-        .cf-header {
-          padding: 64px 32px 0;
-          border-bottom: none;
-        }
+        .cf { padding: var(--space-section) 0; border-bottom: 1px solid rgba(0,0,0,0.12); }
         .cf-title {
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(36px, 3.6vw, 52px); letter-spacing: -0.01em;
-          line-height: 1; color: rgb(0,0,0);
-          margin-bottom: 12px;
-        }
-        .cf-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.45);
-          line-height: 1.6; max-width: 360px;
+          font-size: clamp(44px, 5vw, 72px); line-height: 1; letter-spacing: -0.015em;
+          color: rgb(0,0,0);
+          margin-bottom: clamp(48px, 7vw, 96px);
         }
 
-        /* Fields */
-        .cf-fields { flex: 1; padding: 64px 32px 0; }
-
-        .cf-field {
-          display: flex; align-items: center;
-          border-bottom: 1px solid rgba(0,0,0,0.08);
-          position: relative;
-          transition: box-shadow 120ms;
+        /* The sentence */
+        .cf-letter {
+          font-family: 'Montserrat', sans-serif; font-weight: 400;
+          font-size: clamp(22px, 2.3vw, 34px); line-height: 1.2;
+          color: rgb(30,30,30);
+          display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 36px);
         }
-        .cf-field.cf-last { border-bottom: none; }
-        .cf-field.cf-focused {
-          box-shadow: inset 0 0 0 1px rgba(30,100,255,0.35);
+        .cf-line { display: flex; align-items: flex-end; flex-wrap: wrap; column-gap: 14px; row-gap: 8px; }
+        .cf-line > span { padding-bottom: 6px; white-space: nowrap; }
+        .cf-input {
+          flex: 1 1 280px; min-width: 0;
+          border: none; border-bottom: 1px solid rgba(0,0,0,0.3); border-radius: 0;
+          background: transparent; outline: none;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(24px, 2.4vw, 34px); line-height: 1.2;
+          color: rgb(217,44,43);
+          padding: 0 0 6px clamp(0px, 1.6vw, 24px);
+          transition: border-color 150ms;
         }
+        .cf-input.name { flex: 0 1 30%; min-width: 220px; }
+        .cf-input.full { padding-left: 0; }
+        .cf-input::placeholder { color: rgba(0,0,0,0.22); }
+        .cf-input:focus { border-bottom-color: rgb(217,44,43); }
 
-        .cf-field input,
-        .cf-field textarea {
-          flex: 1; min-width: 0;
-          border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgb(0,0,0);
-          padding: 17px 0;
-          resize: none;
+        .cf-foot {
+          margin-top: clamp(56px, 7vw, 96px);
+          display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
         }
-        .cf-field textarea { min-height: 88px; padding-top: 18px; }
-
-        .cf-field input::placeholder,
-        .cf-field textarea::placeholder { color: rgba(0,0,0,0.28); }
-
-        /* Right label — only visible when field has a value */
-        .cf-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.3);
-          white-space: nowrap; padding-left: 12px; flex-shrink: 0;
-          pointer-events: none; opacity: 0; transition: opacity 120ms;
+        .cf-note {
+          font-family: 'Montserrat', sans-serif; font-weight: 400;
+          font-size: clamp(17px, 1.6vw, 24px); line-height: 1.4;
+          color: rgba(0,0,0,0.5); max-width: 30ch;
         }
-        .cf-field input:not(:placeholder-shown) ~ .cf-label,
-        .cf-field textarea:not(:placeholder-shown) ~ .cf-label { opacity: 1; }
-
-        /* Red prefilled value (from PDP "cere oferta") */
-        .cf-field.cf-prefilled input { color: rgb(217,44,43); }
-
-        /* Footer / submit */
-        .cf-footer { padding: 64px 32px 32px; }
+        .cf-error { font-family: 'Montserrat', sans-serif; font-size: 14px; color: rgb(217,44,43); margin-top: 10px; }
         .cf-submit {
-          width: 100%; padding: 13px;
+          display: inline-flex; align-items: center; gap: 40px;
           background: rgb(0,0,0); color: rgb(255,255,255);
-          border: none;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          cursor: pointer; transition: background 150ms;
+          border: none; border-radius: 4px; cursor: pointer;
+          padding: 16px 16px 16px 64px;
+          font-family: 'Montserrat', sans-serif; font-weight: 500;
+          font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+          transition: background 150ms;
         }
         .cf-submit:hover { background: rgb(217,44,43); }
+        .cf-submit:disabled { opacity: 0.55; cursor: default; }
+        .cf-submit-icon {
+          width: 32px; height: 32px; border-radius: 50%;
+          background: rgba(255,255,255,0.14);
+          display: inline-flex; align-items: center; justify-content: center;
+          transition: transform 250ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .cf-submit:hover .cf-submit-icon { transform: translateX(3px); }
+
+        .cf-thanks { font-family: 'Montserrat', sans-serif; font-size: clamp(22px, 2.3vw, 34px); line-height: 1.3; color: rgb(30,30,30); max-width: 32ch; }
+        .cf-thanks em { font-style: normal; font-family: 'Neuton', serif; color: rgb(217,44,43); }
 
         @media (max-width: 768px) {
-          .cf-header { padding: 40px 20px 0; }
-          .cf-fields { padding: 40px 20px 0; }
-          .cf-footer { padding: 40px 20px 32px; }
+          .cf-line { flex-direction: column; align-items: stretch; }
+          .cf-line > span { white-space: normal; padding-bottom: 0; }
+          .cf-input, .cf-input.name { flex: 1 1 auto; width: 100%; padding-left: 0; }
+          .cf-submit { width: 100%; justify-content: space-between; padding-left: 24px; }
         }
       `}</style>
 
-      <form className="cf-wrap" onSubmit={handleSubmit}>
-        <div className="cf-header">
-          <h2 className="cf-title">Hai să vorbim</h2>
-          <p className="cf-sub">
-            Completati formularul si va raspundem in cel mai scurt
-            timp cu o oferta personalizata nevoilor dumneavoastra.
-          </p>
-        </div>
+      <h2 id="cf-title" className="cf-title">Hai să vorbim</h2>
 
-        <div className="cf-fields">
-          <div className={`cf-field${focused === 'nume' ? ' cf-focused' : ''}`}>
-            <input placeholder="nume" value={form.nume} onChange={set('nume')}
-              onFocus={() => setFocused('nume')} onBlur={() => setFocused(null)} />
-            <span className="cf-label">nume</span>
+      {sent ? (
+        <p className="cf-thanks">
+          Mulțumim{form.nume.trim() ? <>, <em>{form.nume.trim()}</em></> : null}! Pregătim oferta și vă contactăm în cel mai scurt timp.
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <div className="cf-letter">
+            <div className="cf-line">
+              <span>Mă numesc</span>
+              <input className="cf-input name" required autoComplete="name" aria-label="Nume"
+                placeholder="numele dumneavoastră" value={form.nume} onChange={set('nume')} />
+              <span>și sunt interesat să obțin o ofertă</span>
+            </div>
+            <div className="cf-line">
+              <span>personalizată pentru</span>
+              <input className="cf-input" required aria-label="Produse de interes"
+                placeholder="produsele sau cantitățile dorite" value={form.produs} onChange={set('produs')} />
+            </div>
+            <div className="cf-line">
+              <span>Vă rog să mă contactați la</span>
+              <input className="cf-input" type="tel" autoComplete="tel" aria-label="Telefon"
+                placeholder="telefon" value={form.telefon} onChange={set('telefon')} />
+            </div>
+            <div className="cf-line">
+              <input className="cf-input full" type="email" required autoComplete="email" aria-label="Email"
+                placeholder="adresa de e-mail" value={form.email} onChange={set('email')} />
+            </div>
           </div>
 
-          <div className={`cf-field${focused === 'email' ? ' cf-focused' : ''}`}>
-            <input type="email" placeholder="email" value={form.email} onChange={set('email')}
-              onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} />
-            <span className="cf-label">email</span>
+          <div className="cf-foot">
+            <div>
+              <p className="cf-note">Pregătim oferte personalizate, întotdeauna adaptate nevoilor și cerințelor dumneavoastră.</p>
+              {error && <p className="cf-error">{error}</p>}
+            </div>
+            <button type="submit" className="cf-submit" disabled={sending}>
+              {sending ? 'Se trimite…' : 'Trimite mesajul'}
+              <span className="cf-submit-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </button>
           </div>
-
-          <div className={`cf-field${focused === 'telefon' ? ' cf-focused' : ''}`}>
-            <input type="tel" placeholder="telefon" value={form.telefon} onChange={set('telefon')}
-              onFocus={() => setFocused('telefon')} onBlur={() => setFocused(null)} />
-            <span className="cf-label">telefon</span>
-          </div>
-
-          <div className={`cf-field${focused === 'companie' ? ' cf-focused' : ''}`}>
-            <input placeholder="companie (optional)" value={form.companie} onChange={set('companie')}
-              onFocus={() => setFocused('companie')} onBlur={() => setFocused(null)} />
-            <span className="cf-label">companie</span>
-          </div>
-
-          <div className={`cf-field${focused === 'produs' ? ' cf-focused' : ''}${prefilledProduct ? ' cf-prefilled' : ''}`}>
-            <input placeholder="produse de interes" value={form.produs} onChange={set('produs')}
-              onFocus={() => setFocused('produs')} onBlur={() => setFocused(null)} />
-            <span className="cf-label">produse de interes</span>
-          </div>
-
-          <div className={`cf-field cf-last${focused === 'mesaj' ? ' cf-focused' : ''}`}>
-            <textarea
-              placeholder="Descrieti produsele care va intereseaza, cantitatile dorite sau orice alt mesaj."
-              value={form.mesaj} onChange={set('mesaj')}
-              onFocus={() => setFocused('mesaj')} onBlur={() => setFocused(null)}
-            />
-            <span className="cf-label">mesaj</span>
-          </div>
-        </div>
-
-        <div className="cf-footer">
-          {error && (
-            <p style={{
-              fontFamily: 'Recursive, sans-serif',
-              fontSize: '13px',
-              color: 'rgb(217,44,43)',
-              marginBottom: '14px',
-              lineHeight: 1.5,
-            }}>{error}</p>
-          )}
-          <button type="submit" className="cf-submit" disabled={sending} style={sending ? { opacity: 0.55, cursor: 'default' } : undefined}>
-            {sending ? 'Se trimite…' : 'Trimite mesajul'}
-          </button>
-        </div>
-      </form>
-    </>
+        </form>
+      )}
+    </section>
   )
 }

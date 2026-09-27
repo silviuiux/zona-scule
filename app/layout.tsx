@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Bungee (admin login only), Recursive (body), Inter (UI), Montserrat (pills/buttons), Neuton (display), JetBrains Mono (data labels) */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Bungee&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&family=Montserrat:wght@500&family=Neuton&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bungee&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500&family=Neuton&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
       </head>
