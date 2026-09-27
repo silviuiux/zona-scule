@@ -15,14 +15,22 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    type themselves out; the title block fills in under the logo;
  *  • a finale plays, then an "APROBAT" stamp with today's date lands.
  *
- * Two drawings, both at 1:1 (their SVGs are sized in CSS millimetres and
+ * Three drawings, all at 1:1 (their SVGs are sized in CSS millimetres and
  * the viewBox units are mm):
- *  - "nail" (default): a Ø3,1 × 100 nail standing on a board section, which
+ *  - "nail" (?egg=nail): a Ø3,1 × 100 nail standing on a board section, which
  *    a hammer then drives in over four scroll-driven hits until only the
  *    head is left above the surface; finale: the camera zooms into
  *    detail A at 5:1.
  *  - "blade" (?egg=blade): a Ø216 × 30 circular saw blade that turns as you
  *    scroll; finale: a spin-up test run.
+ *  - "drill" (?egg=drill): an HSS Ø10 × 133 twist drill (DIN 338, 118°
+ *    point, 30° helix) with a 4:1 section A–A; it then spins up and feeds
+ *    through a 12 mm steel plate (chips curling out, flutes sliding, the
+ *    section turning in sync), backs out, and the new hole is dimensioned;
+ *    finale: a wind-down test spin.
+ *
+ * Which one shows is shuffled on every page load (never the same one twice
+ * in a row); ?egg=… forces one.
  *
  * Every drawable carries data-s / data-e — its slice of the 0..1 progress —
  * and a data-k kind: draw (stroke-dashoffset, pathLength=1), grow (scale
@@ -33,7 +41,8 @@ const DEAD_ZONE = 500 // px of extra scrolling that "does nothing" first
 const RANGE = 2800 // px of extra scrolling from blank to fully drawn
 const GROW_END = 0.2 // progress by which the footer has grown to full height
 
-type Variant = 'nail' | 'blade'
+type Variant = 'nail' | 'blade' | 'drill'
+const VARIANTS: Variant[] = ['nail', 'blade', 'drill']
 type Kind = 'draw' | 'grow' | 'pop' | 'fade' | 'type'
 type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; wrap: SVGGElement | null }
 
@@ -289,14 +298,187 @@ function BladeArt() {
   )
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// Twist drill — HSS Ø10 × 133, DIN 338 (jobber length), 118° point
+// ════════════════════════════════════════════════════════════════════════════
+const DR = { y: 60, r: 5, tip: 48, pointLen: 3, fluteEnd: 135, end: 181 } // mm; tip on the left
+const DR_LEAD = (Math.PI * 10) / Math.tan((30 * Math.PI) / 180) // helix lead for a 30° helix ≈ 54.4
+const DR_PITCH = DR_LEAD / 2 // two flutes → the side-view pattern repeats every half lead
+const DR_FLUTE_W = 9 // mm between a flute's leading and trailing edge
+const PLATE = { x0: 24, x1: 36, y0: 34, y1: 86 } // steel plate in section
+const DRILL_START = 0.63 // feeding in
+const DRILL_THROUGH = 0.86 // tip out the far side
+const DRILL_RETRACT = 0.89 // start backing out
+const DRILL_BACK = 0.94 // fully out
+const DRILL_FEED = 30 // mm of travel (tip ends 6 mm past the plate)
+const SEC = { x: 166, y: 25, r: 20 } // section A–A at 4:1, in the open space above the shank
+const DR_CUT = 100 // x of the A–A cutting plane on the body
+
+// Flute edges seen from the side: half a helix turn is an S-curve across the
+// Ø10 body over half a lead. Leading and trailing edges of both flutes.
+const fluteEdges = (offset: number) => {
+  let d = ''
+  for (let x0 = DR.tip - 3 * DR_PITCH; x0 < DR.fluteEnd + DR_PITCH; x0 += DR_PITCH) {
+    const x = x0 + offset
+    const k = DR_PITCH
+    d += `M${f2(x)} ${DR.y + DR.r} C${f2(x + k * 0.36)} ${DR.y + DR.r} ${f2(x + k * 0.64)} ${DR.y - DR.r} ${f2(x + k)} ${DR.y - DR.r} `
+  }
+  return d.trim()
+}
+const DR_LEADING = fluteEdges(0)
+const DR_TRAILING = fluteEdges(DR_FLUTE_W)
+
+// Section A–A: Ø10 core circle (drawn 4:1) with two flute cut-outs.
+const SECTION_PATH = (() => {
+  const P = (deg: number) => {
+    const a = (deg * Math.PI) / 180
+    return `${f2(SEC.x + SEC.r * Math.cos(a))} ${f2(SEC.y + SEC.r * Math.sin(a))}`
+  }
+  return `M${P(30)} A${SEC.r} ${SEC.r} 0 0 1 ${P(150)} A11 11 0 0 0 ${P(210)} A${SEC.r} ${SEC.r} 0 0 1 ${P(330)} A11 11 0 0 0 ${P(390)} Z`
+})()
+const SECTION_HATCH = (() => {
+  let d = ''
+  for (let x0 = SEC.x - 44; x0 <= SEC.x + 24; x0 += 2.5) d += `M${f2(x0)} ${SEC.y + 22} L${f2(x0 + 44)} ${SEC.y - 22} `
+  return d.trim()
+})()
+const PLATE_HATCH = (() => {
+  let d = ''
+  for (let y0 = PLATE.y0 - 12; y0 <= PLATE.y1 + 12; y0 += 3) d += `M${PLATE.x0} ${y0 + 12} L${PLATE.x1} ${y0} `
+  return d.trim()
+})()
+
+// Feed (mm the drill has advanced) and spin offset for scroll progress p.
+function drillState(p: number) {
+  let feed = 0
+  if (p >= DRILL_START && p < DRILL_THROUGH) feed = DRILL_FEED * easeInOutSine((p - DRILL_START) / (DRILL_THROUGH - DRILL_START))
+  else if (p >= DRILL_THROUGH && p < DRILL_RETRACT) feed = DRILL_FEED
+  else if (p >= DRILL_RETRACT && p < DRILL_BACK) feed = DRILL_FEED * (1 - easeInOutCubic((p - DRILL_RETRACT) / (DRILL_BACK - DRILL_RETRACT)))
+  const spinning = p > DRILL_START && p < DRILL_BACK
+  const turn = spinning ? ((p - DRILL_START) / (DRILL_BACK - DRILL_START)) * 18 * DR_LEAD : 0 // mm of helix travel
+  return { feed, turn }
+}
+
+function DrillArt() {
+  const dimL = 84, dim87 = 77
+  return (
+    <svg className="bp-art bp-drill" viewBox="0 0 200 180">
+      <Paper x={-20} y={-20} w={240} h={220} cx={110} cy={DR.y} r={140} />
+      <defs>
+        <clipPath id="zs-bp-dbody"><rect x={DR.tip + DR.pointLen} y={DR.y - DR.r} width={DR.fluteEnd - DR.tip - DR.pointLen} height={DR.r * 2} /></clipPath>
+        <clipPath id="zs-bp-plate"><rect x={PLATE.x0} y={PLATE.y0} width={PLATE.x1 - PLATE.x0} height={PLATE.y1 - PLATE.y0} /></clipPath>
+        <clipPath id="zs-bp-sec"><path d={SECTION_PATH} /></clipPath>
+      </defs>
+
+      <line className="cl" x1="12" y1={DR.y} x2="192" y2={DR.y} data-axis="x" data-k="grow" data-s="0.06" data-e="0.14" />
+
+      {/* steel plate in section: faces, break lines, hatch; the drilled hole is cut into it */}
+      <path className="ln strong" pathLength={1} d={`M${PLATE.x1} ${PLATE.y0} V${PLATE.y1} M${PLATE.x0} ${PLATE.y0} V${PLATE.y1}`} data-k="draw" data-s="0.44" data-e="0.48" />
+      <path className="ln" pathLength={1} d={`M${PLATE.x0 - 2} ${PLATE.y0} L27 ${PLATE.y0 + 1.6} L31 ${PLATE.y0 - 1.6} L${PLATE.x1 + 2} ${PLATE.y0} M${PLATE.x0 - 2} ${PLATE.y1} L27 ${PLATE.y1 + 1.6} L31 ${PLATE.y1 - 1.6} L${PLATE.x1 + 2} ${PLATE.y1}`} data-k="draw" data-s="0.47" data-e="0.5" />
+      <g clipPath="url(#zs-bp-plate)">
+        <path className="ln thin" pathLength={1} d={PLATE_HATCH} data-k="draw" data-s="0.49" data-e="0.56" />
+      </g>
+      <path data-role="hole" className="hole" d={`M${PLATE.x1} ${DR.y - DR.r} H${PLATE.x1} V${DR.y + DR.r} H${PLATE.x1}`} />
+      <text className="red mono-s" x={PLATE.x0 - 1} y={PLATE.y0 - 4} textAnchor="middle" data-k="type" data-s="0.5" data-e="0.53" data-text="S235 · t 12" />
+
+      <g data-role="drill">
+        {/* point: two lips meeting at 118°, chisel edge */}
+        <path className="ln strong" pathLength={1} d={`M${DR.tip + DR.pointLen} ${DR.y - DR.r} L${DR.tip} ${DR.y} L${DR.tip + DR.pointLen} ${DR.y + DR.r}`} data-k="draw" data-s="0.12" data-e="0.16" />
+        <path className="ln thin" pathLength={1} d={`M${DR.tip + 0.6} ${DR.y - 0.9} L${DR.tip + 0.6} ${DR.y + 0.9}`} data-k="draw" data-s="0.155" data-e="0.17" />
+        {/* body and margins (lands) */}
+        <path className="ln strong" pathLength={1} d={`M${DR.tip + DR.pointLen} ${DR.y - DR.r} H${DR.fluteEnd}`} data-k="draw" data-s="0.15" data-e="0.22" />
+        <path className="ln strong" pathLength={1} d={`M${DR.tip + DR.pointLen} ${DR.y + DR.r} H${DR.fluteEnd}`} data-k="draw" data-s="0.17" data-e="0.24" />
+        <path className="ln thin" pathLength={1} d={`M${DR.tip + DR.pointLen + 0.4} ${DR.y - DR.r + 0.6} H${DR.fluteEnd - 1} M${DR.tip + DR.pointLen + 0.4} ${DR.y + DR.r - 0.6} H${DR.fluteEnd - 1}`} data-k="draw" data-s="0.22" data-e="0.27" />
+        {/* flutes: helix edges, clipped to the body; slide along it as it turns */}
+        <g clipPath="url(#zs-bp-dbody)">
+          <g data-role="flutes">
+            <path className="ln" pathLength={1} d={DR_LEADING} data-k="draw" data-s="0.29" data-e="0.4" />
+            <path className="ln thin" pathLength={1} d={DR_TRAILING} data-k="draw" data-s="0.32" data-e="0.43" />
+          </g>
+        </g>
+        {/* flute run-out, shank with chamfer */}
+        <path className="ln" pathLength={1} d={`M${DR.fluteEnd} ${DR.y - DR.r} C${DR.fluteEnd - 4} ${DR.y - 1} ${DR.fluteEnd - 2} ${DR.y + 2} ${DR.fluteEnd} ${DR.y + DR.r}`} data-k="draw" data-s="0.26" data-e="0.28" />
+        <path className="ln strong" pathLength={1} d={`M${DR.fluteEnd} ${DR.y - DR.r} H${DR.end - 1} L${DR.end} ${DR.y - DR.r + 1} V${DR.y + DR.r - 1} L${DR.end - 1} ${DR.y + DR.r} H${DR.fluteEnd}`} data-k="draw" data-s="0.27" data-e="0.35" />
+        <text className="mark" x={(DR.fluteEnd + DR.end) / 2} y={DR.y + 0.8} textAnchor="middle" data-k="type" data-s="0.42" data-e="0.48" data-text="HSS-G · Ø10 · DIN 338 · ZS" />
+        {/* cutting plane A–A */}
+        <path className="ln dim" pathLength={1} d={`M${DR_CUT} ${DR.y - 11} V${DR.y - 7.5} M${DR_CUT} ${DR.y + 7.5} V${DR.y + 11} M${DR_CUT} ${DR.y - 11} H${DR_CUT + 3} M${DR_CUT} ${DR.y + 11} H${DR_CUT + 3}`} data-k="draw" data-s="0.36" data-e="0.39" />
+        <path className="arrow" d={arrow(DR_CUT + 4.6, DR.y - 11, 1, 0, 1.8, 0.6)} data-k="pop" data-s="0.385" data-e="0.4" />
+        <path className="arrow" d={arrow(DR_CUT + 4.6, DR.y + 11, 1, 0, 1.8, 0.6)} data-k="pop" data-s="0.385" data-e="0.4" />
+        <text className="red" x={DR_CUT - 1} y={DR.y - 12.5} textAnchor="middle" data-k="type" data-s="0.39" data-e="0.4" data-text="A" />
+        <text className="red" x={DR_CUT - 1} y={DR.y + 14.8} textAnchor="middle" data-k="type" data-s="0.39" data-e="0.4" data-text="A" />
+      </g>
+
+      {/* chips curling out of the hole while it cuts */}
+      <g data-role="chips" className="chips">
+        <path d="M0 0 C1.5 -2 4 -1.5 3.6 0.6 C3.2 2.4 0.8 2.2 1.2 0.6" />
+        <path d="M0 0 C1.2 -1.6 3.4 -1.2 3 0.5 C2.7 2 0.7 1.8 1 0.5" />
+        <path d="M0 0 C1.8 -2.2 4.6 -1.6 4.1 0.7 C3.6 2.7 0.9 2.4 1.4 0.7" />
+      </g>
+
+      {/* dimensions — fade away before the drill starts cutting */}
+      <g data-k="fade" data-dir="out" data-s="0.6" data-e="0.63">
+        <path className="ln thin" pathLength={1} d={`M${DR.tip} ${DR.y + 1} V${dimL + 3} M${DR.end} ${DR.y + DR.r + 1} V${dimL + 3} M${DR.fluteEnd} ${DR.y + DR.r + 1} V${dim87 + 3}`} data-k="draw" data-s="0.4" data-e="0.43" />
+        <path className="ln dim" pathLength={1} d={`M${DR.tip} ${dimL} H${DR.end}`} data-k="draw" data-s="0.42" data-e="0.46" />
+        <path className="arrow" d={arrow(DR.tip, dimL, -1, 0)} data-k="pop" data-s="0.45" data-e="0.47" />
+        <path className="arrow" d={arrow(DR.end, dimL, 1, 0)} data-k="pop" data-s="0.44" data-e="0.46" />
+        <text className="red" x={(DR.tip + DR.end) / 2} y={dimL - 1.2} textAnchor="middle" data-k="type" data-s="0.45" data-e="0.48" data-text="133" />
+        <path className="ln dim" pathLength={1} d={`M${DR.tip} ${dim87} H${DR.fluteEnd}`} data-k="draw" data-s="0.44" data-e="0.48" />
+        <path className="arrow" d={arrow(DR.tip, dim87, -1, 0)} data-k="pop" data-s="0.47" data-e="0.49" />
+        <path className="arrow" d={arrow(DR.fluteEnd, dim87, 1, 0)} data-k="pop" data-s="0.46" data-e="0.48" />
+        <text className="red" x={(DR.tip + DR.fluteEnd) / 2} y={dim87 - 1.2} textAnchor="middle" data-k="type" data-s="0.47" data-e="0.5" data-text="87" />
+        {/* Ø10 h8 on the shank */}
+        <path className="ln dim" pathLength={1} d={`M166 ${DR.y + DR.r} L170 ${DR.y + 13} H177`} data-k="draw" data-s="0.47" data-e="0.5" />
+        <path className="arrow" d={arrow(166, DR.y + DR.r, 166 - 170, DR.y + DR.r - (DR.y + 13))} data-k="pop" data-s="0.49" data-e="0.51" />
+        <text className="red" x="170" y={DR.y + 11.8} data-k="type" data-s="0.5" data-e="0.52" data-text="Ø10 h8" />
+        {/* 118° point angle */}
+        <path className="ln dim" pathLength={1} d={`M${f2(DR.tip + 7 * Math.cos((-59 * Math.PI) / 180))} ${f2(DR.y + 7 * Math.sin((-59 * Math.PI) / 180))} A7 7 0 0 1 ${f2(DR.tip + 7 * Math.cos((59 * Math.PI) / 180))} ${f2(DR.y + 7 * Math.sin((59 * Math.PI) / 180))}`} data-k="draw" data-s="0.5" data-e="0.53" />
+        <text className="red" x={DR.tip + 2} y={DR.y - 8.5} data-k="type" data-s="0.52" data-e="0.54" data-text="118°" />
+        {/* helix angle */}
+        <path className="ln dim" pathLength={1} d={`M${f2(DR.tip + DR.pointLen + DR_PITCH * 1.5)} ${DR.y} L114 ${DR.y - 18} H121`} data-k="draw" data-s="0.52" data-e="0.55" />
+        <text className="red" x="114" y={DR.y - 19.2} data-k="type" data-s="0.54" data-e="0.56" data-text="β 30°" />
+      </g>
+
+      {/* section A–A, 4:1 — turns with the drill */}
+      <text className="red" x={SEC.x - SEC.r - 6} y={SEC.y + 1} textAnchor="end" data-k="type" data-s="0.55" data-e="0.58" data-text="A–A  4:1" />
+      <line className="cl" x1={SEC.x - 24} y1={SEC.y} x2={SEC.x + 24} y2={SEC.y} data-axis="x" data-k="grow" data-s="0.5" data-e="0.53" />
+      <line className="cl" x1={SEC.x} y1={SEC.y - 23} x2={SEC.x} y2={SEC.y + 24} data-axis="y" data-k="grow" data-s="0.51" data-e="0.54" />
+      <g data-role="section">
+        <path className="ln strong" pathLength={1} d={SECTION_PATH} data-k="draw" data-s="0.52" data-e="0.57" />
+        <g clipPath="url(#zs-bp-sec)">
+          <path className="ln thin" pathLength={1} d={SECTION_HATCH} data-k="draw" data-s="0.56" data-e="0.6" />
+        </g>
+      </g>
+
+      {/* the finished hole */}
+      <path className="ln dim" pathLength={1} d={`M${(PLATE.x0 + PLATE.x1) / 2} ${DR.y - DR.r} L${PLATE.x1 + 8} ${DR.y - 22} H${PLATE.x1 + 16}`} data-k="draw" data-s="0.94" data-e="0.97" />
+      <path className="arrow" d={arrow((PLATE.x0 + PLATE.x1) / 2, DR.y - DR.r, (PLATE.x0 + PLATE.x1) / 2 - PLATE.x1 - 8, DR.y - DR.r - DR.y + 22)} data-k="pop" data-s="0.96" data-e="0.975" />
+      <text className="red" x={PLATE.x1 + 8} y={DR.y - 23.2} data-k="type" data-s="0.96" data-e="0.99" data-text="Ø10 TRECĂTOR" />
+
+      <Pen scale={PX} />
+    </svg>
+  )
+}
+
 const TITLE_PART: Record<Variant, string> = {
   nail: 'CUI CAP PLAT 3,1×100',
   blade: 'DISC CIRCULAR Ø216 × 30',
+  drill: 'BURGHIU HSS Ø10 × 133',
 }
 
-// ?egg=blade shows the saw blade instead of the nail (default).
+// A different drawing on each page load (never the same one twice in a
+// row, remembered per browser); ?egg=nail|blade|drill forces one.
+let chosenVariant: Variant | null = null
+const pickVariant = (): Variant => {
+  const forced = new URLSearchParams(window.location.search).get('egg')
+  if (VARIANTS.includes(forced as Variant)) return forced as Variant
+  let last: string | null = null
+  try { last = localStorage.getItem('zs-egg') } catch {}
+  const pool = VARIANTS.filter(v => v !== last)
+  const v = pool[Math.floor(Math.random() * pool.length)]
+  try { localStorage.setItem('zs-egg', v) } catch {}
+  return v
+}
 const subscribe = () => () => {}
-const readVariant = (): Variant => (new URLSearchParams(window.location.search).get('egg') === 'blade' ? 'blade' : 'nail')
+const readVariant = (): Variant => (chosenVariant ??= pickVariant())
 const serverVariant = (): Variant => 'nail'
 
 export default function FooterBlueprint() {
@@ -387,9 +569,42 @@ export default function FooterBlueprint() {
       sparks?.animate([{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0 }], { duration: 320, easing: 'ease-out' })
       art.animate([{ translate: '0 0' }, { translate: '0 1.5px' }, { translate: '0 0' }], { duration: 160, easing: 'ease-out' })
     }
+    // drill: feed, spin (flutes slide + section turns), hole, chips
+    const drill = art.querySelector<SVGGElement>('[data-role="drill"]')
+    const flutes = art.querySelector<SVGGElement>('[data-role="flutes"]')
+    const section = art.querySelector<SVGGElement>('[data-role="section"]')
+    const hole = art.querySelector<SVGPathElement>('[data-role="hole"]')
+    const chips = Array.from(art.querySelectorAll<SVGPathElement>('[data-role="chips"] path'))
+    let drillTurn = 0
+    const setSpin = (turn: number) => {
+      drillTurn = turn
+      flutes?.setAttribute('transform', `translate(${f2(turn % DR_PITCH)} 0)`)
+      section?.setAttribute('transform', `rotate(${((turn / DR_LEAD) * 360).toFixed(2)} ${SEC.x} ${SEC.y})`)
+    }
+    let maxDepth = 0
+    const frameDrill = (p: number) => {
+      const { feed, turn } = drillState(p)
+      drill?.setAttribute('transform', `translate(${f2(-feed)} 0)`)
+      setSpin(turn)
+      // hole depth follows the full-diameter part of the point, never shrinks
+      const depth = Math.max(0, Math.min(PLATE.x1 - PLATE.x0, PLATE.x1 - (DR.tip - feed + DR.pointLen * 0.5)))
+      maxDepth = Math.max(maxDepth, depth)
+      const x = PLATE.x1 - maxDepth
+      hole?.setAttribute('d', `M${PLATE.x1} ${DR.y - DR.r} H${f2(x)} V${DR.y + DR.r} H${PLATE.x1}`)
+      const cutting = p > DRILL_START && p < DRILL_THROUGH && depth > 0 && depth < PLATE.x1 - PLATE.x0
+      chips.forEach((c, i) => {
+        const ph = (((p - DRILL_START) * 60 + i / chips.length) % 1 + 1) % 1
+        const side = i % 2 ? 1 : -1
+        const cx = PLATE.x1 + 1 + ph * 9, cy = DR.y + side * (DR.r + 1 + ph * 7)
+        c.setAttribute('transform', `translate(${f2(cx)} ${f2(cy)}) rotate(${(ph * 540).toFixed(0)}) scale(${(0.6 + ph * 0.6).toFixed(2)})`)
+        c.style.opacity = cutting ? String(Math.sin(ph * Math.PI)) : '0'
+      })
+    }
+
     let lastP = 0
     const frameArt = (p: number) => {
       if (variant === 'blade') { setBlade(-p * BLADE_TURN); return }
+      if (variant === 'drill') { frameDrill(p); return }
       const { depth, gap } = nailState(p)
       const tf = nailTransform(depth)
       for (const g of nailGroups) g.setAttribute('transform', tf)
@@ -487,6 +702,12 @@ export default function FooterBlueprint() {
     const finale = () => {
       finished = true
       if (reduce) { stamp(); return }
+      if (variant === 'drill') {
+        // one more test spin, winding down, then the stamp
+        const from = drillTurn
+        tween(1800, t => setSpin(from + 4 * DR_LEAD * (1 - Math.pow(1 - t, 3))), () => later(stamp, 150))
+        return
+      }
       if (variant === 'blade') {
         const from = bladeAngle
         tween(3200, t => setBlade(from - (2 * 360 + 30) * easeInOutCubic(t)), () => later(stamp, 150))
@@ -574,6 +795,16 @@ export default function FooterBlueprint() {
           right: 12px;
           bottom: calc((100vh - 52px - var(--bp-bar, 57px)) / 2 - 100mm);
         }
+        .bp-drill {
+          overflow: hidden;
+          width: 200mm; height: 180mm;
+          right: 12px;
+          bottom: calc((100vh - 52px - var(--bp-bar, 57px)) / 2 - 90mm);
+        }
+        .bp-art .hole { fill: #fff; stroke: rgba(0,0,0,0.34); stroke-width: 0.3; }
+        .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }
+        .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
+        .bp-art text.mono-s { font-size: 2.3px; }
         .bp-title { width: 460px; height: 96px; left: 12px; top: 0; overflow: visible; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings
@@ -615,7 +846,7 @@ export default function FooterBlueprint() {
         .bp-layer .stamp-ink .stamp-date { font-size: 8.5px; letter-spacing: 0.14em; }
       `}</style>
 
-      {variant === 'blade' ? <BladeArt /> : <NailArt />}
+      {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : <NailArt />}
 
       {/* ── Note, title block and stamp, under the logo ── */}
       <svg ref={titleRef} className="bp-title" viewBox="0 0 460 96">
