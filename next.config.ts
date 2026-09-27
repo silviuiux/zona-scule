@@ -49,6 +49,18 @@ const nextConfig: NextConfig = {
     // optimization + a fresh cache write.
     minimumCacheTTL: 31536000,
   },
+  // zonascule.online serves the in-progress `September` branch (Vercel domain
+  // → Git branch). Keep it out of search results so it never competes with
+  // zonascule.ro as a duplicate site.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(www\\.)?zonascule\\.online' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
