@@ -38,24 +38,22 @@ export default function LegalLayout({
 
         /* ── Header ── */
         .legal-eyebrow {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 11px; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
-          margin-bottom: 14px;
+          color: rgba(0,0,0,0.5);
+          display: flex; align-items: center; gap: 12px;
+          margin-bottom: 20px;
         }
         .legal-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(32px, 4.2vw, 52px);
-          line-height: 1.02;
-          text-transform: uppercase;
-          margin-bottom: 10px;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(44px, 5.5vw, 80px);
+          line-height: 0.98; letter-spacing: -0.015em;
+          margin-bottom: 16px;
           max-width: 900px;
         }
-        .legal-title .red {
-          font-family: 'Bungee Inline', sans-serif;
-          color: rgb(217,44,43);
-        }
+        .legal-eyebrow::before { content: ''; width: 20px; height: 1px; background: rgb(217,44,43); }
+        .legal-title .red { color: rgb(217,44,43); }
         .legal-updated {
           font-family: 'Recursive', sans-serif;
           font-size: 12px; color: rgba(0,0,0,0.4);

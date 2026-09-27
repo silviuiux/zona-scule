@@ -87,7 +87,7 @@ export default function BrandLandingTemplate({
           display: inline-flex; align-items: center; gap: 8px;
         }
         .bp-eyebrow::before {
-          content: ''; width: 6px; height: 6px; border-radius: 1px;
+          content: ''; width: 20px; height: 1px;
           background: var(--brand-accent); flex-shrink: 0;
         }
         .badge {

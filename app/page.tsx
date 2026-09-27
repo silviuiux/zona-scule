@@ -615,7 +615,7 @@ export default async function HomePage() {
         <section className="carousel-section noise-dark">
           <div className="carousel-inner">
             <div className="carousel-header section-head on-dark">
-              <span className="eyebrow-mono"><span className="idx">01</span><span className="sep">/</span>Subcategorii</span>
+              <span className="eyebrow-mono">Din catalogul nostru</span>
               <h2 className="display-title">Explorează catalogul</h2>
               <p className="carousel-sub">Categorii de produse din catalogul nostru</p>
             </div>
@@ -627,7 +627,7 @@ export default async function HomePage() {
       {/* ── SERVICES ── */}
       <section className="services-section">
         <div className="section-head">
-          <span className="eyebrow-mono"><span className="idx">02</span><span className="sep">/</span>Servicii</span>
+          <span className="eyebrow-mono">Dincolo de vânzare</span>
           <h2 className="display-title">Servicii complete</h2>
           <p className="section-sub">Scule profesionale, consultanta, achizitii, garantie si service</p>
         </div>
@@ -644,7 +644,7 @@ export default async function HomePage() {
       <div className="contact-banner-wrap">
         <div className="contact-banner noise-dark">
           <div className="on-dark">
-            <span className="eyebrow-mono"><span className="idx">03</span><span className="sep">/</span>Hai să vorbim</span>
+            <span className="eyebrow-mono">Hai să vorbim</span>
             <h2 className="contact-banner-title">Răspundem rapid.<br /><em>Livrăm în toată țara.</em></h2>
             <p className="contact-banner-sub">Consultanța specializata</p>
           </div>

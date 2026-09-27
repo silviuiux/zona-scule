@@ -115,17 +115,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .bc-sep { color: rgba(0,0,0,0.2); font-size: 12px; }
 
         .pdp-brand {
-          font-family: 'Recursive', sans-serif;
-          font-weight: 500; font-size: 18px; color: rgb(0,0,0);
-          margin-bottom: 4px; letter-spacing: -0.02em;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-weight: 500; font-size: 12px; color: rgb(217,44,43);
+          margin-bottom: 14px; letter-spacing: 0.12em; text-transform: uppercase;
           text-decoration: none; display: inline-block;
         }
         .pdp-brand:hover { text-decoration: underline; }
         .pdp-sku {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 3.5vw, 44px);
-          color: rgb(0,0,0); line-height: 1;
-          text-transform: uppercase; margin-bottom: 12px;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(36px, 4vw, 56px); letter-spacing: -0.01em;
+          color: rgb(0,0,0); line-height: 1.02;
+          margin-bottom: 16px;
         }
         .pdp-desc {
           font-family: 'Recursive', sans-serif;
@@ -171,13 +171,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           padding: 96px 24px 32px;
         }
         .spec-card-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 6px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(0,0,0,0.45); margin-bottom: 10px;
         }
         .spec-card-value {
-          font-family: 'Bungee', sans-serif;
-          font-size: 28px; text-transform: uppercase;
-          letter-spacing: -0.01em; color: rgb(0,0,0);
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
+          font-size: 26px;
+          letter-spacing: -0.02em; color: rgb(0,0,0);
           line-height: 1; margin-bottom: 6px;
         }
         .spec-card-detail {
@@ -225,12 +226,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           display: flex; justify-content: space-between; align-items: center; gap: 24px;
         }
         .cta-banner-eyebrow {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(255,255,255,0.45); margin-bottom: 10px;
         }
         .cta-banner-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: 24px; text-transform: uppercase;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: 32px;
           color: rgb(255,255,255); line-height: 1; letter-spacing: -0.01em;
         }
         .cta-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
@@ -304,7 +306,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             gap: 32px; padding: 32px 12px 40px;
           }
           .pdp-top-inner > :last-child { order: -1; }
-          .pdp-sku { font-size: clamp(24px, 7vw, 44px); }
+          .pdp-sku { font-size: clamp(30px, 8vw, 44px); }
           .specs-grid {
             display: flex !important;
             overflow-x: auto; gap: 10px; padding-bottom: 8px;

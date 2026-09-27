@@ -177,7 +177,7 @@ export default function Loading() {
             )}
           </div>
 
-          {/* Title — two Bungee lines */}
+          {/* Title — two display lines */}
           <div className="skel-title">
             <div className="skel" style={{ height: 72, width: '15%', borderRadius: 4 }} />
             <div className="skel" style={{ height: 72, width: '48%', borderRadius: 4 }} />

@@ -109,10 +109,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           flex-wrap: wrap;
         }
         .cat-bc-pill {
-          font-family: 'Inter', sans-serif;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 500;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           color: rgba(0,0,0,0.45);
           text-decoration: none;
@@ -124,15 +124,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
         .cat-bc-pill:hover { color: rgb(0,0,0); border-color: rgba(0,0,0,0.4); }
         .cat-bc-sep {
-          font-family: 'Inter', sans-serif;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
           font-size: 11px;
           color: rgba(0,0,0,0.25);
         }
         .cat-bc-current {
-          font-family: 'Inter', sans-serif;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 500;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           color: rgba(0,0,0,0.45);
           white-space: nowrap;
@@ -146,22 +146,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           margin-bottom: 20px;
           line-height: 1;
         }
-        .cat-hero-zona {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(48px, 7vw, 96px);
-          color: rgb(217, 44, 43);
-          text-transform: uppercase;
-          letter-spacing: 0.005em;
-          line-height: 1;
-        }
+        .cat-hero-zona,
         .cat-hero-name {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(48px, 7vw, 96px);
-          color: rgb(0, 0, 0);
-          text-transform: uppercase;
-          letter-spacing: 0.005em;
-          line-height: 1;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(56px, 7.5vw, 112px);
+          letter-spacing: -0.015em;
+          line-height: 0.92;
         }
+        .cat-hero-zona { color: rgb(217, 44, 43); }
+        .cat-hero-name { color: rgb(0, 0, 0); }
 
         /* Description */
         .cat-hero-desc {
@@ -185,16 +178,17 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           gap: 8px;
         }
         .cat-hero-stat-num {
-          font-family: 'Bungee', sans-serif;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
           font-size: 22px;
           color: rgb(0,0,0);
-          letter-spacing: 0.02em;
+          letter-spacing: -0.02em;
+          font-variant-numeric: tabular-nums;
         }
         .cat-hero-stat-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           color: rgba(0,0,0,0.35);
         }
@@ -386,25 +380,25 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <div className="cat-hero-title">
             {sp.categorie ? (
               <>
-                <span className="cat-hero-zona">ZONA</span>
+                <span className="cat-hero-zona">Zona</span>
                 <span className="cat-hero-name">{sp.categorie}</span>
               </>
             ) : sp.brand ? (
               <>
-                <span className="cat-hero-zona">ZONA</span>
+                <span className="cat-hero-zona">Zona</span>
                 <span className="cat-hero-name">{sp.brand}</span>
               </>
             ) : sp.q ? (
               <>
-                <span className="cat-hero-zona">CĂUTARE</span>
+                <span className="cat-hero-zona">Căutare</span>
                 <span className="cat-hero-name" style={{ fontSize: 'clamp(28px, 4vw, 56px)' }}>
                   &ldquo;{sp.q}&rdquo;
                 </span>
               </>
             ) : (
               <>
-                <span className="cat-hero-zona">ZONA</span>
-                <span className="cat-hero-name">SCULE</span>
+                <span className="cat-hero-zona">Zona</span>
+                <span className="cat-hero-name">Scule</span>
               </>
             )}
           </div>

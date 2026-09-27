@@ -54,14 +54,12 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
 
         /* Title */
         .zs-title { display: flex; flex-direction: column; gap: 0; margin-bottom: 28px; line-height: 1; }
-        .zs-title-zona {
-          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 96px);
-          color: rgb(217,44,43); text-transform: uppercase; letter-spacing: 0.005em; line-height: 1;
+        .zs-title-zona, .zs-title-name {
+          font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(56px, 7.5vw, 112px);
+          letter-spacing: -0.015em; line-height: 0.92;
         }
-        .zs-title-name {
-          font-family: 'Bungee', sans-serif; font-size: clamp(48px, 7vw, 96px);
-          color: rgb(0,0,0); text-transform: uppercase; letter-spacing: 0.005em; line-height: 1;
-        }
+        .zs-title-zona { color: rgb(217,44,43); }
+        .zs-title-name { color: rgb(0,0,0); }
 
         .zs-desc {
           font-family: 'Recursive', sans-serif; font-size: 15px;
@@ -71,10 +69,10 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         /* Stats */
         .zs-stats { display: flex; align-items: center; gap: 24px; }
         .zs-stat { display: flex; align-items: baseline; gap: 8px; }
-        .zs-stat-num { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(0,0,0); }
+        .zs-stat-num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 22px; letter-spacing: -0.02em; color: rgb(0,0,0); font-variant-numeric: tabular-nums; }
         .zs-stat-label {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.35);
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; font-weight: 500;
+          letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4);
         }
         .zs-stat-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
 
@@ -194,8 +192,8 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
 
           {/* Title */}
           <div className="zs-title">
-            <span className="zs-title-zona">ZONA</span>
-            <span className="zs-title-name">SOLUȚII</span>
+            <span className="zs-title-zona">Zona</span>
+            <span className="zs-title-name">Soluții</span>
           </div>
 
           <p className="zs-desc">

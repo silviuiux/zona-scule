@@ -62,8 +62,8 @@ export default function ContactForm({
             text-align: center; gap: 12px;
           }
           .cf-success-title {
-            font-family: 'Bungee', sans-serif;
-            font-size: 32px; color: rgb(0,0,0);
+            font-family: 'Neuton', serif; font-weight: 400;
+            font-size: 44px; line-height: 1; color: rgb(0,0,0);
           }
           .cf-success-sub {
             font-family: 'Recursive', sans-serif;
@@ -71,7 +71,7 @@ export default function ContactForm({
           }
         `}</style>
         <div className="cf-success">
-          <p className="cf-success-title">MESAJ TRIMIS!</p>
+          <p className="cf-success-title">Mesaj trimis!</p>
           <p className="cf-success-sub">Va contactam in cel mai scurt timp.</p>
         </div>
       </>
@@ -91,10 +91,10 @@ export default function ContactForm({
           border-bottom: none;
         }
         .cf-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 3vw, 42px);
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(36px, 3.6vw, 52px); letter-spacing: -0.01em;
           line-height: 1; color: rgb(0,0,0);
-          text-transform: uppercase; margin-bottom: 12px;
+          margin-bottom: 12px;
         }
         .cf-sub {
           font-family: 'Recursive', sans-serif;
@@ -165,7 +165,7 @@ export default function ContactForm({
 
       <form className="cf-wrap" onSubmit={handleSubmit}>
         <div className="cf-header">
-          <h2 className="cf-title">HAI SA VORBIM</h2>
+          <h2 className="cf-title">Hai să vorbim</h2>
           <p className="cf-sub">
             Completati formularul si va raspundem in cel mai scurt
             timp cu o oferta personalizata nevoilor dumneavoastra.

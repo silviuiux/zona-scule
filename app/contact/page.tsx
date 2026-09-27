@@ -25,24 +25,14 @@ export default function ContactPage({
         }
 
         /* ── Header ── */
-        .contact-location {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
-          margin-bottom: 16px;
-        }
+        .contact-location { margin-bottom: 20px; }
         .contact-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(52px, 7vw, 96px);
-          line-height: 0.92;
-          text-transform: uppercase;
-          margin-bottom: 20px;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(56px, 7.5vw, 112px);
+          line-height: 0.92; letter-spacing: -0.015em;
+          margin-bottom: 24px;
         }
-        .contact-title .red {
-          font-family: 'Bungee Inline', sans-serif;
-          color: rgb(217,44,43);
-        }
+        .contact-title .red { color: rgb(217,44,43); }
         .contact-sub {
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.5);
@@ -67,14 +57,14 @@ export default function ContactPage({
         .info-card:nth-child(n+2) { padding-left: 16px; }
         .info-card:last-child { border-right: none; }
         .info-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 10px; font-weight: 700;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.35);
+          color: rgba(0,0,0,0.4);
         }
         .info-value {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(20px, 2.2vw, 32px);
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
+          font-size: clamp(18px, 1.9vw, 26px); letter-spacing: -0.02em;
           line-height: 1; color: rgb(0,0,0);
           text-decoration: none;
         }
@@ -142,10 +132,10 @@ export default function ContactPage({
         <div className="contact-inner">
 
           {/* Header */}
-          <p className="contact-location">Pitesti, Arges, Romania</p>
+          <p className="contact-location eyebrow-mono">Pitești, Argeș, România</p>
           <h1 className="contact-title">
-            <span className="red">CONTACT</span><br />
-            ZONA SCULE
+            <span className="red">Contact</span><br />
+            Zona Scule
           </h1>
           <p className="contact-sub">
             Completati formularul si va raspundem in cel mai scurt

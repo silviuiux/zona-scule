@@ -28,9 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Bungee (legacy headlines), Recursive (body), Inter (UI), Montserrat (pills/buttons), Neuton (display), JetBrains Mono (data labels) */}
+        {/* Bungee (admin login only), Recursive (body), Inter (UI), Montserrat (pills/buttons), Neuton (display), JetBrains Mono (data labels) */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Inline&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&family=Montserrat:wght@500&family=Neuton&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bungee&family=Recursive:wght@400;500&family=Inter:wght@400;500;600&family=Montserrat:wght@500&family=Neuton&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
       </head>

@@ -132,17 +132,19 @@ body::before {
 /* ─── SHARED TYPE SYSTEM ──────────────────────────────────────────────────
    Two voices: Neuton for display headings (the hero's voice), JetBrains
    Mono for small data/wayfinding labels — the tension between the two is
-   the point. `.eyebrow-mono` takes an optional `.idx` child for numbered
-   section markers ("01 / Servicii"); `.on-dark` flips both for dark bands. */
+   the point. `.eyebrow-mono` is the pre-title above a heading, led by a
+   short red rule; `.on-dark` flips both for dark bands. */
 .eyebrow-mono {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 11px; font-weight: 500;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(0,0,0,0.45);
-  display: inline-flex; align-items: center; gap: 10px;
+  color: rgba(0,0,0,0.5);
+  display: inline-flex; align-items: center; gap: 12px;
 }
-.eyebrow-mono .idx { color: var(--red); }
-.eyebrow-mono .sep { opacity: 0.35; }
+.eyebrow-mono::before {
+  content: ''; width: 20px; height: 1px;
+  background: var(--red); flex-shrink: 0;
+}
 .display-title {
   font-family: 'Neuton', serif; font-weight: 400;
   font-size: clamp(40px, 5vw, 72px);

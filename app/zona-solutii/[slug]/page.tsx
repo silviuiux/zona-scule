@@ -86,10 +86,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         /* Title */
         .art-title {
-          font-family: 'Bungee', sans-serif;
-          font-size: clamp(28px, 5vw, 52px);
-          color: rgb(255,255,255); text-transform: uppercase;
-          letter-spacing: 0.01em; line-height: 1.1;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(40px, 5.5vw, 76px);
+          color: rgb(255,255,255);
+          letter-spacing: -0.015em; line-height: 1;
           margin: 0 0 20px;
         }
 
@@ -121,9 +121,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           margin: 0 0 20px;
         }
         .art-content h2 {
-          font-family: 'Bungee', sans-serif; font-size: 18px;
-          color: rgb(0,0,0); text-transform: uppercase;
-          letter-spacing: 0.04em; margin: 36px 0 12px;
+          font-family: 'Neuton', serif; font-weight: 400; font-size: 30px;
+          color: rgb(0,0,0); line-height: 1.1;
+          letter-spacing: -0.01em; margin: 44px 0 14px;
         }
         .art-content h2:first-child { margin-top: 0; }
         .art-content ul {
@@ -173,8 +173,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           display: block; margin-bottom: 6px;
         }
         .art-products-title {
-          font-family: 'Bungee', sans-serif; font-size: 22px;
-          color: rgb(0,0,0); text-transform: uppercase; letter-spacing: 0.03em;
+          font-family: 'Neuton', serif; font-weight: 400; font-size: 36px;
+          color: rgb(0,0,0); line-height: 1; letter-spacing: -0.01em;
         }
         .art-products-grid {
           display: grid;

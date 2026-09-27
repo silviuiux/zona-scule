@@ -56,15 +56,15 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
         }
         .sv-hero-inner { max-width: 1440px; margin: 0 auto; padding: 72px 12px 40px; }
         .sv-eyebrow {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
-          display: inline-flex; align-items: center; gap: 8px;
-          color: rgba(0,0,0,0.45); margin-bottom: 18px;
+          display: inline-flex; align-items: center; gap: 12px;
+          color: rgba(0,0,0,0.5); margin-bottom: 20px;
         }
-        .sv-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 1px; background: rgb(217,44,43); }
+        .sv-eyebrow::before { content: ''; width: 20px; height: 1px; background: rgb(217,44,43); }
         .sv-title {
-          font-family: 'Bungee', sans-serif; font-size: clamp(32px, 5vw, 60px);
-          text-transform: uppercase; line-height: 1.05; color: rgb(0,0,0); margin-bottom: 14px;
+          font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(44px, 6vw, 84px);
+          letter-spacing: -0.015em; line-height: 0.98; color: rgb(0,0,0); margin-bottom: 18px;
         }
         .sv-desc {
           font-family: 'Recursive', sans-serif; font-size: 15px; line-height: 1.6;
@@ -72,8 +72,8 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
         }
         .sv-stats { display: flex; gap: 24px; flex-wrap: wrap; }
         .sv-stat { display: flex; align-items: baseline; gap: 8px; }
-        .sv-stat-n { font-family: 'Bungee', sans-serif; font-size: 22px; color: rgb(0,0,0); }
-        .sv-stat-l { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .sv-stat-n { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 22px; letter-spacing: -0.02em; color: rgb(0,0,0); font-variant-numeric: tabular-nums; }
+        .sv-stat-l { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
         .sv-stat-div { width: 1px; height: 20px; background: rgba(0,0,0,0.12); }
 
         .sv-page { background: rgb(244,244,244); min-height: 60vh; }
@@ -81,8 +81,8 @@ export default async function SuperviewPage({ searchParams }: { searchParams: Pr
         .sv-cat-section { margin-bottom: 48px; }
         .sv-cat-section:last-child { margin-bottom: 0; }
         .sv-cat-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
-        .sv-cat-title { font-family: 'Bungee', sans-serif; font-size: clamp(18px, 2vw, 24px); text-transform: uppercase; color: rgb(0,0,0); }
-        .sv-cat-count { font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(0,0,0,0.4); }
+        .sv-cat-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(28px, 2.8vw, 40px); letter-spacing: -0.01em; line-height: 1; color: rgb(0,0,0); }
+        .sv-cat-count { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; color: rgba(0,0,0,0.45); }
         .sv-grid {
           display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
         }
