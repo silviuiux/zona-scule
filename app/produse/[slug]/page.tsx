@@ -81,7 +81,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <>
       <Nav />
       <style>{`
-        .pdp { padding-top: 96px; background: rgb(244,244,244); }
+        .pdp { padding-top: 52px; background: rgb(244,244,244); }
 
         /* ── TOP WHITE SECTION ── */
         /* #4: full white background, no border on image */

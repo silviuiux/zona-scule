@@ -67,9 +67,8 @@ export default async function HomePage() {
              ~130px short of the fold — guaranteeing a peek of the first
              category row on short/laptop screens (fixes cards not showing at
              all). Capped at 280px so tall screens keep the roomy composition
-             and simply reveal MORE of the cards below. Floor raised to clear
-             the 96px-tall fixed nav (plus a little breathing room). */
-          padding-top: clamp(104px, calc(100vh - 540px), 280px);
+             and simply reveal MORE of the cards below. */
+          padding-top: clamp(88px, calc(100vh - 540px), 280px);
           padding-bottom: 24px;
           background: transparent;
           min-height: max(320px, calc(100vh - 395px));
@@ -471,10 +470,10 @@ export default async function HomePage() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          /* Nav is fixed at 96px tall — padding-top must clear it before
+          /* Nav is fixed at 52px tall — padding-top must clear it before
              adding the actual breathing room, or content sits flush/under
-             the nav. */
-          .hero { min-height: 75vh; padding-top: 128px; padding-bottom: 48px; }
+             the nav (was 48px total, less than the nav's own height). */
+          .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
           .hero-cta-row {
             flex-direction: column; width: 100%;

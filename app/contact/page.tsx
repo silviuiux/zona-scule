@@ -12,7 +12,7 @@ export default function ContactPage({
       <Nav />
       <style>{`
         .contact-page {
-          padding-top: 96px;
+          padding-top: 52px;
           min-height: 100vh;
           background: rgb(244,244,244);
         }

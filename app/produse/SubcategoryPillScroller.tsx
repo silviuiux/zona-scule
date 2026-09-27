@@ -64,7 +64,7 @@ export default function SubcategoryPillScroller({
   // stuck", so a 1px sentinel immediately BEFORE the wrapper (a normal-flow
   // sibling, not a child of it — it must move independently of the sticky
   // box to be useful) is watched via IntersectionObserver: once it scrolls
-  // past the sticky offset (96px navbar height) and leaves the viewport,
+  // past the sticky offset (52px navbar height) and leaves the viewport,
   // the wrapper itself must be pinned. Drives the `.stuck` class that swaps
   // in a white backdrop + shadow only while actually pinned, leaving it
   // transparent (blending with the gray listing background) the rest of
@@ -78,7 +78,7 @@ export default function SubcategoryPillScroller({
     if (!sentinel) return
     const observer = new IntersectionObserver(
       ([entry]) => setStuck(!entry.isIntersecting),
-      { rootMargin: '-97px 0px 0px 0px', threshold: 0 }
+      { rootMargin: '-53px 0px 0px 0px', threshold: 0 }
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
@@ -109,7 +109,7 @@ export default function SubcategoryPillScroller({
 
         .subcat-scroller.is-sticky {
           position: sticky;
-          top: 96px;
+          top: 52px;
           z-index: 50;
           margin: 0 0 16px;
           padding-top: 16px;
@@ -170,7 +170,7 @@ export default function SubcategoryPillScroller({
         @media (max-width: 768px) {
           .subcat-scroller {
             position: sticky;
-            top: 96px;
+            top: 52px;
             z-index: 50;
             margin: -20px 0 20px;
             padding: 32px 0;

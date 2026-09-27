@@ -25,7 +25,7 @@ export default async function ZonaSolutiiPage({ searchParams }: { searchParams: 
         /* ── Hero ── */
         .zs-hero {
           background: rgb(255,255,255);
-          padding-top: 96px;
+          padding-top: 52px;
           min-height: 52vh;
           display: flex; flex-direction: column; justify-content: flex-end;
           border-bottom: 1px solid rgba(0,0,0,0.07);

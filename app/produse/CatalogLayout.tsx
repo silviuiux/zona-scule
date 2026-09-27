@@ -75,7 +75,7 @@ export default function CatalogLayout(props: {
         }
         .filter-row.is-sticky {
           position: sticky;
-          top: 96px;
+          top: 52px;
           z-index: 51;
           margin: 0 0 16px;
           padding: 16px 0;

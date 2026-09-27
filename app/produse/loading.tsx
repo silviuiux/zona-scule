@@ -37,7 +37,7 @@ export default function Loading() {
         /* ── Hero section (white) ── */
         .skel-hero {
           background: rgb(255, 255, 255);
-          padding-top: 96px;
+          padding-top: 52px;
           min-height: 62vh;
           display: flex;
           flex-direction: column;

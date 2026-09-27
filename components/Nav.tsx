@@ -130,29 +130,24 @@ export default function Nav() {
       <style>{`
         .nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          height: 96px;
+          height: 52px;
           background: rgb(255,255,255);
-          box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms;
         }
-        .nav.scrolled { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
 
-        /* 32px vertical / 102px horizontal — matches the source design's
-           padding exactly (not a rounder "relaxed" guess like 32 both
-           ways). Content itself is a single ~33px-tall row, so 32+33+32
-           lands almost exactly on .nav's own 96px height. */
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
-          display: flex; align-items: stretch; padding: 0 102px;
+          display: flex; align-items: stretch; padding: 0 32px;
         }
 
-        /* Logo — no extra right padding: the design's only gap here is the
-           flexible "auto" space before the search trigger (handled by
-           .nav-search-wrap's margin-left: auto below), not a fixed inset. */
+        /* Logo */
         .nav-logo {
           display: flex; align-items: center;
           text-decoration: none; flex-shrink: 0;
+          padding-right: 32px;
           height: 100%;
         }
 
@@ -172,7 +167,7 @@ export default function Nav() {
         .nav-search-trigger {
           display: flex; align-items: center; gap: 8px;
           background: none; border: none; cursor: pointer;
-          padding: 8px 14px; white-space: nowrap;
+          padding: 12px 14px; white-space: nowrap;
         }
         .nav-search-wrap.open .nav-search-trigger { display: none; }
         .nav-search-form {
@@ -335,7 +330,7 @@ export default function Nav() {
            trigger) — thin underline sweeps in under the label on hover. */
         .nav-link {
           position: relative;
-          flex-shrink: 0; padding: 8px 14px;
+          flex-shrink: 0; padding: 12px 14px;
           background: transparent; color: rgba(0,0,0,0.55);
           font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600;
@@ -344,7 +339,7 @@ export default function Nav() {
         }
         .nav-link::after {
           content: '';
-          position: absolute; left: 14px; right: 14px; bottom: 5px;
+          position: absolute; left: 14px; right: 14px; bottom: 9px;
           height: 1px; background: currentColor;
           transform: scaleX(0); transform-origin: left;
           transition: transform 200ms ease;
@@ -352,7 +347,7 @@ export default function Nav() {
         .nav-link:hover { color: rgb(0,0,0); }
         .nav-link:hover::after { transform: scaleX(1); }
         .nav-contact {
-          flex-shrink: 0; padding: 8px 18px;
+          flex-shrink: 0; padding: 12px 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
           border-radius: 2px; font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600;
@@ -366,7 +361,7 @@ export default function Nav() {
           .nav-search-trigger { display: none; }
           .nav-search-wrap {
             display: none;
-            position: absolute; top: 96px; left: 0; right: 0;
+            position: absolute; top: 52px; left: 0; right: 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
             background: rgb(255,255,255);
             z-index: 99;

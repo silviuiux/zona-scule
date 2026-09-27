@@ -90,7 +90,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         /* ── Hero section (white) ── */
         .cat-hero {
           background: rgb(255, 255, 255);
-          padding-top: 96px; /* nav height */
+          padding-top: 52px; /* nav height */
           border-bottom: 1px solid rgba(0,0,0,0.07);
         }
         .cat-hero-inner {
@@ -245,7 +245,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
              it sticks to the top while it fits, then releases and scrolls
              with the page once the list is taller than the viewport — every
              brand stays reachable via normal page scroll. */
-          position: sticky; top: 96px;
+          position: sticky; top: 52px;
         }
         .products-main { flex: 1; padding: 32px 0 80px; min-width: 0; }
         .products-header {

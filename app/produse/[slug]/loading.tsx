@@ -37,7 +37,7 @@ export default function Loading() {
         }
 
         /* Page shell */
-        .pdp-skel { padding-top: 96px; background: rgb(244,244,244); }
+        .pdp-skel { padding-top: 52px; background: rgb(244,244,244); }
 
         /* ── Top white section ── */
         .pdp-skel-top {

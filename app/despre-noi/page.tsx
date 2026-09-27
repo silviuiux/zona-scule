@@ -14,7 +14,7 @@ export default function DespreNoiPage() {
       <Nav />
       <style>{`
         .about-page {
-          padding-top: 96px;
+          padding-top: 52px;
           min-height: 100vh;
         }
         .about-inner {
