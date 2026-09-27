@@ -132,22 +132,27 @@ export default function Nav() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           height: 96px;
           background: rgb(255,255,255);
-          box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.08);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms;
         }
-        .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
+        .nav.scrolled { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
 
+        /* 32px vertical / 102px horizontal — matches the source design's
+           padding exactly (not a rounder "relaxed" guess like 32 both
+           ways). Content itself is a single ~33px-tall row, so 32+33+32
+           lands almost exactly on .nav's own 96px height. */
         .nav-inner {
           max-width: 1440px; margin: 0 auto; width: 100%;
-          display: flex; align-items: stretch; padding: 0 32px;
+          display: flex; align-items: stretch; padding: 0 102px;
         }
 
-        /* Logo */
+        /* Logo — no extra right padding: the design's only gap here is the
+           flexible "auto" space before the search trigger (handled by
+           .nav-search-wrap's margin-left: auto below), not a fixed inset. */
         .nav-logo {
           display: flex; align-items: center;
           text-decoration: none; flex-shrink: 0;
-          padding-right: 32px;
           height: 100%;
         }
 
