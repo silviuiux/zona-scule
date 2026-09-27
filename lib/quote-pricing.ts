@@ -11,7 +11,9 @@ export type QuotePricing = {
 
 /**
  * Derives the customer-facing quote price (ex-TVA) from a product's
- * acquisition/cost price (`products.price`). Margin is applied first, then
+ * acquisition/cost price. That price is NOT `products.price` (which only
+ * holds a public sort rank) — read it server-side with the service key via
+ * the `get_product_cost_prices` RPC (backed by private.product_prices). Margin is applied first, then
  * a volume discount for 10+ units of the same product: 1% off per
  * additional 10 units, capped at 42%. The discount schedule is internal
  * business logic and must never be disclosed to the customer — only the

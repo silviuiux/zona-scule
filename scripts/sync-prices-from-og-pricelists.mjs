@@ -1,8 +1,17 @@
 /**
  * sync-prices-from-og-pricelists.mjs
  *
- * Sincronizează products.price din Supabase cu prețurile din listele de preț
- * ale furnizorilor (extras/OG PRICE LIST/*.csv). Match strict pe SKU
+ * Sincronizează prețurile de achiziție din Supabase cu prețurile din listele de preț
+ * ale furnizorilor (extras/OG PRICE LIST/*.csv).
+ *
+ * IMPORTANT (2026-09-27): prețurile reale NU mai stau public în products.price.
+ * Ele sunt în private.product_prices (schemă neexpusă prin API); products.price
+ * conține doar o valoare de ORDINE (cel mai mic preț = 0.01, următorul = 0.02, …)
+ * folosită la sortare. Scriptul:
+ *   - CITEȘTE prețurile reale prin RPC-ul get_product_cost_prices (doar service_role);
+ *   - SCRIE în continuare cu update({ price }) pe products — un trigger mută
+ *     valoarea în private.product_prices și păstrează rangul public;
+ *   - la final, refresh_product_listing() recalculează rangurile și MV-ul. Match strict pe SKU
  * (products.sku === PDT_SUP_REF din CSV) — NU pe brand, pentru că fișierele
  * sunt grupate pe distribuitor/export, nu pe brandul real al produsului
  * (ex: fișierul "TOYA" conține și un produs cu brand_name="Vorel" în DB,
@@ -168,6 +177,13 @@ function buildPriceMap(rows) {
 
 // ── 3. Fetch produse din DB care matchează SKU-urile din CSV ───────────────────
 
+// Prețurile reale (achiziție) — doar prin RPC, products.price e doar rang de sortare.
+async function fetchCostPrices(ids) {
+  const { data, error } = await supabase.rpc('get_product_cost_prices', { p_ids: ids })
+  if (error) throw error
+  return new Map(data.map(r => [r.product_id, r.price]))
+}
+
 async function fetchMatchingProducts(skus) {
   const products = []
   const chunkSize = 300
@@ -175,10 +191,11 @@ async function fetchMatchingProducts(skus) {
     const chunk = skus.slice(i, i + chunkSize)
     const { data, error } = await supabase
       .from('products')
-      .select('id, sku, brand_name, name, price')
+      .select('id, sku, brand_name, name')
       .in('sku', chunk)
     if (error) throw error
-    products.push(...data)
+    const costs = await fetchCostPrices(data.map(p => p.id))
+    products.push(...data.map(p => ({ ...p, price: costs.get(p.id) ?? null })))
     process.stdout.write(`\r  🔎 Caut în DB: ${Math.min(i + chunkSize, skus.length)}/${skus.length} SKU-uri verificate`)
   }
   console.log()
@@ -247,11 +264,18 @@ async function main() {
   let legacyUpdates = []
   if (!skipLegacy) {
     console.log(`\n🔎 Caut produse cu preț "real" (≠ ${PLACEHOLDER_PRICE}) deja în DB, nematchuite de niciun CSV (legacy RON→EUR)...`)
-    const { data: pricedProducts, error } = await supabase
-      .from('products')
-      .select('id, sku, brand_name, name, price')
-      .neq('price', PLACEHOLDER_PRICE)
-    if (error) throw error
+    // Toate prețurile reale, paginat (PostgREST limitează răspunsurile la ~1000 rânduri).
+    const pricedProducts = []
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase.rpc('get_product_cost_prices').range(from, from + 999)
+      if (error) throw error
+      pricedProducts.push(
+        ...data
+          .filter(r => parseFloat(r.price) !== PLACEHOLDER_PRICE)
+          .map(r => ({ id: r.product_id, sku: r.sku, brand_name: r.brand_name, name: r.name, price: r.price })),
+      )
+      if (data.length < 1000) break
+    }
 
     legacyUpdates = pricedProducts
       .filter(p => !matchedSkuSet.has(p.sku))

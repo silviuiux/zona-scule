@@ -57,9 +57,11 @@ export type Product = {
   images_migrated: boolean
   manufacturer_url: string | null
   created_at: string | null
-  // Acquisition/cost price (see lib/quote-pricing.ts) — added to
-  // product_listing/product_listing_mv 2026-07-11 specifically so the
-  // storefront listing can sort by it (see getProducts' default order).
+  // SORT RANK, not a price (since 2026-09-27): the lowest real price maps to
+  // 0.01, the next distinct price to 0.02, and so on — only the order is
+  // public. Real acquisition prices live in private.product_prices (not
+  // exposed by the API; service_role only, via get_product_cost_prices).
+  // See scripts/sql/2026-09-27-private-product-prices.sql.
   price: number | null
   // ── PFERD variants (additive migration) ──
   family_id: string | null

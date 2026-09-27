@@ -1,3 +1,9 @@
+// ⚠️ OUTDATED COPY — do not run. Since 2026-09-27 products.price only holds a
+// public sort rank; real prices live in private.product_prices. Use
+// scripts/sync-prices-from-og-pricelists.mjs, which reads/writes them safely.
+console.error('✗ Copie veche. Rulează scripts/sync-prices-from-og-pricelists.mjs.')
+process.exit(1)
+
 /**
  * sync-prices-from-og-pricelists.mjs
  *

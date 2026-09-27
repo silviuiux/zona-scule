@@ -14,6 +14,13 @@ npm install csv-parse ws
 
 ## sync-prices-from-og-pricelists.mjs
 
+> **Din 2026-09-27:** prețurile reale de achiziție stau în `private.product_prices`
+> (neexpus prin API). `products.price` conține doar un rang public de sortare
+> (cel mai mic preț = 0.01, următorul = 0.02, …). Scriptul citește prețurile
+> reale prin RPC-ul `get_product_cost_prices` (doar cu service key) și scrie
+> în continuare pe `products.price` — un trigger mută valoarea în tabelul privat.
+> Detalii: `scripts/sql/2026-09-27-private-product-prices.sql`.
+
 Sincronizează `products.price` cu prețurile din listele de preț ale furnizorilor
 (`extras/OG PRICE LIST/*.csv`). Match strict pe SKU — NU pe brand, pentru că
 fișierele sunt grupate pe distribuitor/export, nu pe brandul real al produsului.
