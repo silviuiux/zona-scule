@@ -14,16 +14,12 @@ export default async function Footer() {
   return (
     <>
       <style>{`
-        /* Dark canvas — deliberate contrast with the light pages above it.
-           Corner glow (brand red) + the same fine dot-grid texture used on
-           .carousel-section elsewhere on the site, so dark sections feel related. */
+        /* Light canvas — thin rules top (above the grid) and bottom (above
+           the copyright bar) stand in for the dark card's own edges. */
         .footer {
           position: relative;
-          background-color: rgb(17,17,17);
-          background-image:
-            radial-gradient(circle at 4% -12%, rgba(217,44,43,0.18), transparent 40%),
-            radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-          background-size: auto, 26px 26px;
+          background-color: rgb(255,255,255);
+          border-top: 1px solid rgba(0,0,0,0.12);
         }
 
         .footer-grid {
@@ -43,60 +39,53 @@ export default async function Footer() {
         .footer-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 13px;
-          color: rgba(255,255,255,0.5);
+          color: rgba(0,0,0,0.55);
           line-height: 1.7;
           max-width: 300px;
         }
 
         .footer-col-title {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.85);
-          display: flex; align-items: center; gap: 8px;
-          margin-bottom: 16px;
-        }
-        /* Small indicator dot — instrument-panel accent, not decoration for its own sake */
-        .footer-col-title::before {
-          content: '';
-          width: 5px; height: 5px;
-          background: rgb(217,44,43);
-          border-radius: 1px;
-          flex-shrink: 0;
+          font-family: 'Neuton', serif;
+          font-size: 22px; font-weight: 400;
+          color: rgb(0,0,0);
+          margin-bottom: 18px;
         }
 
         .footer-link {
           font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.5);
+          font-size: 13px; color: rgba(0,0,0,0.6);
           text-decoration: none; display: block; margin-bottom: 10px;
           transition: color 150ms;
         }
-        .footer-link:hover { color: rgb(255,255,255); }
-        a.footer-link:hover { color: rgb(237,90,89); }
+        .footer-link:hover { color: rgb(217,44,43); }
         .footer-link-btn {
           background: none; border: none; padding: 0;
           text-align: left; cursor: pointer;
           font: inherit;
         }
-        .footer-link-btn:hover { color: rgb(237,90,89); }
+        .footer-link-btn:hover { color: rgb(217,44,43); }
+        /* Phone/email specifically read as hyperlinks (underlined), matching
+           the reference — the rest of the footer links stay plain text with
+           a color-only hover, same as everywhere else on the site. */
+        .footer-link-underline { text-decoration: underline; }
 
         .footer-vat {
           font-family: 'Recursive', monospace;
           font-size: 11px;
           letter-spacing: 0.02em;
-          color: rgba(255,255,255,0.3);
+          color: rgba(0,0,0,0.4);
         }
 
         .footer-bottom {
           position: relative;
-          border-top: 1px solid rgba(255,255,255,0.08);
+          border-top: 1px solid rgba(0,0,0,0.12);
           padding: 18px 12px;
           max-width: 1440px; margin: 0 auto;
           display: flex; justify-content: space-between; align-items: center;
         }
         .footer-bottom span {
           font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(255,255,255,0.32); text-decoration: none;
+          font-size: 11px; color: rgba(0,0,0,0.4); text-decoration: none;
           letter-spacing: 0.01em;
         }
 
@@ -143,8 +132,8 @@ export default async function Footer() {
           </div>
           <div>
             <p className="footer-col-title">Contact</p>
-            <a href="tel:0248222298" className="footer-link">0248.222.298</a>
-            <a href="mailto:contact@zonascule.ro" className="footer-link">contact@zonascule.ro</a>
+            <a href="tel:0248222298" className="footer-link footer-link-underline">0248.222.298</a>
+            <a href="mailto:contact@zonascule.ro" className="footer-link footer-link-underline">contact@zonascule.ro</a>
             <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
             <p className="footer-vat">CIF / VAT: RO 6796092</p>
           </div>
