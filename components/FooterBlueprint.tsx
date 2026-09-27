@@ -2,7 +2,7 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 /**
- * Homepage easter egg. Once the page is scrolled all the way to the bottom,
+ * Footer easter egg (every page). Once the page is scrolled all the way to the bottom,
  * further wheel (or touch) scrolling looks like it does nothing — but after
  * a short dead zone it starts drafting a technical drawing, driven by how
  * far you keep scrolling:

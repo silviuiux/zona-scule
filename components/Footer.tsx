@@ -3,9 +3,9 @@ import { LEGAL_PAGES, ANPC_SAL_URL } from '@/lib/legal-nav'
 import { getCategoriesWithCount } from '@/lib/supabase'
 import FooterBlueprint from './FooterBlueprint'
 
-// `blueprint` enables the homepage-only scroll-past-the-end easter egg
-// (see FooterBlueprint.tsx).
-export default async function Footer({ blueprint = false }: { blueprint?: boolean } = {}) {
+// `blueprint` enables the scroll-past-the-end easter egg (see
+// FooterBlueprint.tsx) — on by default, so every page with a footer has it.
+export default async function Footer({ blueprint = true }: { blueprint?: boolean } = {}) {
   // Top 5 by product count, not sort_order — the footer is a quick-nav
   // shortcut to the site's biggest categories, not the full curated
   // category ordering used in the sidebar/dropdowns elsewhere.
