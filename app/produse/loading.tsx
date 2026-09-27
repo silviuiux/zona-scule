@@ -4,8 +4,7 @@
  *
  * Mirrors the CURRENT default layout — CatalogLayout's "pills" mode
  * (ViewModeContext defaults to 'pills' for anyone without a saved
- * preference in localStorage): a filter row of 4 equal cells (view
- * switcher + brand/category/subcategory dropdowns) and a 4-column product
+ * preference in localStorage): category + brand pill rows and a 4-column product
  * grid, no persistent sidebar. The old vertical Sidebar.tsx list is still
  * available behind the view-switcher toggle, but is no longer the default
  * — this skeleton previously mirrored that legacy sidebar layout, which
@@ -101,18 +100,13 @@ export default function Loading() {
           padding: 0 12px;
         }
 
-        /* ── Filter row — view switcher + 3 dropdowns, 4 equal cells,
-             matches CatalogLayout's ".filter-row" grid exactly. ── */
+        /* ── Filter rows — category + brand pill carousels, each led by
+             a label, matching CatalogLayout's ".filter-row". ── */
         .skel-filter-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          display: flex; flex-direction: column; gap: 12px;
           margin: 32px 0 16px;
         }
-        .skel-filter-cell {
-          height: 40px;
-          border-radius: 8px;
-        }
+        .skel-filter-line { display: flex; align-items: center; gap: 16px; overflow: hidden; }
 
         /* ── Main ── */
         .skel-main { padding: 0 0 80px; min-width: 0; }
@@ -208,10 +202,15 @@ export default function Loading() {
       <div className="skel-page">
         <div className="skel-layout">
           <main className="skel-main">
-            {/* Filter row — view switcher + brand/category/subcategory dropdowns */}
+            {/* Filter rows — category pills, brand pills */}
             <div className="skel-filter-row">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="skel skel-filter-cell" />
+              {[[110, 150, 130, 170, 120, 140], [90, 110, 100, 120, 95, 105, 115]].map((row, r) => (
+                <div key={r} className="skel-filter-line">
+                  <div className="skel" style={{ height: 10, width: 80, flexShrink: 0, marginRight: 16 }} />
+                  {row.map((w, i) => (
+                    <div key={i} className="skel" style={{ height: 36, width: w, borderRadius: 999, flexShrink: 0 }} />
+                  ))}
+                </div>
               ))}
             </div>
 

@@ -3,10 +3,10 @@ import { useRouter } from 'next/navigation'
 import type { SuperviewFilterOption } from '@/lib/supabase'
 
 /**
- * Filter bar for /produse/superview — same three-dropdown shape and
- * onChange + router.push pattern as CategoryPillBar.tsx on the main /produse
- * listing, but scoped to the already-deduped "one per brand/category/
- * subcategory" superview set rather than the full catalogue: picking a
+ * Filter bar for /produse/superview — three dropdowns (onChange +
+ * router.push, same href rules as the main /produse listing), but
+ * scoped to the already-deduped "one per brand/category/subcategory"
+ * superview set rather than the full catalogue: picking a
  * brand here shows one representative product per category/subcategory
  * *within that brand*, not a fresh dedup pass. All the actual filtering
  * happens server-side in getSuperviewProducts() (lib/supabase.ts) — this

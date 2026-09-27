@@ -24,11 +24,9 @@ export default async function SubcategoryBar({
    *  while pills swipe past behind them. Optional so this component still
    *  works where no toggle applies. */
   toggle?: ReactNode
-  /** Pin this bar right under the navbar. Only one bar should be sticky at
-   *  a time — the pills-mode dropdown row (CatalogLayout.tsx) is sticky
-   *  exactly when this isn't (i.e. when no category/brand is selected),
-   *  and this bar takes over stickiness once one is. Defaults to true so
-   *  existing callers that don't care keep the old always-sticky behavior. */
+  /** Pin this bar right under the navbar (desktop). /produse turns this off
+   *  for the unfiltered "Toate" bar and on once a category/brand is
+   *  selected. Defaults to true. */
   sticky?: boolean
 }) {
   const subs = prefetchedSubs ?? (categoryName ? await getSubcategoriesByCategoryName(categoryName) : [])
