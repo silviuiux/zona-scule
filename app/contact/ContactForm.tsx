@@ -58,7 +58,14 @@ export default function ContactForm({
   return (
     <section className="cf" aria-labelledby="cf-title">
       <style>{`
-        .cf { padding: var(--space-section) 0; border-bottom: 1px solid rgba(0,0,0,0.12); }
+        .cf {
+          /* Hero: fills the screen minus a strip, so the contact cards below
+             peek above the fold and hint at more to scroll to. */
+          min-height: calc(100vh - 52px - 160px);
+          display: flex; flex-direction: column; justify-content: center;
+          padding: clamp(24px, 5vh, 64px) 0;
+          border-bottom: 1px solid rgba(0,0,0,0.12);
+        }
         /* Compact letter on the left 60% — the rest of the full-width
            section is open space. No panel by default; a hairline outline
            frames it only while a field is being filled in. */
@@ -66,7 +73,7 @@ export default function ContactForm({
           width: 60%;
           border: 1px solid transparent;
           border-radius: 4px;
-          padding: clamp(32px, 4vw, 56px);
+          padding: clamp(16px, 3.5vh, 40px) clamp(24px, 3vw, 40px);
           transition: border-color 250ms ease;
         }
         .cf-panel:focus-within { border-color: rgba(0,0,0,0.12); }
@@ -75,7 +82,7 @@ export default function ContactForm({
           font-family: 'Neuton', serif; font-weight: 400;
           font-size: clamp(36px, 3.4vw, 48px); line-height: 1; letter-spacing: -0.015em;
           color: rgb(0,0,0);
-          margin-bottom: 48px;
+          margin-bottom: clamp(24px, 4.5vh, 48px);
         }
 
         /* The sentence */
@@ -83,7 +90,7 @@ export default function ContactForm({
           font-family: 'Montserrat', sans-serif; font-weight: 400;
           font-size: clamp(17px, 1.4vw, 20px); line-height: 1.3;
           color: rgb(30,30,30);
-          display: flex; flex-direction: column; gap: 22px;
+          display: flex; flex-direction: column; gap: clamp(12px, 2.2vh, 22px);
         }
         .cf-line { display: flex; align-items: flex-end; flex-wrap: wrap; column-gap: 12px; row-gap: 8px; }
         .cf-line > span { padding-bottom: 5px; white-space: nowrap; }
@@ -103,7 +110,7 @@ export default function ContactForm({
         .cf-input:focus { border-bottom-color: rgb(217,44,43); }
 
         .cf-foot {
-          margin-top: 48px; padding-top: 24px;
+          margin-top: clamp(24px, 4.5vh, 48px); padding-top: clamp(16px, 2.5vh, 24px);
           border-top: 1px solid rgba(0,0,0,0.06);
           display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
         }
@@ -140,6 +147,7 @@ export default function ContactForm({
           .cf-line { flex-direction: column; align-items: stretch; }
           .cf-line > span { white-space: normal; padding-bottom: 0; }
           .cf-input, .cf-input.name { flex: 1 1 auto; width: 100%; padding-left: 0; }
+          .cf { min-height: 0; }
           .cf-panel { width: 100%; }
           .cf-submit { width: 100%; justify-content: space-between; }
         }

@@ -42,7 +42,7 @@ export default function ContactPage({
 
         /* ── Info bar ── */
         .contact-info-bar {
-          margin-top: var(--space-section);
+          margin-top: 56px; /* close under the hero so the cards peek above the fold */
           display: grid; grid-template-columns: repeat(3, 1fr);
           gap: 0;
           background: rgb(255,255,255);
