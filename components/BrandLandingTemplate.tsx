@@ -226,14 +226,31 @@ export default function BrandLandingTemplate({
         .bp-section-sub { font-family: 'Recursive', sans-serif; font-size: 15px; line-height: 1.5; color: rgba(0,0,0,0.5); text-align: left; }
 
         /* ══════════════════ USE-CASE CAROUSELS ══════════════════ */
-        .bp-usecase-section { padding: 72px 12px; border-top: 1px solid rgba(0,0,0,0.06); }
-        .bp-usecase-group { margin-bottom: 64px; }
-        .bp-usecase-group:last-child { margin-bottom: 0; }
-        .bp-usecase-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding: 0 2px; }
-        .bp-usecase-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: rgb(0,0,0); }
-        .bp-usecase-count { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(0,0,0,0.4); }
+        .bp-usecase-section { padding: 72px 12px 0; border-top: 1px solid rgba(0,0,0,0.06); }
+        /* Each carousel is its own band; odd ones get a full-bleed light
+           gray background (box-shadow spread sideways, clip-path trims it
+           to the band's own height), so consecutive groups alternate
+           white / #f4f4f4 edge to edge. */
+        .bp-usecase-group { padding: 56px 0 24px; }
+        .bp-usecase-group.alt {
+          background: #f4f4f4;
+          box-shadow: 0 0 0 100vmax #f4f4f4;
+          clip-path: inset(0 -100vmax);
+        }
+        .bp-usecase-head {
+          display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
+          padding: 0 2px;
+        }
+        .bp-usecase-head .bp-section-title { margin: 0; }
+        .bp-usecase-count {
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px;
+          letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+          color: rgba(0,0,0,0.45); text-decoration: none;
+        }
+        .bp-usecase-count:hover { color: rgb(0,0,0); }
         .bp-usecase-scroll {
           display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
+          margin: 32px 0; /* breathing room above/below each row of cards */
           scroll-snap-type: x mandatory; scrollbar-width: thin;
         }
         .bp-usecase-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
@@ -507,10 +524,10 @@ export default function BrandLandingTemplate({
             <h2 className="bp-section-title">{config.useCaseSectionTitle}</h2>
             <p className="bp-section-sub">{config.useCaseSectionSub}</p>
           </div>
-          {applicationGroups.map(group => (
-            <div key={group.title} className="bp-usecase-group">
+          {applicationGroups.map((group, i) => (
+            <div key={group.title} className={`bp-usecase-group${i % 2 ? ' alt' : ''}`}>
               <div className="bp-usecase-head">
-                <span className="bp-usecase-title">{group.title}</span>
+                <h3 className="bp-section-title">{group.title}</h3>
                 <Link
                   href={`${catalogHref}&q=${encodeURIComponent(group.title)}`}
                   className="bp-usecase-count"
@@ -570,10 +587,10 @@ export default function BrandLandingTemplate({
             <h2 className="bp-section-title">{config.subcategorySectionTitle ?? 'Descoperă pe subcategorii'}</h2>
             <p className="bp-section-sub">{config.subcategorySectionSub ?? 'Produsele grupate exact cum sunt organizate în catalog.'}</p>
           </div>
-          {subcategoryGroups.map(group => (
-            <div key={group.title} className="bp-usecase-group">
+          {subcategoryGroups.map((group, i) => (
+            <div key={group.title} className={`bp-usecase-group${i % 2 ? ' alt' : ''}`}>
               <div className="bp-usecase-head">
-                <span className="bp-usecase-title">{group.title}</span>
+                <h3 className="bp-section-title">{group.title}</h3>
                 <Link
                   href={`/produse?brand=${encodeURIComponent(config.brandName)}&subcategorie=${encodeURIComponent(group.title)}`}
                   className="bp-usecase-count"
