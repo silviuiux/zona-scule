@@ -344,6 +344,15 @@ export default function BrandLandingTemplate({
           display: flex; align-items: center; justify-content: center;
           color: var(--brand-accent); font-family: 'Neuton', serif; font-size: 26px;
         }
+        /* Brand logo tile — replaces the initials circle when the brand
+           config has a logo (wide wordmarks need a wide box). */
+        .bp-specialist-logo {
+          width: 112px; height: 72px; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px;
+          padding: 12px;
+        }
+        .bp-specialist-logo img { width: 100%; height: 100%; object-fit: contain; }
         .bp-specialist-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: rgb(0,0,0); }
         .bp-specialist-role { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-accent); margin: 2px 0 8px; }
         .bp-specialist-note { font-family: 'Recursive', sans-serif; font-size: 13.5px; line-height: 1.55; color: rgba(0,0,0,0.6); max-width: 560px; }
@@ -354,8 +363,7 @@ export default function BrandLandingTemplate({
         /* Two columns on desktop — uses the full container width the way a
            single centered text column can't, without stretching each Q&A
            row to an unreadable ~1400px line length. */
-        .bp-faq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-items: start; }
-        @media (max-width: 800px) { .bp-faq-list { grid-template-columns: 1fr; } }
+        .bp-faq-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
         .bp-faq-item { background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden; }
         .bp-faq-q {
           list-style: none; cursor: pointer; padding: 18px 20px;
@@ -610,9 +618,15 @@ export default function BrandLandingTemplate({
       <div id="specialist" className="bp-specialist-wrap">
         <div className="bp-specialist">
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <div className="bp-specialist-photo">
-              {(config.specialist?.name ?? 'Echipa tehnică Zona Scule').split(' ').map(w => w[0]).slice(0, 2).join('')}
-            </div>
+            {config.logo ? (
+              <div className="bp-specialist-logo">
+                <Image src={config.logo.src} alt={config.logo.alt} width={config.logo.width} height={config.logo.height} />
+              </div>
+            ) : (
+              <div className="bp-specialist-photo">
+                {(config.specialist?.name ?? 'Echipa tehnică Zona Scule').split(' ').map(w => w[0]).slice(0, 2).join('')}
+              </div>
+            )}
             <div>
               <div className="bp-specialist-name">{config.specialist?.name ?? 'Echipa tehnică Zona Scule'}</div>
               <div className="bp-specialist-role">{config.specialist?.role ?? `Consultanță produse ${config.brandName}`}</div>
