@@ -787,19 +787,19 @@ export default function FooterBlueprint() {
           overflow: visible;
           width: 280mm; height: 264mm;
           right: calc(12px - 24mm);
-          bottom: calc((100vh - 52px - var(--bp-bar, 57px)) / 2 - 132mm);
+          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 132mm);
         }
         .bp-nail {
           overflow: hidden; /* frames the camera move */
           width: 180mm; height: 200mm;
           right: 12px;
-          bottom: calc((100vh - 52px - var(--bp-bar, 57px)) / 2 - 100mm);
+          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 100mm);
         }
         .bp-drill {
           overflow: hidden;
           width: 200mm; height: 180mm;
           right: 12px;
-          bottom: calc((100vh - 52px - var(--bp-bar, 57px)) / 2 - 90mm);
+          bottom: calc((100vh - var(--nav-h) - var(--bp-bar, 57px)) / 2 - 90mm);
         }
         .bp-art .hole { fill: #fff; stroke: rgba(0,0,0,0.34); stroke-width: 0.3; }
         .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }

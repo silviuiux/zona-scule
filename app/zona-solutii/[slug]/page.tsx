@@ -41,7 +41,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <style>{`
         /* ── Hero ── */
         .art-hero {
-          padding-top: 52px;
+          padding-top: var(--nav-h);
           min-height: 60vh;
           display: flex; align-items: flex-end;
           position: relative; overflow: hidden;

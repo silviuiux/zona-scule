@@ -36,7 +36,7 @@ export default async function BranduriPage() {
       <Nav />
       <style>{`
         .branduri-page {
-          padding-top: 52px;
+          padding-top: var(--nav-h);
           min-height: 100vh;
         }
         .branduri-inner {

@@ -20,7 +20,7 @@ export default function ContactPage({
       <Nav />
       <style>{`
         .contact-page {
-          padding-top: 52px;
+          padding-top: var(--nav-h);
           min-height: 100vh;
           /* Transparent over the white body, so the dot grid and laser show
              through; positioned so content paints above body::before. */

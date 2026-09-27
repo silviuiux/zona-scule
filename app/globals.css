@@ -13,6 +13,9 @@
   /* One spacing unit for page rhythm: the gap between sections and between
      a section's heading and its content. */
   --space-section: 120px;
+  /* Height of the fixed site nav; everything that clears or sticks under
+     it (page top paddings, sticky bars, full-height footer) uses this. */
+  --nav-h: 68px;
 
   /*
     Noise texture — matches Figma Noise plugin settings:
@@ -26,7 +29,7 @@
 }
 
 @media (max-width: 768px) {
-  :root { --space-section: 64px; }
+  :root { --space-section: 64px; --nav-h: 56px; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

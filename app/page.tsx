@@ -513,10 +513,10 @@ export default async function HomePage() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-          /* Nav is fixed at 52px tall — padding-top must clear it before
+          /* Nav is fixed at --nav-h tall — padding-top must clear it before
              adding the actual breathing room, or content sits flush/under
              the nav (was 48px total, less than the nav's own height). */
-          .hero { min-height: 75vh; padding-top: 84px; }
+          .hero { min-height: 75vh; padding-top: calc(var(--nav-h) + 32px); }
           .hero-inner { gap: 20px; padding: 0 12px; }
           .stats-grid { grid-template-columns: 1fr; min-height: 0; }
           .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }

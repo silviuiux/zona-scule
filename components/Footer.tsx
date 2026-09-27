@@ -25,8 +25,8 @@ export default async function Footer({ blueprint = false }: { blueprint?: boolea
           border-top: 1px solid rgba(0,0,0,0.12);
           /* 80vh by default; the homepage easter egg (FooterBlueprint)
              drives --footer-grow 0 → 1 to expand it to the full viewport
-             below the 52px nav. */
-          min-height: calc(80vh + (20vh - 52px) * var(--footer-grow, 0));
+             below the fixed nav (--nav-h). */
+          min-height: calc(80vh + (20vh - var(--nav-h)) * var(--footer-grow, 0));
           display: flex; flex-direction: column;
         }
 
@@ -47,7 +47,7 @@ export default async function Footer({ blueprint = false }: { blueprint?: boolea
           /* The easter egg's growth goes here only: the logo rises while the
              columns and copyright bar stay pinned to the bottom, and the
              space-evenly top/bottom gaps don't change. */
-          margin-bottom: calc((20vh - 52px) * var(--footer-grow, 0));
+          margin-bottom: calc((20vh - var(--nav-h)) * var(--footer-grow, 0));
         }
         .footer-logo-icon, .footer-logo-word { display: block; height: 64px; width: auto; }
 

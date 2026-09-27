@@ -61,7 +61,7 @@ export default function ContactForm({
         .cf {
           /* Hero: fills the screen minus a strip, so the contact cards below
              peek above the fold and hint at more to scroll to. */
-          min-height: calc(100vh - 52px - 160px);
+          min-height: calc(100vh - var(--nav-h) - 160px);
           display: flex; flex-direction: column; justify-content: center;
           padding: clamp(24px, 5vh, 64px) 0;
           border-bottom: 1px solid rgba(0,0,0,0.12);

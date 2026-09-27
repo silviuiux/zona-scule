@@ -130,7 +130,7 @@ export default function Nav() {
       <style>{`
         .nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          height: 52px;
+          height: var(--nav-h);
           background: rgb(255,255,255);
           box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
@@ -168,6 +168,7 @@ export default function Nav() {
           display: flex; align-items: center; gap: 8px;
           background: none; border: none; cursor: pointer;
           padding: 12px 14px; white-space: nowrap;
+          align-self: center; /* hug the label so its underline sits right under it */
         }
         .nav-search-wrap.open .nav-search-trigger { display: none; }
         .nav-search-form {
@@ -322,11 +323,18 @@ export default function Nav() {
         }
 
         /* Right-side links */
+        /* A hairline divider separates the search trigger from the links. */
         .nav-links {
-          display: flex; align-items: center; gap: 8px;
-          flex-shrink: 0; padding-left: 32px;
+          display: flex; align-items: center; gap: 20px;
+          flex-shrink: 0; margin-left: 20px; padding-left: 20px;
+          position: relative;
         }
-        /* Text links (Catalog, Branduri, Despre noi + the collapsed search
+        .nav-links::before {
+          content: ''; position: absolute; left: 0; top: 50%;
+          width: 1px; height: 16px; transform: translateY(-50%);
+          background: rgba(0,0,0,0.12);
+        }
+        /* Text links (Catalog, Branduri + the collapsed search
            trigger) — thin underline sweeps in under the label on hover. */
         .nav-link {
           position: relative;
@@ -346,8 +354,11 @@ export default function Nav() {
         }
         .nav-link:hover { color: rgb(0,0,0); }
         .nav-link:hover::after { transform: scaleX(1); }
+        /* The search trigger keeps its underline — it reads as an input line. */
+        .nav-search-trigger::after { transform: scaleX(1); opacity: 0.35; transition: opacity 200ms ease; }
+        .nav-search-trigger:hover::after { opacity: 1; }
         .nav-contact {
-          flex-shrink: 0; padding: 12px 18px;
+          flex-shrink: 0; margin-left: 8px; padding: 8px 18px;
           background: rgb(0,0,0); color: rgb(255,255,255);
           border-radius: 2px; font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 600;
@@ -361,7 +372,7 @@ export default function Nav() {
           .nav-search-trigger { display: none; }
           .nav-search-wrap {
             display: none;
-            position: absolute; top: 52px; left: 0; right: 0;
+            position: absolute; top: var(--nav-h); left: 0; right: 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
             background: rgb(255,255,255);
             z-index: 99;
@@ -376,6 +387,8 @@ export default function Nav() {
             color: rgba(0,0,0,0.5); margin-left: auto;
           }
           .nav-link { display: none; }
+          .nav-links { margin-left: 0; padding-left: 0; }
+          .nav-links::before { display: none; }
           .nav-contact { padding: 7px 12px; font-size: 10px; }
         }
         @media (min-width: 769px) {
@@ -514,7 +527,6 @@ export default function Nav() {
           <div className="nav-links">
             <Link href="/produse" className="nav-link">Catalog</Link>
             <Link href="/branduri" className="nav-link">Branduri</Link>
-            <Link href="/contact#despre-noi" className="nav-link">Despre noi</Link>
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>
         </div>

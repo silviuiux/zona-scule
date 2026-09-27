@@ -27,7 +27,7 @@ export default function LegalLayout({
       <Nav />
       <style>{`
         .legal-page {
-          padding-top: 52px;
+          padding-top: var(--nav-h);
           min-height: 100vh;
           background: rgb(244,244,244);
         }
