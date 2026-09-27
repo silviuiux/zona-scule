@@ -15,8 +15,8 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    type themselves out; the title block fills in under the logo;
  *  • a finale plays, then an "APROBAT" stamp with today's date lands.
  *
- * Three drawings, all at 1:1 (their SVGs are sized in CSS millimetres and
- * the viewBox units are mm):
+ * Four drawings (their SVGs are sized in CSS millimetres and the viewBox
+ * units are the object's mm — 1:1, except the power drill at 1:2):
  *  - "nail" (?egg=nail): a Ø3,1 × 100 nail standing on a board section, which
  *    a hammer then drives in over four scroll-driven hits until only the
  *    head is left above the surface; finale: the camera zooms into
@@ -29,8 +29,16 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    section turning in sync), backs out, and the new hole is dimensioned;
  *    finale: a wind-down test spin.
  *
+ *  - "power" (?egg=power): an 18V brushless drill/driver, drawn assembled
+ *    (gearbox, motor and electronics as hidden lines), which then comes apart
+ *    into an exploded view — chuck, clutch collar, planetary gearbox and
+ *    motor slide out along the axis, trigger forward, electronics and
+ *    battery down — with balloons, a parts list and a section B–B through
+ *    the motor (12-slot stator, 4-pole rotor); finale: a test spin.
+ *
  * Which one shows is shuffled on every page load (never the same one twice
- * in a row); ?egg=… forces one.
+ * in a row) between blade, drill and power — the nail is out of the shuffle
+ * for now; ?egg=… forces any of them.
  *
  * Every drawable carries data-s / data-e — its slice of the 0..1 progress —
  * and a data-k kind: draw (stroke-dashoffset, pathLength=1), grow (scale
@@ -41,8 +49,10 @@ const DEAD_ZONE = 500 // px of extra scrolling that "does nothing" first
 const RANGE = 2800 // px of extra scrolling from blank to fully drawn
 const GROW_END = 0.2 // progress by which the footer has grown to full height
 
-type Variant = 'nail' | 'blade' | 'drill'
-const VARIANTS: Variant[] = ['nail', 'blade', 'drill']
+type Variant = 'nail' | 'blade' | 'drill' | 'power'
+const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power']
+// In the page-load shuffle; the rest stay reachable with ?egg=…
+const SHUFFLED: Variant[] = ['blade', 'drill', 'power']
 type Kind = 'draw' | 'grow' | 'pop' | 'fade' | 'type'
 type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; wrap: SVGGElement | null }
 
@@ -76,15 +86,16 @@ const Pen = ({ scale = 1 }: { scale?: number }) => (
   </g>
 )
 // Drafting-grid paper (5 mm / 25 mm), faded towards the edges.
-const Paper = ({ x, y, w, h, cx, cy, r }: { x: number; y: number; w: number; h: number; cx: number; cy: number; r: number }) => (
+// `unit`: viewBox units per mm of paper (2 on a 1:2 drawing).
+const Paper = ({ x, y, w, h, cx, cy, r, unit = 1 }: { x: number; y: number; w: number; h: number; cx: number; cy: number; r: number; unit?: number }) => (
   <>
     <defs>
-      <pattern id="zs-bp-minor" width="5" height="5" patternUnits="userSpaceOnUse">
-        <path className="grid-minor" d="M5 0 H0 V5" />
+      <pattern id="zs-bp-minor" width={5 * unit} height={5 * unit} patternUnits="userSpaceOnUse">
+        <path className="grid-minor" d={`M${5 * unit} 0 H0 V${5 * unit}`} />
       </pattern>
-      <pattern id="zs-bp-major" width="25" height="25" patternUnits="userSpaceOnUse" x={cx} y={cy}>
-        <rect width="25" height="25" fill="url(#zs-bp-minor)" />
-        <path className="grid-major" d="M25 0 H0 V25" />
+      <pattern id="zs-bp-major" width={25 * unit} height={25 * unit} patternUnits="userSpaceOnUse" x={cx} y={cy}>
+        <rect width={25 * unit} height={25 * unit} fill="url(#zs-bp-minor)" />
+        <path className="grid-major" d={`M${25 * unit} 0 H0 V${25 * unit}`} />
       </pattern>
       <radialGradient id="zs-bp-fade" cx={cx} cy={cy} r={r} gradientUnits="userSpaceOnUse">
         <stop offset="0.55" stopColor="#fff" />
@@ -458,21 +469,245 @@ function DrillArt() {
   )
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// Cordless drill/driver 18V, brushless — exploded assembly, drawn at 1:2
+// (viewBox units are the drill's own mm; the SVG is sized at half that)
+// ════════════════════════════════════════════════════════════════════════════
+const PY = 70 // spindle axis
+const PAR = (x: number, y: number, dx: number, dy: number) => arrow(x, y, dx, dy, 4.4, 1.4)
+// Each part slides out along its own vector over its own slice of progress.
+const POWER_PARTS = [
+  { role: 'x-chuck', dx: -144, dy: 0, s: 0.58, e: 0.72 },
+  { role: 'x-collar', dx: -132, dy: 0, s: 0.6, e: 0.73 },
+  { role: 'x-gear', dx: -112, dy: 0, s: 0.62, e: 0.75 },
+  { role: 'x-motor', dx: -96, dy: 0, s: 0.64, e: 0.77 },
+  { role: 'x-trigger', dx: -30, dy: 6, s: 0.66, e: 0.76 },
+  { role: 'x-pcb', dx: 0, dy: 18, s: 0.68, e: 0.78 },
+  { role: 'x-battery', dx: 0, dy: 30, s: 0.68, e: 0.8 },
+]
+// Chuck sleeve grip ribs (parallel to the axis) seen from the side at a turn
+// of `deg` — only the ones facing us.
+const chuckRibs = (deg: number) => {
+  let d = ''
+  for (let i = 0; i < 12; i++) {
+    const a = ((i * 30 + deg) * Math.PI) / 180
+    if (Math.cos(a) < 0.2) continue
+    const y = PY + 20 * Math.sin(a)
+    d += `M163 ${f2(y)} H187 `
+  }
+  return d.trim()
+}
+const BB = { x: 368, y: 122 } // section B–B through the motor
+const bbPt = (r: number, deg: number) => {
+  const a = (deg * Math.PI) / 180
+  return `${f2(BB.x + r * Math.cos(a))} ${f2(BB.y + r * Math.sin(a))}`
+}
+// Stator: 12 T-shaped teeth around the rotor bore.
+const BB_STATOR_INNER = (() => {
+  let d = ''
+  for (let i = 0; i < 12; i++) {
+    const a = i * 30
+    d += `${i ? 'L' : 'M'}${bbPt(11.5, a - 11)} A11.5 11.5 0 0 1 ${bbPt(11.5, a + 11)} L${bbPt(13, a + 11)} L${bbPt(13, a + 5)} L${bbPt(19, a + 5)} A19 19 0 0 1 ${bbPt(19, a + 25)} L${bbPt(13, a + 25)} L${bbPt(13, a + 19)} `
+  }
+  return d + 'Z'
+})()
+const BB_STATOR = `${circle(BB.x, BB.y, 24)} ${BB_STATOR_INNER}`
+const BB_HATCH = (() => {
+  let d = ''
+  for (let x0 = BB.x - 54; x0 <= BB.x + 30; x0 += 3) d += `M${f2(x0)} ${BB.y + 26} L${f2(x0 + 52)} ${BB.y - 26} `
+  return d.trim()
+})()
+const BB_MAGNETS = [0, 90, 180, 270]
+  .map(a => `M${bbPt(10.3, a - 36)} A10.3 10.3 0 0 1 ${bbPt(10.3, a + 36)} L${bbPt(7.6, a + 36)} A7.6 7.6 0 0 0 ${bbPt(7.6, a - 36)} Z`)
+  .join(' ')
+const BB_COILS = Array.from({ length: 12 }, (_, i) => circle(...(bbPt(16, i * 30 + 15).split(' ').map(Number) as [number, number]), 1.1)).join(' ')
+const PARTS_LIST = [
+  'MANDRINĂ AUTOBLOCANTĂ 13 mm',
+  'INEL AMBREIAJ 21+1',
+  'REDUCTOR PLANETAR 2 VIT.',
+  'MOTOR BRUSHLESS 18V',
+  'CARCASĂ · MÂNER',
+  'TRĂGACI VARIABIL',
+  'MODUL ELECTRONIC',
+  'ACUMULATOR 18V · 2,0 Ah',
+]
+// Balloons: [n, balloon x, y, leader path]
+const BALLOONS: [number, number, number, string][] = [
+  [1, 31, 24, 'M31 49 V30'],
+  [2, 74, 24, 'M74 45 V30'],
+  [3, 115, 24, 'M115 47 V30'],
+  [4, 160, 24, 'M160 45 V30'],
+  [5, 300, 24, 'M300 43 V30'],
+  [6, 190, 152, 'M204 140 L194 147.5'],
+  [7, 347, 194, 'M316 194 H341'],
+  [8, 347, 237, 'M322 237 H341'],
+]
+
+function PowerArt() {
+  const hid = (d: string, s: number) => (
+    <g data-k="fade" data-dir="out" data-s="0.58" data-e="0.61">
+      <path className="hid" d={d} data-k="fade" data-s={s} data-e={s + 0.05} />
+    </g>
+  )
+  return (
+    <svg className="bp-art bp-power" viewBox="0 0 400 265">
+      <Paper x={-20} y={-20} w={440} h={320} cx={200} cy={130} r={260} unit={2} />
+      <defs>
+        <clipPath id="zs-bp-bb"><path d={BB_STATOR} clipRule="evenodd" /></clipPath>
+      </defs>
+
+      <line className="cl" x1="0" y1={PY} x2="346" y2={PY} data-axis="x" data-k="grow" data-s="0.06" data-e="0.14" />
+
+      {/* 5 · housing (clamshell, stays put) */}
+      <path className="ln strong" pathLength={1} d="M212 47 C250 44 300 42 322 46 C334 50 338 60 338 70 C338 82 332 92 320 96 H294 C290 120 286 146 286 168 H324 V184 H204 V168 H242 C244 146 246 124 250 100 H226 C220 100 214 97 212 93 Z" data-k="draw" data-s="0.22" data-e="0.36" />
+      <path className="ln" pathLength={1} d="M262 44.5 V40 H278 V44" data-k="draw" data-s="0.34" data-e="0.36" />
+      <path className="ln thin" pathLength={1} d="M326 58 H331 M325 64 H333 M325 70 H334 M325 76 H333 M326 82 H331" data-k="draw" data-s="0.35" data-e="0.38" />
+      <path className="ln thin" pathLength={1} d="M253 104 C250 126 248 146 247 164 M289 100 C285 124 283 146 282 164" data-k="draw" data-s="0.36" data-e="0.4" />
+      <path className="ln thin" pathLength={1} d={`${circle(304, 60, 2)} ${circle(304, 82, 2)} ${circle(266, 150, 2)} ${circle(209, 176, 1.6)}`} data-k="draw" data-s="0.38" data-e="0.41" />
+
+      {/* 1 · chuck */}
+      <g data-role="x-chuck">
+        <path className="ln strong" pathLength={1} d={`M150 ${PY - 9} L156 ${PY - 15} L160 ${PY - 20} H190 L192 ${PY - 18} H200 V${PY + 18} H192 L190 ${PY + 20} H160 L156 ${PY + 15} L150 ${PY + 9} Z`} data-k="draw" data-s="0.12" data-e="0.2" />
+        <path className="ln thin" pathLength={1} d={`M160 ${PY - 20} V${PY + 20} M190 ${PY - 20} V${PY + 20}`} data-k="draw" data-s="0.19" data-e="0.21" />
+        <path data-role="ribs" className="ln thin" pathLength={1} d={chuckRibs(0)} data-k="draw" data-s="0.2" data-e="0.24" />
+        <path className="ln thin" pathLength={1} d={`M150 ${PY - 3} L147 ${PY - 2} V${PY + 2} L150 ${PY + 3}`} data-k="draw" data-s="0.2" data-e="0.21" />
+      </g>
+
+      {/* 2 · clutch collar */}
+      <g data-role="x-collar">
+        <path className="ln strong" pathLength={1} d={`M200 ${PY - 22} L201.5 ${PY - 24} H210.5 L212 ${PY - 22} V${PY + 22} L210.5 ${PY + 24} H201.5 L200 ${PY + 22} Z`} data-k="draw" data-s="0.2" data-e="0.24" />
+        <path className="ln thin" pathLength={1} d={`M203 ${PY - 24} V${PY - 20} M206 ${PY - 24} V${PY - 20} M209 ${PY - 24} V${PY - 20} M203 ${PY + 20} V${PY + 24} M206 ${PY + 20} V${PY + 24} M209 ${PY + 20} V${PY + 24}`} data-k="draw" data-s="0.23" data-e="0.25" />
+      </g>
+
+      {/* 3 · two-speed planetary gearbox — hidden inside, drawn as it comes out */}
+      <g data-role="x-gear">
+        {hid(`M204 65 H212 V75 H204 Z M212 48 H250 V92 H212 Z`, 0.41)}
+        <path className="ln strong" pathLength={1} d={`M212 48 H250 V92 H212 Z`} data-k="draw" data-s="0.63" data-e="0.7" />
+        <path className="ln" pathLength={1} d={`M212 65 H204 V75 H212 M231 48 V44 H235 V48`} data-k="draw" data-s="0.68" data-e="0.71" />
+        <path className="ln thin" pathLength={1} d={`M226 48 V92 M238 48 V92 ${circle(217, 52, 1.2)} ${circle(217, 88, 1.2)} ${circle(245, 52, 1.2)} ${circle(245, 88, 1.2)}`} data-k="draw" data-s="0.7" data-e="0.74" />
+        <path className="hid" d={`M213 60 H249 M213 80 H249`} data-k="fade" data-s="0.72" data-e="0.75" />
+      </g>
+
+      {/* 4 · brushless motor: stator, rotor shaft with pinion, hall board, fan */}
+      <g data-role="x-motor">
+        {hid(`M252 46 H284 V94 H252 Z M290 49 H297 V91 H290 Z`, 0.42)}
+        <path className="ln strong" pathLength={1} d="M252 46 H284 V94 H252 Z" data-k="draw" data-s="0.65" data-e="0.71" />
+        <path className="ln thin" pathLength={1} d="M256 47 V93 M260 47 V93 M264 47 V93 M272 47 V93 M276 47 V93 M280 47 V93" data-k="draw" data-s="0.7" data-e="0.73" />
+        <path className="ln" pathLength={1} d="M252 50 C246 50 246 60 252 60 M252 80 C246 80 246 90 252 90 M284 50 C290 50 290 60 284 60 M284 80 C290 80 290 90 284 90" data-k="draw" data-s="0.71" data-e="0.74" />
+        <path className="ln" pathLength={1} d={`M240 ${PY - 3} H300 V${PY + 3} H240 Z M240 ${PY - 3} L241 ${PY - 4.5} L242 ${PY - 3} L243 ${PY - 4.5} L244 ${PY - 3} L245 ${PY - 4.5} L246 ${PY - 3}`} data-k="draw" data-s="0.67" data-e="0.71" />
+        <path className="ln" pathLength={1} d="M290 49 H297 V91 H290 Z M291 53 L296 57 M291 60 L296 64 M291 76 L296 80 M291 83 L296 87" data-k="draw" data-s="0.72" data-e="0.75" />
+        <path className="ln thin" pathLength={1} d="M286 54 H288.5 V86 H286 Z" data-k="draw" data-s="0.73" data-e="0.75" />
+        {/* cutting plane B–B */}
+        <path className="ln dim" pathLength={1} d="M268 36 V42 M268 98 V104 M268 36 H274 M268 104 H280" data-k="draw" data-s="0.74" data-e="0.77" />
+        <path className="arrow" d={PAR(279, 36, 1, 0)} data-k="pop" data-s="0.765" data-e="0.78" />
+        <path className="arrow" d={PAR(285, 104, 1, 0)} data-k="pop" data-s="0.765" data-e="0.78" />
+        <text className="red" x="266" y="33" textAnchor="middle" data-k="type" data-s="0.77" data-e="0.78" data-text="B" />
+        <text className="red" x="266" y="112" textAnchor="middle" data-k="type" data-s="0.77" data-e="0.78" data-text="B" />
+      </g>
+
+      {/* 6 · trigger */}
+      <g data-role="x-trigger">
+        <path className="ln strong" pathLength={1} d="M247 106 H236 Q230 106 230 112 V128 Q230 134 236 134 H247" data-k="draw" data-s="0.36" data-e="0.39" />
+        <path className="ln thin" pathLength={1} d="M233 114 V126" data-k="draw" data-s="0.385" data-e="0.4" />
+      </g>
+
+      {/* 7 · electronics module in the foot */}
+      <g data-role="x-pcb">
+        {hid(`M212 171 H314 V179 H212 Z`, 0.43)}
+        <path className="ln strong" pathLength={1} d="M212 172 H314 V179 H212 Z" data-k="draw" data-s="0.69" data-e="0.74" />
+        <path className="ln thin" pathLength={1} d={`M222 172 V168 H230 V172 M236 172 V168 H244 V172 M250 172 V168 H258 V172 M266 172 V168 H274 V172 M282 172 V168 H290 V172 ${circle(302, 169.5, 2.5)} M296 179 V183 M306 179 V183`} data-k="draw" data-s="0.73" data-e="0.77" />
+      </g>
+
+      {/* 8 · battery pack */}
+      <g data-role="x-battery">
+        <path className="ln strong" pathLength={1} d="M208 184 H320 V224 Q320 230 314 230 H214 Q208 230 208 224 Z" data-k="draw" data-s="0.38" data-e="0.46" />
+        <path className="ln thin" pathLength={1} d="M212 190 H316 M208 193 H204 V203 H208 M292 219 H296 M299 219 H303 M306 219 H310" data-k="draw" data-s="0.44" data-e="0.48" />
+        <text className="mark" x="260" y="210" textAnchor="middle" data-k="type" data-s="0.46" data-e="0.5" data-text="ZS · 18V · 2,0 Ah · Li-Ion" />
+      </g>
+
+      {/* overall dimensions — fade away before it comes apart */}
+      <g data-k="fade" data-dir="out" data-s="0.55" data-e="0.58">
+        <path className="ln thin" pathLength={1} d="M150 58 V20 M338 66 V20 M280 40 H364 M322 230 H364" data-k="draw" data-s="0.46" data-e="0.49" />
+        <path className="ln dim" pathLength={1} d="M150 25 H338" data-k="draw" data-s="0.48" data-e="0.51" />
+        <path className="arrow" d={PAR(150, 25, -1, 0)} data-k="pop" data-s="0.5" data-e="0.52" />
+        <path className="arrow" d={PAR(338, 25, 1, 0)} data-k="pop" data-s="0.49" data-e="0.51" />
+        <text className="red" x="244" y="22" textAnchor="middle" data-k="type" data-s="0.5" data-e="0.53" data-text="188" />
+        <path className="ln dim" pathLength={1} d="M360 40 V230" data-k="draw" data-s="0.5" data-e="0.53" />
+        <path className="arrow" d={PAR(360, 40, 0, -1)} data-k="pop" data-s="0.52" data-e="0.54" />
+        <path className="arrow" d={PAR(360, 230, 0, 1)} data-k="pop" data-s="0.51" data-e="0.53" />
+        <text className="red" x="357" y="135" textAnchor="middle" transform="rotate(-90 357 135)" data-k="type" data-s="0.52" data-e="0.55" data-text="190" />
+      </g>
+
+      {/* section B–B through the motor: laminated stator, 4-pole rotor */}
+      <text className="red" x={BB.x} y={BB.y - 30} textAnchor="middle" data-k="type" data-s="0.76" data-e="0.78" data-text="B–B" />
+      <line className="cl" x1={BB.x - 28} y1={BB.y} x2={BB.x + 28} y2={BB.y} data-axis="x" data-k="grow" data-s="0.76" data-e="0.78" />
+      <line className="cl" x1={BB.x} y1={BB.y - 27} x2={BB.x} y2={BB.y + 28} data-axis="y" data-k="grow" data-s="0.765" data-e="0.785" />
+      <path className="ln strong" pathLength={1} d={BB_STATOR} data-k="draw" data-s="0.77" data-e="0.82" />
+      <g clipPath="url(#zs-bp-bb)">
+        <path className="ln thin" pathLength={1} d={BB_HATCH} data-k="draw" data-s="0.81" data-e="0.84" />
+      </g>
+      <path className="ln thin" pathLength={1} d={BB_COILS} data-k="draw" data-s="0.82" data-e="0.85" />
+      <g data-role="bb-rotor">
+        <path className="ln" pathLength={1} d={circle(BB.x, BB.y, 10.3)} data-k="draw" data-s="0.79" data-e="0.81" />
+        <path className="ln dim" pathLength={1} d={BB_MAGNETS} data-k="draw" data-s="0.8" data-e="0.83" />
+        <path className="ln" pathLength={1} d={`${circle(BB.x, BB.y, 3)} M${BB.x - 1} ${BB.y - 3} V${BB.y - 2} H${BB.x + 1} V${BB.y - 3}`} data-k="draw" data-s="0.82" data-e="0.84" />
+      </g>
+
+      {/* balloons */}
+      <g data-role="balloons">
+        {BALLOONS.map(([n, x, y, lead], i) => {
+          const s = 0.8 + i * 0.008
+          return (
+            <g key={n}>
+              <path className="ln thin" pathLength={1} d={lead} data-k="draw" data-s={s.toFixed(3)} data-e={(s + 0.02).toFixed(3)} />
+              <path className="ln" pathLength={1} d={circle(x, y, 5.5)} data-k="draw" data-s={(s + 0.015).toFixed(3)} data-e={(s + 0.03).toFixed(3)} />
+              <text className="bal" x={x} y={y + 1.9} textAnchor="middle" data-k="type" data-s={(s + 0.025).toFixed(3)} data-e={(s + 0.03).toFixed(3)} data-text={String(n)} />
+            </g>
+          )
+        })}
+      </g>
+
+      {/* parts list */}
+      <text className="red" x="10" y="159" data-k="type" data-s="0.82" data-e="0.84" data-text="LISTĂ DE PIESE" />
+      <path className="ln" pathLength={1} d={`M10 164 H190 V245 H10 Z M24 164 V245 M172 164 V245 ${Array.from({ length: 8 }, (_, i) => `M10 ${173 + i * 9} H190`).join(' ')}`} data-k="draw" data-s="0.83" data-e="0.87" />
+      <text className="pl pl-h" x="17" y="171" textAnchor="middle" data-k="type" data-s="0.85" data-e="0.86" data-text="POZ" />
+      <text className="pl pl-h" x="28" y="171" data-k="type" data-s="0.85" data-e="0.865" data-text="DENUMIRE" />
+      <text className="pl pl-h" x="181" y="171" textAnchor="middle" data-k="type" data-s="0.855" data-e="0.865" data-text="BUC." />
+      {PARTS_LIST.map((name, i) => {
+        const s = 0.86 + i * 0.012
+        const y = 180 + i * 9
+        return (
+          <g key={name}>
+            <text className="pl" x="17" y={y} textAnchor="middle" data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.004).toFixed(3)} data-text={String(i + 1)} />
+            <text className="pl" x="28" y={y} data-k="type" data-s={(s + 0.002).toFixed(3)} data-e={(s + 0.012).toFixed(3)} data-text={name} />
+            <text className="pl" x="181" y={y} textAnchor="middle" data-k="type" data-s={(s + 0.01).toFixed(3)} data-e={(s + 0.012).toFixed(3)} data-text="1" />
+          </g>
+        )
+      })}
+
+      <Pen scale={PX * 2} />
+    </svg>
+  )
+}
+
 const TITLE_PART: Record<Variant, string> = {
   nail: 'CUI CAP PLAT 3,1×100',
   blade: 'DISC CIRCULAR Ø216 × 30',
   drill: 'BURGHIU HSS Ø10 × 133',
+  power: 'MAȘINĂ DE GĂURIT 18V',
 }
+const TITLE_SCALE: Record<Variant, string> = { nail: 'SCARA 1:1', blade: 'SCARA 1:1', drill: 'SCARA 1:1', power: 'SCARA 1:2' }
 
 // A different drawing on each page load (never the same one twice in a
-// row, remembered per browser); ?egg=nail|blade|drill forces one.
+// row, remembered per browser); ?egg=nail|blade|drill|power forces one.
+// The nail is out of the shuffle for now.
 let chosenVariant: Variant | null = null
 const pickVariant = (): Variant => {
   const forced = new URLSearchParams(window.location.search).get('egg')
   if (VARIANTS.includes(forced as Variant)) return forced as Variant
   let last: string | null = null
   try { last = localStorage.getItem('zs-egg') } catch {}
-  const pool = VARIANTS.filter(v => v !== last)
+  const pool = SHUFFLED.filter(v => v !== last)
   const v = pool[Math.floor(Math.random() * pool.length)]
   try { localStorage.setItem('zs-egg', v) } catch {}
   return v
@@ -601,10 +836,30 @@ export default function FooterBlueprint() {
       })
     }
 
+    // power drill: parts slide apart; the chuck and the B–B rotor turn
+    const parts = POWER_PARTS.map(pp => ({ ...pp, el: art.querySelector<SVGGElement>(`[data-role="${pp.role}"]`) }))
+    const ribs = art.querySelector<SVGPathElement>('[data-role="ribs"]')
+    const bbRotor = art.querySelector<SVGGElement>('[data-role="bb-rotor"]')
+    let powerTurn = 0
+    const setPowerSpin = (deg: number) => {
+      powerTurn = deg
+      ribs?.setAttribute('d', chuckRibs(deg))
+      bbRotor?.setAttribute('transform', `rotate(${(-deg).toFixed(2)} ${BB.x} ${BB.y})`)
+    }
+    const framePower = (p: number) => {
+      for (const pp of parts) {
+        const t = easeInOutCubic(clamp01((p - pp.s) / (pp.e - pp.s)))
+        pp.el?.setAttribute('transform', `translate(${f2(pp.dx * t)} ${f2(pp.dy * t)})`)
+      }
+      bbRotor?.setAttribute('transform', `rotate(${(-p * 120).toFixed(2)} ${BB.x} ${BB.y})`)
+      powerTurn = p * 120
+    }
+
     let lastP = 0
     const frameArt = (p: number) => {
       if (variant === 'blade') { setBlade(-p * BLADE_TURN); return }
       if (variant === 'drill') { frameDrill(p); return }
+      if (variant === 'power') { framePower(p); return }
       const { depth, gap } = nailState(p)
       const tf = nailTransform(depth)
       for (const g of nailGroups) g.setAttribute('transform', tf)
@@ -707,6 +962,12 @@ export default function FooterBlueprint() {
         // one more test spin, winding down, then the stamp
         const from = drillTurn
         tween(1800, t => setSpin(from + 4 * DR_LEAD * (1 - Math.pow(1 - t, 3))), () => later(stamp, 150))
+        return
+      }
+      if (variant === 'power') {
+        // test run of the exploded drivetrain: spin up, wind down, then the stamp
+        const from = powerTurn
+        tween(2600, t => setPowerSpin(from + 3 * 360 * easeInOutCubic(t)), () => later(stamp, 150))
         return
       }
       if (variant === 'blade') {
@@ -812,6 +1073,26 @@ export default function FooterBlueprint() {
           right: var(--gutter);
           bottom: calc(50vh - 90mm);
         }
+        /* 1:2 — viewBox units are the drill's mm, the SVG is half that */
+        .bp-power {
+          overflow: hidden;
+          width: 200mm; height: 132.5mm;
+          right: var(--gutter);
+          bottom: calc(50vh - 37.5mm);
+          --sw: 2;
+        }
+        /* Laptop-sized screens: a touch smaller so it clears the logo and
+           the link columns. */
+        @media (max-width: 1365px), (max-height: 860px) {
+          .bp-power { width: 172mm; height: 114mm; bottom: calc(50vh - 32mm); }
+        }
+        .bp-art.bp-power text { font-size: 5.4px; }
+        .bp-art.bp-power text.mark { font-size: 4.2px; }
+        .bp-art.bp-power text.pl { font-size: 4.4px; }
+        .bp-art.bp-power text.pl-h { fill: rgba(0,0,0,0.6); font-weight: 500; }
+        .bp-art.bp-power text.bal { font-size: 5.4px; fill: rgba(0,0,0,0.6); }
+        .bp-art.bp-power .hid { stroke-dasharray: 2.4 1.6; }
+        .bp-art.bp-power .cl { stroke-dasharray: 7.4 2.12 1.06 2.12; }
         .bp-art .hole { fill: #fff; stroke: rgba(0,0,0,0.34); stroke-width: 0.3; }
         .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
@@ -857,7 +1138,7 @@ export default function FooterBlueprint() {
         .bp-layer .stamp-ink .stamp-date { font-size: 8.5px; letter-spacing: 0.14em; }
       `}</style>
 
-      {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : <NailArt />}
+      {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : <NailArt />}
 
       {/* ── Note, title block and stamp, under the logo ── */}
       <svg ref={titleRef} className="bp-title" viewBox="0 0 460 96">
@@ -872,7 +1153,7 @@ export default function FooterBlueprint() {
         <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
         <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />
         <text x="10" y="59" data-k="type" data-s="0.92" data-e="0.96" data-text={TITLE_PART[variant]} />
-        <text ref={scaleRef} x="190" y="59" data-k="type" data-s="0.94" data-e="0.97" data-text="SCARA 1:1" />
+        <text ref={scaleRef} x="190" y="59" data-k="type" data-s="0.94" data-e="0.97" data-text={TITLE_SCALE[variant]} />
         <text x="10" y="81" data-k="type" data-s="0.95" data-e="0.99" data-text="PITEȘTI · 26+ ANI" />
         <text x="190" y="81" data-k="type" data-s="0.97" data-e="1" data-text="FOAIA 1/1" />
 
