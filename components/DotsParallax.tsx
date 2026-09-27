@@ -30,12 +30,29 @@ import { useEffect } from 'react'
  * directly — the "organic" part of the effect. The easing loop only runs
  * while the values are still moving; it stops once they settle and restarts
  * on the next pointer movement.
+ *
+ * Renders the cross-line laser layer (.laser in globals.css) and drives its
+ * variables — see renderLaser() below.
  */
+
+// Anything the cursor can be "on" that isn't bare page background. While
+// over one of these the laser fades out, so it only ever shows on empty
+// space and never draws red over text, cards or images.
+const CONTENT_SELECTOR =
+  'a, button, input, textarea, select, label, img, video, svg, canvas, iframe, ' +
+  'p, h1, h2, h3, h4, h5, h6, li, dt, dd, blockquote, table, ' +
+  'nav, footer, form, [role="button"], [role="dialog"]'
+
+const DOT_TILE = 16 // must match body::before's background-size
+const DOT_CENTER = DOT_TILE / 2
+
 export default function DotsParallax() {
   useEffect(() => {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const finePointer = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
 
     const root = document.documentElement
+    let renderLaser = () => {}
     let raf = 0
     const update = () => {
       raf = 0
@@ -46,6 +63,8 @@ export default function DotsParallax() {
       // Noise layer moves at 90% of scroll speed: shift background-position
       // by -10% of scrollY so the absolute element's net speed = 90%.
       root.style.setProperty('--noise-y', `${-y * 0.1}px`)
+      // Dots slide under a still cursor while scrolling — re-snap the laser.
+      renderLaser()
     }
     const onScroll = () => {
       if (raf) return
@@ -75,14 +94,56 @@ export default function DotsParallax() {
     let curY = 0.5
     let hoverRaf = 0
 
+    // Current dot-layer transform, derived from the same eased values the
+    // CSS vars are built from (so the laser always agrees with the dots).
+    const layerTransform = () => {
+      const nx = (curX - 0.5) * 2
+      const ny = (curY - 0.5) * 2
+      return {
+        tx: nx * DOT_TX_RANGE,
+        ty: ny * DOT_TY_RANGE,
+        s: 1 + (Math.abs(nx) + Math.abs(ny)) * 0.5 * DOT_SCALE_RANGE,
+      }
+    }
+
+    // ── Cross-line laser ──
+    let mouseX = -1
+    let mouseY = -1
+    let laserOn = false
+    if (finePointer) {
+      renderLaser = () => {
+        if (mouseX < 0) return
+        // Screen → layer-local coords: undo translate + scale (about the
+        // viewport centre, the layer's transform-origin).
+        const { tx, ty, s } = layerTransform()
+        const cx = window.innerWidth / 2
+        const cy = window.innerHeight / 2
+        const px = cx + (mouseX - tx - cx) / s
+        const py = cy + (mouseY - ty - cy) / s
+        // Snap to the nearest dot column/row (rows carry the scroll offset).
+        const dotY = -window.scrollY * 0.8
+        const col = Math.round((px - DOT_CENTER) / DOT_TILE) * DOT_TILE + DOT_CENTER
+        const row = Math.round((py - DOT_CENTER - dotY) / DOT_TILE) * DOT_TILE + DOT_CENTER + dotY
+        root.style.setProperty('--laser-x', `${col}px`)
+        root.style.setProperty('--laser-y', `${row.toFixed(2)}px`)
+        root.style.setProperty('--laser-cx', `${px.toFixed(1)}px`)
+        root.style.setProperty('--laser-cy', `${py.toFixed(1)}px`)
+      }
+    }
+    const setLaserOn = (on: boolean) => {
+      if (on === laserOn) return
+      laserOn = on
+      root.style.setProperty('--laser-on', on ? '1' : '0')
+    }
+
     const tick = () => {
       curX += (targetX - curX) * EASE
       curY += (targetY - curY) * EASE
-      const nx = (curX - 0.5) * 2 // -1..1
-      const ny = (curY - 0.5) * 2
-      root.style.setProperty('--dot-tx', `${(nx * DOT_TX_RANGE).toFixed(2)}px`)
-      root.style.setProperty('--dot-ty', `${(ny * DOT_TY_RANGE).toFixed(2)}px`)
-      root.style.setProperty('--dot-scale', `${(1 + (Math.abs(nx) + Math.abs(ny)) * 0.5 * DOT_SCALE_RANGE).toFixed(4)}`)
+      const { tx, ty, s } = layerTransform()
+      root.style.setProperty('--dot-tx', `${tx.toFixed(2)}px`)
+      root.style.setProperty('--dot-ty', `${ty.toFixed(2)}px`)
+      root.style.setProperty('--dot-scale', `${s.toFixed(4)}`)
+      renderLaser()
 
       if (Math.abs(targetX - curX) < EPSILON && Math.abs(targetY - curY) < EPSILON) {
         hoverRaf = 0
@@ -96,11 +157,18 @@ export default function DotsParallax() {
     const onMouseMove = (e: MouseEvent) => {
       targetX = e.clientX / window.innerWidth
       targetY = e.clientY / window.innerHeight
+      mouseX = e.clientX
+      mouseY = e.clientY
+      if (finePointer) {
+        const t = e.target as Element | null
+        setLaserOn(!!t && !t.closest(CONTENT_SELECTOR))
+      }
       kick()
     }
     const onMouseLeave = () => {
       targetX = 0.5
       targetY = 0.5
+      setLaserOn(false)
       kick()
     }
     window.addEventListener('mousemove', onMouseMove, { passive: true })
@@ -114,5 +182,13 @@ export default function DotsParallax() {
       if (hoverRaf) cancelAnimationFrame(hoverRaf)
     }
   }, [])
-  return null
+
+  // First element in <body> (see app/layout.tsx), so — like body::before —
+  // it paints beneath all positioned page content.
+  return (
+    <div className="laser" aria-hidden="true">
+      <div className="laser-h" />
+      <div className="laser-v" />
+    </div>
+  )
 }

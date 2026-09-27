@@ -67,6 +67,61 @@ body::before {
   will-change: background-position, transform;
 }
 
+/* ─── CROSS-LINE LASER ─────────────────────────────────────────────────────
+   The dot grid doubles as a laser-level target: while the cursor rests on
+   empty page space, the dot row and dot column through it light up red,
+   brightest at the cursor and fading ~420px out along each line.
+   .laser shares body::before's exact geometry (same tile, parallax offset
+   and cursor-drift transform) so its red dots sit precisely on the gray
+   ones. <DotsParallax /> writes the variables, already converted into this
+   layer's own (pre-transform) coordinates and snapped to a dot row/column:
+     --laser-x / --laser-y   snapped column / row centre
+     --laser-cx / --laser-cy cursor position (centre of each line's falloff)
+     --laser-on              0/1, cross-fades the whole thing */
+.laser {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  transform: translate3d(var(--dot-tx, 0px), var(--dot-ty, 0px), 0) scale(var(--dot-scale, 1));
+  opacity: var(--laser-on, 0);
+  transition: opacity 350ms ease;
+}
+.laser-h, .laser-v {
+  position: absolute; inset: 0;
+  background-repeat: repeat, no-repeat;
+  background-size: 16px 16px, 100% 100%;
+  background-position: 0 var(--dot-y, 0px), 0 0;
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+.laser-h {
+  background-image:
+    radial-gradient(circle, rgba(217,44,43,0.95) 1.5px, transparent 1.7px),
+    linear-gradient(to bottom,
+      transparent calc(var(--laser-y, -99px) - 0.5px), rgba(217,44,43,0.22) calc(var(--laser-y, -99px) - 0.5px),
+      rgba(217,44,43,0.22) calc(var(--laser-y, -99px) + 0.5px), transparent calc(var(--laser-y, -99px) + 0.5px));
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) + 5px), transparent calc(var(--laser-y, -99px) + 5px)),
+    linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
+  mask-image:
+    linear-gradient(to bottom, transparent calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) + 5px), transparent calc(var(--laser-y, -99px) + 5px)),
+    linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
+}
+.laser-v {
+  background-image:
+    radial-gradient(circle, rgba(217,44,43,0.95) 1.5px, transparent 1.7px),
+    linear-gradient(to right,
+      transparent calc(var(--laser-x, -99px) - 0.5px), rgba(217,44,43,0.22) calc(var(--laser-x, -99px) - 0.5px),
+      rgba(217,44,43,0.22) calc(var(--laser-x, -99px) + 0.5px), transparent calc(var(--laser-x, -99px) + 0.5px));
+  -webkit-mask-image:
+    linear-gradient(to right, transparent calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) + 5px), transparent calc(var(--laser-x, -99px) + 5px)),
+    linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
+  mask-image:
+    linear-gradient(to right, transparent calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) + 5px), transparent calc(var(--laser-x, -99px) + 5px)),
+    linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .laser { display: none; }
+}
+
 /* ─── NOISE TEXTURE SYSTEM ───────────────────────────────────────────────
    .noise-global  : full-page fixed overlay, always on top (z-index 9999)
                     pointer-events: none so clicks pass through
