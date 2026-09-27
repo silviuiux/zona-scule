@@ -669,7 +669,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <Footer />
+      <Footer blueprint />
     </>
   )
 }
