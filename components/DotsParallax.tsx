@@ -107,9 +107,66 @@ export default function DotsParallax() {
     }
 
     // ── Cross-line laser ──
+    // Each beam is a damped spring chasing its snapped dot row/column, so a
+    // move overshoots and wobbles briefly before settling — like a
+    // self-levelling laser's pendulum. Tuned so a one-row (16px) jump
+    // overshoots ~5px, swings back ~1.7px, and settles in ~0.6s.
+    const SPRING_K = 0.12
+    const SPRING_DAMP = 0.8
+    const IDLE_MS = 7000
+    const IDLE_KICK = 3 // px/step → a ~5px wobble around the resting line
+    const STEP_MS = 1000 / 60 // fixed-rate spring steps, same feel at 60/120Hz
+    // A beam never trails its target by more than MAX_LAG or moves faster
+    // than MAX_VEL, so every move — a one-row nudge or a full-screen flick —
+    // ends in the same small ~4-5px wobble instead of a big whip.
+    const MAX_LAG = 24
+    const MAX_VEL = 3
+    const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows
+
     let mouseX = -1
     let mouseY = -1
     let laserOn = false
+    const beamX = { pos: 0, vel: 0, target: 0 }
+    const beamY = { pos: 0, vel: 0, target: 0 }
+    let springRaf = 0
+    let lastT = 0
+    let idleTimer = 0
+    let colIdx = NaN // current dot column/row the beams sit on (NaN = unset)
+    let rowIdx = NaN
+
+    const writeBeams = () => {
+      root.style.setProperty('--laser-x', `${beamX.pos.toFixed(2)}px`)
+      root.style.setProperty('--laser-y', `${beamY.pos.toFixed(2)}px`)
+    }
+    const springFrame = (now: number) => {
+      const steps = Math.min(4, Math.max(1, Math.round((now - lastT) / STEP_MS)))
+      lastT = now
+      for (let i = 0; i < steps; i++) {
+        for (const b of [beamX, beamY]) {
+          const gap = b.target - b.pos
+          if (Math.abs(gap) > MAX_LAG) b.pos = b.target - Math.sign(gap) * MAX_LAG
+          b.vel = (b.vel + (b.target - b.pos) * SPRING_K) * SPRING_DAMP
+          b.vel = Math.max(-MAX_VEL, Math.min(MAX_VEL, b.vel))
+          b.pos += b.vel
+        }
+      }
+      writeBeams()
+      const moving = [beamX, beamY].some(b => Math.abs(b.vel) > 0.01 || Math.abs(b.target - b.pos) > 0.05)
+      if (moving) {
+        springRaf = requestAnimationFrame(springFrame)
+      } else {
+        beamX.pos = beamX.target
+        beamY.pos = beamY.target
+        writeBeams()
+        springRaf = 0
+      }
+    }
+    const runSpring = () => {
+      if (springRaf) return
+      lastT = performance.now()
+      springRaf = requestAnimationFrame(springFrame)
+    }
+
     if (finePointer) {
       renderLaser = () => {
         if (mouseX < 0) return
@@ -120,20 +177,52 @@ export default function DotsParallax() {
         const cy = window.innerHeight / 2
         const px = cx + (mouseX - tx - cx) / s
         const py = cy + (mouseY - ty - cy) / s
-        // Snap to the nearest dot column/row (rows carry the scroll offset).
+        // Snap to the nearest dot column/row (rows carry the scroll offset),
+        // with hysteresis: keep the current line until the cursor is clearly
+        // past the midpoint, so the slow cursor-drift of the dot plane (a few
+        // px) can't make a beam hop rows on its own after the mouse stops.
+        // Tracked as grid indices (not px) so scrolling moves the target
+        // along with its row and it can never be left between rows.
         const dotY = -window.scrollY * 0.8
-        const col = Math.round((px - DOT_CENTER) / DOT_TILE) * DOT_TILE + DOT_CENTER
-        const row = Math.round((py - DOT_CENTER - dotY) / DOT_TILE) * DOT_TILE + DOT_CENTER + dotY
-        root.style.setProperty('--laser-x', `${col}px`)
-        root.style.setProperty('--laser-y', `${row.toFixed(2)}px`)
+        const colF = (px - DOT_CENTER) / DOT_TILE
+        const rowF = (py - DOT_CENTER - dotY) / DOT_TILE
+        const keep = 0.5 + SNAP_HYSTERESIS / DOT_TILE
+        if (!(Math.abs(colF - colIdx) <= keep)) colIdx = Math.round(colF)
+        if (!(Math.abs(rowF - rowIdx) <= keep)) rowIdx = Math.round(rowF)
+        beamX.target = colIdx * DOT_TILE + DOT_CENTER
+        beamY.target = rowIdx * DOT_TILE + DOT_CENTER + dotY
         root.style.setProperty('--laser-cx', `${px.toFixed(1)}px`)
         root.style.setProperty('--laser-cy', `${py.toFixed(1)}px`)
+        runSpring()
       }
     }
     const setLaserOn = (on: boolean) => {
       if (on === laserOn) return
       laserOn = on
       root.style.setProperty('--laser-on', on ? '1' : '0')
+      if (on) {
+        // Appear already on the cursor, not springing in from a stale spot.
+        renderLaser()
+        beamX.pos = beamX.target
+        beamY.pos = beamY.target
+        beamX.vel = beamY.vel = 0
+        writeBeams()
+      }
+    }
+
+    // After IDLE_MS without mouse movement, knock the beams so they wobble
+    // and resettle — then again every IDLE_MS for as long as it stays idle.
+    const idleWiggle = () => {
+      if (laserOn) {
+        beamX.vel -= IDLE_KICK
+        beamY.vel += IDLE_KICK
+        runSpring()
+      }
+      idleTimer = window.setTimeout(idleWiggle, IDLE_MS)
+    }
+    const resetIdle = () => {
+      window.clearTimeout(idleTimer)
+      idleTimer = window.setTimeout(idleWiggle, IDLE_MS)
     }
 
     const tick = () => {
@@ -162,6 +251,7 @@ export default function DotsParallax() {
       if (finePointer) {
         const t = e.target as Element | null
         setLaserOn(!!t && !t.closest(CONTENT_SELECTOR))
+        resetIdle()
       }
       kick()
     }
@@ -169,6 +259,7 @@ export default function DotsParallax() {
       targetX = 0.5
       targetY = 0.5
       setLaserOn(false)
+      window.clearTimeout(idleTimer)
       kick()
     }
     window.addEventListener('mousemove', onMouseMove, { passive: true })
@@ -180,6 +271,8 @@ export default function DotsParallax() {
       window.removeEventListener('mouseleave', onMouseLeave)
       if (raf) cancelAnimationFrame(raf)
       if (hoverRaf) cancelAnimationFrame(hoverRaf)
+      if (springRaf) cancelAnimationFrame(springRaf)
+      window.clearTimeout(idleTimer)
     }
   }, [])
 

@@ -68,15 +68,15 @@ body::before {
 }
 
 /* ─── CROSS-LINE LASER ─────────────────────────────────────────────────────
-   The dot grid doubles as a laser-level target: while the cursor rests on
-   empty page space, the dot row and dot column through it light up red,
-   brightest at the cursor and fading ~420px out along each line.
-   .laser shares body::before's exact geometry (same tile, parallax offset
-   and cursor-drift transform) so its red dots sit precisely on the gray
-   ones. <DotsParallax /> writes the variables, already converted into this
-   layer's own (pre-transform) coordinates and snapped to a dot row/column:
-     --laser-x / --laser-y   snapped column / row centre
-     --laser-cx / --laser-cy cursor position (centre of each line's falloff)
+   While the cursor rests on empty page space, two hairline red beams cross
+   at it, running along the dot row and dot column through the cursor and
+   fading out ~420px along each line — the dots themselves stay untouched.
+   .laser shares body::before's transform (cursor drift) so the beams stay
+   registered on the dot grid. <DotsParallax /> writes the variables in this
+   layer's own (pre-transform) coordinates:
+     --laser-x / --laser-y   beam positions (spring-animated: they overshoot
+                             and wiggle before settling on the snapped row/column)
+     --laser-cx / --laser-cy cursor position (centre of each beam's falloff)
      --laser-on              0/1, cross-fades the whole thing */
 .laser {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -86,37 +86,21 @@ body::before {
 }
 .laser-h, .laser-v {
   position: absolute; inset: 0;
-  background-repeat: repeat, no-repeat;
-  background-size: 16px 16px, 100% 100%;
-  background-position: 0 var(--dot-y, 0px), 0 0;
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+  background-repeat: no-repeat;
 }
 .laser-h {
-  background-image:
-    radial-gradient(circle, rgba(217,44,43,0.95) 1.5px, transparent 1.7px),
-    linear-gradient(to bottom,
-      transparent calc(var(--laser-y, -99px) - 0.5px), rgba(217,44,43,0.22) calc(var(--laser-y, -99px) - 0.5px),
-      rgba(217,44,43,0.22) calc(var(--laser-y, -99px) + 0.5px), transparent calc(var(--laser-y, -99px) + 0.5px));
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) + 5px), transparent calc(var(--laser-y, -99px) + 5px)),
-    linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
-  mask-image:
-    linear-gradient(to bottom, transparent calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) - 5px), #000 calc(var(--laser-y, -99px) + 5px), transparent calc(var(--laser-y, -99px) + 5px)),
-    linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
+  background-image: linear-gradient(to bottom,
+    transparent calc(var(--laser-y, -99px) - 0.5px), rgba(217,44,43,0.5) calc(var(--laser-y, -99px) - 0.5px),
+    rgba(217,44,43,0.5) calc(var(--laser-y, -99px) + 0.5px), transparent calc(var(--laser-y, -99px) + 0.5px));
+  -webkit-mask-image: linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
+  mask-image: linear-gradient(to right, transparent calc(var(--laser-cx, -999px) - 420px), #000 var(--laser-cx, -999px), transparent calc(var(--laser-cx, -999px) + 420px));
 }
 .laser-v {
-  background-image:
-    radial-gradient(circle, rgba(217,44,43,0.95) 1.5px, transparent 1.7px),
-    linear-gradient(to right,
-      transparent calc(var(--laser-x, -99px) - 0.5px), rgba(217,44,43,0.22) calc(var(--laser-x, -99px) - 0.5px),
-      rgba(217,44,43,0.22) calc(var(--laser-x, -99px) + 0.5px), transparent calc(var(--laser-x, -99px) + 0.5px));
-  -webkit-mask-image:
-    linear-gradient(to right, transparent calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) + 5px), transparent calc(var(--laser-x, -99px) + 5px)),
-    linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
-  mask-image:
-    linear-gradient(to right, transparent calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) - 5px), #000 calc(var(--laser-x, -99px) + 5px), transparent calc(var(--laser-x, -99px) + 5px)),
-    linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
+  background-image: linear-gradient(to right,
+    transparent calc(var(--laser-x, -99px) - 0.5px), rgba(217,44,43,0.5) calc(var(--laser-x, -99px) - 0.5px),
+    rgba(217,44,43,0.5) calc(var(--laser-x, -99px) + 0.5px), transparent calc(var(--laser-x, -99px) + 0.5px));
+  -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
+  mask-image: linear-gradient(to bottom, transparent calc(var(--laser-cy, -999px) - 420px), #000 var(--laser-cy, -999px), transparent calc(var(--laser-cy, -999px) + 420px));
 }
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .laser { display: none; }
