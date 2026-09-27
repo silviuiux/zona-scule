@@ -10,6 +10,10 @@
   --text-70: rgb(102, 102, 102);
   --border: rgba(0,0,0,0.08);
 
+  /* One spacing unit for page rhythm: the gap between sections and between
+     a section's heading and its content. */
+  --space-section: 120px;
+
   /*
     Noise texture — matches Figma Noise plugin settings:
       Noise size X:2 Y:2  → baseFrequency 0.5 (1/size)
@@ -19,6 +23,10 @@
     crisp black/white specks that read on both light and dark surfaces.
   */
   --noise-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncG type='linear' slope='4' intercept='-1.5'/%3E%3CfeFuncB type='linear' slope='4' intercept='-1.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 768px) {
+  :root { --space-section: 64px; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

@@ -64,16 +64,19 @@ export default async function HomePage() {
         .hero {
           /* Viewport-height responsive top padding. The non-padding hero
              content (chips + title + subtitle + search row) is
-             ~410px tall, so pinning padding-top to (100vh - ~540px) keeps
-             the hero bottom ~130px short of the fold — guaranteeing a peek
+             ~410px tall, so pinning padding-top to (100vh - ~540px), less
+             the bottom padding's --space-section, keeps the first category
+             row starting just short of the fold — guaranteeing a peek
              of the first category row on short/laptop screens (fixes cards
              not showing at all). Capped at 280px so tall screens keep the
              roomy composition and simply reveal MORE of the cards below. */
-          padding-top: clamp(88px, calc(100vh - 540px), 280px);
-          padding-bottom: 24px;
+          padding-top: clamp(88px, calc(100vh - 540px - var(--space-section) + 24px), 280px);
+          padding-bottom: var(--space-section);
           background: transparent;
           min-height: max(320px, calc(100vh - 395px));
-          display: flex; align-items: center;
+          /* Content sits on the bottom padding (not centred), so the gap to
+             the category grid is exactly --space-section. */
+          display: flex; align-items: flex-end;
           overflow: hidden;
         }
         .hero-inner {
@@ -122,7 +125,7 @@ export default async function HomePage() {
            heads, so the band's edges and the first label line up with them. */
         .stats-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px 12px;
+          padding: 0 12px var(--space-section);
         }
         .stats-grid {
           display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -233,7 +236,7 @@ export default async function HomePage() {
         .cats-section {
           background: transparent;
           max-width: 1440px; margin: 0 auto;
-          padding: 0 12px 64px;
+          padding: 0 12px var(--space-section);
         }
         .cats-masonry {
           position: relative;
@@ -338,8 +341,8 @@ export default async function HomePage() {
         /* ─── SERVICES ── */
         .services-section {
           max-width: 1440px; margin: 0 auto;
-          padding: 120px 12px 64px;
-          display: flex; flex-direction: column; gap: 64px;
+          padding: var(--space-section) 12px;
+          display: flex; flex-direction: column; gap: var(--space-section);
         }
         /* Section head: mono numbered eyebrow → Neuton title → muted sub.
            Shared .eyebrow-mono/.display-title live in globals.css. */
@@ -456,19 +459,19 @@ export default async function HomePage() {
           background-color: rgb(18, 18, 18);
           background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
           background-size: 28px 28px;
-          padding: 120px 0 120px;
+          padding: var(--space-section) 0;
         }
         .carousel-inner {
           max-width: 1440px; margin: 0 auto; padding: 0 12px;
         }
-        .carousel-header { margin-bottom: 48px; }
+        .carousel-header { margin-bottom: var(--space-section); }
         .carousel-sub {
           font-family: 'Recursive', sans-serif;
           font-size: 16px; color: rgba(255,255,255,0.4); line-height: 1.5;
         }
         /* ─── CONTACT BANNER ── */
         .contact-banner-wrap {
-          padding: 64px 12px 120px;
+          padding: 0 12px var(--space-section);
           max-width: 1440px; margin: 0 auto;
         }
         .contact-banner {
@@ -513,9 +516,8 @@ export default async function HomePage() {
           /* Nav is fixed at 52px tall — padding-top must clear it before
              adding the actual breathing room, or content sits flush/under
              the nav (was 48px total, less than the nav's own height). */
-          .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
+          .hero { min-height: 75vh; padding-top: 84px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
-          .stats-section { padding: 48px 12px; }
           .stats-grid { grid-template-columns: 1fr; min-height: 0; }
           .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }
           .stat-cell:last-child { border-bottom: none; }
@@ -536,7 +538,6 @@ export default async function HomePage() {
             border-radius: 8px;
           }
 
-          .cats-section { padding: 0 12px 64px; }
           /* Desktop uses an absolutely-positioned masonry (see .cat-card's
              inline top/left/width, set in CategoryGrid.tsx). That doesn't
              suit mobile, so drop back to a plain 2-column grid: !important
@@ -558,7 +559,7 @@ export default async function HomePage() {
             height: 220px;
           }
 
-          .services-section { padding: 64px 0 64px; gap: 40px; }
+          .services-section { padding-left: 0; padding-right: 0; }
           .services-section .section-head { padding: 0 12px; }
           .services-grid {
             display: flex;
@@ -573,10 +574,8 @@ export default async function HomePage() {
           .service-card { aspect-ratio: 3 / 4; height: auto; width: 100%; padding: 28px; }
           .service-desc { margin-bottom: 16px; }
 
-          .carousel-section { padding: 64px 0 64px; }
           .carousel-inner { padding: 0 12px; }
 
-          .contact-banner-wrap { padding: 64px 12px; }
           .contact-banner { padding: 36px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
           .contact-banner-btn { width: 100%; justify-content: center; }
 
