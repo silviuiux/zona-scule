@@ -118,12 +118,17 @@ export default async function HomePage() {
            three equal cells split by hairlines, a mono label on top and a
            huge mono readout at the bottom (ticks up via CountUp once in
            view). ── */
+        /* Same 1440px/12px container as the category grid and section
+           heads, so the band's edges and the first label line up with them. */
         .stats-section {
-          display: grid; grid-template-columns: repeat(3, 1fr);
+          max-width: 1440px; margin: 56px auto 0;
+          padding: 0 12px;
+        }
+        .stats-grid {
+          display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
           min-height: 50vh;
           border-top: 1px solid rgba(0,0,0,0.08);
           border-bottom: 1px solid rgba(0,0,0,0.08);
-          margin: 56px 0 0;
         }
         .stat-cell {
           display: flex; flex-direction: column; justify-content: space-between;
@@ -131,6 +136,7 @@ export default async function HomePage() {
           padding: 40px clamp(20px, 3vw, 48px) 48px;
           border-right: 1px solid rgba(0,0,0,0.08);
         }
+        .stat-cell:first-child { padding-left: 0; }
         .stat-cell:last-child { border-right: none; }
         .stat-n {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -509,8 +515,9 @@ export default async function HomePage() {
              the nav (was 48px total, less than the nav's own height). */
           .hero { min-height: 75vh; padding-top: 84px; padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 12px; }
-          .stats-section { grid-template-columns: 1fr; min-height: 0; margin-top: 32px; }
-          .stat-cell { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 12px 32px; }
+          .stats-section { margin-top: 32px; }
+          .stats-grid { grid-template-columns: 1fr; min-height: 0; }
+          .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }
           .stat-cell:last-child { border-bottom: none; }
           .hero-cta-row {
             flex-direction: column; width: 100%;
@@ -596,17 +603,19 @@ export default async function HomePage() {
       {/* ── STATS ── */}
       {totalCount > 0 && (
         <section className="stats-section" aria-label="Zona Scule în cifre">
-          <div className="stat-cell">
-            <span className="eyebrow-mono">Produse în catalog<span className="stat-live" aria-hidden="true" /></span>
-            <span className="stat-n"><CountUp value={totalCount} onView delay={0} /></span>
-          </div>
-          <div className="stat-cell">
-            <span className="eyebrow-mono">Branduri</span>
-            <span className="stat-n"><CountUp value={brands.length} onView delay={150} /></span>
-          </div>
-          <div className="stat-cell">
-            <span className="eyebrow-mono">Ani de experiență</span>
-            <span className="stat-n"><CountUp value={26} suffix="+" onView delay={300} /></span>
+          <div className="stats-grid">
+            <div className="stat-cell">
+              <span className="eyebrow-mono">Produse în catalog<span className="stat-live" aria-hidden="true" /></span>
+              <span className="stat-n"><CountUp value={totalCount} onView delay={0} /></span>
+            </div>
+            <div className="stat-cell">
+              <span className="eyebrow-mono">Branduri</span>
+              <span className="stat-n"><CountUp value={brands.length} onView delay={150} /></span>
+            </div>
+            <div className="stat-cell">
+              <span className="eyebrow-mono">Ani de experiență</span>
+              <span className="stat-n"><CountUp value={26} suffix="+" onView delay={300} /></span>
+            </div>
           </div>
         </section>
       )}
