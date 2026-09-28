@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
+import HeroSketch from '@/components/HeroSketch'
 import CountUp from '@/components/CountUp'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
@@ -87,7 +88,19 @@ export default async function HomePage() {
           gap: 26px;
           transform: translate3d(0, var(--hero-y, 0px), 0);
           will-change: transform;
+          position: relative;
         }
+        /* Drafting loop on the right (HeroSketch) — only where the title
+           and search row leave it a clear column. */
+        .hero-sketch-wrap {
+          position: absolute; right: var(--gutter); bottom: 0;
+          width: clamp(380px, 34vw, 520px);
+          pointer-events: none;
+          animation: hero-sketch-in 900ms 700ms ease both;
+        }
+        .hero-sketch-wrap svg { display: block; width: 100%; height: auto; }
+        @keyframes hero-sketch-in { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 1199px) { .hero-sketch-wrap { display: none; } }
         @media (prefers-reduced-motion: reduce) {
           .hero-inner { transform: none; }
         }
@@ -601,6 +614,7 @@ export default async function HomePage() {
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
           </div>
+          <div className="hero-sketch-wrap"><HeroSketch /></div>
         </div>
       </section>
 
