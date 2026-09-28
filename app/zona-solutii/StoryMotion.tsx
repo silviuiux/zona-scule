@@ -14,6 +14,11 @@ import { useEffect } from 'react'
  *                  rest recede; the sequence's counter shows its number.
  *   [data-parallax] a full-bleed image that drifts slightly against the
  *                  scroll.
+ *   [data-expand]  the first photo, pinned while it grows to the whole
+ *                  screen: --p 0 → 1 across its scroll length.
+ *   [data-open]    a full-bleed photo opening from a framed picture as it
+ *                  comes in: --o 0 → 1 from entering to filling the screen.
+ *   .zs-progress   reading progress, --read 0 → 1 on <html>.
  */
 export default function StoryMotion() {
   useEffect(() => {
@@ -44,10 +49,27 @@ export default function StoryMotion() {
     document.querySelectorAll('[data-steps]').forEach(g => g.querySelector('[data-step]')?.classList.add('is-active'))
 
     const layers = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'))
+    const expands = Array.from(document.querySelectorAll<HTMLElement>('[data-expand]'))
+    const opens = Array.from(document.querySelectorAll<HTMLElement>('[data-open]'))
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
     let raf = 0
-    const drift = () => {
+    const frame = () => {
       raf = 0
       const vh = window.innerHeight
+      const max = document.documentElement.scrollHeight - vh
+      root.style.setProperty('--read', max > 0 ? clamp01(window.scrollY / max).toFixed(4) : '0')
+      for (const el of expands) {
+        const r = el.getBoundingClientRect()
+        // grows over the first ~60% of the pinned stretch, then holds
+        const p = clamp01(-r.top / ((r.height - vh) * 0.6))
+        el.style.setProperty('--p', (1 - (1 - p) ** 2).toFixed(4))
+      }
+      for (const el of opens) {
+        const r = el.getBoundingClientRect()
+        if (r.bottom < 0 || r.top > vh) continue
+        const o = clamp01((vh - r.top) / (vh * 0.85))
+        el.style.setProperty('--o', (1 - (1 - o) ** 2).toFixed(4))
+      }
       for (const el of layers) {
         const r = el.getBoundingClientRect()
         if (r.bottom < 0 || r.top > vh) continue
@@ -56,9 +78,9 @@ export default function StoryMotion() {
         if (inner) inner.style.transform = `translate3d(0, ${(t * -6).toFixed(2)}%, 0) scale(1.12)`
       }
     }
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(drift) }
-    if (!reduce && layers.length) {
-      drift()
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(frame) }
+    if (!reduce) {
+      frame()
       window.addEventListener('scroll', onScroll, { passive: true })
       window.addEventListener('resize', onScroll)
     }
@@ -70,6 +92,7 @@ export default function StoryMotion() {
       window.removeEventListener('resize', onScroll)
       if (raf) cancelAnimationFrame(raf)
       root.classList.remove('zs-motion')
+      root.style.removeProperty('--read')
     }
   }, [])
   return null

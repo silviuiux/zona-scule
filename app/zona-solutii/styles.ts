@@ -300,17 +300,52 @@ export const STORY_CSS = `
   .zs-scroll-cue span { display: inline-block; animation: zs-cue 2.4s ease-in-out infinite; }
   @keyframes zs-cue { 0%, 100% { transform: translateY(-2px); opacity: 0.4; } 50% { transform: translateY(4px); opacity: 1; } }
 
-  /* ── Full-bleed photos ── */
-  .zs-bleed { position: relative; width: 100vw; margin: var(--zs-gap) 0 0 calc(50% - 50vw); }
-  .zs-story-hero + .zs-bleed { margin-top: 0; }
-  .zs-bleed-frame { position: relative; height: 78vh; min-height: 420px; overflow: hidden; background: rgb(236,236,236); }
-  .zs-bleed.tall .zs-bleed-frame { height: 92vh; }
+  /* ── Reading progress: a red hairline under the navbar ── */
+  .zs-progress { position: fixed; left: 0; right: 0; top: var(--nav-h); height: 2px; z-index: 90; pointer-events: none; }
+  .zs-progress span { display: block; height: 100%; background: rgb(217,44,43); transform-origin: left; transform: scaleX(var(--read, 0)); }
+
+  /* ── First photo: pinned, growing from a framed picture to the whole
+     screen (--p 0 → 1, set by StoryMotion; 1 without JS) ── */
+  .zs-expand { --inset-x: max(var(--gutter), calc((100vw - 1440px) / 2 + var(--gutter))); position: relative; width: 100vw; margin-left: calc(50% - 50vw); height: 200vh; }
+  .zs-expand-stick { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow: hidden; }
+  .zs-expand-frame {
+    position: absolute; inset: 0; overflow: hidden; background: rgb(236,236,236);
+    clip-path: inset(calc((1 - var(--p, 1)) * 12vh) calc((1 - var(--p, 1)) * var(--inset-x)) calc((1 - var(--p, 1)) * 12vh) round calc((1 - var(--p, 1)) * 6px));
+  }
+  .zs-expand-img { position: absolute; inset: 0; transform: scale(calc(1.22 - var(--p, 1) * 0.22)); will-change: transform; }
+  .zs-expand-frame::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.62) 100%);
+    opacity: clamp(0, calc((var(--p, 1) - 0.35) * 2), 1);
+  }
+  .zs-expand-copy {
+    position: absolute; z-index: 1; left: var(--inset-x); right: var(--inset-x); bottom: clamp(48px, 10vh, 120px);
+    max-width: 980px; color: rgb(255,255,255);
+    opacity: clamp(0, calc((var(--p, 1) - 0.55) * 3), 1);
+    transform: translateY(calc((1 - var(--p, 1)) * 60px));
+  }
+  .zs-expand-kicker {
+    display: block; margin-bottom: 24px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.7);
+  }
+  .zs-expand-line { font-family: 'Neuton', serif; font-size: clamp(36px, 4.6vw, 72px); line-height: 1.04; letter-spacing: -0.015em; }
+
+  /* ── Full-bleed photos: they open up as they scroll in (--o 0 → 1) ── */
+  .zs-bleed { --inset-x: max(var(--gutter), calc((100vw - 1440px) / 2 + var(--gutter))); position: relative; width: 100vw; margin: var(--zs-gap) 0 0 calc(50% - 50vw); }
+  .zs-bleed-frame {
+    position: relative; height: 92vh; min-height: 420px; overflow: hidden; background: rgb(236,236,236);
+    clip-path: inset(calc((1 - var(--o, 1)) * 10%) calc((1 - var(--o, 1)) * var(--inset-x)) round calc((1 - var(--o, 1)) * 6px));
+  }
+  .zs-bleed.tall .zs-bleed-frame { height: 100vh; }
   .zs-bleed-img { position: absolute; inset: 0; transform: scale(1.12); will-change: transform; }
   .zs-bleed-cap {
-    max-width: 1440px; margin: 20px auto 0; padding: 0 var(--gutter);
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+    padding: 96px var(--inset-x) 36px;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
     font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em;
-    text-transform: uppercase; color: rgba(0,0,0,0.45);
+    text-transform: uppercase; color: rgba(255,255,255,0.85);
   }
+  .zs-bleed-cap span { display: inline-block; opacity: clamp(0, calc((var(--o, 1) - 0.7) * 4), 1); }
   .zs-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
   .zs-pair.n1 { grid-template-columns: 1fr; }
   .zs-pair-item { position: relative; height: 64vh; min-height: 320px; border-radius: 4px; overflow: hidden; background: rgb(236,236,236); }
@@ -350,9 +385,6 @@ export const STORY_CSS = `
   .zs-quote::before { content: ''; display: block; width: 48px; height: 2px; background: rgb(217,44,43); margin-bottom: 36px; }
   .zs-quote-text { font-family: 'Neuton', serif; font-size: clamp(32px, 3.8vw, 58px); line-height: 1.14; letter-spacing: -0.01em; color: rgb(0,0,0); margin-bottom: 28px; }
 
-  /* ── Carousels bleed off the right edge ── */
-  .zs-scroll-bleed { margin-right: calc(50% - 50vw); padding-right: var(--gutter); }
-  .zs-scroll-bleed > * { flex: 0 0 260px; }
 
   /* ── Wider rhythm for the existing blocks ── */
   .zs-story .zs-check, .zs-story .zs-rules { gap: 24px; }
@@ -369,13 +401,19 @@ export const STORY_CSS = `
     transition-delay: calc(var(--i, 0) * 110ms);
   }
   html.zs-motion .zs-story [data-reveal].is-in { opacity: 1; transform: none; }
-  html.zs-motion .zs-story .zs-bleed[data-reveal] {
-    transform: none; clip-path: inset(6% 5% 6% 5%);
-    transition: opacity 900ms ease, clip-path 1500ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  /* chapter titles rise word by word, each from under its own mask */
+  .zs-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+  .zs-w > span { display: inline-block; }
+  html.zs-motion .zs-story .zs-chapter[data-reveal] { transform: none; }
+  html.zs-motion .zs-story .zs-chapter .zs-w > span {
+    transform: translate3d(0, 108%, 0);
+    transition: transform 1100ms cubic-bezier(0.2, 0.7, 0.1, 1); transition-delay: calc(120ms + var(--w, 0) * 55ms);
   }
-  html.zs-motion .zs-story .zs-bleed[data-reveal].is-in { clip-path: inset(0 0 0 0); }
+  html.zs-motion .zs-story .zs-chapter.is-in .zs-w > span { transform: none; }
   @media (prefers-reduced-motion: reduce) {
-    html.zs-motion .zs-story [data-reveal] { opacity: 1; transform: none; clip-path: none; transition: none; }
+    html.zs-motion .zs-story [data-reveal], html.zs-motion .zs-story .zs-chapter .zs-w > span { opacity: 1; transform: none; transition: none; }
+    .zs-expand { height: auto; }
+    .zs-expand-stick { position: relative; top: 0; }
     .zs-scroll-cue span { animation: none; }
     .zs-bleed-img { transform: none; }
   }
@@ -393,7 +431,10 @@ export const STORY_CSS = `
     .zs-story { --zs-gap: 112px; }
     .zs-story-hero { min-height: auto; }
     .zs-scroll-cue { display: none; }
-    .zs-bleed-frame, .zs-bleed.tall .zs-bleed-frame { height: 62vh; min-height: 320px; }
+    .zs-bleed-frame, .zs-bleed.tall .zs-bleed-frame { height: 70vh; min-height: 320px; }
+    .zs-expand { height: 160vh; }
+    .zs-expand-copy { bottom: 40px; }
+    .zs-bleed-cap { padding-bottom: 20px; }
     .zs-pair { grid-template-columns: 1fr; }
     .zs-pair-item { height: 44vh; }
     .zs-seq-n { font-size: 48px; }

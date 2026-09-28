@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import type { CSSProperties, ReactNode } from 'react'
+import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -83,6 +83,11 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
     }] : []),
   ]
 
+  // each word in its own mask, so a title can rise into view word by word
+  const words = (t: string) => t.split(' ').map((w, k, all) => (
+    <Fragment key={k}><span className="zs-w"><span style={{ '--w': k } as CSSProperties}>{w}</span></span>{k < all.length - 1 ? ' ' : ''}</Fragment>
+  ))
+
   // numbered chapters: "01 — Șurubelnițe izolate…"
   let chapterNo = 0
   const chapter = (title: string, text?: string, aside?: ReactNode) => {
@@ -91,7 +96,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       <header className="zs-chapter" data-reveal>
         <span className="zs-chapter-n">{String(chapterNo).padStart(2, '0')}</span>
         <div className="zs-chapter-main">
-          <h2 className="zs-chapter-title">{title}</h2>
+          <h2 className="zs-chapter-title">{words(title)}</h2>
           {text && <p className="zs-chapter-text">{text}</p>}
         </div>
         {aside}
@@ -122,14 +127,32 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   )
 
   const fullBleed = ({ src, alt, caption, tall, key }: { src: string; alt: string; caption?: string; tall?: boolean; key?: string | number }) => (
-    <figure key={key} className={`zs-bleed${tall ? ' tall' : ''}`} data-reveal>
+    <figure key={key} className={`zs-bleed${tall ? ' tall' : ''}`} data-open>
       <div className="zs-bleed-frame" data-parallax>
         <div className="zs-bleed-img">
           <Image src={src} alt={alt} fill sizes="100vw" style={{ objectFit: 'cover' }} />
         </div>
+        {caption && <figcaption className="zs-bleed-cap"><span>{caption}</span></figcaption>}
       </div>
-      {caption && <figcaption className="zs-bleed-cap">{caption}</figcaption>}
     </figure>
+  )
+
+  // the first photo: pinned while it grows from a framed picture to the
+  // whole screen, the headline surfacing over it
+  const expand = (src: string, alt: string, line: string) => (
+    <section className="zs-expand" data-expand>
+      <div className="zs-expand-stick">
+        <div className="zs-expand-frame">
+          <div className="zs-expand-img">
+            <Image src={src} alt={alt} fill sizes="100vw" style={{ objectFit: 'cover' }} priority />
+          </div>
+          <div className="zs-expand-copy">
+            <span className="zs-expand-kicker">{story.domain}</span>
+            <p className="zs-expand-line">{line}</p>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 
   let checklistNo = 0
@@ -156,12 +179,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 Vezi toate <b>{n(row.total)}</b> <span aria-hidden="true">→</span>
               </Link>
             ))}
-            <div className="zs-scroll zs-scroll-bleed">
-              {row.products.map((p, k) => (
-                <div key={p.id} className="zs-scroll-item" data-reveal style={stagger(Math.min(k, 5))}>
-                  <ProductCard product={p} />
-                </div>
-              ))}
+            <div className="zs-scroll" data-reveal>
+              {row.products.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )
@@ -358,6 +377,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       <style>{SOLUTIONS_CSS + STORY_CSS}</style>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <StoryMotion />
+      <div className="zs-progress" aria-hidden="true"><span /></div>
       <main className="zs-page zs-story">
         <div className="zs-wrap">
           <header className="zs-story-hero">
@@ -371,7 +391,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               ? <h1 className="zs-title zs-title-long" data-reveal style={stagger(2)}>{story.title}</h1>
               : <h1 className="zs-title" data-reveal style={stagger(2)}><span className="red">Zona</span><br />{story.profession}</h1>}
             <div className="zs-story-intro">
-              <p className="zs-headline" data-reveal style={stagger(3)}>{story.headline}</p>
+              {/* with a photo, the headline surfaces over it instead (expand) */}
+              {!heroPhoto && <p className="zs-headline" data-reveal style={stagger(3)}>{story.headline}</p>}
               <p className="zs-sub" data-reveal style={stagger(4)}>{story.excerpt}</p>
             </div>
             <div className="zs-stats" data-reveal style={stagger(5)}>
@@ -397,7 +418,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <span className="zs-scroll-cue" aria-hidden="true">Derulează <span>↓</span></span>
           </header>
 
-          {heroPhoto && fullBleed({ src: heroPhoto, alt: `${story.title ?? story.profession} — în lucru`, tall: true })}
+          {heroPhoto && expand(heroPhoto, `${story.title ?? story.profession} — în lucru`, story.headline)}
 
           {story.sections.map(render)}
 

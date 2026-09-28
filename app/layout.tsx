@@ -4,6 +4,7 @@ import DotsParallax from '@/components/DotsParallax'
 import { NavigationProgressProvider } from '@/components/NavigationProgress'
 import AnalyticsGate from '@/components/AnalyticsGate'
 import CookieConsent from '@/components/CookieConsent'
+import PlainHeadings from '@/components/PlainHeadings'
 
 export const metadata: Metadata = {
   title: 'Zona Scule — Scule și Echipamente Profesionale',
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </NavigationProgressProvider>
         <CookieConsent />
         <AnalyticsGate />
+        <PlainHeadings />
       </body>
     </html>
   )
