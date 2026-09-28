@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ANPC_SAL_URL } from '@/lib/legal-nav'
 import { getBrandHref } from '@/lib/brand-content'
 import FooterBlueprint from './FooterBlueprint'
+import StoriesTeaser from './StoriesTeaser'
 
 // Curated quick links: label → categories.name (as stored) / products.brand_name
 const CATEGORIES: [label: string, name: string][] = [
@@ -21,7 +22,9 @@ const BRANDS: [label: string, name: string][] = [
 
 // `blueprint` enables the scroll-past-the-end easter egg (see
 // FooterBlueprint.tsx) — on by default, so every page with a footer has it.
-export default function Footer({ blueprint = true }: { blueprint?: boolean } = {}) {
+// `stories` puts a few Zona Soluții stories right above it (off on the
+// Zona Soluții pages themselves).
+export default function Footer({ blueprint = true, stories = true }: { blueprint?: boolean; stories?: boolean } = {}) {
 
   return (
     <>
@@ -152,6 +155,8 @@ export default function Footer({ blueprint = true }: { blueprint?: boolean } = {
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px var(--gutter); }
         }
       `}</style>
+
+      {stories && <StoriesTeaser />}
 
       <footer className={blueprint ? 'footer footer-bp' : 'footer'}>
         <div className="footer-main">

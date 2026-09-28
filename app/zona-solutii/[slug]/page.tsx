@@ -418,7 +418,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           </section>
         </div>
       </main>
-      <Footer />
+      <Footer stories={false} />
     </>
   )
 }

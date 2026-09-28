@@ -95,7 +95,7 @@ export default async function ZonaSolutiiPage() {
           <div className="zs-end" />
         </div>
       </main>
-      <Footer />
+      <Footer stories={false} />
     </>
   )
 }

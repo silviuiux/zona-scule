@@ -894,6 +894,7 @@ export default function FooterBlueprint() {
   const variant = useSyncExternalStore(subscribe, readVariant, serverVariant)
   const layerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<SVGSVGElement>(null)
+  const noteRef = useRef<SVGSVGElement>(null)
   const stampRef = useRef<SVGGElement>(null)
   const dateRef = useRef<SVGTextElement>(null)
   const scaleRef = useRef<SVGTextElement>(null)
@@ -945,6 +946,16 @@ export default function FooterBlueprint() {
       const box = layer.getBoundingClientRect()
       title.style.left = `${(l.left - box.left).toFixed(1)}px`
       title.style.top = `${(l.bottom - box.top + 40).toFixed(1)}px`
+      // the note: from where the wordmark ends, centred in the gap between
+      // the logo and the link columns
+      const note = noteRef.current
+      const word = footer?.querySelector('.footer-logo-word')
+      const grid = footer?.querySelector('.footer-grid')
+      if (note && word && grid) {
+        const w = word.getBoundingClientRect(), g = grid.getBoundingClientRect()
+        note.style.left = `${(w.right - box.left).toFixed(1)}px`
+        note.style.top = `${((l.bottom + g.top) / 2 - 22 - box.top).toFixed(1)}px`
+      }
     }
     placeTitle()
 
@@ -1400,6 +1411,8 @@ export default function FooterBlueprint() {
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
         .bp-art text.mono-s { font-size: 2.3px; }
         .bp-title { width: 460px; height: 126px; left: var(--gutter); top: 0; overflow: visible; }
+        .bp-note { width: 240px; height: 44px; left: 0; top: 0; overflow: visible; }
+        .bp-note text { font-size: 10px; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings
            (0.265mm ≈ 1px, scaled by --sw during the camera zoom), px on the
@@ -1443,7 +1456,15 @@ export default function FooterBlueprint() {
 
       {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : variant === 'caliper' ? <CaliperArt /> : variant === 'level' ? <LevelArt /> : <NailArt />}
 
-      {/* ── Note, title block and stamp, under the logo ── */}
+      {/* ── Three-line note: right of the logo's end, halfway down the gap ── */}
+      <svg ref={noteRef} className="bp-note" viewBox="0 0 240 44">
+        <text x="0" y="10" className="note" data-k="type" data-arrive="" data-s="0.3" data-e="0.62" data-text="// Ai derulat până la capăt." />
+        <text x="0" y="24" className="note" data-k="type" data-arrive="" data-s="0.6" data-e="0.76" data-text="// Mulțumesc." />
+        <text x="0" y="38" className="note" data-k="type" data-arrive="" data-s="0.74" data-e="0.97" data-text="// Derulează în continuare." />
+        <Pen />
+      </svg>
+
+      {/* ── Title block and stamp, under the logo ── */}
       <svg ref={titleRef} className="bp-title" viewBox="0 0 460 126">
         <defs>
           <filter id="zs-bp-ink" x="-10%" y="-20%" width="120%" height="140%">
@@ -1451,11 +1472,8 @@ export default function FooterBlueprint() {
             <feDisplacementMap in="SourceGraphic" scale="1.6" />
           </filter>
         </defs>
-        <text x="0" y="10" className="note" data-k="type" data-arrive="" data-s="0.3" data-e="0.62" data-text="// Ai derulat până la capăt." />
-        <text x="0" y="24" className="note" data-k="type" data-arrive="" data-s="0.6" data-e="0.76" data-text="// Mulțumesc." />
-        <text x="0" y="38" className="note" data-k="type" data-arrive="" data-s="0.74" data-e="0.97" data-text="// Derulează în continuare." />
-        {/* title block + stamp, below the three-line note */}
-        <g transform="translate(0 30)">
+        {/* title block + stamp */}
+        <g transform="translate(0 -22)">
           <path className="ln" pathLength={1} d="M0 22 H290 V88 H0 Z M0 44 H290 M0 66 H290 M180 22 V88" data-k="draw" data-s="0.88" data-e="0.93" />
           <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
           <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />
