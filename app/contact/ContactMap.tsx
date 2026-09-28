@@ -23,13 +23,6 @@ import ContactMapScroller from './ContactMapScroller'
 
 const MAPS_URL = 'https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z'
 
-const CITY_LABELS: [string, keyof typeof M.places, 'start' | 'end'][] = [
-  ['BUCUREȘTI', 'Bucharest', 'start'],
-  ['CLUJ-NAPOCA', 'Cluj-Napoca', 'end'],
-  ['IAȘI', 'Iași', 'start'],
-  ['TIMIȘOARA', 'Timișoara', 'start'],
-]
-
 export default function ContactMap() {
   return (
     <section className="cmap" aria-label="Locația Zona Scule: Strada Sfânta Vineri 28, Pitești">
@@ -87,6 +80,9 @@ export default function ContactMap() {
         .cmap-svg .ro { stroke: rgba(0,0,0,0.62); stroke-width: calc(1px * var(--u, 1)); }
         .cmap-svg .ro-fill { fill: rgba(217,44,43,0.04); stroke: none; }
         .cmap-svg .eu { stroke: rgba(0,0,0,0.15); stroke-width: calc(0.6px * var(--u, 1)); }
+        .cmap-svg .mw { fill: none; stroke: rgba(0,0,0,0.42); stroke-width: calc(1.1px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
+        .cmap-svg .mw.mw-b { stroke: rgba(0,0,0,0.34); stroke-dasharray: calc(4px * var(--u, 1)) calc(3px * var(--u, 1)); }
+        .cmap-svg .city text { font-size: 9px; }
         .cmap-svg .danube { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg text {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -157,18 +153,20 @@ export default function ContactMap() {
               <path className="dr danube" pathLength={1} d={M.danube} data-k="draw" data-s="0.7" data-e="0.8" />
               <path className="ro-fill" d={M.romania} data-k="fade" data-s="0.7" data-e="0.78" />
               <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.6" data-e="0.74" />
-              {CITY_LABELS.map(([label, key, anchor], i) => {
-                const [x, y] = M.places[key] as readonly [number, number]
-                const s = 0.74 + i * 0.008
+              {/* motorways: open solid, under construction dashed */}
+              <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.82" data-e="0.94" />
+              <path className="mw mw-b" d={M.motorways.building} data-k="fade" data-s="0.88" data-e="0.94" />
+              {M.cities.map((c, i) => {
+                const s = 0.86 + i * 0.004
                 return (
-                  <g key={key} className="lbl city" data-x={x} data-y={y} data-k="fade" data-s={s.toFixed(3)} data-e={(s + 0.03).toFixed(3)}>
-                    <circle className="dot" r="2.5" />
-                    <text x={anchor === 'start' ? 9 : -9} y="3.5" textAnchor={anchor}>{label}</text>
+                  <g key={c.n} className="lbl city" data-x={c.at[0]} data-y={c.at[1]} data-k="fade" data-s={s.toFixed(3)} data-e={(s + 0.03).toFixed(3)}>
+                    <circle className="dot" r="2.2" />
+                    <text x={c.anchor === 'start' ? 7 : -7} y="3" textAnchor={c.anchor as 'start' | 'end'}>{c.n}</text>
                   </g>
                 )
               })}
-              <g className="lbl" data-x={30000} data-y={-150000}>
-                <text className="big" textAnchor="middle" data-k="type" data-s="0.76" data-e="0.82" data-text="ROMÂNIA" />
+              <g className="lbl" data-x={30000} data-y={-150000} data-k="fade" data-s="0" data-e="0.001" data-out-s="0.84" data-out-e="0.88">
+                <text className="big" textAnchor="middle" data-k="type" data-s="0.74" data-e="0.8" data-text="ROMÂNIA" />
               </g>
             </g>
 
@@ -242,8 +240,11 @@ export default function ContactMap() {
                  the motorway across the county and the country */}
             <g data-k="fade" data-s="0.3" data-e="0.34">
               <path className="dr a1" pathLength={1} d={A1.east} data-k="draw" data-s="0.32" data-e="0.62" />
-              <path className="a1 a1-building" d={A1.building} data-k="fade" data-s="0.42" data-e="0.48" />
-              <path className="dr a1" pathLength={1} d={A1.west} data-k="draw" data-s="0.64" data-e="0.8" />
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.62" data-out-e="0.68">
+                <path className="a1 a1-building" d={A1.building} data-k="fade" data-s="0.42" data-e="0.48" />
+              </g>
+              <path className="dr a1" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.64" data-e="0.8" />
+              <path className="a1 a1-building" d={M.motorways.a1building} data-k="fade" data-s="0.66" data-e="0.72" />
               <g data-k="fade" data-s="0.76" data-e="0.8">
                 <g className="lbl" data-x={-85000} data-y={-122000}>
                   <text className="a1-label" textAnchor="middle" y="-10" data-k="type" data-s="0.78" data-e="0.82" data-text="A1" />
