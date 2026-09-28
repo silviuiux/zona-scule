@@ -1008,11 +1008,12 @@ export async function getBrandsBySubcategories(subs: string[]): Promise<{ brand_
   return (data as { brand_name: string; cnt: number }[]).map(r => ({ brand_name: r.brand_name, cnt: Number(r.cnt) }))
 }
 
-/** One manufacturer application photo (the tool in use) from a set of
+/** Manufacturer application photos (the tool in use) from a set of
  *  subcategories — only from the Bosch and Kärcher media hosts, whose file
- *  paths mark application shots and which next.config allows. */
-export async function getApplicationImage(subs: string[]): Promise<string | null> {
-  if (subs.length === 0) return null
+ *  paths mark application shots and which next.config allows. Distinct
+ *  photos, at most one per product, most expensive products first. */
+export async function getApplicationImages(subs: string[], max = 4): Promise<string[]> {
+  if (subs.length === 0) return []
   const { data, error } = await supabase
     .from('products')
     .select('gallery_url_1, gallery_url_2, gallery_url_3')
@@ -1021,13 +1022,23 @@ export async function getApplicationImage(subs: string[]): Promise<string | null
     .not('gallery_url_1', 'is', null)
     .order('price', { ascending: false, nullsFirst: false })
     .limit(200)
-  if (error || !data) return null
+  if (error || !data) return []
   const isApp = (u: string | null) => !!u && /(pt-media\.bosch-pt\.com.*application(?!.*VERTICAL))|(kaercher-media\.com\/.*\/application\/)/i.test(u)
+  const out: string[] = []
+  // the same photo is shared by a product's variants — key on its media id
+  const seen = new Set<string>()
   for (const r of data as { gallery_url_1: string | null; gallery_url_2: string | null; gallery_url_3: string | null }[]) {
     const hit = [r.gallery_url_1, r.gallery_url_2, r.gallery_url_3].find(isApp)
-    if (hit) return hit
+    const key = hit && (hit.match(/\/application\/([^/]+)\//)?.[1] ?? hit.match(/-o(\d+)v\d+-/)?.[1] ?? hit)
+    if (hit && key && !seen.has(key)) { seen.add(key); out.push(hit) }
+    if (out.length >= max) break
   }
-  return null
+  return out
+}
+
+/** One application photo — see getApplicationImages. */
+export async function getApplicationImage(subs: string[]): Promise<string | null> {
+  return (await getApplicationImages(subs, 1))[0] ?? null
 }
 
 export type ProductDetail = {

@@ -269,3 +269,133 @@ export const SOLUTIONS_CSS = `
     .zs-tip { padding-left: 20px; }
   }
 `
+
+// Story pages (/zona-solutii/[slug]) — the editorial layer on top of
+// SOLUTIONS_CSS: generous space, full-bleed photos, numbered chapters, step
+// sequences and scroll reveals (driven by StoryMotion).
+export const STORY_CSS = `
+  .zs-story { --zs-gap: clamp(140px, 22vh, 280px); }
+  .zs-story .zs-block { padding-top: var(--zs-gap); }
+  .zs-story .zs-end { padding-bottom: var(--zs-gap); }
+
+  /* ── Hero: a quiet first screen ── */
+  .zs-story-hero {
+    position: relative;
+    min-height: calc(100vh - var(--nav-h));
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: clamp(96px, 16vh, 180px) 0 clamp(88px, 14vh, 150px);
+  }
+  .zs-story-hero .zs-crumbs { margin-bottom: auto; padding-bottom: 48px; }
+  .zs-story-hero .eyebrow-mono { margin-bottom: 28px; }
+  .zs-story-hero .zs-title { margin-bottom: 48px; }
+  .zs-story-intro { max-width: 720px; margin-bottom: 56px; }
+  .zs-story-intro .zs-headline { margin-bottom: 20px; }
+  .zs-story-intro .zs-sub { margin-bottom: 0; }
+  .zs-story-hero .zs-brands { margin-top: 32px; }
+  .zs-scroll-cue {
+    position: absolute; right: 0; bottom: clamp(88px, 14vh, 150px);
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(0,0,0,0.4); display: flex; gap: 10px; align-items: center;
+  }
+  .zs-scroll-cue span { display: inline-block; animation: zs-cue 2.4s ease-in-out infinite; }
+  @keyframes zs-cue { 0%, 100% { transform: translateY(-2px); opacity: 0.4; } 50% { transform: translateY(4px); opacity: 1; } }
+
+  /* ── Full-bleed photos ── */
+  .zs-bleed { position: relative; width: 100vw; margin: var(--zs-gap) 0 0 calc(50% - 50vw); }
+  .zs-story-hero + .zs-bleed { margin-top: 0; }
+  .zs-bleed-frame { position: relative; height: 78vh; min-height: 420px; overflow: hidden; background: rgb(236,236,236); }
+  .zs-bleed.tall .zs-bleed-frame { height: 92vh; }
+  .zs-bleed-img { position: absolute; inset: 0; transform: scale(1.12); will-change: transform; }
+  .zs-bleed-cap {
+    max-width: 1440px; margin: 20px auto 0; padding: 0 var(--gutter);
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(0,0,0,0.45);
+  }
+  .zs-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .zs-pair.n1 { grid-template-columns: 1fr; }
+  .zs-pair-item { position: relative; height: 64vh; min-height: 320px; border-radius: 4px; overflow: hidden; background: rgb(236,236,236); }
+  .zs-gallery-block .zs-bleed { margin-top: 0; }
+
+  /* ── Numbered chapters ── */
+  .zs-chapter {
+    display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 24px; align-items: end;
+    margin-bottom: clamp(56px, 8vh, 96px);
+  }
+  .zs-chapter-n { align-self: start; padding-top: 14px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; color: rgb(217,44,43); }
+  .zs-chapter-n::after { content: ''; display: block; width: 32px; height: 1px; background: rgb(217,44,43); margin-top: 12px; }
+  .zs-chapter-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(40px, 4.8vw, 76px); line-height: 0.98; letter-spacing: -0.015em; color: rgb(0,0,0); max-width: 900px; }
+  .zs-chapter-text { font-family: 'Recursive', sans-serif; font-size: 16px; line-height: 1.65; color: rgba(0,0,0,0.55); max-width: 560px; margin-top: 20px; }
+  .zs-chapter .zs-car-link { margin-bottom: 6px; }
+
+  /* ── Step sequences: one step at a time ── */
+  .zs-seq { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  .zs-seq-side { grid-column: span 5; }
+  .zs-seq-sticky { position: sticky; top: calc(var(--nav-h) + 14vh); display: flex; flex-direction: column; gap: 28px; }
+  .zs-seq-lead { font-family: 'Neuton', serif; font-size: clamp(28px, 2.6vw, 40px); line-height: 1.18; color: rgb(0,0,0); }
+  .zs-seq-lead.big { font-size: clamp(26px, 2.3vw, 36px); line-height: 1.28; }
+  .zs-seq-count { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; color: rgba(0,0,0,0.4); }
+  .zs-seq-count span { color: rgb(217,44,43); }
+  .zs-seq-steps { grid-column: 7 / span 6; list-style: none; }
+  .zs-seq-step { padding: 16vh 0; border-top: 1px solid rgba(0,0,0,0.1); transition: opacity 600ms ease; }
+  .zs-seq-step:first-child { padding-top: 0; border-top: none; }
+  .zs-seq-n { display: block; font-family: 'Neuton', serif; font-size: 64px; line-height: 1; color: rgb(217,44,43); margin-bottom: 24px; }
+  .zs-seq-t { font-family: 'Neuton', serif; font-size: clamp(28px, 2.4vw, 38px); line-height: 1.1; color: rgb(0,0,0); margin-bottom: 16px; }
+  .zs-seq-p { font-family: 'Recursive', sans-serif; font-size: 16px; line-height: 1.7; color: rgba(0,0,0,0.6); max-width: 520px; }
+  html.zs-motion .zs-seq-step { opacity: 0.16; }
+  html.zs-motion .zs-seq-step.is-active { opacity: 1; }
+
+  /* ── Pull quote ── */
+  .zs-quote-block { display: flex; justify-content: center; }
+  .zs-quote { max-width: 1040px; text-align: left; padding-left: 0; }
+  .zs-quote::before { content: ''; display: block; width: 48px; height: 2px; background: rgb(217,44,43); margin-bottom: 36px; }
+  .zs-quote-text { font-family: 'Neuton', serif; font-size: clamp(32px, 3.8vw, 58px); line-height: 1.14; letter-spacing: -0.01em; color: rgb(0,0,0); margin-bottom: 28px; }
+
+  /* ── Carousels bleed off the right edge ── */
+  .zs-scroll-bleed { margin-right: calc(50% - 50vw); padding-right: var(--gutter); }
+  .zs-scroll-bleed > * { flex: 0 0 260px; }
+
+  /* ── Wider rhythm for the existing blocks ── */
+  .zs-story .zs-check, .zs-story .zs-rules { gap: 24px; }
+  .zs-story .zs-check-item { min-height: 200px; padding: 32px; }
+  .zs-story .zs-faq-solo { max-width: 920px; margin-left: 144px; }
+  .zs-story .zs-verdict { padding-top: 48px; }
+  .zs-story .zs-verdict .zs-quote-text { font-size: clamp(28px, 3vw, 44px); }
+  .zs-story .zs-cta { padding: clamp(40px, 6vw, 88px); }
+
+  /* ── Scroll reveals (only once StoryMotion has taken over) ── */
+  html.zs-motion .zs-story [data-reveal] {
+    opacity: 0; transform: translate3d(0, 28px, 0);
+    transition: opacity 1000ms cubic-bezier(0.2, 0.65, 0.2, 1), transform 1200ms cubic-bezier(0.2, 0.65, 0.2, 1);
+    transition-delay: calc(var(--i, 0) * 110ms);
+  }
+  html.zs-motion .zs-story [data-reveal].is-in { opacity: 1; transform: none; }
+  html.zs-motion .zs-story .zs-bleed[data-reveal] {
+    transform: none; clip-path: inset(6% 5% 6% 5%);
+    transition: opacity 900ms ease, clip-path 1500ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  }
+  html.zs-motion .zs-story .zs-bleed[data-reveal].is-in { clip-path: inset(0 0 0 0); }
+  @media (prefers-reduced-motion: reduce) {
+    html.zs-motion .zs-story [data-reveal] { opacity: 1; transform: none; clip-path: none; transition: none; }
+    .zs-scroll-cue span { animation: none; }
+    .zs-bleed-img { transform: none; }
+  }
+
+  @media (max-width: 1024px) {
+    .zs-seq-side, .zs-seq-steps { grid-column: 1 / -1; }
+    .zs-seq-sticky { position: static; margin-bottom: 48px; }
+    .zs-seq-step { padding: 48px 0; }
+    html.zs-motion .zs-seq-step { opacity: 1; }
+    .zs-chapter { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .zs-chapter-n { padding-top: 0; }
+    .zs-story .zs-faq-solo { margin-left: 0; }
+  }
+  @media (max-width: 640px) {
+    .zs-story { --zs-gap: 112px; }
+    .zs-story-hero { min-height: auto; }
+    .zs-scroll-cue { display: none; }
+    .zs-bleed-frame, .zs-bleed.tall .zs-bleed-frame { height: 62vh; min-height: 320px; }
+    .zs-pair { grid-template-columns: 1fr; }
+    .zs-pair-item { height: 44vh; }
+    .zs-seq-n { font-size: 48px; }
+  }
+`

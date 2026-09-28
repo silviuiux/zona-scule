@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CSSProperties, ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,13 +7,17 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { SOLUTIONS, SOLUTION_TYPES, getSolution, solutionSubs, type SolutionSection } from '@/lib/solutions'
-import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImage, getProductDetail } from '@/lib/supabase'
+import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImages, getProductDetail } from '@/lib/supabase'
 import { getBrandHref } from '@/lib/brand-content'
-import { SOLUTIONS_CSS } from '../styles'
+import { SOLUTIONS_CSS, STORY_CSS } from '../styles'
+import StoryMotion from '../StoryMotion'
 
-// One template for every story in lib/solutions.ts: the sections render in
-// the order the story lists them. Numbers and products come live from the
-// catalog, refreshed hourly.
+// One template for every story in lib/solutions.ts, laid out as an
+// editorial long-read: a quiet hero, a full-bleed photo, then the story's
+// sections in the order it lists them — numbered chapters with a lot of air
+// between them, full-bleed photos between chapters, step sequences that
+// light up one step at a time, and content that rises in as it's reached
+// (StoryMotion). Numbers and products come live from the catalog, hourly.
 export const revalidate = 3600
 
 export function generateStaticParams() {
@@ -27,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 const n = (v: number) => v.toLocaleString('ro-RO')
 const pad = (i: number) => String(i + 1).padStart(2, '0')
+const stagger = (i: number) => ({ ['--i' as string]: i }) as CSSProperties
 
 export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {
   const story = getSolution((await params).slug)
@@ -34,12 +40,20 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
   const subs = solutionSubs(story)
   const carousels = story.sections.filter((x): x is Extract<SolutionSection, { kind: 'carousel' }> => x.kind === 'carousel')
-  const [brands, image, rows, product] = await Promise.all([
+  const imageSlots = story.sections.filter(x => x.kind === 'image').length
+  const [brands, pool, rows, product] = await Promise.all([
     getBrandsBySubcategories(subs),
-    story.sections.some(x => x.kind === 'image') ? getApplicationImage(subs) : Promise.resolve(null),
+    story.product ? Promise.resolve([]) : getApplicationImages(subs, imageSlots + 1),
     Promise.all(carousels.map(c => getProductsBySubcategories(c.subs))),
     story.product ? getProductDetail(story.product) : Promise.resolve(null),
   ])
+  // photos: the first opens the story under the hero, the rest go to the
+  // story's image sections (product stories: the product's own photos)
+  const photos = product ? product.applicationImages : pool
+  const heroPhoto = photos[0] ?? null
+  const galleryPhotos = product ? photos.slice(1) : []
+  let photoNo = 1
+
   const features = (product?.special_features ?? '').split('|').map(f => f.trim()).filter(Boolean)
   const productImage = product ? (product.main_image_storage_url || product.main_image_url) : null
   const rowOf = new Map(carousels.map((c, i) => [c, rows[i]]))
@@ -69,51 +83,85 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
     }] : []),
   ]
 
+  // numbered chapters: "01 — Șurubelnițe izolate…"
+  let chapterNo = 0
+  const chapter = (title: string, text?: string, aside?: ReactNode) => {
+    chapterNo++
+    return (
+      <header className="zs-chapter" data-reveal>
+        <span className="zs-chapter-n">{String(chapterNo).padStart(2, '0')}</span>
+        <div className="zs-chapter-main">
+          <h2 className="zs-chapter-title">{title}</h2>
+          {text && <p className="zs-chapter-text">{text}</p>}
+        </div>
+        {aside}
+      </header>
+    )
+  }
+
+  // a sequence that lights up one step at a time as it scrolls past
+  const sequence = ({ label, lead, steps, big }: { label: string; lead: string; steps: { title: string; text: string }[]; big?: boolean }) => (
+    <div className="zs-seq" data-steps>
+      <div className="zs-seq-side">
+        <div className="zs-seq-sticky">
+          <span className="eyebrow-mono">{label}</span>
+          <p className={big ? 'zs-seq-lead big' : 'zs-seq-lead'}>{lead}</p>
+          <p className="zs-seq-count"><span data-step-current>01</span> / {String(steps.length).padStart(2, '0')}</p>
+        </div>
+      </div>
+      <ol className="zs-seq-steps">
+        {steps.map((st, k) => (
+          <li key={st.title} className="zs-seq-step" data-step={pad(k)}>
+            <span className="zs-seq-n">{pad(k)}</span>
+            <p className="zs-seq-t">{st.title}</p>
+            <p className="zs-seq-p">{st.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+
+  const fullBleed = ({ src, alt, caption, tall, key }: { src: string; alt: string; caption?: string; tall?: boolean; key?: string | number }) => (
+    <figure key={key} className={`zs-bleed${tall ? ' tall' : ''}`} data-reveal>
+      <div className="zs-bleed-frame" data-parallax>
+        <div className="zs-bleed-img">
+          <Image src={src} alt={alt} fill sizes="100vw" style={{ objectFit: 'cover' }} />
+        </div>
+      </div>
+      {caption && <figcaption className="zs-bleed-cap">{caption}</figcaption>}
+    </figure>
+  )
+
   let checklistNo = 0
   const render = (sec: SolutionSection, i: number) => {
     switch (sec.kind) {
       case 'intro':
         return (
-          <section key={i} className="zs-section">
-            <div className="zs-intro">
-              <p className="zs-lead">{sec.lead}</p>
-              <ol className="zs-steps">
-                {sec.steps.map((st, k) => (
-                  <li key={st.title} className="zs-step">
-                    <span className="zs-step-n">{pad(k)}</span>
-                    <div><p className="zs-step-t">{st.title}</p><p className="zs-step-p">{st.text}</p></div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+          <section key={i} className="zs-block">
+            {sequence({ label: 'Cum se lucrează', lead: sec.lead, steps: sec.steps, big: true })}
           </section>
         )
-      case 'image':
-        if (!image) return null
-        return (
-          <section key={i} className="zs-section">
-            <div className="zs-image">
-              <Image src={image} alt={`${story.domain} — sculă în lucru`} fill sizes="(max-width: 1440px) 100vw, 1376px" style={{ objectFit: 'cover' }} />
-              <span className="zs-image-cap">{sec.caption ?? `${story.domain} · în lucru`}</span>
-            </div>
-          </section>
-        )
+      case 'image': {
+        const src = photos[photoNo++]
+        if (!src) return null
+        return fullBleed({ key: i, src, alt: `${story.domain} — sculă în lucru`, caption: sec.caption ?? `${story.domain} · în lucru` })
+      }
       case 'carousel': {
         const row = rowOf.get(sec)
         if (!row || row.products.length === 0) return null
         return (
-          <section key={i} className="zs-section">
-            <div className="zs-car-head">
-              <div>
-                <h2 className="zs-car-title">{sec.title}</h2>
-                <p className="zs-car-text">{sec.text}</p>
-              </div>
+          <section key={i} className="zs-block">
+            {chapter(sec.title, sec.text, (
               <Link href={`/produse?subcategorie=${encodeURIComponent(sec.subs[0])}`} className="zs-car-link">
                 Vezi toate <b>{n(row.total)}</b> <span aria-hidden="true">→</span>
               </Link>
-            </div>
-            <div className="zs-scroll">
-              {row.products.map(p => <ProductCard key={p.id} product={p} />)}
+            ))}
+            <div className="zs-scroll zs-scroll-bleed">
+              {row.products.map((p, k) => (
+                <div key={p.id} className="zs-scroll-item" data-reveal style={stagger(Math.min(k, 5))}>
+                  <ProductCard product={p} />
+                </div>
+              ))}
             </div>
           </section>
         )
@@ -121,11 +169,11 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       case 'checklist':
         checklistNo++
         return (
-          <section key={i} className="zs-section" id={checklistNo === 1 ? 'trusa' : undefined}>
-            <h2 className="zs-check-title">{sec.title}</h2>
+          <section key={i} className="zs-block" id={checklistNo === 1 ? 'trusa' : undefined}>
+            {chapter(sec.title, sec.text)}
             <div className="zs-check">
               {sec.items.map((it, k) => (
-                <Link key={it.name} href={`/produse?q=${encodeURIComponent(it.q)}`} className="zs-check-item">
+                <Link key={it.name} href={`/produse?q=${encodeURIComponent(it.q)}`} className="zs-check-item" data-reveal style={stagger(k % 3)}>
                   <span className="zs-check-n">{pad(k)}</span>
                   <span className="zs-check-name">{it.name}</span>
                   <span className="zs-check-why">{it.why}</span>
@@ -137,19 +185,18 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         )
       case 'tip':
         return (
-          <section key={i} className="zs-section">
-            <blockquote className="zs-tip">
-              <p className="zs-tip-text">{sec.text}</p>
+          <section key={i} className="zs-block zs-quote-block">
+            <blockquote className="zs-quote" data-reveal>
+              <p className="zs-quote-text">{sec.text}</p>
               <span className="zs-tip-by">— {sec.by}</span>
             </blockquote>
           </section>
         )
       case 'compare':
         return (
-          <section key={i} className="zs-section">
-            <h2 className="zs-check-title">{sec.title}</h2>
-            {sec.text && <p className="zs-car-text zs-compare-text">{sec.text}</p>}
-            <div className="zs-compare-wrap">
+          <section key={i} className="zs-block">
+            {chapter(sec.title, sec.text)}
+            <div className="zs-compare-wrap" data-reveal>
               <table className="zs-compare">
                 <thead><tr>{sec.head.map((h, k) => <th key={k} scope="col">{h}</th>)}</tr></thead>
                 <tbody>
@@ -159,16 +206,16 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 </tbody>
               </table>
             </div>
-            {sec.note && <p className="zs-compare-note">{sec.note}</p>}
+            {sec.note && <p className="zs-compare-note" data-reveal>{sec.note}</p>}
           </section>
         )
       case 'rules':
         return (
-          <section key={i} className="zs-section">
-            <h2 className="zs-check-title">{sec.title}</h2>
+          <section key={i} className="zs-block">
+            {chapter(sec.title)}
             <div className="zs-rules">
-              {sec.items.map(r => (
-                <div key={r.when} className="zs-rule">
+              {sec.items.map((r, k) => (
+                <div key={r.when} className="zs-rule" data-reveal style={stagger(k % 2)}>
                   <span className="zs-rule-if">Dacă</span>
                   <p className="zs-rule-when">{r.when}</p>
                   <span className="zs-rule-arrow" aria-hidden="true">→</span>
@@ -180,23 +227,14 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         )
       case 'howto':
         return (
-          <section key={i} className="zs-section">
-            <h2 className="zs-check-title">{sec.title}</h2>
-            <ol className="zs-howto">
-              {sec.steps.map((st, k) => (
-                <li key={st.title} className="zs-howto-step">
-                  <span className="zs-howto-n">{pad(k)}</span>
-                  <p className="zs-step-t">{st.title}</p>
-                  <p className="zs-step-p">{st.text}</p>
-                </li>
-              ))}
-            </ol>
+          <section key={i} className="zs-block">
+            {sequence({ label: 'Pas cu pas', lead: sec.title, steps: sec.steps })}
           </section>
         )
       case 'cta':
         return (
-          <section key={i} className="zs-section">
-            <div className="zs-cta">
+          <section key={i} className="zs-block">
+            <div className="zs-cta" data-reveal>
               <div>
                 <h2 className="zs-cta-title">{sec.title}</h2>
                 <p className="zs-cta-text">{sec.text}</p>
@@ -208,52 +246,55 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       case 'product':
         if (!product) return null
         return (
-          <section key={i} className="zs-section">
+          <section key={i} className="zs-block">
             <div className="zs-product">
-              <div className="zs-product-img">
+              <div className="zs-product-img" data-reveal>
                 {productImage && <Image src={productImage} alt={product.name} fill sizes="(max-width: 1024px) 100vw, 640px" style={{ objectFit: 'contain' }} priority />}
               </div>
               <div className="zs-product-body">
-                <span className="zs-card-domain">{product.brand_name}</span>
-                <h2 className="zs-product-name">{product.name}</h2>
-                {product.short_description && <p className="zs-product-short">{product.short_description}</p>}
+                <span className="zs-card-domain" data-reveal>{product.brand_name}</span>
+                <h2 className="zs-product-name" data-reveal style={stagger(1)}>{product.name}</h2>
+                {product.short_description && <p className="zs-product-short" data-reveal style={stagger(2)}>{product.short_description}</p>}
                 {features.length > 0 && (
                   <ul className="zs-product-features">
-                    {features.map(f => <li key={f}>{f}</li>)}
+                    {features.map((f, k) => <li key={f} data-reveal style={stagger(3 + k)}>{f}</li>)}
                   </ul>
                 )}
-                <Link href={`/produse/${product.slug}`} className="zs-cta-btn zs-product-btn">Vezi produsul <span aria-hidden="true">→</span></Link>
+                <Link href={`/produse/${product.slug}`} className="zs-cta-btn zs-product-btn" data-reveal style={stagger(4)}>Vezi produsul <span aria-hidden="true">→</span></Link>
               </div>
             </div>
           </section>
         )
       case 'gallery': {
-        const imgs = product?.applicationImages ?? []
-        if (imgs.length === 0) return null
+        if (galleryPhotos.length === 0) return null
+        const [first, ...rest] = galleryPhotos
         return (
-          <section key={i} className="zs-section">
-            <h2 className="zs-check-title">{sec.title}</h2>
-            <div className={`zs-gallery n${Math.min(imgs.length, 3)}`}>
-              {imgs.slice(0, 3).map((src, k) => (
-                <div key={src} className="zs-gallery-item">
-                  <Image src={src} alt={`${product?.name} — în lucru ${k + 1}`} fill sizes={k === 0 ? '(max-width: 1024px) 100vw, 900px' : '(max-width: 1024px) 50vw, 460px'} style={{ objectFit: 'cover' }} />
-                </div>
-              ))}
-            </div>
+          <section key={i} className="zs-block zs-gallery-block">
+            {chapter(sec.title)}
+            {fullBleed({ src: first, alt: `${product?.name} — în lucru`, tall: true })}
+            {rest.length > 0 && (
+              <div className={`zs-pair n${rest.length}`}>
+                {rest.slice(0, 2).map((src, k) => (
+                  <div key={src} className="zs-pair-item" data-reveal style={stagger(k)}>
+                    <Image src={src} alt={`${product?.name} — în lucru ${k + 2}`} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )
       }
       case 'specs':
         return (
-          <section key={i} className="zs-section">
-            <h2 className="zs-check-title">{sec.title}</h2>
+          <section key={i} className="zs-block">
+            {chapter(sec.title)}
             <div className="zs-specs">
-              {sec.groups.map(g => (
-                <div key={g.name} className="zs-spec-group">
+              {sec.groups.map((g, k) => (
+                <div key={g.name} className="zs-spec-group" data-reveal style={stagger(k % 2)}>
                   <p className="zs-spec-group-name">{g.name}</p>
                   <dl>
-                    {g.rows.map(([k, v]) => (
-                      <div key={k} className="zs-spec-row"><dt>{k}</dt><dd>{v}</dd></div>
+                    {g.rows.map(([key, v]) => (
+                      <div key={key} className="zs-spec-row"><dt>{key}</dt><dd>{v}</dd></div>
                     ))}
                   </dl>
                 </div>
@@ -264,13 +305,13 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         )
       case 'proscons':
         return (
-          <section key={i} className="zs-section">
+          <section key={i} className="zs-block">
             <div className="zs-proscons">
-              <div className="zs-pc">
+              <div className="zs-pc" data-reveal>
                 <h2 className="zs-pc-title"><span className="zs-pc-mark plus">+</span> Puncte forte</h2>
                 <ul>{sec.pros.map(p => <li key={p}>{p}</li>)}</ul>
               </div>
-              <div className="zs-pc">
+              <div className="zs-pc" data-reveal style={stagger(1)}>
                 <h2 className="zs-pc-title"><span className="zs-pc-mark">!</span> De știut</h2>
                 <ul>{sec.cons.map(p => <li key={p}>{p}</li>)}</ul>
               </div>
@@ -279,14 +320,14 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         )
       case 'verdict':
         return (
-          <section key={i} className="zs-section">
+          <section key={i} className="zs-block">
             <div className="zs-verdict">
-              <div>
+              <div data-reveal>
                 <span className="eyebrow-mono">Verdict</span>
-                <p className="zs-tip-text">{sec.text}</p>
+                <p className="zs-quote-text">{sec.text}</p>
                 <span className="zs-tip-by">— Analiza echipei tehnice Zona Scule</span>
               </div>
-              <div className="zs-verdict-for">
+              <div className="zs-verdict-for" data-reveal style={stagger(1)}>
                 <p className="zs-spec-group-name">Pentru cine</p>
                 <ul>{sec.forWho.map(w => <li key={w}>{w}</li>)}</ul>
                 {product && <Link href={`/produse/${product.slug}`} className="zs-car-link">Vezi produsul <span aria-hidden="true">→</span></Link>}
@@ -296,17 +337,15 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         )
       case 'faq':
         return (
-          <section key={i} className="zs-section">
-            <div className="zs-faq">
-              <h2 className="zs-faq-title">Întrebări frecvente</h2>
-              <div className="zs-faq-list">
-                {sec.items.map(f => (
-                  <details key={f.q} className="zs-faq-item">
-                    <summary>{f.q}</summary>
-                    <p>{f.a}</p>
-                  </details>
-                ))}
-              </div>
+          <section key={i} className="zs-block">
+            {chapter("Întrebări frecvente")}
+            <div className="zs-faq-list zs-faq-solo">
+              {sec.items.map((f, k) => (
+                <details key={f.q} className="zs-faq-item" data-reveal style={stagger(k)}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
             </div>
           </section>
         )
@@ -316,35 +355,38 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   return (
     <>
       <Nav />
-      <style>{SOLUTIONS_CSS}</style>
+      <style>{SOLUTIONS_CSS + STORY_CSS}</style>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="zs-page">
+      <StoryMotion />
+      <main className="zs-page zs-story">
         <div className="zs-wrap">
-          <header className="zs-hero">
-            <nav className="zs-crumbs" aria-label="Breadcrumb">
+          <header className="zs-story-hero">
+            <nav className="zs-crumbs" aria-label="Breadcrumb" data-reveal>
               <Link href="/zona-solutii" className="zs-crumb">Zona Soluții</Link>
               <span className="zs-crumb-sep">/</span>
               <span className="zs-crumb-cur">{typeInfo.label}</span>
             </nav>
-            <span className="eyebrow-mono">{story.domain}</span>
+            <span className="eyebrow-mono" data-reveal style={stagger(1)}>{story.domain}</span>
             {story.title
-              ? <h1 className="zs-title zs-title-long">{story.title}</h1>
-              : <h1 className="zs-title"><span className="red">Zona</span><br />{story.profession}</h1>}
-            <p className="zs-headline">{story.headline}</p>
-            <p className="zs-sub">{story.excerpt}</p>
-            {story.heroStats ? (
-              <div className="zs-stats">
-                {story.heroStats.map(([v, l]) => (
+              ? <h1 className="zs-title zs-title-long" data-reveal style={stagger(2)}>{story.title}</h1>
+              : <h1 className="zs-title" data-reveal style={stagger(2)}><span className="red">Zona</span><br />{story.profession}</h1>}
+            <div className="zs-story-intro">
+              <p className="zs-headline" data-reveal style={stagger(3)}>{story.headline}</p>
+              <p className="zs-sub" data-reveal style={stagger(4)}>{story.excerpt}</p>
+            </div>
+            <div className="zs-stats" data-reveal style={stagger(5)}>
+              {story.heroStats
+                ? story.heroStats.map(([v, l]) => (
                   <div key={l} className="zs-stat"><span className="zs-stat-num">{v}</span><span className="zs-stat-label">{l}</span></div>
-                ))}
-              </div>
-            ) : <div className="zs-stats">
-              <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">{story.type === 'meserie' ? 'produse relevante' : 'produse recomandate'}</span></div>
-              <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">branduri</span></div>
-              <div className="zs-stat"><span className="zs-stat-num">{carousels.length}</span><span className="zs-stat-label">familii de produse</span></div>
-            </div>}
+                ))
+                : <>
+                  <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">{story.type === 'meserie' ? 'produse relevante' : 'produse recomandate'}</span></div>
+                  <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">branduri</span></div>
+                  <div className="zs-stat"><span className="zs-stat-num">{carousels.length}</span><span className="zs-stat-label">familii de produse</span></div>
+                </>}
+            </div>
             {brands.length > 0 && !story.product && (
-              <div className="zs-brands">
+              <div className="zs-brands" data-reveal style={stagger(6)}>
                 {brands.slice(0, 6).map(b => (
                   <Link key={b.brand_name} href={getBrandHref(b.brand_name)} className="zs-brand">
                     {b.brand_name} <span>{n(b.cnt)}</span>
@@ -352,15 +394,18 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 ))}
               </div>
             )}
+            <span className="zs-scroll-cue" aria-hidden="true">Derulează <span>↓</span></span>
           </header>
+
+          {heroPhoto && fullBleed({ src: heroPhoto, alt: `${story.title ?? story.profession} — în lucru`, tall: true })}
 
           {story.sections.map(render)}
 
-          <section className="zs-section zs-end">
-            <h2 className="zs-related-title">Alte soluții</h2>
+          <section className="zs-block zs-end">
+            {chapter("Alte soluții")}
             <div className="zs-cards">
-              {related.map(r => (
-                <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card">
+              {related.map((r, k) => (
+                <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card" data-reveal style={stagger(k)}>
                   <div className="zs-card-body">
                     <span className="zs-card-domain">{r.domain}</span>
                     <span className="zs-card-title">{r.title ?? r.profession}</span>

@@ -117,8 +117,8 @@ export default function DotsParallax() {
     const ROT_PUSH = 0.004 // deg/step of angular velocity per px of cursor travel
     const ROT_MAX_VEL = 0.12 // deg/step
     const ROT_MAX = 0.8 // deg
-    const IDLE_FADE_MS = 1000 // once the cursor is still and the cross has settled…
-    const FADE_OUT_MS = 1000 // …it fades out (ease-out); other on/off changes stay quick
+    const IDLE_FADE_MS = 200 // cursor still this long → the laser starts fading…
+    const FADE_OUT_MS = 2000 // …slowly, ease-out (the cross keeps settling as it goes); other on/off changes stay quick
     const FADE_QUICK_MS = 300
     const STEP_MS = 1000 / 60 // fixed-rate steps, same feel at 60/120Hz
     const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows
@@ -165,7 +165,6 @@ export default function DotsParallax() {
         rot.angle = rot.vel = 0
         writeBeams()
         springRaf = 0
-        if (laserOn) startIdle()
       }
     }
     const runSpring = () => {
@@ -208,7 +207,7 @@ export default function DotsParallax() {
       }
     }
     // Visible only while the cursor is over empty space and hasn't been
-    // still (with the cross settled) for IDLE_FADE_MS.
+    // still for IDLE_FADE_MS.
     const syncLaser = (fadeMs = FADE_QUICK_MS) => {
       const on = overEmpty && awake
       if (on === laserOn) return
@@ -226,7 +225,7 @@ export default function DotsParallax() {
       }
     }
 
-    // Settled and still → count down, then fade. Any move cancels it.
+    // Still → count down, then fade. Any move restarts it.
     const startIdle = () => {
       window.clearTimeout(fadeTimer)
       fadeTimer = window.setTimeout(() => {
@@ -234,9 +233,8 @@ export default function DotsParallax() {
         syncLaser(FADE_OUT_MS)
       }, IDLE_FADE_MS)
     }
-    // (every move re-targets the beams, so the spring always runs and
-    // restarts the countdown when it settles)
-    const resetIdle = () => window.clearTimeout(fadeTimer)
+    // every move restarts the countdown
+    const resetIdle = () => startIdle()
 
     const tick = () => {
       curX += (targetX - curX) * EASE
