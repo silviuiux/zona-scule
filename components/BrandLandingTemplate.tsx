@@ -56,14 +56,14 @@ export default function BrandLandingTemplate({
     .sort((a, b) => b.product_count - a.product_count)
     .slice(0, 6)
 
-  // Full-bleed hero image — no dedicated photography per brand yet, so this
-  // reuses a real product image already fetched for the carousels below
-  // (first product of the first subcategory/use-case group) instead of
-  // hotlinking a stock photo. Renders nothing if neither group has one.
+  // Full-bleed hero image — the brand's configured application photo, else a
+  // real product image already fetched for the carousels below (first
+  // product of the first subcategory/use-case group). Renders nothing if
+  // there's neither.
   const heroImageProduct = subcategoryGroups[0]?.products[0] ?? applicationGroups[0]?.products[0] ?? null
-  const heroImageUrl = heroImageProduct
+  const heroImageUrl = config.bannerImage ?? (heroImageProduct
     ? (heroImageProduct.main_image_storage_url || heroImageProduct.main_image_url)
-    : null
+    : null)
 
   const faqJsonLd = {
     '@context': 'https://schema.org',

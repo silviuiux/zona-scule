@@ -69,6 +69,11 @@ export type BrandPageConfig = {
 
   logo?: BrandLogo
 
+  /** Application photo (the tool in use) for the brand page's full-bleed
+   *  image and the /branduri banner. Without one, both fall back to an image
+   *  from the brand's own products. */
+  bannerImage?: string
+
   eyebrow: string
   heroTitle: HeroLine[]
   heroSub: string
@@ -241,6 +246,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
       'Măturătoare, aparate de curățat cu presiune și echipamente industriale Karcher pentru aeroporturi, șantiere, depozite și centre de producție.',
 
     logo: { src: '/brand-logos/karcher.png', width: 1004, height: 263, alt: 'Kärcher' },
+    // NT 75/2 Tact² Me Tc Adv — professional wet & dry vacuum, in use
+    bannerImage: 'https://s1.kaercher-media.com/mam/16673160/application/147785/d0.jpg',
 
     eyebrow: 'Partener autorizat Karcher',
     heroTitle: [
@@ -640,6 +647,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
   bosch: {
     slug: 'bosch',
     brandName: 'BOSCH',
+    // GWS 18V-15 P angle grinder at work — Scule Electrice Profesionale (BE)
+    bannerImage: 'https://pt-media.bosch-pt.com/media/ro-RO/06019H6A00-GWS-18V-15-P-125-mm-ro-RO-o390314v186-GWS-18V-15-P-application-grinding01.jpg',
     metaTitle: 'BOSCH — Accesorii Profesionale pentru Scule Electrice | Zona Scule',
     metaDescription:
       'Burghie, pânze de ferăstrău, discuri de șlefuit și corpuri abrazive BOSCH pentru zidărie, metal și lemn — accesorii profesionale pentru orice sculă electrică.',
@@ -723,6 +732,14 @@ export function getBrandHref(brandName: string): string {
     c => c.brandName.toLowerCase() === brandName.toLowerCase()
   )
   return config ? `/brand/${config.slug}` : `/produse?brand=${encodeURIComponent(brandName)}`
+}
+
+/** Brand-name → its configured application photo, if any. */
+export function getBrandBanner(brandName: string): string | null {
+  const config = Object.values(BRAND_PAGES).find(
+    c => c.brandName.toLowerCase() === brandName.toLowerCase()
+  )
+  return config?.bannerImage ?? null
 }
 
 /**

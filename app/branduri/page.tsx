@@ -5,7 +5,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getBrands, getRandomExpensiveProductsByBrand, getBrandSubcategoryNames } from '@/lib/supabase'
-import { getBrandHref, getBrandLogo } from '@/lib/brand-content'
+import { getBrandHref, getBrandLogo, getBrandBanner } from '@/lib/brand-content'
 
 export const revalidate = 3600
 
@@ -241,16 +241,17 @@ export default async function BranduriPage() {
             // Banner is deliberately NOT the main product shot — the first
             // gallery/alt image found among the sampled products, closer to
             // an in-context/application photo than a plain catalog cutout.
-            // With none, the banner keeps its plain grey ground so the logo,
+            // Brands with a configured application photo (getBrandBanner) use
+            // that. With none, the banner keeps its plain grey ground so the logo,
             // title and link still have a home.
-            const bannerProduct = group.find(p => p.gallery_url_1)
+            const bannerSrc = getBrandBanner(b.name) ?? group.find(p => p.gallery_url_1)?.gallery_url_1
             const logo = getBrandLogo(b.name)
             return (
               <div key={b.name} className="branduri-promoted">
                 <div className="branduri-promoted-banner">
-                  {bannerProduct?.gallery_url_1 && (
+                  {bannerSrc && (
                     <Image
-                      src={bannerProduct.gallery_url_1}
+                      src={bannerSrc}
                       alt=""
                       fill
                       sizes="100vw"
