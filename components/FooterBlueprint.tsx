@@ -735,6 +735,15 @@ export default function FooterBlueprint() {
 
     const bar = footer?.querySelector<HTMLElement>('.footer-bottom')
     if (bar && footer) footer.style.setProperty('--bp-bar', `${bar.offsetHeight}px`)
+    // room taken by the link columns at the bottom of the footer, so tall
+    // drawings can sit just above them
+    const cols = footer?.querySelector<HTMLElement>('.footer-grid')
+    const measureCols = () => {
+      if (!cols) return
+      const r = cols.getBoundingClientRect(), box = layer.getBoundingClientRect()
+      layer.style.setProperty('--bp-cols', `${Math.round(box.bottom - r.top)}px`)
+    }
+    measureCols()
 
     const d = new Date()
     const pad = (n: number) => String(n).padStart(2, '0')
@@ -1060,7 +1069,8 @@ export default function FooterBlueprint() {
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchmove', onTouchMove, { passive: false })
-    window.addEventListener('resize', placeTitle)
+    const onResize = () => { placeTitle(); measureCols() }
+    window.addEventListener('resize', onResize)
     // The nav is only away while the drawing is in view: scrolling back up
     // brings it back, returning to the bottom hides it again.
     const onScroll = () => {
@@ -1076,7 +1086,7 @@ export default function FooterBlueprint() {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
-      window.removeEventListener('resize', placeTitle)
+      window.removeEventListener('resize', onResize)
       if (raf) cancelAnimationFrame(raf)
       if (animRaf) cancelAnimationFrame(animRaf)
       timers.forEach(t => window.clearTimeout(t))
@@ -1094,32 +1104,32 @@ export default function FooterBlueprint() {
           overflow: visible;
           width: 280mm; height: 264mm;
           right: calc(var(--gutter) - 24mm);
-          bottom: calc(50vh - 132mm);
+          bottom: calc((100vh - var(--bp-bar, 57px)) / 2 - 132mm);
         }
         .bp-nail {
           overflow: hidden; /* frames the camera move */
           width: 180mm; height: 200mm;
           right: var(--gutter);
-          bottom: calc(50vh - 100mm);
+          bottom: calc((100vh - var(--bp-bar, 57px)) / 2 - 100mm);
         }
         .bp-drill {
           overflow: hidden;
           width: 200mm; height: 180mm;
           right: var(--gutter);
-          bottom: calc(50vh - 90mm);
+          bottom: calc((100vh - var(--bp-bar, 57px)) / 2 - 90mm);
         }
         /* 1:2 — viewBox units are the drill's mm, the SVG is half that */
         .bp-power {
           overflow: hidden;
           width: 200mm; height: 132.5mm;
           right: var(--gutter);
-          bottom: calc(50vh - 37.5mm);
+          bottom: calc(var(--bp-cols, 300px) + 16px); /* just above the link columns */
           --sw: 2;
         }
         /* Laptop-sized screens: a touch smaller so it clears the logo and
            the link columns. */
         @media (max-width: 1365px), (max-height: 860px) {
-          .bp-power { width: 172mm; height: 114mm; bottom: calc(50vh - 32mm); }
+          .bp-power { width: 172mm; height: 114mm; }
         }
         .bp-art.bp-power text { font-size: 5.4px; }
         .bp-art.bp-power text.mark { font-size: 4.2px; }

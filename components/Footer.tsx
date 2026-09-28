@@ -28,43 +28,42 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
              slides away at the same time, so nothing sits on top of it. */
           min-height: calc(80vh + 20vh * var(--footer-grow, 0));
           display: flex; flex-direction: column;
-          overflow: clip; /* the copyright bar slides out through the bottom edge */
         }
 
-        /* Logo row and link columns with equal space above the logo,
-           between the two, and below the columns — space-evenly shares
-           out whatever the 80vh minimum height leaves over. Positioned so
-           the homepage blueprint layer (FooterBlueprint) can sit behind. */
+        /* Logo at the top, link columns pinned to the bottom — 64px above
+           the copyright bar — with whatever the 80vh leaves in between. When
+           the easter egg grows the footer, only that middle gap grows (the
+           page stays pinned to the bottom, so the logo rises with the
+           footer's top edge). Positioned so the blueprint layer
+           (FooterBlueprint) can sit behind. */
         .footer-main {
           position: relative;
           flex: 1;
           width: 100%; max-width: 1440px; margin: 0 auto;
-          padding: 96px var(--gutter) calc(96px - 56px * var(--footer-grow, 0));
-          display: flex; flex-direction: column; justify-content: space-evenly; gap: 96px;
+          padding: 96px var(--gutter) 64px;
+          display: flex; flex-direction: column; justify-content: space-between; gap: 96px;
         }
         .footer-logo {
           position: relative; z-index: 1;
           display: flex; align-items: center; gap: 64px;
-          /* The easter egg's growth goes here only, so the space-evenly
-             gaps don't change: the logo rises with the footer's top edge,
-             and the columns sink toward the bottom edge into the room left
-             by the copyright bar and the trimmed bottom padding — clearing
-             the middle for the drawing. */
-          margin-bottom: calc((20vh + var(--bp-bar, 57px) + 56px) * var(--footer-grow, 0));
         }
         .footer-logo-icon, .footer-logo-word { display: block; height: 64px; width: auto; }
 
+        /* 12-column grid: "Zona Scule" spans 6 (its text kept to the first
+           3), then Categorii / Informatii / Contact, 2 columns each */
         .footer-grid {
           position: relative; z-index: 1;
-          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 56px;
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px;
         }
+        .footer-grid > * { grid-column: span 2; }
+        .footer-grid > .footer-col-about { grid-column: span 6; }
+        .footer-col-about > * { max-width: calc((100% - 16px) / 2); }
 
         .footer-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 13px;
           color: rgba(0,0,0,0.55);
           line-height: 1.7;
-          max-width: 300px;
         }
 
         .footer-col-title {
@@ -106,9 +105,6 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           border-top: 1px solid rgba(0,0,0,0.12);
           padding: 18px var(--gutter);
           max-width: 1440px; margin: 0 auto;
-          /* Easter egg: a negative margin pulls it out of the footer's
-             height, so it slides down through the clipped bottom edge. */
-          margin-bottom: calc(-1 * var(--bp-bar, 57px) * var(--footer-grow, 0));
           display: flex; justify-content: space-between; align-items: center;
         }
         .footer-bottom span {
@@ -123,6 +119,8 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           .footer-logo { gap: 24px; }
           .footer-logo-icon, .footer-logo-word { height: 40px; }
           .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+          .footer-grid > *, .footer-grid > .footer-col-about { grid-column: auto; }
+          .footer-col-about > * { max-width: none; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px var(--gutter); }
         }
       `}</style>
@@ -141,7 +139,7 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
             </svg>
           </div>
           <div className="footer-grid">
-            <div>
+            <div className="footer-col-about">
               <p className="footer-col-title">Zona Scule</p>
               <p className="footer-desc">
                 Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
