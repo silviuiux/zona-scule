@@ -218,7 +218,7 @@ export async function getProducts({
  */
 export async function getRandomExpensiveProductsByBrand(
   brandName: string,
-  { poolSize = 20, count = 6 }: { poolSize?: number; count?: number } = {}
+  { poolSize = 40, count = 24 }: { poolSize?: number; count?: number } = {}
 ): Promise<Product[]> {
   const { products } = await getProducts({ brandName, pageSize: poolSize })
   const shuffled = [...products].sort(() => Math.random() - 0.5)
@@ -486,7 +486,7 @@ export type ApplicationGroup = { title: string; count: number; products: Product
  */
 export async function getApplicationGroupsByBrand(
   brandName: string,
-  { maxGroups = 6, perGroup = 10, sampleSize = 500 }:
+  { maxGroups = 6, perGroup = 24, sampleSize = 500 }:
     { maxGroups?: number; perGroup?: number; sampleSize?: number } = {}
 ): Promise<ApplicationGroup[]> {
   const { products } = await getProducts({ brandName, pageSize: sampleSize })
@@ -523,7 +523,7 @@ export async function getApplicationGroupsByBrand(
  */
 export async function getSubcategoryGroupsByBrand(
   brandName: string,
-  { maxGroups = 6, perGroup = 10, sampleSize = 500 }:
+  { maxGroups = 6, perGroup = 24, sampleSize = 500 }:
     { maxGroups?: number; perGroup?: number; sampleSize?: number } = {}
 ): Promise<ApplicationGroup[]> {
   const { products } = await getProducts({ brandName, pageSize: sampleSize })

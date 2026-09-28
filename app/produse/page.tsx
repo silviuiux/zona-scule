@@ -11,6 +11,7 @@ import CatalogLayout from './CatalogLayout'
 import { ViewModeProvider } from './ViewModeContext'
 import ViewSwitcherButton from './ViewSwitcherButton'
 import { MobileFilterToggle, MobileFilterBackdrop } from './MobileFilterDrawer'
+import { getBrandHref } from '@/lib/brand-content'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const brandOne = brandSel.length === 1 ? brandSel[0] : undefined
   const catOne = catSel.length === 1 ? catSel[0] : undefined
   const multi = brandSel.length > 1 || catSel.length > 1
+  // One brand picked, and it has its own landing page → link to it
+  const brandPageHref = brandSel.length === 1 && getBrandHref(brandSel[0]).startsWith('/brand/') ? getBrandHref(brandSel[0]) : undefined
 
   // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
   // still needed for the fetch-shape decisions below (which sidebar data to
@@ -166,6 +169,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-stats {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
           gap: 24px;
         }
         .cat-hero-stat {
@@ -188,6 +192,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           text-transform: uppercase;
           color: rgba(0,0,0,0.35);
         }
+        /* Secondary, outlined: one brand picked and it has its own page */
+        .cat-hero-brand-link {
+          margin-left: auto;
+          display: inline-flex; align-items: center; gap: 16px;
+          height: 44px; padding: 0 24px; border-radius: 4px;
+          border: 1px solid rgba(0,0,0,0.85); color: rgb(0,0,0);
+          font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500;
+          letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+          transition: background 150ms, color 150ms;
+        }
+        .cat-hero-brand-link:hover { background: rgb(0,0,0); color: rgb(255,255,255); }
+        .cat-hero-brand-link span { transition: transform 150ms; }
+        .cat-hero-brand-link:hover span { transform: translateX(3px); }
         .cat-hero-stat-div {
           width: 1px;
           height: 20px;
@@ -260,6 +277,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           .cat-hero-inner { padding: 80px var(--gutter) 40px; }
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
+          .cat-hero-brand-link { margin-left: 0; }
 
           /* Sidebar becomes a fixed-position overlay drawer below, so
              products-main is the only in-flow child here on mobile — its
@@ -432,6 +450,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 </div>
               </>
             )}
+            {brandPageHref && (
+              <Link href={brandPageHref} className="cat-hero-brand-link">
+                Pagina {brandSel[0]} <span aria-hidden="true">→</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -476,7 +499,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               categoryName={catOne}
               brandName={brandOne}
               activeSub={sp.subcategorie}
-              total={activeCategory?.product_count}
               prefetchedSubs={categorySubs}
             />
           ) : brandOne && catSel.length === 0 && brandSubs.length > 0 ? (
@@ -484,14 +506,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               toggle={<MobileFilterToggle />}
               brandName={brandOne}
               activeSub={sp.subcategorie}
-              total={total}
               prefetchedSubs={brandSubs}
             />
           ) : !isFiltered ? (
             <SubcategoryBar
               toggle={<MobileFilterToggle />}
               activeSub={sp.subcategorie}
-              total={heroTotal}
               prefetchedSubs={allSubs}
               sticky={false}
             />

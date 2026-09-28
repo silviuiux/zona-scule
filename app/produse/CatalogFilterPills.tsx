@@ -6,8 +6,8 @@ import SubcategoryPillScroller from './SubcategoryPillScroller'
  * Pills-mode filters for /produse (desktop): a brands row, then a
  * categories row — both multi-select and intersecting. Picking pills within
  * a row widens the selection (OR); the two rows narrow each other (AND), and
- * each row's counts are scoped to what's selected in the other one. The
- * first pill of each row ("Toate") clears that row. Changing the selection
+ * each row's counts are scoped to what's selected in the other one. Once a
+ * row has picks, its first pill is "× CLEAR n", which drops them. Changing the selection
  * drops the subcategory (it belonged to the previous category) and keeps a
  * search. Scrolling (wheel + arrow buttons) comes from
  * SubcategoryPillScroller.
@@ -74,13 +74,20 @@ export default function CatalogFilterPills({
         .fp-pill.active .fp-count { color: rgba(255,255,255,0.55); }
         /* selected pills carry a small × — click again to remove */
         .fp-x { font-size: 14px; line-height: 1; color: rgba(255,255,255,0.6); margin-right: -4px; }
+        /* "× CLEAR n": only while the row has picks */
+        .fp-pill.fp-clear { border-color: transparent; color: rgb(0,0,0); letter-spacing: 0.06em; }
+        .fp-pill.fp-clear:hover { border-color: rgba(0,0,0,0.22); }
+        .fp-clear .fp-x { color: rgb(0,0,0); margin: 0 -2px 0 0; }
+        .fp-clear .fp-count { color: rgb(0,0,0); }
       `}</style>
 
       {shownBrands.length > 0 && (
         <SubcategoryPillScroller className="fp-track">
-          <Link href={href([], activeCats)} className={`fp-pill${activeBrands.length === 0 ? ' active' : ''}`}>
-            Toate brandurile
-          </Link>
+          {activeBrands.length > 0 && (
+            <Link href={href([], activeCats)} className="fp-pill fp-clear" aria-label={`Șterge filtrele de brand (${activeBrands.length})`}>
+              <span className="fp-x" aria-hidden="true">×</span>CLEAR<span className="fp-count">{activeBrands.length}</span>
+            </Link>
+          )}
           {shownBrands.map(b => {
             const on = has(activeBrands, b.name)
             return (
@@ -94,9 +101,11 @@ export default function CatalogFilterPills({
       )}
 
       <SubcategoryPillScroller className="fp-track">
-        <Link href={href(activeBrands, [])} className={`fp-pill${activeCats.length === 0 ? ' active' : ''}`}>
-          Toate categoriile
-        </Link>
+        {activeCats.length > 0 && (
+          <Link href={href(activeBrands, [])} className="fp-pill fp-clear" aria-label={`Șterge filtrele de categorie (${activeCats.length})`}>
+            <span className="fp-x" aria-hidden="true">×</span>CLEAR<span className="fp-count">{activeCats.length}</span>
+          </Link>
+        )}
         {shownCats.map(c => {
           const on = has(activeCats, c.name)
           return (

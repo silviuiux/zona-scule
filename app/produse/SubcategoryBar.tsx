@@ -7,7 +7,6 @@ export default async function SubcategoryBar({
   categoryName,
   brandName,
   activeSub,
-  total,
   prefetchedSubs,
   toggle,
   sticky = true,
@@ -15,8 +14,6 @@ export default async function SubcategoryBar({
   categoryName?: string
   brandName?: string
   activeSub?: string
-  /** Total products shown in the "Toate" pill */
-  total?: number
   /** Pre-fetched subs — skips internal fetch when provided */
   prefetchedSubs?: SubcategoryWithCount[]
   /** Mobile filter-drawer toggle + desktop view-switcher buttons, rendered
@@ -96,20 +93,21 @@ export default async function SubcategoryBar({
           color: rgba(0,0,0,0.38);
         }
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
+        /* "× CLEAR 1": only while a subcategory is picked */
+        .subcat-pill.subcat-clear { border-color: transparent; color: rgb(0,0,0); letter-spacing: 0.06em; }
+        .subcat-pill.subcat-clear:hover { border-color: rgba(0,0,0,0.22); }
+        .subcat-clear .subcat-x { font-size: 14px; line-height: 1; margin-right: -2px; }
+        .subcat-clear .subcat-count { color: rgb(0,0,0); }
 
       `}</style>
 
       <SubcategoryPillScroller className={`subcat-bar${sticky ? ' is-sticky' : ''}`}>
         {toggle}
-        <Link
-          href={allHref}
-          className={`subcat-pill${!activeSub ? ' active' : ''}`}
-        >
-          Toate
-          {typeof total === 'number' && total > 0 && (
-            <span className="subcat-count">{total.toLocaleString('ro')}</span>
-          )}
-        </Link>
+        {activeSub && (
+          <Link href={allHref} className="subcat-pill subcat-clear" aria-label="Șterge filtrul de subcategorie (1)">
+            <span className="subcat-x" aria-hidden="true">×</span>CLEAR<span className="subcat-count">1</span>
+          </Link>
+        )}
         {subs.map(s => (
           <Link
             key={s.id}

@@ -1159,7 +1159,7 @@ export default function FooterBlueprint() {
         .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
         .bp-art text.mono-s { font-size: 2.3px; }
-        .bp-title { width: 460px; height: 96px; left: var(--gutter); top: 0; overflow: visible; }
+        .bp-title { width: 460px; height: 112px; left: var(--gutter); top: 0; overflow: visible; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings
            (0.265mm ≈ 1px, scaled by --sw during the camera zoom), px on the
@@ -1203,28 +1203,32 @@ export default function FooterBlueprint() {
       {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : <NailArt />}
 
       {/* ── Note, title block and stamp, under the logo ── */}
-      <svg ref={titleRef} className="bp-title" viewBox="0 0 460 96">
+      <svg ref={titleRef} className="bp-title" viewBox="0 0 460 112">
         <defs>
           <filter id="zs-bp-ink" x="-10%" y="-20%" width="120%" height="140%">
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" />
             <feDisplacementMap in="SourceGraphic" scale="1.6" />
           </filter>
         </defs>
-        <text x="0" y="10" className="red" data-k="type" data-arrive="" data-s="0.35" data-e="0.95" data-text="// ai derulat până la capăt. respect." />
-        <path className="ln" pathLength={1} d="M0 22 H290 V88 H0 Z M0 44 H290 M0 66 H290 M180 22 V88" data-k="draw" data-s="0.88" data-e="0.93" />
-        <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
-        <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />
-        <text x="10" y="59" data-k="type" data-s="0.92" data-e="0.96" data-text={TITLE_PART[variant]} />
-        <text ref={scaleRef} x="190" y="59" data-k="type" data-s="0.94" data-e="0.97" data-text={TITLE_SCALE[variant]} />
-        <text x="10" y="81" data-k="type" data-s="0.95" data-e="0.99" data-text="PITEȘTI · 26+ ANI" />
-        <text x="190" y="81" data-k="type" data-s="0.97" data-e="1" data-text="FOAIA 1/1" />
+        <text x="0" y="10" className="red" data-k="type" data-arrive="" data-s="0.35" data-e="0.75" data-text="// ai derulat până la capăt. mulțumesc." />
+        <text x="0" y="24" className="red" data-k="type" data-arrive="" data-s="0.72" data-e="0.97" data-text="// derulează în continuare." />
+        {/* title block + stamp, below the two-line note */}
+        <g transform="translate(0 16)">
+          <path className="ln" pathLength={1} d="M0 22 H290 V88 H0 Z M0 44 H290 M0 66 H290 M180 22 V88" data-k="draw" data-s="0.88" data-e="0.93" />
+          <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
+          <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />
+          <text x="10" y="59" data-k="type" data-s="0.92" data-e="0.96" data-text={TITLE_PART[variant]} />
+          <text ref={scaleRef} x="190" y="59" data-k="type" data-s="0.94" data-e="0.97" data-text={TITLE_SCALE[variant]} />
+          <text x="10" y="81" data-k="type" data-s="0.95" data-e="0.99" data-text="PITEȘTI · 26+ ANI" />
+          <text x="190" y="81" data-k="type" data-s="0.97" data-e="1" data-text="FOAIA 1/1" />
 
-        <g transform="rotate(-7 366 55)">
-          <g ref={stampRef} className="stamp-ink" filter="url(#zs-bp-ink)">
-            <rect x="300" y="31" width="132" height="48" rx="3" strokeWidth="1.6" />
-            <rect x="304" y="35" width="124" height="40" rx="2" strokeWidth="0.7" />
-            <text x="366" y="57" className="stamp-word">APROBAT</text>
-            <text ref={dateRef} x="366" y="69" className="stamp-date" />
+          <g transform="rotate(-7 366 55)">
+            <g ref={stampRef} className="stamp-ink" filter="url(#zs-bp-ink)">
+              <rect x="300" y="31" width="132" height="48" rx="3" strokeWidth="1.6" />
+              <rect x="304" y="35" width="124" height="40" rx="2" strokeWidth="0.7" />
+              <text x="366" y="57" className="stamp-word">APROBAT</text>
+              <text ref={dateRef} x="366" y="69" className="stamp-date" />
+            </g>
           </g>
         </g>
 
