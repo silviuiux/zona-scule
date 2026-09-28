@@ -1,314 +1,209 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getArticleBySlug, getArticles, PROFESSIONS, ARTICLES } from '../articles'
-import { getProducts } from '@/lib/supabase'
+import { SOLUTIONS, getSolution, solutionSubs, type SolutionSection } from '@/lib/solutions'
+import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImage } from '@/lib/supabase'
+import { getBrandHref } from '@/lib/brand-content'
+import { SOLUTIONS_CSS } from '../styles'
 
-export function generateStaticParams() {
-  return ARTICLES.map(a => ({ slug: a.slug }))
-}
-
+// One template for every story in lib/solutions.ts: the sections render in
+// the order the story lists them. Numbers and products come live from the
+// catalog, refreshed hourly.
 export const revalidate = 3600
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })
+export function generateStaticParams() {
+  return SOLUTIONS.map(s => ({ slug: s.slug }))
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const article = getArticleBySlug(slug)
-  if (!article) notFound()
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const s = getSolution((await params).slug)
+  if (!s) return {}
+  return { title: s.metaTitle, description: s.metaDescription, alternates: { canonical: `/zona-solutii/${s.slug}` } }
+}
 
-  const profession = PROFESSIONS.find(p => p.id === article.profession)
+const n = (v: number) => v.toLocaleString('ro-RO')
+const pad = (i: number) => String(i + 1).padStart(2, '0')
 
-  // Fetch related products from catalog using the article's filter
-  const { products: relatedProducts } = await getProducts({
-    ...article.productFilter,
-    page: 1,
-    pageSize: 6,
-  }).catch(() => ({ products: [], total: 0 }))
+export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {
+  const story = getSolution((await params).slug)
+  if (!story) notFound()
 
-  // Related articles — same profession, exclude current
-  const relatedArticles = getArticles(article.profession)
-    .filter(a => a.slug !== article.slug)
-    .slice(0, 3)
+  const subs = solutionSubs(story)
+  const carousels = story.sections.filter((x): x is Extract<SolutionSection, { kind: 'carousel' }> => x.kind === 'carousel')
+  const [brands, image, rows] = await Promise.all([
+    getBrandsBySubcategories(subs),
+    story.sections.some(x => x.kind === 'image') ? getApplicationImage(subs) : Promise.resolve(null),
+    Promise.all(carousels.map(c => getProductsBySubcategories(c.subs))),
+  ])
+  const rowOf = new Map(carousels.map((c, i) => [c, rows[i]]))
+  const totalProducts = brands.reduce((a, b) => a + b.cnt, 0)
+  const faq = story.sections.find((x): x is Extract<SolutionSection, { kind: 'faq' }> => x.kind === 'faq')
+  const related = SOLUTIONS.filter(s => s.slug !== story.slug).slice(0, 3)
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Zona Soluții', item: 'https://www.zonascule.ro/zona-solutii' },
+        { '@type': 'ListItem', position: 2, name: story.domain, item: `https://www.zonascule.ro/zona-solutii/${story.slug}` },
+      ],
+    },
+    ...(faq ? [{
+      '@context': 'https://schema.org', '@type': 'FAQPage',
+      mainEntity: faq.items.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    }] : []),
+  ]
+
+  let checklistNo = 0
+  const render = (sec: SolutionSection, i: number) => {
+    switch (sec.kind) {
+      case 'intro':
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-intro">
+              <p className="zs-lead">{sec.lead}</p>
+              <ol className="zs-steps">
+                {sec.steps.map((st, k) => (
+                  <li key={st.title} className="zs-step">
+                    <span className="zs-step-n">{pad(k)}</span>
+                    <div><p className="zs-step-t">{st.title}</p><p className="zs-step-p">{st.text}</p></div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+        )
+      case 'image':
+        if (!image) return null
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-image">
+              <Image src={image} alt={`${story.domain} — sculă în lucru`} fill sizes="(max-width: 1440px) 100vw, 1376px" style={{ objectFit: 'cover' }} />
+              <span className="zs-image-cap">{sec.caption ?? `${story.domain} · în lucru`}</span>
+            </div>
+          </section>
+        )
+      case 'carousel': {
+        const row = rowOf.get(sec)
+        if (!row || row.products.length === 0) return null
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-car-head">
+              <div>
+                <h2 className="zs-car-title">{sec.title}</h2>
+                <p className="zs-car-text">{sec.text}</p>
+              </div>
+              <Link href={`/produse?subcategorie=${encodeURIComponent(sec.subs[0])}`} className="zs-car-link">
+                Vezi toate <b>{n(row.total)}</b> <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <div className="zs-scroll">
+              {row.products.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          </section>
+        )
+      }
+      case 'checklist':
+        checklistNo++
+        return (
+          <section key={i} className="zs-section" id={checklistNo === 1 ? 'trusa' : undefined}>
+            <h2 className="zs-check-title">{sec.title}</h2>
+            <div className="zs-check">
+              {sec.items.map((it, k) => (
+                <Link key={it.name} href={`/produse?q=${encodeURIComponent(it.q)}`} className="zs-check-item">
+                  <span className="zs-check-n">{pad(k)}</span>
+                  <span className="zs-check-name">{it.name}</span>
+                  <span className="zs-check-why">{it.why}</span>
+                  <span className="zs-check-go">Caută în catalog →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )
+      case 'tip':
+        return (
+          <section key={i} className="zs-section">
+            <blockquote className="zs-tip">
+              <p className="zs-tip-text">{sec.text}</p>
+              <span className="zs-tip-by">— {sec.by}</span>
+            </blockquote>
+          </section>
+        )
+      case 'faq':
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-faq">
+              <h2 className="zs-faq-title">Întrebări frecvente</h2>
+              <div className="zs-faq-list">
+                {sec.items.map(f => (
+                  <details key={f.q} className="zs-faq-item">
+                    <summary>{f.q}</summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
+    }
+  }
 
   return (
     <>
       <Nav />
-      <style>{`
-        /* ── Hero ── */
-        .art-hero {
-          padding-top: var(--nav-h);
-          min-height: 60vh;
-          display: flex; align-items: flex-end;
-          position: relative; overflow: hidden;
-        }
-        .art-hero-bg {
-          position: absolute; inset: 0; z-index: 0;
-        }
-        .art-hero-overlay {
-          position: absolute; inset: 0; z-index: 1;
-          background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-        }
-        .art-hero-inner {
-          position: relative; z-index: 2;
-          max-width: 860px; margin: 0 auto; width: 100%;
-          padding: 48px 24px 56px;
-        }
-
-        /* Breadcrumb */
-        .art-bc { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-        .art-bc-pill {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(255,255,255,0.65); text-decoration: none;
-          border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; padding: 5px 14px;
-          transition: color 150ms, border-color 150ms; white-space: nowrap;
-        }
-        .art-bc-pill:hover { color: rgb(255,255,255); border-color: rgba(255,255,255,0.7); }
-        .art-bc-sep { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,0.3); }
-        .art-bc-cur {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55);
-        }
-
-        /* Profession tag */
-        .art-tag {
-          display: inline-block; margin-bottom: 16px;
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgb(255,255,255); background: rgb(217,44,43);
-          border-radius: 2px; padding: 5px 12px;
-        }
-
-        /* Title */
-        .art-title {
-          font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(40px, 5.5vw, 76px);
-          color: rgb(255,255,255);
-          letter-spacing: -0.015em; line-height: 1;
-          margin: 0 0 20px;
-        }
-
-        /* Meta */
-        .art-meta { display: flex; align-items: center; gap: 16px; }
-        .art-meta-item {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-          color: rgba(255,255,255,0.55); letter-spacing: 0.03em;
-        }
-        .art-meta-div { width: 1px; height: 14px; background: rgba(255,255,255,0.2); }
-
-        /* ── Body section ── */
-        .art-body-wrap {
-          background: rgb(255,255,255); padding: 0 24px;
-        }
-        .art-body-layout {
-          max-width: 860px; margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1fr 260px;
-          gap: 60px;
-          padding: 60px 0 80px;
-        }
-
-        /* Rich text */
-        .art-content { min-width: 0; }
-        .art-content p {
-          font-family: 'Recursive', sans-serif; font-size: 16px;
-          color: rgba(0,0,0,0.75); line-height: 1.75;
-          margin: 0 0 20px;
-        }
-        .art-content h2 {
-          font-family: 'Neuton', serif; font-weight: 400; font-size: 30px;
-          color: rgb(0,0,0); line-height: 1.1;
-          letter-spacing: -0.01em; margin: 44px 0 14px;
-        }
-        .art-content h2:first-child { margin-top: 0; }
-        .art-content ul {
-          margin: 0 0 20px; padding-left: 20px;
-        }
-        .art-content li {
-          font-family: 'Recursive', sans-serif; font-size: 16px;
-          color: rgba(0,0,0,0.75); line-height: 1.7; margin-bottom: 6px;
-        }
-        .art-content strong { color: rgb(0,0,0); font-weight: 700; }
-
-        /* Sidebar */
-        .art-sidebar { display: flex; flex-direction: column; gap: 32px; }
-        .art-sidebar-block {}
-        .art-sidebar-label {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.35);
-          margin-bottom: 12px; display: block;
-        }
-
-        /* Related article mini-card */
-        .art-related-card {
-          display: block; text-decoration: none; padding: 14px;
-          border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
-          margin-bottom: 10px; transition: border-color 150ms, background 150ms;
-        }
-        .art-related-card:hover { background: rgb(249,249,249); border-color: rgba(0,0,0,0.18); }
-        .art-related-tag {
-          font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgb(217,44,43);
-          display: block; margin-bottom: 4px;
-        }
-        .art-related-title {
-          font-family: 'Recursive', sans-serif; font-size: 13px; font-weight: 600;
-          color: rgb(0,0,0); line-height: 1.4;
-        }
-
-        /* ── Products section ── */
-        .art-products-wrap {
-          background: rgb(244,244,244); padding: 60px 24px;
-        }
-        .art-products-inner { max-width: 1200px; margin: 0 auto; }
-        .art-products-header { margin-bottom: 28px; }
-        .art-products-eyebrow {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-          letter-spacing: 0.12em; text-transform: uppercase; color: rgb(217,44,43);
-          display: block; margin-bottom: 6px;
-        }
-        .art-products-title {
-          font-family: 'Neuton', serif; font-weight: 400; font-size: 36px;
-          color: rgb(0,0,0); line-height: 1; letter-spacing: -0.01em;
-        }
-        .art-products-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-        .art-products-cta {
-          margin-top: 28px; display: flex; justify-content: center;
-        }
-        .art-products-link {
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgb(0,0,0); text-decoration: none;
-          border: 1.5px solid rgba(0,0,0,0.3); border-radius: 2px; padding: 7px 24px;
-          transition: background 150ms, color 150ms, border-color 150ms;
-        }
-        .art-products-link:hover {
-          background: rgb(0,0,0); color: rgb(255,255,255); border-color: rgb(0,0,0);
-        }
-
-        /* ── Mobile ── */
-        @media (max-width: 768px) {
-          .art-body-layout { grid-template-columns: 1fr; gap: 40px; }
-          .art-sidebar { order: -1; }
-          .art-products-grid { grid-template-columns: repeat(2, 1fr); }
-          .art-hero-inner { padding: 32px var(--gutter) 40px; }
-          .art-body-wrap { padding: 0 var(--gutter); }
-          .art-products-wrap { padding: 40px var(--gutter); }
-        }
-        @media (max-width: 480px) {
-          .art-products-grid { grid-template-columns: 1fr; }
-        }
-      `}</style>
-
-      {/* ── Hero ── */}
-      <div className="art-hero">
-        <div className="art-hero-bg" style={{ background: article.coverGradient }} />
-        <div className="art-hero-overlay" />
-        <div className="art-hero-inner">
-          <nav className="art-bc">
-            <Link href="/" className="art-bc-pill">Acasă</Link>
-            <span className="art-bc-sep">/</span>
-            <Link href="/zona-solutii" className="art-bc-pill">Zona Soluții</Link>
-            {profession && (
-              <>
-                <span className="art-bc-sep">/</span>
-                <Link
-                  href={`/zona-solutii?profesie=${profession.id}`}
-                  className="art-bc-pill"
-                >
-                  {profession.label}
-                </Link>
-              </>
-            )}
-          </nav>
-
-          {profession && <span className="art-tag">{profession.label}</span>}
-          <h1 className="art-title">{article.title}</h1>
-
-          <div className="art-meta">
-            <span className="art-meta-item">{formatDate(article.publishedAt)}</span>
-            <div className="art-meta-div" />
-            <span className="art-meta-item">{article.readMinutes} min citit</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Article body + sidebar ── */}
-      <div className="art-body-wrap">
-        <div className="art-body-layout">
-          {/* Rich text */}
-          <article
-            className="art-content"
-            dangerouslySetInnerHTML={{ __html: article.body }}
-          />
-
-          {/* Sidebar */}
-          <aside className="art-sidebar">
-            {relatedArticles.length > 0 && (
-              <div className="art-sidebar-block">
-                <span className="art-sidebar-label">Articole similare</span>
-                {relatedArticles.map(a => {
-                  const ap = PROFESSIONS.find(p => p.id === a.profession)
-                  return (
-                    <Link key={a.slug} href={`/zona-solutii/${a.slug}`} className="art-related-card">
-                      {ap && <span className="art-related-tag">{ap.label}</span>}
-                      <span className="art-related-title">{a.title}</span>
-                    </Link>
-                  )
-                })}
+      <style>{SOLUTIONS_CSS}</style>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <main className="zs-page">
+        <div className="zs-wrap">
+          <header className="zs-hero">
+            <nav className="zs-crumbs" aria-label="Breadcrumb">
+              <Link href="/zona-solutii" className="zs-crumb">Zona Soluții</Link>
+              <span className="zs-crumb-sep">/</span>
+              <span className="zs-crumb-cur">{story.domain}</span>
+            </nav>
+            <span className="eyebrow-mono">{story.domain}</span>
+            <h1 className="zs-title"><span className="red">Zona</span><br />{story.profession}</h1>
+            <p className="zs-headline">{story.headline}</p>
+            <p className="zs-sub">{story.excerpt}</p>
+            <div className="zs-stats">
+              <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">produse relevante</span></div>
+              <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">branduri</span></div>
+              <div className="zs-stat"><span className="zs-stat-num">{carousels.length}</span><span className="zs-stat-label">familii de produse</span></div>
+            </div>
+            {brands.length > 0 && (
+              <div className="zs-brands">
+                {brands.slice(0, 6).map(b => (
+                  <Link key={b.brand_name} href={getBrandHref(b.brand_name)} className="zs-brand">
+                    {b.brand_name} <span>{n(b.cnt)}</span>
+                  </Link>
+                ))}
               </div>
             )}
+          </header>
 
-            <div className="art-sidebar-block">
-              <span className="art-sidebar-label">Explorează catalogul</span>
-              <Link
-                href={profession ? `/produse?brand=${article.productFilter.brandName ?? ''}&categorie=${article.productFilter.categoryText ?? ''}` : '/produse'}
-                className="art-products-link"
-                style={{ display: 'inline-block', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}
-              >
-                Vezi toate produsele →
-              </Link>
-            </div>
-          </aside>
-        </div>
-      </div>
+          {story.sections.map(render)}
 
-      {/* ── Embedded products ── */}
-      {relatedProducts.length > 0 && (
-        <div className="art-products-wrap">
-          <div className="art-products-inner">
-            <div className="art-products-header">
-              <span className="art-products-eyebrow">Din catalog</span>
-              <div className="art-products-title">Produse recomandate</div>
-            </div>
-
-            <div className="art-products-grid">
-              {relatedProducts.map(p => (
-                <ProductCard key={p.id} product={p} />
+          <section className="zs-section zs-end">
+            <h2 className="zs-related-title">Alte soluții</h2>
+            <div className="zs-cards">
+              {related.map(r => (
+                <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card">
+                  <div className="zs-card-body">
+                    <span className="zs-card-domain">{r.domain}</span>
+                    <span className="zs-card-title">{r.profession}</span>
+                    <span className="zs-card-text">{r.excerpt}</span>
+                    <span className="zs-card-meta"><span>Zona Soluții</span><b>Citește →</b></span>
+                  </div>
+                </Link>
               ))}
             </div>
-
-            <div className="art-products-cta">
-              <Link
-                href={`/produse${article.productFilter.brandName ? `?brand=${encodeURIComponent(article.productFilter.brandName)}` : article.productFilter.categoryText ? `?categorie=${encodeURIComponent(article.productFilter.categoryText)}` : ''}`}
-                className="art-products-link"
-              >
-                Vezi toate produsele →
-              </Link>
-            </div>
-          </div>
+          </section>
         </div>
-      )}
-
+      </main>
       <Footer />
     </>
   )

@@ -972,3 +972,60 @@ export async function getSubcategoriesByCategoryName(categoryName: string): Prom
     .filter(s => s.product_count > 0)
     .sort((a, b) => b.product_count - a.product_count)
 }
+
+// ─── Zona Soluții (profession stories) ─────────────────────────────────────
+
+const CARD_COLS =
+  'id, slug, name, model, sku, brand_name, short_description, main_image_storage_url, main_image_url, gallery_url_1, st1_label, st1_value, st2_label, st2_value, price, featured, category_text, subcategory_text'
+
+/** A carousel's worth of products from a set of subcategories — a random
+ *  pick from the most expensive `pool` (same idea as the /branduri rows) —
+ *  plus how many products those subcategories hold in all. */
+export async function getProductsBySubcategories(
+  subs: string[],
+  { pool = 60, count = 24 }: { pool?: number; count?: number } = {}
+): Promise<{ products: Product[]; total: number }> {
+  if (subs.length === 0) return { products: [], total: 0 }
+  const { data, error, count: total } = await supabase
+    .from('product_listing_mv')
+    .select(CARD_COLS, { count: 'exact' })
+    .not('slug', 'is', null)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
+    .in('subcategory_text', subs)
+    .order('price', { ascending: false, nullsFirst: false })
+    .order('name')
+    .range(0, pool - 1)
+  if (error || !data) return { products: [], total: 0 }
+  const shuffled = [...(data as Product[])].sort(() => Math.random() - 0.5)
+  return { products: shuffled.slice(0, count), total: total ?? 0 }
+}
+
+/** Brands present across a set of subcategories, most products first. */
+export async function getBrandsBySubcategories(subs: string[]): Promise<{ brand_name: string; cnt: number }[]> {
+  if (subs.length === 0) return []
+  const { data, error } = await supabase.rpc('get_brands_by_subcategories', { p_subcategories: subs })
+  if (error || !data) return []
+  return (data as { brand_name: string; cnt: number }[]).map(r => ({ brand_name: r.brand_name, cnt: Number(r.cnt) }))
+}
+
+/** One manufacturer application photo (the tool in use) from a set of
+ *  subcategories — only from the Bosch and Kärcher media hosts, whose file
+ *  paths mark application shots and which next.config allows. */
+export async function getApplicationImage(subs: string[]): Promise<string | null> {
+  if (subs.length === 0) return null
+  const { data, error } = await supabase
+    .from('products')
+    .select('gallery_url_1, gallery_url_2, gallery_url_3')
+    .in('subcategory_text', subs)
+    .in('brand_name', ['BOSCH', 'Karcher'])
+    .not('gallery_url_1', 'is', null)
+    .order('price', { ascending: false, nullsFirst: false })
+    .limit(200)
+  if (error || !data) return null
+  const isApp = (u: string | null) => !!u && /(pt-media\.bosch-pt\.com.*application(?!.*VERTICAL))|(kaercher-media\.com\/.*\/application\/)/i.test(u)
+  for (const r of data as { gallery_url_1: string | null; gallery_url_2: string | null; gallery_url_3: string | null }[]) {
+    const hit = [r.gallery_url_1, r.gallery_url_2, r.gallery_url_3].find(isApp)
+    if (hit) return hit
+  }
+  return null
+}

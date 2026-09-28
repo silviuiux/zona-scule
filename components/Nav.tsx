@@ -524,6 +524,7 @@ export default function Nav() {
           {/* Right links */}
           <div className="nav-links">
             <Link href="/produse" className="nav-link">Catalog</Link>
+            <Link href="/zona-solutii" className="nav-link">Zona Soluții</Link>
             <Link href="/branduri" className="nav-link">Branduri</Link>
             <Link href="/contact" className="nav-contact">Contact</Link>
           </div>

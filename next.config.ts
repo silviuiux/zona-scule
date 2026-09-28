@@ -52,6 +52,16 @@ const nextConfig: NextConfig = {
   // zonascule.online serves the in-progress `September` branch (Vercel domain
   // → Git branch). Keep it out of search results so it never competes with
   // zonascule.ro as a duplicate site.
+  // The old Zona Soluții articles → the profession stories that replaced them
+  async redirects() {
+    return [
+      { source: '/zona-solutii/trusa-ideala-instalatori', destination: '/zona-solutii/scule-pentru-instalatori', permanent: true },
+      { source: '/zona-solutii/uneltele-electricianului-profesionist', destination: '/zona-solutii/scule-pentru-electricieni', permanent: true },
+      { source: '/zona-solutii/ghid-spalat-presiune-profesionisti', destination: '/zona-solutii/echipamente-curatenie-profesionala', permanent: true },
+      { source: '/zona-solutii/unelte-gradinarit-profesional', destination: '/zona-solutii', permanent: true },
+      { source: '/zona-solutii/scule-acumulator-vs-fir', destination: '/zona-solutii', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

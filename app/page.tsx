@@ -4,7 +4,6 @@ import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
-import HeroMark from '@/components/HeroMark'
 import CountUp from '@/components/CountUp'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
@@ -90,14 +89,6 @@ export default async function HomePage() {
           will-change: transform;
           position: relative;
         }
-        /* The mark, oversized and faint, drawing itself on the right
-           (HeroMark) — only where the title and search row leave it room. */
-        .hero-mark-wrap {
-          position: absolute; right: var(--gutter); bottom: -24px;
-          width: clamp(950px, 77.5vw, 1350px); /* 2.5× */
-          pointer-events: none;
-        }
-        @media (max-width: 1199px) { .hero-mark-wrap { display: none; } }
         @media (prefers-reduced-motion: reduce) {
           .hero-inner { transform: none; }
         }
@@ -611,7 +602,6 @@ export default async function HomePage() {
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
           </div>
-          <div className="hero-mark-wrap"><HeroMark /></div>
         </div>
       </section>
 
