@@ -79,7 +79,6 @@ export default async function BranduriPage() {
           transition: border-color 150ms, box-shadow 150ms;
         }
         .branduri-card:hover {
-          border-color: rgba(217,44,43,0.3);
           box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
         .branduri-card-logo {

@@ -111,11 +111,16 @@ export default function SubcategoryPillScroller({
           position: relative;
         }
 
+        /* Rows sit 12px apart (brands / categories / subcategories); the
+           last one leaves 32px before the product grid. */
+        .subcat-scroller:has(> .subcat-bar) { margin-bottom: 32px; }
         .subcat-scroller.is-sticky {
           position: sticky;
           top: var(--nav-h);
           z-index: 50;
-          margin: 0 0 16px;
+          /* the padding gives the pinned white band some air; the negative
+             top margin cancels it in normal flow so the row gap stays 12px */
+          margin: -16px 0 16px;
           padding-top: 16px;
           padding-bottom: 16px;
           /* Transparent until actually pinned (see .stuck below) — so it
@@ -193,10 +198,9 @@ export default function SubcategoryPillScroller({
            own — no negative-margin breakout needed since we want the row
            to shrink into the existing footprint, not for the wrapper to
            grow past it. */
-        @media (min-width: 1024px) {
-          .subcat-scroller { padding-left: 48px; padding-right: 48px; }
-        }
-
+        /* Arrows sit just outside the content edge, in the page gutter
+           (32px) — the rows keep the full container width. Bare chevrons;
+           a white rounded-rectangle backdrop only on hover. Desktop only. */
         .subcat-arrow {
           display: none;
           position: absolute;
@@ -205,25 +209,18 @@ export default function SubcategoryPillScroller({
              row's (51) — otherwise the sticky pill row painted on top of it
              and the arrows looked like they were sitting "behind" the pills. */
           z-index: 60;
-          width: 36px; height: 36px;
+          width: 28px; height: 40px;
           align-items: center; justify-content: center;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.95);
-          -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
-          border: 1px solid rgba(0,0,0,0.08);
-          box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-          color: rgba(0,0,0,0.55);
-          cursor: pointer;
-          transition: color 150ms, background 150ms, box-shadow 150ms;
-        }
-        .subcat-arrow:hover {
+          border-radius: 4px;
+          background: rgba(255,255,255,0);
+          border: none;
           color: rgb(0,0,0);
-          background: rgb(255,255,255);
-          box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+          cursor: pointer;
+          transition: background 150ms;
         }
-        .subcat-arrow-left { left: 4px; }
-        .subcat-arrow-right { right: 4px; }
+        .subcat-arrow:hover { background: rgb(255,255,255); }
+        .subcat-arrow-left { left: -30px; }
+        .subcat-arrow-right { right: -30px; }
 
         @media (min-width: 1024px) {
           .subcat-arrow { display: flex; }

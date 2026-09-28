@@ -56,7 +56,7 @@ export default function CatalogFilterPills({
         .fp-track::-webkit-scrollbar { display: none; }
         .fp-pill {
           display: inline-flex; align-items: center; gap: 10px;
-          height: 44px; padding: 0 18px; flex-shrink: 0;
+          height: 52px; padding: 0 20px; flex-shrink: 0;
           border-radius: 4px; /* same corners as the breadcrumb and buttons */
           font-family: 'Recursive', sans-serif;
           font-size: 13px; color: rgba(0,0,0,0.7);

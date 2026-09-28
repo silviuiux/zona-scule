@@ -27,9 +27,11 @@ export default function CatalogLayout({
     <>
       <style>{`
         .filter-row {
-          margin: 24px 0 32px;
-          display: flex; flex-direction: column; gap: 12px;
+          margin: 24px 0 12px; /* 12px to the subcategory row, same as between rows */
         }
+        /* 12px between the rows — margins, not flex gap: each row is preceded
+           by a zero-height sticky sentinel that a gap would count too */
+        .filter-row .subcat-scroller:not(:last-child) { margin-bottom: 12px; }
 
         /* Default (pills mode): sidebar list hidden, pill rows shown, grid
            at 4 columns. Only on desktop — mobile always uses its own

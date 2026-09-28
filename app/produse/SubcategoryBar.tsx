@@ -51,9 +51,9 @@ export default async function SubcategoryBar({
     <>
       <style>{`
         .subcat-bar {
-          margin: 16px 0;
+          margin: 0;
           padding: 0;
-          display: flex; gap: 10px;
+          display: flex; gap: 8px;
           overflow-x: auto;
           scrollbar-width: none; -ms-overflow-style: none;
         }
@@ -69,19 +69,19 @@ export default async function SubcategoryBar({
 
         .subcat-pill {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 9px 16px; flex-shrink: 0;
-          border-radius: 999px;
+          height: 52px; padding: 0 20px; flex-shrink: 0;
+          border-radius: 4px; /* same corners as the other pill rows */
           font-family: 'Recursive', sans-serif;
           font-size: 13px; font-weight: 400;
           color: rgba(0,0,0,0.7);
           text-decoration: none;
           background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          border: 1px solid rgba(0,0,0,0.07);
           transition: background 150ms, border-color 150ms, color 150ms;
           white-space: nowrap;
         }
         .subcat-pill:hover {
-          border-color: rgba(0,0,0,0.25);
+          border-color: rgba(0,0,0,0.22);
           color: rgb(0,0,0);
         }
         .subcat-pill.active {
@@ -91,10 +91,9 @@ export default async function SubcategoryBar({
         }
 
         .subcat-count {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 500;
-          color: rgba(0,0,0,0.4);
-          letter-spacing: 0.02em;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 11px;
+          color: rgba(0,0,0,0.38);
         }
         .subcat-pill.active .subcat-count { color: rgba(255,255,255,0.55); }
 
