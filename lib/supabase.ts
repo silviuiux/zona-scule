@@ -113,6 +113,11 @@ export type Subcategory = {
 
 // ─── Query helpers ─────────────────────────────────────────────────────────────
 
+/** Brand / category filters may name several values ("A,B" or ['A','B']) —
+ *  names never contain commas (subcategory names can, so they stay single). */
+export const filterList = (v?: string | string[] | null): string[] =>
+  (Array.isArray(v) ? v : v ? v.split(',') : []).map(s => s.trim()).filter(Boolean)
+
 export async function getProducts({
   page = 1,
   pageSize = 24,
@@ -124,8 +129,8 @@ export async function getProducts({
 }: {
   page?: number
   pageSize?: number
-  brandName?: string
-  categoryText?: string
+  brandName?: string | string[]
+  categoryText?: string | string[]
   subcategoryText?: string
   search?: string
   featured?: boolean
@@ -174,8 +179,12 @@ export async function getProducts({
     query = query.or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
   }
 
-  if (brandName) query = query.eq('brand_name', brandName)
-  if (categoryText) query = query.eq('category_text', categoryText)
+  // several brands / categories: OR within each, AND between them
+  const brands = filterList(brandName), cats = filterList(categoryText)
+  if (brands.length === 1) query = query.eq('brand_name', brands[0])
+  else if (brands.length > 1) query = query.in('brand_name', brands)
+  if (cats.length === 1) query = query.eq('category_text', cats[0])
+  else if (cats.length > 1) query = query.in('category_text', cats)
   if (subcategoryText) query = query.eq('subcategory_text', subcategoryText)
   if (search) {
     // Use the generated `search_vector` tsvector column with the existing GIN
@@ -567,17 +576,24 @@ export async function getBrandsByFilter({
   subcategoryText,
   search,
 }: {
-  categoryText?: string
+  categoryText?: string | string[]
   subcategoryText?: string
   search?: string
 } = {}): Promise<BrandWithCount[]> {
+  const cats = filterList(categoryText)
   const [{ data: brands, error }, { data: counts }] = await Promise.all([
     supabase.from('brands').select('*').order('name'),
-    supabase.rpc('get_brands_by_filter', {
-      p_category:    categoryText    ?? null,
-      p_subcategory: subcategoryText ?? null,
-      p_search:      search          ?? null,
-    }),
+    cats.length > 1
+      ? supabase.rpc('get_brands_by_categories', {
+          p_categories:  cats,
+          p_subcategory: subcategoryText ?? null,
+          p_search:      search          ?? null,
+        })
+      : supabase.rpc('get_brands_by_filter', {
+          p_category:    cats[0]         ?? null,
+          p_subcategory: subcategoryText ?? null,
+          p_search:      search          ?? null,
+        }),
   ])
   if (error || !brands) return []
 
@@ -591,6 +607,19 @@ export async function getBrandsByFilter({
     .filter(b => (countMap[b.name.toLowerCase().trim()] ?? 0) > 0)
     .map(b => ({ ...b, product_count: countMap[b.name.toLowerCase().trim()] }))
     .sort((a, b) => b.product_count - a.product_count)
+}
+
+/** Category counts within the selected brands (the /produse pill filters).
+ *  Takes the category rows from `all` and swaps in the scoped counts. */
+export async function getCategoriesByBrands(brands: string[], all: CategoryWithCount[]): Promise<CategoryWithCount[]> {
+  const { data, error } = await supabase.rpc('get_categories_by_brands', { p_brands: brands })
+  if (error || !data) return all
+  const countMap: Record<string, number> = {}
+  for (const row of data as { category_text: string; cnt: number }[]) {
+    if (row.category_text) countMap[row.category_text.toLowerCase().trim()] = row.cnt
+  }
+  // keep the curated category order; only the counts change
+  return all.map(c => ({ ...c, product_count: countMap[c.name.toLowerCase().trim()] ?? 0 }))
 }
 
 export async function getSubcategoriesByCategory(categoryId: string) {

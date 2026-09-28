@@ -27,7 +27,7 @@ export default function CatalogLayout({
     <>
       <style>{`
         .filter-row {
-          margin: 16px 0;
+          margin: 24px 0 32px;
           display: flex; flex-direction: column; gap: 12px;
         }
 

@@ -2,7 +2,7 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount, getCategoriesByBrands, filterList } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -23,6 +23,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   // pageSize LoadMore requests, or offset pagination skips/dupes products.
   const pageSize = 24
   const isFiltered = !!(sp.brand || sp.categorie || sp.q)
+  // Brands / categories can be multi-selected (?brand=A,B&categorie=X,Y).
+  // Views that only make sense for ONE of them (category hero, subcategory
+  // bar, breadcrumb) use catOne / brandOne.
+  const brandSel = filterList(sp.brand)
+  const catSel = filterList(sp.categorie)
+  const brandOne = brandSel.length === 1 ? brandSel[0] : undefined
+  const catOne = catSel.length === 1 ? catSel[0] : undefined
+  const multi = brandSel.length > 1 || catSel.length > 1
 
   // Fully unfiltered view ("Toate", no category/brand/subcategory/search) —
   // still needed for the fetch-shape decisions below (which sidebar data to
@@ -38,28 +46,30 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     getProducts({
       page: 1,
       pageSize,
-      brandName: sp.brand,
-      categoryText: sp.categorie,
+      brandName: brandSel,
+      categoryText: catSel,
       subcategoryText: sp.subcategorie,
       search: sp.q,
     }),
     getCategoriesWithCount(),
     getBrandsByFilter({
-      categoryText: sp.categorie,
+      categoryText: catSel,
       subcategoryText: sp.subcategorie,
       search: sp.q,
     }),
     getAllSubcategoriesWithCount(),
-    sp.brand && !sp.categorie ? getSubcategoriesByBrandName(sp.brand) : Promise.resolve([]),
-    sp.categorie ? getSubcategoriesByCategoryName(sp.categorie) : Promise.resolve([]),
+    brandOne && catSel.length === 0 ? getSubcategoriesByBrandName(brandOne) : Promise.resolve([]),
+    catOne ? getSubcategoriesByCategoryName(catOne) : Promise.resolve([]),
     getRawProductCount(),
   ])
 
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
   const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
+  // counts in the categories pill row, scoped to the selected brands
+  const pillCategories = brandSel.length ? await getCategoriesByBrands(brandSel, categories) : categories
 
-  const activeCategory = sp.categorie
-    ? categories.find(c => c.name.toLowerCase() === sp.categorie!.toLowerCase())
+  const activeCategory = catOne
+    ? categories.find(c => c.name.toLowerCase() === catOne.toLowerCase())
     : null
 
   // Show the site-wide raw total (same number as /admin/status and the
@@ -328,18 +338,23 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <nav className="cat-breadcrumb">
             <ViewSwitcherButton />
             <Link href="/produse" className="cat-bc-pill">Catalog</Link>
-            {sp.categorie && (
+            {multi ? (
+              <>
+                <span className="cat-bc-sep">/</span>
+                <span className="cat-bc-current">Selecție</span>
+              </>
+            ) : catOne && (
               <>
                 <span className="cat-bc-sep">/</span>
                 {sp.subcategorie ? (
                   <Link
-                    href={`/produse?categorie=${encodeURIComponent(sp.categorie)}`}
+                    href={`/produse?categorie=${encodeURIComponent(catOne)}`}
                     className="cat-bc-pill"
                   >
-                    {sp.categorie}
+                    {catOne}
                   </Link>
                 ) : (
-                  <span className="cat-bc-current">{sp.categorie}</span>
+                  <span className="cat-bc-current">{catOne}</span>
                 )}
               </>
             )}
@@ -349,10 +364,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 <span className="cat-bc-current">{sp.subcategorie}</span>
               </>
             )}
-            {sp.brand && !sp.categorie && (
+            {!multi && brandOne && !catOne && (
               <>
                 <span className="cat-bc-sep">/</span>
-                <span className="cat-bc-current">{sp.brand}</span>
+                <span className="cat-bc-current">{brandOne}</span>
               </>
             )}
             {sp.q && (
@@ -365,15 +380,22 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
           {/* Title */}
           <div className="cat-hero-title">
-            {sp.categorie ? (
+            {multi ? (
               <>
-                <span className="cat-hero-zona">Zona</span>
-                <span className="cat-hero-name">{sp.categorie}</span>
+                <span className="cat-hero-zona">Selecție</span>
+                <span className="cat-hero-name" style={{ fontSize: 'clamp(28px, 4vw, 56px)' }}>
+                  {[...brandSel, ...catSel].join(' · ')}
+                </span>
               </>
-            ) : sp.brand ? (
+            ) : catOne ? (
               <>
                 <span className="cat-hero-zona">Zona</span>
-                <span className="cat-hero-name">{sp.brand}</span>
+                <span className="cat-hero-name">{catOne}</span>
+              </>
+            ) : brandOne ? (
+              <>
+                <span className="cat-hero-zona">Zona</span>
+                <span className="cat-hero-name">{brandOne}</span>
               </>
             ) : sp.q ? (
               <>
@@ -423,20 +445,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               <Sidebar
                 categories={categories}
                 brands={brands}
-                activeCat={sp.categorie}
+                activeCat={catOne}
                 activeSub={sp.subcategorie}
-                activeBrand={sp.brand}
+                activeBrand={brandOne}
                 totalCount={rawTotal}
               />
             </>
           }
           filters={
             <CatalogFilterPills
-              categories={categories}
+              categories={pillCategories}
               brands={brands}
-              activeCat={sp.categorie}
-              activeBrand={sp.brand}
-              totalCount={rawTotal}
+              activeCats={catSel}
+              activeBrands={brandSel}
+              search={sp.q}
             />
           }
         >
@@ -448,19 +470,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               row so it's still reachable. Only sticky right under the
               navbar once a category/brand is active. (The desktop
               view-switcher lives in the hero's breadcrumb row.) */}
-          {sp.categorie ? (
+          {catOne && brandSel.length <= 1 ? (
             <SubcategoryBar
               toggle={<MobileFilterToggle />}
-              categoryName={sp.categorie}
-              brandName={sp.brand}
+              categoryName={catOne}
+              brandName={brandOne}
               activeSub={sp.subcategorie}
               total={activeCategory?.product_count}
               prefetchedSubs={categorySubs}
             />
-          ) : sp.brand && brandSubs.length > 0 ? (
+          ) : brandOne && catSel.length === 0 && brandSubs.length > 0 ? (
             <SubcategoryBar
               toggle={<MobileFilterToggle />}
-              brandName={sp.brand}
+              brandName={brandOne}
               activeSub={sp.subcategorie}
               total={total}
               prefetchedSubs={brandSubs}
