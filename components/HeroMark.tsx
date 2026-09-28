@@ -9,7 +9,7 @@ export default function HeroMark() {
       <style>{`
         .hero-mark { display: block; width: 100%; height: auto; overflow: visible; }
         .hero-mark path {
-          fill: none; stroke: rgba(0,0,0,0.13); stroke-width: 0.055;
+          fill: none; stroke: rgba(0,0,0,0.065); stroke-width: 0.018;
           stroke-linejoin: round; stroke-linecap: round;
           stroke-dasharray: 1; stroke-dashoffset: 1;
           animation: hero-mark 16s cubic-bezier(0.45, 0, 0.35, 1) infinite both;
