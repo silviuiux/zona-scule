@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
 import AnimatedHero from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
-import HeroSketch from '@/components/HeroSketch'
+import HeroMark from '@/components/HeroMark'
 import CountUp from '@/components/CountUp'
 import CategoryGrid from '@/components/CategoryGrid'
 import SubcategoryCarousel from '@/components/SubcategoryCarousel'
@@ -90,17 +90,14 @@ export default async function HomePage() {
           will-change: transform;
           position: relative;
         }
-        /* Drafting loop on the right (HeroSketch) — only where the title
-           and search row leave it a clear column. */
-        .hero-sketch-wrap {
-          position: absolute; right: var(--gutter); bottom: 0;
-          width: clamp(380px, 34vw, 520px);
+        /* The mark, oversized and faint, drawing itself on the right
+           (HeroMark) — only where the title and search row leave it room. */
+        .hero-mark-wrap {
+          position: absolute; right: var(--gutter); bottom: -24px;
+          width: clamp(380px, 31vw, 540px);
           pointer-events: none;
-          animation: hero-sketch-in 900ms 700ms ease both;
         }
-        .hero-sketch-wrap svg { display: block; width: 100%; height: auto; }
-        @keyframes hero-sketch-in { from { opacity: 0; } to { opacity: 1; } }
-        @media (max-width: 1199px) { .hero-sketch-wrap { display: none; } }
+        @media (max-width: 1199px) { .hero-mark-wrap { display: none; } }
         @media (prefers-reduced-motion: reduce) {
           .hero-inner { transform: none; }
         }
@@ -614,7 +611,7 @@ export default async function HomePage() {
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} />
           </div>
-          <div className="hero-sketch-wrap"><HeroSketch /></div>
+          <div className="hero-mark-wrap"><HeroMark /></div>
         </div>
       </section>
 

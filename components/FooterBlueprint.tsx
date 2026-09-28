@@ -4,10 +4,11 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
 /**
  * Footer easter egg (every page, desktop). The footer is a full viewport
  * tall, so ordinary scrolling comes to rest on all of it: on the way in its
- * top edge pushes the nav up and away, faint drafting-grid paper fades in
- * and a note types itself under the logo. Scrolling on from that stop
- * starts drafting a technical drawing straight away, driven by how far you
- * keep scrolling (scrolling back rewinds it):
+ * top edge pushes the nav up and away and a note types itself under the
+ * logo — "derulează în continuare", the only hint. A fresh scroll from that
+ * stop (after a short beat, see DEAD_ZONE) starts drafting a technical
+ * drawing on faint grid paper, driven by how far you keep scrolling
+ * (scrolling back rewinds it):
  *
  *  • a red "pen" crosshair traces the drawing line by line while labels
  *    type themselves out; the title block fills in under the logo;
@@ -51,10 +52,16 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  * to fade away) or type (text).
  */
 const RANGE = 2600 // px of extra scrolling from blank to fully drawn
-// The first bit of scrolling past the end jumps straight to where the
-// drawing's first lines start (the paper and the note are already out by
-// then — they arrive with the footer, see `arrival`).
-const P0 = 0.05
+// A short beat before anything draws: the first bit of scrolling past the
+// end does nothing but hold the page, so the drawing never looks like part
+// of the footer. One deliberate scroll gets past it.
+const DEAD_ZONE = 60
+// Scrolling that is still the gesture which brought the page to the bottom
+// (trackpad / wheel momentum) never starts the drawing — only a fresh
+// scroll does (a pause of this long between wheel events), or a gesture
+// that keeps pushing after the page has sat at the bottom for a while.
+const NEW_GESTURE_GAP = 180 // ms
+const SETTLED = 2000 // ms at the bottom
 
 type Variant = 'nail' | 'blade' | 'drill' | 'power' | 'caliper' | 'level'
 const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power', 'caliper', 'level']
@@ -112,7 +119,7 @@ const Paper = ({ x, y, w, h, cx, cy, r, unit = 1 }: { x: number; y: number; w: n
         <rect x={x} y={y} width={w} height={h} fill="url(#zs-bp-fade)" />
       </mask>
     </defs>
-    <rect className="paper" x={x} y={y} width={w} height={h} fill="url(#zs-bp-major)" mask="url(#zs-bp-mask)" data-k="fade" data-arrive="" data-s="0.25" data-e="0.9" />
+    <rect className="paper" x={x} y={y} width={w} height={h} fill="url(#zs-bp-major)" mask="url(#zs-bp-mask)" data-k="fade" data-s="0" data-e="0.08" />
   </>
 )
 
@@ -1071,7 +1078,7 @@ export default function FooterBlueprint() {
 
     // How far the footer has come into view (0 → 1 as its top edge
     // travels the upper half of the screen, 1 at the natural stop): the
-    // paper and the note arrive with it, ahead of any drawing.
+    // note arrives with it, ahead of any drawing.
     let arrival = 0
     const render = (p: number) => {
       placeTitle()
@@ -1083,7 +1090,10 @@ export default function FooterBlueprint() {
         const t = easeInOutSine(raw)
         const style = it.el.style
         let chars = 0
-        if (it.kind === 'draw') style.strokeDashoffset = String(1 - t)
+        if (it.kind === 'draw') {
+          style.strokeDashoffset = String(1 - t)
+          style.visibility = t > 0 ? '' : 'hidden' // a round cap would leave a dot
+        }
         else if (it.kind === 'grow') style.transform = it.el.dataset.axis === 'y' ? `scaleY(${t})` : `scaleX(${t})`
         else if (it.kind === 'pop') style.transform = `scale(${raw < 1 ? easeInOutCubic(raw) * 1.15 : 1})`
         else if (it.kind === 'fade') style.opacity = String(it.out ? 1 - t : t)
@@ -1233,17 +1243,24 @@ export default function FooterBlueprint() {
       else delete doc.dataset.eggHold
     }
     // Returns true when the event was consumed by the drawing.
+    let lastInput = 0
+    let endSince = atEnd() ? 0 : Infinity // when the page last reached the bottom
     const push = (delta: number) => {
+      const now = performance.now()
+      const gap = now - lastInput
+      lastInput = now
       if (hidden()) return false // no room for it on small screens
       if (!atEnd()) return false
       if (delta > 0) {
         if (finished) return true
-        overscroll = Math.min(overscroll + delta, RANGE)
+        // not yet started: only a fresh scroll (or a settled page) counts
+        if (overscroll <= 0 && cur <= 0 && gap < NEW_GESTURE_GAP && now - endSince < SETTLED) return false
+        overscroll = Math.min(overscroll + delta, DEAD_ZONE + RANGE)
       } else {
         if (overscroll <= 0) return cur > 0 // still rewinding: hold the page
         overscroll = Math.max(0, overscroll + delta)
       }
-      const next = overscroll > 0 ? P0 + (1 - P0) * (overscroll / RANGE) : 0
+      const next = clamp01((overscroll - DEAD_ZONE) / RANGE)
       target = reduce ? (next > 0 ? 1 : 0) : next
       if (finished && target < 1) undoFinale()
       setHold()
@@ -1267,12 +1284,14 @@ export default function FooterBlueprint() {
     const onResize = () => { placeTitle(); measureCols() }
     window.addEventListener('resize', onResize)
     // Ordinary scrolling brings the footer in: as its top edge reaches the
-    // nav, the nav is pushed up and away, and the paper and note arrive —
+    // nav, the nav is pushed up and away, and the note arrives —
     // so the natural stop at the bottom is already the blank sheet, and
     // the very next scroll draws. Scrolling back up reverses all of it.
     let lastEgg = -1, scrollRaf = 0
     const onScroll = () => {
       setHold()
+      if (!atEnd()) endSince = Infinity
+      else if (endSince === Infinity) endSince = performance.now()
       if (scrollRaf) return
       scrollRaf = requestAnimationFrame(() => {
         scrollRaf = 0
