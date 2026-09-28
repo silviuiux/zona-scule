@@ -22,7 +22,7 @@ export default async function BranduriPage() {
   const brands = await getBrands()
   const featured = brands.filter(b => getBrandLogo(b.name))
   const [promotedGroups, tickers] = await Promise.all([
-    Promise.all(featured.map(b => getRandomExpensiveProductsByBrand(b.name))),
+    Promise.all(featured.map(b => getRandomExpensiveProductsByBrand(b.name, { poolSize: 40, count: 24 }))),
     Promise.all(brands.map(b => getBrandSubcategoryNames(b.name))),
   ])
   const totalProducts = brands.reduce((n, b) => n + b.product_count, 0)
@@ -141,23 +141,34 @@ export default async function BranduriPage() {
           border-radius: 10px; overflow: hidden; margin-bottom: 40px;
           background: rgb(238,238,238);
         }
-        .branduri-promoted-head {
-          display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
-          margin-bottom: 24px;
+        /* Logo, title and link sit in three corners of the banner: logo
+           top-left (no backdrop), title bottom-left and link bottom-right on
+           solid plates. */
+        .branduri-promoted-banner > * { z-index: 1; }
+        .branduri-promoted-banner > img { z-index: 0; }
+        .branduri-promoted-logo {
+          position: absolute; top: 24px; left: 24px;
+          display: block; height: 40px; width: auto; max-width: 40%;
+          object-fit: contain; object-position: left center;
         }
-        .branduri-promoted-heading { display: flex; flex-direction: column; gap: 16px; }
-        .branduri-promoted-logo { display: block; height: 36px; width: auto; object-fit: contain; object-position: left center; }
         .branduri-promoted-title {
+          position: absolute; left: 24px; bottom: 24px; max-width: calc(100% - 280px);
+          margin: 0; padding: 14px 20px 16px;
+          background: rgb(255,255,255); border-radius: 4px;
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(32px, 3.4vw, 52px); line-height: 1; letter-spacing: -0.015em;
+          font-size: clamp(28px, 3vw, 44px); line-height: 1; letter-spacing: -0.015em;
           color: rgb(0,0,0);
         }
         .branduri-promoted-link {
+          position: absolute; right: 24px; bottom: 24px;
+          display: inline-flex; align-items: center; gap: 10px;
+          height: 48px; padding: 0 20px;
+          background: rgb(0,0,0); color: rgb(255,255,255); border-radius: 4px;
           font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4); text-decoration: none;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          text-decoration: none; transition: background 150ms;
         }
-        .branduri-promoted-link:hover { color: rgb(217,44,43); }
+        .branduri-promoted-link:hover { background: rgb(217,44,43); }
         .branduri-promoted-scroll {
           display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
           scroll-snap-type: x mandatory; scrollbar-width: thin;
@@ -172,8 +183,10 @@ export default async function BranduriPage() {
           .branduri-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 768px) {
-          .branduri-promoted-banner { height: 40vh; min-height: 220px; margin-bottom: 24px; }
-          .branduri-promoted-logo { height: 28px; }
+          .branduri-promoted-banner { height: 40vh; min-height: 260px; margin-bottom: 24px; }
+          .branduri-promoted-logo { height: 28px; top: 16px; left: 16px; }
+          .branduri-promoted-title { left: 16px; bottom: 76px; max-width: calc(100% - 32px); font-size: 26px; padding: 10px 14px 12px; }
+          .branduri-promoted-link { left: 16px; right: auto; bottom: 16px; height: 44px; }
         }
       `}</style>
 
@@ -228,13 +241,14 @@ export default async function BranduriPage() {
             // Banner is deliberately NOT the main product shot — the first
             // gallery/alt image found among the sampled products, closer to
             // an in-context/application photo than a plain catalog cutout.
-            // Skips the banner (keeps the carousel) if none of them have one.
+            // With none, the banner keeps its plain grey ground so the logo,
+            // title and link still have a home.
             const bannerProduct = group.find(p => p.gallery_url_1)
             const logo = getBrandLogo(b.name)
             return (
               <div key={b.name} className="branduri-promoted">
-                {bannerProduct?.gallery_url_1 && (
-                  <div className="branduri-promoted-banner">
+                <div className="branduri-promoted-banner">
+                  {bannerProduct?.gallery_url_1 && (
                     <Image
                       src={bannerProduct.gallery_url_1}
                       alt=""
@@ -242,16 +256,12 @@ export default async function BranduriPage() {
                       sizes="100vw"
                       style={{ objectFit: 'cover' }}
                     />
-                  </div>
-                )}
-                <div className="branduri-promoted-head">
-                  <div className="branduri-promoted-heading">
-                    {logo && (
-                      <Image src={logo.src} alt={logo.alt ?? b.name} width={logo.width} height={logo.height} className="branduri-promoted-logo" />
-                    )}
-                    <h2 className="branduri-promoted-title">Selecție premium {b.name}</h2>
-                  </div>
-                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot →</Link>
+                  )}
+                  {logo && (
+                    <Image src={logo.src} alt={logo.alt ?? b.name} width={logo.width} height={logo.height} className="branduri-promoted-logo" />
+                  )}
+                  <h2 className="branduri-promoted-title">Selecție premium {b.name}</h2>
+                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot <span aria-hidden="true">→</span></Link>
                 </div>
                 <div className="branduri-promoted-scroll">
                   {group.map(p => <ProductCard key={p.id} product={p} />)}
