@@ -2,15 +2,13 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 /**
- * Footer easter egg (every page). Once the page is scrolled all the way to the bottom,
- * further wheel (or touch) scrolling looks like it does nothing — but after
- * a short dead zone it starts drafting a technical drawing, driven by how
- * far you keep scrolling:
+ * Footer easter egg (every page, desktop). The footer is a full viewport
+ * tall, so ordinary scrolling comes to rest on all of it: on the way in its
+ * top edge pushes the nav up and away, faint drafting-grid paper fades in
+ * and a note types itself under the logo. Scrolling on from that stop
+ * starts drafting a technical drawing straight away, driven by how far you
+ * keep scrolling (scrolling back rewinds it):
  *
- *  • the footer eases from 80vh up to fill the screen below the nav (only
- *    the gap between logo and link columns grows; the page stays pinned to
- *    the bottom, so the logo rises while the columns stay put) and faint
- *    drafting-grid paper fades in;
  *  • a red "pen" crosshair traces the drawing line by line while labels
  *    type themselves out; the title block fills in under the logo;
  *  • a finale plays, then an "APROBAT" stamp with today's date lands.
@@ -45,16 +43,18 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  * along data-axis), pop (scale, arrowheads), fade (opacity; data-dir="out"
  * to fade away) or type (text).
  */
-const DEAD_ZONE = 500 // px of extra scrolling that "does nothing" first
-const RANGE = 2800 // px of extra scrolling from blank to fully drawn
-const GROW_END = 0.2 // progress by which the footer has grown to full height
+const RANGE = 2600 // px of extra scrolling from blank to fully drawn
+// The first bit of scrolling past the end jumps straight to where the
+// drawing's first lines start (the paper and the note are already out by
+// then — they arrive with the footer, see `arrival`).
+const P0 = 0.05
 
 type Variant = 'nail' | 'blade' | 'drill' | 'power'
 const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power']
 // In the page-load shuffle; the rest stay reachable with ?egg=…
 const SHUFFLED: Variant[] = ['blade', 'drill', 'power']
 type Kind = 'draw' | 'grow' | 'pop' | 'fade' | 'type'
-type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; wrap: SVGGElement | null }
+type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; arrive: boolean; wrap: SVGGElement | null }
 
 const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
@@ -105,7 +105,7 @@ const Paper = ({ x, y, w, h, cx, cy, r, unit = 1 }: { x: number; y: number; w: n
         <rect x={x} y={y} width={w} height={h} fill="url(#zs-bp-fade)" />
       </mask>
     </defs>
-    <rect className="paper" x={x} y={y} width={w} height={h} fill="url(#zs-bp-major)" mask="url(#zs-bp-mask)" data-k="fade" data-s="0.02" data-e="0.12" />
+    <rect className="paper" x={x} y={y} width={w} height={h} fill="url(#zs-bp-major)" mask="url(#zs-bp-mask)" data-k="fade" data-arrive="" data-s="0.25" data-e="0.9" />
   </>
 )
 
@@ -757,6 +757,7 @@ export default function FooterBlueprint() {
         text: kind === 'type' ? el.dataset.text ?? '' : '',
         len: kind === 'draw' ? (el as SVGGeometryElement).getTotalLength() : 0,
         out: el.dataset.dir === 'out',
+        arrive: el.dataset.arrive !== undefined,
         wrap: el.ownerSVGElement?.querySelector<SVGGElement>('.pen-wrap') ?? null,
       }
     })
@@ -881,21 +882,17 @@ export default function FooterBlueprint() {
       lastP = p
     }
 
-    let lastGrow = 0
+    // How far the footer has come into view (0 → 1 as its top edge
+    // travels the upper half of the screen, 1 at the natural stop): the
+    // paper and the note arrive with it, ahead of any drawing.
+    let arrival = 0
     const render = (p: number) => {
-      const grow = easeInOutCubic(Math.min(1, p / GROW_END))
-      if (footer && grow !== lastGrow) {
-        lastGrow = grow
-        footer.style.setProperty('--footer-grow', grow.toFixed(4))
-        doc.style.setProperty('--egg', grow.toFixed(4)) // Nav slides up by this
-        window.scrollTo(0, doc.scrollHeight)
-      }
       placeTitle()
       frameArt(p)
 
       let pen: { wrap: SVGGElement; xy: [number, number] } | null = null
       for (const it of items) {
-        const raw = clamp01((p - it.s) / (it.e - it.s))
+        const raw = clamp01(((it.arrive ? arrival : p) - it.s) / (it.e - it.s))
         const t = easeInOutSine(raw)
         const style = it.el.style
         let chars = 0
@@ -1029,6 +1026,7 @@ export default function FooterBlueprint() {
         raf = requestAnimationFrame(frame)
       }
     }
+    const hidden = () => getComputedStyle(layer).display === 'none'
     const atEnd = () => window.scrollY + window.innerHeight >= doc.scrollHeight - 2
     // While any of the drawing is out, the wheel belongs to it: down draws
     // on, up rewinds — the page itself only scrolls again once it's back at
@@ -1039,16 +1037,16 @@ export default function FooterBlueprint() {
     }
     // Returns true when the event was consumed by the drawing.
     const push = (delta: number) => {
-      if (getComputedStyle(layer).display === 'none') return false // no room for it on small screens
+      if (hidden()) return false // no room for it on small screens
       if (!atEnd()) return false
       if (delta > 0) {
         if (finished) return true
-        overscroll = Math.min(overscroll + delta, DEAD_ZONE + RANGE)
+        overscroll = Math.min(overscroll + delta, RANGE)
       } else {
         if (overscroll <= 0) return cur > 0 // still rewinding: hold the page
         overscroll = Math.max(0, overscroll + delta)
       }
-      const next = clamp01((overscroll - DEAD_ZONE) / RANGE)
+      const next = overscroll > 0 ? P0 + (1 - P0) * (overscroll / RANGE) : 0
       target = reduce ? (next > 0 ? 1 : 0) : next
       if (finished && target < 1) undoFinale()
       setHold()
@@ -1071,16 +1069,35 @@ export default function FooterBlueprint() {
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     const onResize = () => { placeTitle(); measureCols() }
     window.addEventListener('resize', onResize)
-    // The nav is only away while the drawing is in view: scrolling back up
-    // brings it back, returning to the bottom hides it again.
+    // Ordinary scrolling brings the footer in: as its top edge reaches the
+    // nav, the nav is pushed up and away, and the paper and note arrive —
+    // so the natural stop at the bottom is already the blank sheet, and
+    // the very next scroll draws. Scrolling back up reverses all of it.
+    let lastEgg = -1, scrollRaf = 0
     const onScroll = () => {
       setHold()
-      if (!lastGrow) return
-      doc.style.setProperty('--egg', atEnd() ? lastGrow.toFixed(4) : '0')
+      if (scrollRaf) return
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = 0
+        if (!footer || hidden()) {
+          if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg') }
+          return
+        }
+        const top = footer.getBoundingClientRect().top
+        const vh = window.innerHeight
+        if (top >= vh) { if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg') } return }
+        const navH = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 68
+        const egg = clamp01((navH - top) / navH)
+        if (Math.abs(egg - lastEgg) > 1e-3) { lastEgg = egg; doc.style.setProperty('--egg', egg.toFixed(4)) }
+        const a = atEnd() ? 1 : clamp01(1 - top / (vh / 2))
+        if (a !== arrival) { arrival = a; if (!raf) render(cur) }
+      })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
     return () => {
       window.removeEventListener('scroll', onScroll)
+      if (scrollRaf) cancelAnimationFrame(scrollRaf)
       doc.style.removeProperty('--egg')
       delete doc.dataset.eggHold
       window.removeEventListener('wheel', onWheel)
@@ -1193,7 +1210,7 @@ export default function FooterBlueprint() {
             <feDisplacementMap in="SourceGraphic" scale="1.6" />
           </filter>
         </defs>
-        <text x="0" y="10" className="red" data-k="type" data-s="0.01" data-e="0.08" data-text="// ai derulat până la capăt. respect." />
+        <text x="0" y="10" className="red" data-k="type" data-arrive="" data-s="0.35" data-e="0.95" data-text="// ai derulat până la capăt. respect." />
         <path className="ln" pathLength={1} d="M0 22 H290 V88 H0 Z M0 44 H290 M0 66 H290 M180 22 V88" data-k="draw" data-s="0.88" data-e="0.93" />
         <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
         <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />

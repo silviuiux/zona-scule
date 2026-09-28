@@ -23,10 +23,11 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           position: relative;
           background-color: rgb(255,255,255);
           border-top: 1px solid rgba(0,0,0,0.12);
-          /* 80vh by default; the easter egg (FooterBlueprint) drives
-             --footer-grow 0 → 1 to expand it to the full viewport — the nav
-             slides away at the same time, so nothing sits on top of it. */
-          min-height: calc(80vh + 20vh * var(--footer-grow, 0));
+          /* 80vh; with the easter egg (FooterBlueprint, desktop) a full
+             viewport, so the page's natural stop is the whole footer in
+             view — the nav has slid away by then — and the next scroll
+             starts the drawing. */
+          min-height: 80vh;
           display: flex; flex-direction: column;
         }
 
@@ -36,6 +37,7 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
            page stays pinned to the bottom, so the logo rises with the
            footer's top edge). Positioned so the blueprint layer
            (FooterBlueprint) can sit behind. */
+        @media (min-width: 1024px) { .footer.footer-bp { min-height: 100vh; } }
         .footer-main {
           position: relative;
           flex: 1;
@@ -125,7 +127,7 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
         }
       `}</style>
 
-      <footer className="footer">
+      <footer className={blueprint ? 'footer footer-bp' : 'footer'}>
         <div className="footer-main">
           {blueprint && <FooterBlueprint />}
           <div className="footer-logo">

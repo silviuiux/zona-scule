@@ -134,8 +134,8 @@ export default function Nav() {
           background: rgb(255,255,255);
           box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
           display: flex; align-items: stretch;
-          /* Footer easter egg (FooterBlueprint sets --egg 0 → 1 on <html>):
-             the nav stops being sticky and slides up out of view. */
+          /* Footer easter egg (FooterBlueprint sets --egg 0 → 1 on <html>
+             as the footer's top edge reaches it): pushed up out of view. */
           transform: translateY(calc((-100% - 40px) * var(--egg, 0))); /* + clear its shadow */
           transition: box-shadow 200ms, transform 250ms ease-out;
         }
