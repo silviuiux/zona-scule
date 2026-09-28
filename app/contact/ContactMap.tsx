@@ -1,6 +1,8 @@
 import { CONTACT_MAP as M } from '@/lib/contact-map-data'
 
 const C = M.city
+const D = M.detail
+const A1 = M.a1route
 import ContactMapScroller from './ContactMapScroller'
 
 /**
@@ -52,6 +54,17 @@ export default function ContactMap() {
         .cmap-svg .dr { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; stroke-linecap: round; stroke-linejoin: round; }
         .cmap-svg .st { stroke: rgba(0,0,0,0.26); stroke-width: calc(0.7px * var(--u, 1) * var(--w, 1)); }
         .cmap-svg .st.main { stroke: rgba(0,0,0,0.72); }
+        .cmap-svg .d-water { fill: rgba(126,192,222,0.26); stroke: none; }
+        .cmap-svg .d-park { fill: rgba(128,196,146,0.16); stroke: none; }
+        .cmap-svg .d-minor { stroke: rgba(0,0,0,0.17); stroke-width: calc(0.6px * var(--u, 1)); }
+        .cmap-svg .d-art { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.9px * var(--u, 1)); }
+        .cmap-svg .d-hw { stroke: rgba(0,0,0,0.4); stroke-width: calc(1.2px * var(--u, 1)); }
+        .cmap-svg .d-junction { stroke: rgba(0,0,0,0.42); stroke-width: calc(0.6px * var(--u, 1)); }
+        .cmap-svg .d-junction-fill { fill: rgba(0,0,0,0.035); stroke: none; }
+        /* the A1, highlighted in every view */
+        .cmap-svg .a1 { fill: none; stroke: rgba(217,44,43,0.78); stroke-width: calc(1.8px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
+        .cmap-svg .a1.a1-building { stroke-dasharray: calc(5px * var(--u, 1)) calc(4px * var(--u, 1)); stroke-width: calc(1.4px * var(--u, 1)); }
+        .cmap-svg text.a1-label { font-size: 9.5px; fill: rgba(217,44,43,0.85); letter-spacing: 0.16em; font-weight: 500; }
         .cmap-svg .c-road { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.8px * var(--u, 1) * var(--w, 1)); }
         .cmap-svg .c-road.a1 { stroke: rgba(0,0,0,0.5); }
         /* river as two banks: a grey band with a paler core (widths in metres) */
@@ -166,6 +179,12 @@ export default function ContactMap() {
               <path className="dr river" pathLength={1} d={M.arges} data-k="draw" data-s="0.36" data-e="0.46" />
               <path className="urban-fill" d={M.urban} data-k="fade" data-s="0.46" data-e="0.5" />
               <path className="dr urban" pathLength={1} d={M.urban} data-k="draw" data-s="0.34" data-e="0.44" />
+              <g className="lbl" data-x={9500} data-y={3500} data-a={19}>
+                <text className="a1-label" textAnchor="middle" y="-8" data-k="type" data-s="0.44" data-e="0.48" data-text="A1 → BUCUREȘTI" />
+              </g>
+              <g className="lbl" data-x={-7100} data-y={-8000} data-a={62}>
+                <text className="a1-label" textAnchor="middle" y="-8" data-k="type" data-s="0.46" data-e="0.5" data-text="A1 → SIBIU (ÎN LUCRU)" />
+              </g>
               <g className="lbl" data-x={-2500} data-y={4200}>
                 <text className="big" textAnchor="end" data-k="type" data-s="0.47" data-e="0.52" data-text="PITEȘTI" />
               </g>
@@ -180,28 +199,16 @@ export default function ContactMap() {
             {/* 01 · Pitești around the shop: main roads, the A1 junction,
                  the Argeș, parks and landmarks, the streets next door */}
             <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.33" data-out-e="0.42">
-              <path className="dr c-river-band" pathLength={1} d={C.arges} data-k="draw" data-s="0.02" data-e="0.12" />
-              <path className="dr c-river-in" pathLength={1} d={C.arges} data-k="draw" data-s="0.02" data-e="0.12" />
-              <path className="dr c-river-band thin" pathLength={1} d={C.doamnei} data-k="draw" data-s="0.06" data-e="0.12" />
-              <path className="dr c-river-in thin" pathLength={1} d={C.doamnei} data-k="draw" data-s="0.06" data-e="0.12" />
-              <path className="dr c-park" pathLength={1} d={C.parks} data-k="draw" data-s="0.14" data-e="0.2" />
-              <path className="c-park-fill" d={C.parks} data-k="fade" data-s="0.18" data-e="0.22" />
-              <path className="dr c-park" pathLength={1} d={C.vivo} data-k="draw" data-s="0.16" data-e="0.19" />
-              {C.roads.map((r, i) => {
-                const s = r.id === 'a1' ? 0.03 : 0.05 + i * 0.012
-                return (
-                  <path key={r.id} className={`dr c-road${r.id === 'a1' ? ' a1' : ''}`} pathLength={1} d={r.d}
-                    style={{ ['--w' as string]: r.w }} data-k="draw" data-s={s.toFixed(3)} data-e={(s + 0.08).toFixed(3)} />
-                )
-              })}
-              <circle className="dr c-road" pathLength={1} cx={C.junction[0]} cy={C.junction[1]} r="70" style={{ ['--w' as string]: 1 }} data-k="draw" data-s="0.12" data-e="0.15" />
-              {M.streets.filter(st => st.id !== 'dn65').map((st, i) => {
-                const s = st.main ? 0.08 : 0.1 + i * 0.008
-                return (
-                  <path key={st.id} className={`dr st${st.main ? ' main' : ''}`} pathLength={1} d={st.d}
-                    style={{ ['--w' as string]: st.w }} data-k="draw" data-s={s.toFixed(3)} data-e={(s + 0.06).toFixed(3)} />
-                )
-              })}
+              {/* traced from map references: pale water and green areas, then
+                  streets by class, the A1 junction as road outlines, the A1 */}
+              <path className="d-water" d={D.water} data-k="fade" data-s="0.02" data-e="0.08" />
+              <path className="d-park" d={D.parks} data-k="fade" data-s="0.04" data-e="0.1" />
+              <path className="dr d-minor" pathLength={1} d={D.minor} data-k="draw" data-s="0.08" data-e="0.2" />
+              <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.05" data-e="0.15" />
+              <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.03" data-e="0.11" />
+              <path className="d-junction-fill" d={D.junction} data-k="fade" data-s="0.12" data-e="0.16" />
+              <path className="dr d-junction" pathLength={1} d={D.junction} data-k="draw" data-s="0.06" data-e="0.15" />
+              <path className="dr a1" pathLength={1} d={D.a1} data-k="draw" data-s="0.02" data-e="0.1" />
 
               {/* labels leave before the camera pulls out */}
               <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.31">
@@ -228,6 +235,19 @@ export default function ContactMap() {
                     </g>
                   )
                 })}
+              </g>
+            </g>
+
+            {/* A1 — highlighted at every zoom: the city trace above, then
+                 the motorway across the county and the country */}
+            <g data-k="fade" data-s="0.3" data-e="0.34">
+              <path className="dr a1" pathLength={1} d={A1.east} data-k="draw" data-s="0.32" data-e="0.62" />
+              <path className="a1 a1-building" d={A1.building} data-k="fade" data-s="0.42" data-e="0.48" />
+              <path className="dr a1" pathLength={1} d={A1.west} data-k="draw" data-s="0.64" data-e="0.8" />
+              <g data-k="fade" data-s="0.76" data-e="0.8">
+                <g className="lbl" data-x={-85000} data-y={-122000}>
+                  <text className="a1-label" textAnchor="middle" y="-10" data-k="type" data-s="0.78" data-e="0.82" data-text="A1" />
+                </g>
               </g>
             </g>
 
