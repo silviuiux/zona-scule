@@ -431,8 +431,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </div>
 
           {/* Description */}
-          {activeCategory?.description && (
+          {activeCategory?.description ? (
             <p className="cat-hero-desc">{activeCategory.description}</p>
+          ) : isTrulyUnfiltered && (
+            <p className="cat-hero-desc">
+              Scule electrice și de mână, accesorii și abrazive, aparate de măsură, echipamente de curățenie
+              și de protecție — gama completă a producătorilor pe care îi distribuim, pentru profesioniști și firme.
+            </p>
           )}
 
           {/* Stats */}

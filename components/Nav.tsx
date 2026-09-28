@@ -1,29 +1,37 @@
 'use client'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Suggestion = {
-  slug: string
-  brand: string | null
-  model: string | null
-  category: string | null
-  img: string | null
-}
-
+/**
+ * Navbar — outlined buttons in Oswald, three states:
+ *  1. rest: Cauta · Catalog · Branduri · Zona Soluții as outlined buttons,
+ *     Contact solid black;
+ *  2. search open: Cauta grows into a wide outlined field between the logo
+ *     and the links;
+ *  3. typing: the bar turns light grey, the links drop their outlines, and
+ *     a panel opens below with query completions from /api/search — the
+ *     typed part regular, the completion bold; × dismisses a suggestion.
+ */
 export default function Nav() {
   const [q, setQ] = useState('')
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
-  const [dropOpen, setDropOpen] = useState(false)
+  const [terms, setTerms] = useState<string[]>([])
+  const [dismissed, setDismissed] = useState<string[]>([])
   const [activeIdx, setActiveIdx] = useState(-1)
   const [fetching, setFetching] = useState(false)
+  const [indent, setIndent] = useState(0)
 
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+  const navRef = useRef<HTMLElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+
+  const typing = searchOpen && q.trim().length > 0
+  const shown = terms.filter(t => !dismissed.includes(t))
+  const panelOpen = typing && shown.length > 0
 
   // ── scroll shadow ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -32,97 +40,83 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // ── click-outside → close dropdown, and collapse an empty expanded search ──
+  // ── click outside the nav → collapse an empty search ───────────────────────
   useEffect(() => {
     const fn = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setDropOpen(false)
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setActiveIdx(-1)
-        setQ(q => {
-          if (!q.trim()) setSearchOpen(false)
-          return q
-        })
+        setQ(v => { if (!v.trim()) setSearchOpen(false); return v })
       }
     }
     document.addEventListener('mousedown', fn)
     return () => document.removeEventListener('mousedown', fn)
   }, [])
 
-  // ── debounced typeahead ────────────────────────────────────────────────────
+  // ── the suggestions line up with the search field ──────────────────────────
+  useEffect(() => {
+    const measure = () => {
+      const w = wrapRef.current, inner = innerRef.current
+      if (w && inner) setIndent(w.getBoundingClientRect().left - inner.getBoundingClientRect().left - parseFloat(getComputedStyle(inner).paddingLeft))
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [searchOpen])
+
+  // ── debounced completions ──────────────────────────────────────────────────
   useEffect(() => {
     const trimmed = q.trim()
-    if (trimmed.length < 2) {
-      setSuggestions([])
-      setDropOpen(false)
-      setActiveIdx(-1)
-      return
-    }
+    if (trimmed.length < 2) return
     const t = setTimeout(async () => {
       setFetching(true)
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`)
         const data = await res.json()
-        const prods: Suggestion[] = data.products ?? []
-        setSuggestions(prods)
-        setDropOpen(prods.length > 0)
+        setTerms(data.terms ?? [])
         setActiveIdx(-1)
       } catch {
-        setSuggestions([])
-        setDropOpen(false)
+        setTerms([])
       } finally {
         setFetching(false)
       }
-    }, 250)
+    }, 200)
     return () => clearTimeout(t)
   }, [q])
 
-  // ── keyboard navigation ────────────────────────────────────────────────────
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!dropOpen) {
-      if (e.key === 'Escape' && !q.trim()) setSearchOpen(false)
-      return
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActiveIdx(i => Math.min(i + 1, suggestions.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActiveIdx(i => Math.max(i - 1, -1))
-    } else if (e.key === 'Escape') {
-      setDropOpen(false)
-      setActiveIdx(-1)
-      if (!q.trim()) setSearchOpen(false)
-    } else if (e.key === 'Enter' && activeIdx >= 0) {
-      e.preventDefault()
-      navigateTo(suggestions[activeIdx].slug)
-    }
-  }
-
-  const navigateTo = useCallback((slug: string) => {
-    router.push(`/produse/${slug}`)
-    setDropOpen(false)
+  const go = useCallback((term: string) => {
+    const t = term.trim()
+    if (!t) return
+    router.push(`/produse?q=${encodeURIComponent(t)}`)
     setQ('')
+    setTerms([])
     setActiveIdx(-1)
+    setSearchOpen(false)
+    inputRef.current?.blur()
   }, [router])
 
-  const clearSearch = () => {
-    setQ('')
-    setSuggestions([])
-    setDropOpen(false)
-    setActiveIdx(-1)
-    inputRef.current?.focus()
+  const openSearch = () => { setSearchOpen(true); setTimeout(() => inputRef.current?.focus(), 30) }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      if (q) { setQ(''); setTerms([]) } else setSearchOpen(false)
+      setActiveIdx(-1)
+      return
+    }
+    if (!panelOpen) return
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx(i => Math.min(i + 1, shown.length - 1)) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, -1)) }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const trimmed = q.trim()
-    if (!trimmed) return
-    if (activeIdx >= 0 && suggestions[activeIdx]) {
-      navigateTo(suggestions[activeIdx].slug)
-    } else {
-      router.push(`/produse?q=${encodeURIComponent(trimmed)}`)
-      setDropOpen(false)
-    }
+    go(activeIdx >= 0 && shown[activeIdx] ? shown[activeIdx] : q)
+  }
+
+  // typed part regular, the rest bold
+  const split = (term: string) => {
+    const typed = q.trim()
+    const fold = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    return fold(term).startsWith(fold(typed)) ? [term.slice(0, typed.length), term.slice(typed.length)] : ['', term]
   }
 
   return (
@@ -137,267 +131,122 @@ export default function Nav() {
           /* Footer easter egg (FooterBlueprint sets --egg 0 → 1 on <html>
              as the footer's top edge reaches it): pushed up out of view. */
           transform: translateY(calc((-100% - 40px) * var(--egg, 0))); /* + clear its shadow */
-          transition: box-shadow 200ms, transform 250ms ease-out;
+          transition: box-shadow 200ms, transform 250ms ease-out, background 200ms;
         }
         .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
+        .nav.typing { background: rgb(243,243,243); }
 
         .nav-inner {
+          position: relative;
           max-width: 1440px; margin: 0 auto; width: 100%;
           /* Same side gutter as the page content, so the logo and the
              Contact button line up with everything below. */
-          display: flex; align-items: stretch; padding: 0 var(--gutter);
+          display: flex; align-items: center; gap: 12px; padding: 0 var(--gutter);
         }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; height: 100%; margin-right: auto; }
+        .nav.search-open .nav-logo { margin-right: 32px; }
 
-        /* Logo */
-        .nav-logo {
-          display: flex; align-items: center;
-          text-decoration: none; flex-shrink: 0;
-          padding-right: 32px;
-          height: 100%;
+        /* Shared button look: Oswald, wide tracking, hairline outline */
+        .nav-btn {
+          display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+          height: 40px; padding: 0 20px; flex-shrink: 0;
+          border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background: rgb(255,255,255);
+          font-family: 'Oswald', 'Inter', sans-serif; font-weight: 400;
+          font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+          color: rgb(20,20,20); text-decoration: none; white-space: nowrap; cursor: pointer;
+          transition: border-color 150ms, color 150ms, background 150ms;
         }
+        .nav-btn:hover { border-color: rgba(0,0,0,0.45); }
+        .nav-btn.solid { background: rgb(18,18,18); border-color: rgb(18,18,18); color: rgb(255,255,255); padding: 0 32px; }
+        .nav-btn.solid:hover { background: rgb(217,44,43); border-color: rgb(217,44,43); }
+        /* while typing, the links step back to plain grey text */
+        .nav.typing .nav-links .nav-btn:not(.solid) { border-color: transparent; background: transparent; color: rgba(0,0,0,0.38); }
+        .nav.typing .nav-links .nav-btn:not(.solid):hover { color: rgb(0,0,0); }
 
-        /* Search wrap — relative so dropdown anchors to it. Collapsed by
-           default (margin-left: auto hugs it + everything after it to the
-           right, next to the logo's empty space); .open drops the auto
-           margin and grows to fill that space with the full input row. */
-        .nav-search-wrap {
-          flex: 0 0 auto;
-          margin-left: auto;
-          position: relative;
-          display: flex; align-items: stretch;
-        }
-        .nav-search-wrap.open {
-          flex: 1 1 auto; min-width: 0; margin-left: 0;
-        }
-        .nav-search-trigger {
-          display: flex; align-items: center; gap: 8px;
-          background: none; border: none; cursor: pointer;
-          padding: 12px 14px; white-space: nowrap;
-          align-self: center; /* hug the label so its underline sits right under it */
-        }
-        .nav-search-wrap.open .nav-search-trigger { display: none; }
+        /* Search: a button at rest, a wide field when open */
+        .nav-search-wrap { flex: 0 0 auto; display: flex; }
+        .nav.search-open .nav-search-wrap { flex: 1 1 auto; min-width: 0; margin-right: 12px; }
+        .nav-search-trigger svg { flex-shrink: 0; }
         .nav-search-form {
-          display: none;
-          flex: 1; align-items: center;
-          height: 100%; padding: 0 14px; gap: 16px;
-          min-width: 0;
+          flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px;
+          height: 40px; padding: 0 20px;
+          border: 1px solid rgb(18,18,18); border-radius: 4px; background: rgb(255,255,255);
         }
-        .nav-search-wrap.open .nav-search-form {
-          display: flex;
-          border-bottom: 1px solid rgba(0,0,0,0.18);
-        }
+        .nav-search-icon { flex-shrink: 0; color: rgb(18,18,18); display: flex; }
         .nav-search-input {
-          flex: 1; min-width: 0;
-          border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgb(0,0,0);
+          flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+          font-family: 'Recursive', sans-serif; font-size: 14px; color: rgb(0,0,0);
         }
-        .nav-search-input::placeholder { color: rgba(0,0,0,0.35); }
-        .nav-search-btn {
-          flex-shrink: 0; background: none; border: none;
-          display: flex; align-items: center; justify-content: center;
-          cursor: pointer; color: rgba(0,0,0,0.4);
-          padding: 4px; transition: color 150ms;
-        }
-        .nav-search-btn:hover { color: rgb(217,44,43); }
-
-        /* Right-side submit label — "CAUTA", static regardless of what's
-           typed (per the reference design); red once there's a query. */
         .nav-search-go {
-          flex-shrink: 0; background: none; border: none; cursor: pointer;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(0,0,0,0.32);
-          transition: color 150ms;
+          flex-shrink: 0; background: none; border: none; cursor: pointer; padding: 0;
+          font-family: 'Oswald', 'Inter', sans-serif; font-size: 13px; letter-spacing: 0.22em;
+          text-transform: uppercase; color: rgb(20,20,20);
         }
-        .nav-search-go:hover, .nav-search-go.active { color: rgb(217,44,43); }
+        .nav-search-go:hover { color: rgb(217,44,43); }
 
-        /* ── Suggestions dropdown ── */
-        .nav-suggestions {
-          position: absolute;
-          top: calc(100% + 1px); left: 0; right: 0;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.09);
-          border-top: none;
-          border-radius: 0 0 6px 6px;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-          z-index: 200;
-          overflow: hidden;
-        }
+        .nav-links { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
-        /* Individual result row */
-        .nav-sug-item {
-          display: flex; align-items: center; gap: 12px;
-          padding: 8px 14px;
-          text-decoration: none;
-          cursor: pointer;
-          transition: background 100ms;
-          border-bottom: 1px solid rgba(0,0,0,0.04);
+        /* ── Completions panel (typing) ── */
+        .nav-panel {
+          position: absolute; top: 100%; left: var(--gutter); right: var(--gutter);
+          background: rgb(243,243,243);
+          border-top: 1px solid rgba(0,0,0,0.14); border-bottom: 1px solid rgba(0,0,0,0.14);
+          padding: 24px 0 28px;
         }
-        .nav-sug-item:last-of-type { border-bottom: none; }
-        .nav-sug-item:hover,
-        .nav-sug-item.active { background: rgb(246,246,246); }
-
-        /* Image box */
-        .nav-sug-img {
-          flex-shrink: 0;
-          width: 52px; height: 52px;
-          border-radius: 4px;
-          background: rgb(250,250,250);
-          border: 1px solid rgba(0,0,0,0.05);
-          position: relative;
-          overflow: hidden;
+        .nav-panel::before { /* grey reaches the window edges behind the panel */
+          content: ''; position: absolute; top: -1px; bottom: -29px; left: -100vw; right: -100vw;
+          background: rgb(243,243,243); z-index: -1;
         }
-        .nav-sug-img-placeholder {
-          width: 100%; height: 100%;
-          display: flex; align-items: center; justify-content: center;
-          color: rgba(0,0,0,0.15); font-size: 10px;
-          font-family: Recursive, sans-serif;
+        .nav-panel-list { list-style: none; padding-left: var(--indent, 0px); }
+        .nav-term {
+          display: flex; align-items: center; gap: 18px; padding: 6px 0;
+          font-family: 'Inter', sans-serif; font-size: 22px; line-height: 1.3; color: rgb(0,0,0);
         }
-
-        /* Text */
-        .nav-sug-text {
-          flex: 1; min-width: 0;
-          display: flex; flex-direction: column; gap: 2px;
+        .nav-term-x {
+          flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+          width: 28px; height: 28px; margin-left: 4px; border: none; background: none; cursor: pointer;
+          color: rgb(0,0,0); border-radius: 4px; transition: background 120ms;
         }
-        .nav-sug-brand {
-          font-family: 'Inter', sans-serif;
-          font-size: 9px; font-weight: 700;
-          letter-spacing: 0.09em; text-transform: uppercase;
-          color: rgba(0,0,0,0.38);
-        }
-        .nav-sug-model {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; font-weight: 500;
-          color: rgb(0,0,0); letter-spacing: -0.01em;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .nav-sug-cat {
-          font-family: 'Recursive', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.35);
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        /* Arrow icon */
-        .nav-sug-arrow {
-          flex-shrink: 0;
-          color: rgba(0,0,0,0.2);
-          transition: color 100ms, transform 100ms;
-        }
-        .nav-sug-item:hover .nav-sug-arrow,
-        .nav-sug-item.active .nav-sug-arrow {
-          color: rgba(0,0,0,0.5);
-          transform: translate(1px, -1px);
-        }
-
-        /* "See all results" footer row */
-        .nav-sug-footer {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 10px 14px;
-          background: rgb(249,249,249);
-          border-top: 1px solid rgba(0,0,0,0.06);
-          text-decoration: none;
-          transition: background 100ms;
-        }
-        .nav-sug-footer:hover { background: rgb(244,244,244); }
-        .nav-sug-footer-label {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
-        }
-        .nav-sug-footer-label strong {
-          color: rgb(0,0,0); font-weight: 600;
-        }
-        .nav-sug-footer-action {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.07em; text-transform: uppercase;
-          color: rgb(217,44,43);
-        }
-
-        /* Thin loading bar at top of dropdown */
-        .nav-sug-loading {
-          height: 2px;
+        .nav-term-x:hover { background: rgba(0,0,0,0.06); }
+        .nav-term-go { background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
+        .nav-term-go b { font-weight: 700; }
+        .nav-term.active .nav-term-go, .nav-term-go:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+        .nav-panel-loading {
+          position: absolute; top: -1px; left: 0; right: 0; height: 1px;
           background: linear-gradient(90deg, transparent 0%, rgb(217,44,43) 50%, transparent 100%);
-          background-size: 200% 100%;
-          animation: nav-sug-sweep 1s linear infinite;
+          background-size: 200% 100%; animation: nav-sweep 1s linear infinite;
         }
-        @keyframes nav-sug-sweep {
-          from { background-position: 100% 0; }
-          to   { background-position: -100% 0; }
-        }
+        @keyframes nav-sweep { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 
-        /* Right-side links */
-        .nav-links {
-          display: flex; align-items: center; gap: 20px;
-          flex-shrink: 0; margin-left: 20px;
-          position: relative;
+        /* ── Tablets: tighter buttons ── */
+        @media (max-width: 1180px) {
+          .nav-btn { padding: 0 14px; letter-spacing: 0.16em; }
+          .nav-btn.solid { padding: 0 20px; }
+          .nav-inner, .nav-links { gap: 8px; }
         }
-        /* Text links (Catalog, Branduri + the collapsed search
-           trigger) — thin underline sweeps in under the label on hover. */
-        .nav-link {
-          position: relative;
-          flex-shrink: 0; padding: 12px 14px;
-          background: transparent; color: rgba(0,0,0,0.55);
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.07em; text-transform: uppercase;
-          text-decoration: none; transition: color 150ms; white-space: nowrap;
-        }
-        .nav-link::after {
-          content: '';
-          position: absolute; left: 14px; right: 14px; bottom: 9px;
-          height: 1px; background: currentColor;
-          transform: scaleX(0); transform-origin: left;
-          transition: transform 200ms ease;
-        }
-        .nav-link:hover { color: rgb(0,0,0); }
-        .nav-link:hover::after { transform: scaleX(1); }
-        /* The search trigger keeps its underline — it reads as an input line. */
-        .nav-search-trigger::after { transform: scaleX(1); opacity: 0.35; transition: opacity 200ms ease; }
-        .nav-search-trigger:hover::after { opacity: 1; }
-        .nav-contact {
-          flex-shrink: 0; margin-left: 8px; padding: 8px 18px;
-          background: rgb(0,0,0); color: rgb(255,255,255);
-          border-radius: 2px; font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.07em; text-transform: uppercase;
-          text-decoration: none; transition: background 150ms; white-space: nowrap;
-        }
-        .nav-contact:hover { background: rgb(217,44,43); }
-
-        /* ── Mobile ── */
+        /* ── Phones: search opens as a row under the bar; links collapse ── */
         @media (max-width: 768px) {
-          .nav-search-trigger { display: none; }
-          .nav-search-wrap {
-            display: none;
-            position: absolute; top: var(--nav-h); left: 0; right: 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            background: rgb(255,255,255);
-            z-index: 99;
+          .nav-links .nav-btn:not(.solid) { display: none; }
+          .nav-btn { height: 36px; }
+          .nav-btn.solid { padding: 0 16px; font-size: 12px; letter-spacing: 0.16em; }
+          .nav-search-trigger { padding: 0; width: 40px; border-color: transparent; }
+          .nav-search-trigger span { display: none; }
+          .nav.search-open .nav-search-wrap {
+            position: absolute; top: 100%; left: 0; right: 0; margin: 0;
+            padding: 10px var(--gutter); background: rgb(255,255,255);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
           }
-          .nav-search-wrap.open { display: flex; flex-direction: column; margin-left: 0; }
-          .nav-search-wrap.open .nav-search-form { height: 48px; border-bottom: none; }
-          .nav-suggestions { border-radius: 0 0 6px 6px; }
-          .nav-search-toggle {
-            display: flex; align-items: center; justify-content: center;
-            width: 40px; height: 100%;
-            background: none; border: none; cursor: pointer;
-            color: rgba(0,0,0,0.5); margin-left: auto;
-          }
-          .nav-link { display: none; }
-          .nav-links { margin-left: 0; }
-          .nav-contact { padding: 7px 12px; font-size: 10px; }
-        }
-        @media (min-width: 769px) {
-          .nav-search-toggle { display: none; }
+          .nav.typing .nav-search-wrap { background: rgb(243,243,243); }
+          .nav.search-open .nav-logo { margin-right: auto; }
+          .nav-panel { top: calc(100% + 61px); padding: 12px 0 16px; }
+          .nav-panel-list { padding-left: 0; }
+          .nav-term { font-size: 17px; gap: 12px; }
         }
       `}</style>
 
-      <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
-        <div className="nav-inner">
-          {/* Logo */}
-          <Link href="/" className="nav-logo">
+      <nav ref={navRef} className={`nav${scrolled ? ' scrolled' : ''}${searchOpen ? ' search-open' : ''}${typing ? ' typing' : ''}`}>
+        <div ref={innerRef} className="nav-inner" style={{ ['--indent' as string]: `${indent + 12}px` }}>
+          <Link href="/" className="nav-logo" aria-label="Zona Scule — acasă">
             <svg width="120" height="23" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18.213 12.0338L30.8793 0.5C24.2231 0.503334 17.8019 3.0075 12.8326 7.53234L0 19.2162H13.7136L1.32144 30.5C7.62846 30.5 13.7038 28.0759 18.3403 23.7111L23.1138 19.2162L31 12.0338H18.213Z" fill="#D92C2B"/>
               <path d="M0 12.4575V0.506836H12.4901L0 12.4575Z" fill="#D92C2B"/>
@@ -406,128 +255,59 @@ export default function Nav() {
             </svg>
           </Link>
 
-          {/* Search + dropdown — wrap is relative so dropdown anchors here */}
-          <div ref={wrapRef} className={`nav-search-wrap${searchOpen ? ' open' : ''}`}>
-            <button
-              type="button"
-              className="nav-link nav-search-trigger"
-              onClick={() => { setSearchOpen(true); setTimeout(() => inputRef.current?.focus(), 50) }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-              Cauta
-            </button>
-            <form className="nav-search-form" onSubmit={handleSubmit}>
-              {q ? (
-                <button className="nav-search-btn" type="button" onClick={clearSearch} aria-label="Sterge cautarea">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M18 6 6 18M6 6l12 12"/>
-                  </svg>
-                </button>
-              ) : (
-                <button className="nav-search-btn" type="submit" aria-label="Cauta">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                  </svg>
-                </button>
-              )}
-              <input
-                ref={inputRef}
-                className="nav-search-input"
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onFocus={() => suggestions.length > 0 && setDropOpen(true)}
-                placeholder="cauta orice..."
-                autoComplete="off"
-                spellCheck={false}
-              />
-              <button
-                className={`nav-search-go${q.trim() ? ' active' : ''}`}
-                type="submit"
-              >
-                Cauta
+          <div ref={wrapRef} className="nav-search-wrap">
+            {searchOpen ? (
+              <form className="nav-search-form" onSubmit={handleSubmit} role="search">
+                <span className="nav-search-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></svg>
+                </span>
+                <input
+                  ref={inputRef}
+                  className="nav-search-input"
+                  value={q}
+                  onChange={e => { setQ(e.target.value); setDismissed([]); if (e.target.value.trim().length < 2) setTerms([]) }}
+                  onKeyDown={handleKeyDown}
+                  aria-label="Caută în catalog"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <button className="nav-search-go" type="submit">Cauta</button>
+              </form>
+            ) : (
+              <button type="button" className="nav-btn nav-search-trigger" onClick={openSearch} aria-label="Caută">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/></svg>
+                <span>Cauta</span>
               </button>
-            </form>
-
-            {/* Dropdown */}
-            {dropOpen && (
-              <div className="nav-suggestions" role="listbox">
-                {fetching && <div className="nav-sug-loading" />}
-
-                {suggestions.map((s, i) => (
-                  <div
-                    key={s.slug}
-                    className={`nav-sug-item${i === activeIdx ? ' active' : ''}`}
-                    role="option"
-                    aria-selected={i === activeIdx}
-                    onMouseEnter={() => setActiveIdx(i)}
-                    onMouseLeave={() => setActiveIdx(-1)}
-                    onClick={() => navigateTo(s.slug)}
-                  >
-                    {/* Image */}
-                    <div className="nav-sug-img">
-                      {s.img ? (
-                        <Image
-                          src={s.img}
-                          alt={s.model ?? ''}
-                          fill
-                          sizes="52px"
-                          style={{ objectFit: 'contain', padding: '6px' }}
-                        />
-                      ) : (
-                        <div className="nav-sug-img-placeholder">—</div>
-                      )}
-                    </div>
-
-                    {/* Text */}
-                    <div className="nav-sug-text">
-                      {s.brand && <span className="nav-sug-brand">{s.brand}</span>}
-                      <span className="nav-sug-model">{s.model}</span>
-                      {s.category && <span className="nav-sug-cat">{s.category}</span>}
-                    </div>
-
-                    {/* Arrow */}
-                    <svg className="nav-sug-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                    </svg>
-                  </div>
-                ))}
-
-                {/* Footer — full results link */}
-                <Link
-                  href={`/produse?q=${encodeURIComponent(q.trim())}`}
-                  className="nav-sug-footer"
-                  onClick={() => { setDropOpen(false); setQ('') }}
-                >
-                  <span className="nav-sug-footer-label">
-                    Cauta <strong>&ldquo;{q.trim()}&rdquo;</strong> in toate produsele
-                  </span>
-                  <span className="nav-sug-footer-action">Vezi toate →</span>
-                </Link>
-              </div>
             )}
           </div>
 
-          {/* Mobile search toggle */}
-          <button
-            className="nav-search-toggle"
-            onClick={() => { setSearchOpen(v => !v); setTimeout(() => inputRef.current?.focus(), 50) }}
-            aria-label="Cauta"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-          </button>
-
-          {/* Right links */}
           <div className="nav-links">
-            <Link href="/produse" className="nav-link">Catalog</Link>
-            <Link href="/zona-solutii" className="nav-link">Zona Soluții</Link>
-            <Link href="/branduri" className="nav-link">Branduri</Link>
-            <Link href="/contact" className="nav-contact">Contact</Link>
+            <Link href="/produse" className="nav-btn">Catalog</Link>
+            <Link href="/branduri" className="nav-btn">Branduri</Link>
+            <Link href="/zona-solutii" className="nav-btn">Zona Soluții</Link>
+            <Link href="/contact" className="nav-btn solid">Contact</Link>
           </div>
+
+          {panelOpen && (
+            <div className="nav-panel" role="listbox" aria-label="Sugestii de căutare">
+              {fetching && <div className="nav-panel-loading" />}
+              <ul className="nav-panel-list">
+                {shown.map((t, i) => {
+                  const [typed, rest] = split(t)
+                  return (
+                    <li key={t} className={`nav-term${i === activeIdx ? ' active' : ''}`} role="option" aria-selected={i === activeIdx} onMouseEnter={() => setActiveIdx(i)}>
+                      <button type="button" className="nav-term-x" aria-label={`Ascunde „${t}”`} onClick={() => setDismissed(d => [...d, t])}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                      <button type="button" className="nav-term-go" onClick={() => go(t)}>
+                        {typed}<b>{rest}</b>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       </nav>
     </>
