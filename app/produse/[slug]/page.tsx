@@ -197,7 +197,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           letter-spacing: 0.1em; text-transform: uppercase;
           color: rgba(0,0,0,0.35); margin-bottom: 24px;
         }
-        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         /* #9: info cards — 96px top, 32px bottom */
         .info-card {
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.06);

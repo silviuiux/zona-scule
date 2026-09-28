@@ -4,9 +4,10 @@ import { submitContactMessage } from './actions'
 
 /**
  * "Fill-in-the-sentence" contact form: the request reads as one letter —
- * "Mă numesc ___ și sunt interesat să obțin o ofertă personalizată pentru
- * ___. Vă rog să mă contactați la ___ / ___" — with the inputs sitting on
- * the text's underlines, typed values in red Neuton. The sentence itself
+ * "Mă numesc ___ și sunt interesat să obțin o ofertă pentru / ___ (produse
+ * și cantități) / ___ (mesaj) / Vă rog să mă contactați la: tel ___
+ * email ___" — with the inputs sitting on the text's underlines, typed
+ * values in red Neuton. The sentence itself
  * becomes the message sent through submitContactMessage (same pipeline as
  * before: contact_messages row + office email).
  */
@@ -23,6 +24,7 @@ export default function ContactForm({
   const [form, setForm] = useState({
     nume: '',
     produs: prefilledProduct,
+    mesaj: '',
     telefon: '',
     email: '',
   })
@@ -31,7 +33,7 @@ export default function ContactForm({
   const [error, setError] = useState<string | null>(null)
 
   const set = (k: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,7 +50,11 @@ export default function ContactForm({
       email: form.email,
       telefon: form.telefon,
       produs: form.produs,
-      mesaj: `Mă numesc ${form.nume.trim()} și sunt interesat să obțin o ofertă personalizată pentru ${form.produs.trim()}. Vă rog să mă contactați la ${contact}.`,
+      mesaj: [
+        `Mă numesc ${form.nume.trim()} și sunt interesat să obțin o ofertă pentru ${form.produs.trim()}.`,
+        form.mesaj.trim(),
+        `Vă rog să mă contactați la: ${contact}.`,
+      ].filter(Boolean).join('\n\n'),
     })
     setSending(false)
     if (res.ok) setSent(true)
@@ -66,57 +72,52 @@ export default function ContactForm({
           padding: clamp(24px, 5vh, 64px) 0;
           border-bottom: 1px solid rgba(0,0,0,0.12);
         }
-        /* Compact letter on the left 60% — the rest of the full-width
-           section is open space. No panel by default; a hairline outline
-           frames it only while a field is being filled in. */
-        .cf-panel {
-          width: 60%;
-          border: 1px solid transparent;
-          border-radius: 4px;
-          padding: clamp(16px, 3.5vh, 40px) clamp(24px, 3vw, 40px);
-          transition: border-color 250ms ease;
-        }
-        .cf-panel:focus-within { border-color: rgba(0,0,0,0.12); }
+        /* The letter sits straight on the container margin — no panel. */
+        .cf-panel { width: 60%; }
         .cf-eyebrow { margin-bottom: 16px; }
         .cf-title {
           font-family: 'Neuton', serif; font-weight: 400;
           font-size: clamp(36px, 3.4vw, 48px); line-height: 1; letter-spacing: -0.015em;
           color: rgb(0,0,0);
-          margin-bottom: clamp(24px, 4.5vh, 48px);
+          margin-bottom: clamp(24px, 4.5vh, 44px);
         }
 
         /* The sentence */
         .cf-letter {
           font-family: 'Montserrat', sans-serif; font-weight: 400;
-          font-size: clamp(17px, 1.4vw, 20px); line-height: 1.3;
+          font-size: clamp(15px, 1.15vw, 17px); line-height: 1.3;
           color: rgb(30,30,30);
-          display: flex; flex-direction: column; gap: clamp(12px, 2.2vh, 22px);
+          display: flex; flex-direction: column; gap: clamp(10px, 1.8vh, 18px);
         }
-        .cf-line { display: flex; align-items: flex-end; flex-wrap: wrap; column-gap: 12px; row-gap: 8px; }
+        .cf-line { display: flex; align-items: flex-end; flex-wrap: wrap; column-gap: 10px; row-gap: 8px; }
         .cf-line > span { padding-bottom: 5px; white-space: nowrap; }
+        .cf-line.gap-top { margin-top: clamp(6px, 1.2vh, 12px); }
         .cf-input {
-          flex: 1 1 200px; min-width: 0;
+          flex: 1 1 180px; min-width: 0;
           border: none; border-bottom: 1px solid rgba(0,0,0,0.25); border-radius: 0;
           background: transparent; outline: none;
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(19px, 1.55vw, 22px); line-height: 1.3;
+          font-size: clamp(17px, 1.3vw, 19px); line-height: 1.3;
           color: rgb(217,44,43);
-          padding: 0 0 4px 8px;
+          padding: 0 0 4px 6px;
           transition: border-color 150ms;
         }
-        .cf-input.name { flex: 0 1 34%; min-width: 180px; }
+        .cf-input.name { flex: 0 1 30%; min-width: 160px; }
+        .cf-input.email { flex: 2 1 220px; }
         .cf-input.full { padding-left: 0; }
+        .cf-input.msg { resize: none; overflow: hidden; field-sizing: content; min-height: 1.3em; }
         .cf-input::placeholder { color: rgba(0,0,0,0.22); }
         .cf-input:focus { border-bottom-color: rgb(217,44,43); }
+        .cf-label { color: rgba(0,0,0,0.45); }
 
         .cf-foot {
-          margin-top: clamp(24px, 4.5vh, 48px); padding-top: clamp(16px, 2.5vh, 24px);
+          margin-top: clamp(24px, 4.5vh, 44px); padding-top: clamp(16px, 2.5vh, 24px);
           border-top: 1px solid rgba(0,0,0,0.06);
           display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
         }
         .cf-note {
           font-family: 'Montserrat', sans-serif; font-weight: 400;
-          font-size: 14px; line-height: 1.5;
+          font-size: 13px; line-height: 1.5;
           color: rgba(0,0,0,0.5); max-width: 34ch;
         }
         .cf-error { font-family: 'Montserrat', sans-serif; font-size: 13px; color: rgb(217,44,43); margin-top: 8px; }
@@ -139,8 +140,8 @@ export default function ContactForm({
         }
         .cf-submit:hover .cf-submit-icon { transform: translateX(3px); }
 
-        .cf-thanks { font-family: 'Montserrat', sans-serif; font-size: 20px; line-height: 1.4; color: rgb(30,30,30); max-width: 34ch; }
-        .cf-thanks em { font-style: normal; font-family: 'Neuton', serif; font-size: 22px; color: rgb(217,44,43); }
+        .cf-thanks { font-family: 'Montserrat', sans-serif; font-size: 18px; line-height: 1.4; color: rgb(30,30,30); max-width: 34ch; }
+        .cf-thanks em { font-style: normal; font-family: 'Neuton', serif; font-size: 20px; color: rgb(217,44,43); }
 
         @media (max-width: 1100px) { .cf-panel { width: 80%; } }
         @media (max-width: 768px) {
@@ -168,20 +169,25 @@ export default function ContactForm({
                 <span>Mă numesc</span>
                 <input className="cf-input name" required autoComplete="name" aria-label="Nume"
                   placeholder="numele dumneavoastră" value={form.nume} onChange={set('nume')} />
-                <span>și sunt interesat să obțin o ofertă</span>
+                <span>și sunt interesat să obțin o ofertă pentru</span>
               </div>
               <div className="cf-line">
-                <span>personalizată pentru</span>
-                <input className="cf-input" required aria-label="Produse de interes"
-                  placeholder="produsele sau cantitățile dorite" value={form.produs} onChange={set('produs')} />
+                <input className="cf-input full" required aria-label="Produse și cantități"
+                  placeholder="produsele și cantitățile dorite" value={form.produs} onChange={set('produs')} />
               </div>
               <div className="cf-line">
-                <span>Vă rog să mă contactați la</span>
+                <textarea className="cf-input full msg" rows={1} aria-label="Mesaj"
+                  placeholder="mesaj (opțional)" value={form.mesaj} onChange={set('mesaj')} />
+              </div>
+              <div className="cf-line gap-top">
+                <span>Vă rog să mă contactați la:</span>
+              </div>
+              <div className="cf-line">
+                <span className="cf-label">tel:</span>
                 <input className="cf-input" type="tel" autoComplete="tel" aria-label="Telefon"
                   placeholder="telefon" value={form.telefon} onChange={set('telefon')} />
-              </div>
-              <div className="cf-line">
-                <input className="cf-input full" type="email" required autoComplete="email" aria-label="Email"
+                <span className="cf-label">email:</span>
+                <input className="cf-input email" type="email" required autoComplete="email" aria-label="Email"
                   placeholder="adresa de e-mail" value={form.email} onChange={set('email')} />
               </div>
             </div>

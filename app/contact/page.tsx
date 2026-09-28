@@ -41,21 +41,21 @@ export default function ContactPage({
         .contact-section { margin-top: var(--space-section); scroll-margin-top: 96px; }
 
         /* ── Info bar ── */
+        /* Info boxes — separate cards on a 16px gutter */
         .contact-info-bar {
           margin-top: 56px; /* close under the hero so the cards peek above the fold */
           display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 0;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          gap: 16px;
         }
         .info-card {
           padding: 32px;
-          border-right: 1px solid rgba(0,0,0,0.08);
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.08);
           display: flex; flex-direction: column; gap: 8px;
           text-decoration: none;
+          transition: border-color 150ms;
         }
-        .info-card:nth-child(n+2) { padding-left: 16px; }
-        .info-card:last-child { border-right: none; }
+        a.info-card:hover { border-color: rgba(217,44,43,0.3); }
         .info-label {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
           font-size: 10.5px; font-weight: 500;
@@ -128,15 +128,17 @@ export default function ContactPage({
         }
         .about-facts {
           display: grid; grid-template-columns: repeat(3, 1fr);
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
+          gap: 16px;
         }
         .about-fact {
           padding: 32px;
-          border-right: 1px solid rgba(0,0,0,0.08);
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.08);
           display: flex; flex-direction: column; gap: 12px;
+          text-decoration: none;
         }
-        .about-fact:last-child { border-right: none; }
+        a.about-fact { transition: border-color 150ms; }
+        a.about-fact:hover { border-color: rgba(217,44,43,0.3); }
         .about-fact-value {
           font-family: 'Neuton', serif;
           font-size: 48px; line-height: 1; color: rgb(217,44,43);
@@ -151,11 +153,7 @@ export default function ContactPage({
           .contact-page { --space-section: 88px; }
           .about-grid { grid-template-columns: 1fr; gap: 24px; }
           .about-facts { grid-template-columns: 1fr; }
-          .about-fact { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
-          .about-fact:last-child { border-bottom: none; }
           .contact-info-bar { grid-template-columns: 1fr; }
-          .info-card { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
-          .info-card:last-child { border-bottom: none; }
           .contact-map { height: 360px; }
         }
       `}</style>
@@ -233,10 +231,15 @@ export default function ContactPage({
                 <span className="about-fact-value">S.E.A.P.</span>
                 <span className="about-fact-label">Furnizor înregistrat pentru achiziții publice</span>
               </div>
-              <div className="about-fact">
-                <span className="about-fact-value">08:30–17:00</span>
-                <span className="about-fact-label">Luni – Vineri, Strada Sfânta Vineri 28, Pitești</span>
-              </div>
+              <a
+                href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-fact"
+              >
+                <span className="about-fact-value">Pitești</span>
+                <span className="about-fact-label">Strada Sfânta Vineri 28 · 110024 · deschide în Google Maps ↗</span>
+              </a>
             </div>
           </section>
 

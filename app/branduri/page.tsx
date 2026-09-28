@@ -14,22 +14,14 @@ export const metadata: Metadata = {
   description: 'Toate brandurile disponibile în catalogul Zona Scule — de la Bosch și Milwaukee la Karcher, PFERD, Osborn și RUKO.',
 }
 
-// Featured brands get their own "premium picks" widget — a banner image
-// above a random sample of that brand's most expensive products (see
-// getRandomExpensiveProductsByBrand). `name` must match products.brand_name
-// exactly (case-sensitive).
-const PROMOTED_BRANDS = [
-  { name: 'BOSCH', label: 'Bosch' },
-  { name: 'Milwaukee', label: 'Milwaukee' },
-  { name: 'Karcher', label: 'Karcher' },
-  { name: 'KRAUSE', label: 'Krause' },
-]
-
+// Featured brands — for now, the ones with a logo (see getBrandLogo) —
+// span two columns in the grid and each get a "premium picks" section: a
+// tall banner above a random sample of that brand's most expensive products
+// (getRandomExpensiveProductsByBrand, matched on products.brand_name).
 export default async function BranduriPage() {
-  const [brands, promotedGroups] = await Promise.all([
-    getBrands(),
-    Promise.all(PROMOTED_BRANDS.map(b => getRandomExpensiveProductsByBrand(b.name))),
-  ])
+  const brands = await getBrands()
+  const featured = brands.filter(b => getBrandLogo(b.name))
+  const promotedGroups = await Promise.all(featured.map(b => getRandomExpensiveProductsByBrand(b.name)))
 
   return (
     <>
@@ -57,12 +49,14 @@ export default async function BranduriPage() {
         }
         .branduri-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 12px;
-          margin-bottom: 72px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-auto-flow: dense; /* backfill the holes the wide cards leave */
+          gap: 16px;
+          margin-bottom: var(--space-section);
         }
         .branduri-card {
           display: flex; flex-direction: column; gap: 6px;
+          min-height: 150px;
           padding: 20px 22px;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
@@ -79,6 +73,10 @@ export default async function BranduriPage() {
           object-fit: contain; object-position: left center;
           margin-bottom: 4px;
         }
+        /* Featured (logo) brands span two columns, logo up front */
+        .branduri-card.wide { grid-column: span 2; justify-content: space-between; }
+        .branduri-card.wide .branduri-card-logo { height: 44px; max-width: 60%; margin-bottom: 20px; }
+        .branduri-card.wide .branduri-card-name { font-size: 17px; }
         .branduri-card-name {
           font-family: 'Inter', sans-serif;
           font-size: 15px; font-weight: 600;
@@ -90,18 +88,22 @@ export default async function BranduriPage() {
         }
 
         /* ── Promoted brand widgets (banner + carousel) ── */
-        .branduri-promoted { margin-bottom: 64px; }
+        .branduri-promoted { margin-bottom: var(--space-section); }
+        .branduri-promoted:last-child { margin-bottom: 0; }
         .branduri-promoted-banner {
-          position: relative; width: 100%; height: 25vh; min-height: 200px; max-height: 340px;
-          border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+          position: relative; width: 100%; height: 55vh; min-height: 320px; max-height: 620px;
+          border-radius: 10px; overflow: hidden; margin-bottom: 40px;
           background: rgb(238,238,238);
         }
         .branduri-promoted-head {
-          display: flex; align-items: baseline; justify-content: space-between;
-          margin-bottom: 14px;
+          display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+          margin-bottom: 24px;
         }
+        .branduri-promoted-heading { display: flex; flex-direction: column; gap: 16px; }
+        .branduri-promoted-logo { display: block; height: 36px; width: auto; object-fit: contain; object-position: left center; }
         .branduri-promoted-title {
-          font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(32px, 3.4vw, 52px); line-height: 1; letter-spacing: -0.015em;
           color: rgb(0,0,0);
         }
         .branduri-promoted-link {
@@ -111,7 +113,7 @@ export default async function BranduriPage() {
         }
         .branduri-promoted-link:hover { color: rgb(217,44,43); }
         .branduri-promoted-scroll {
-          display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
+          display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
           scroll-snap-type: x mandatory; scrollbar-width: thin;
         }
         .branduri-promoted-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
@@ -119,6 +121,13 @@ export default async function BranduriPage() {
         .branduri-grid-title {
           font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
           color: rgb(0,0,0); margin-bottom: 14px;
+        }
+        @media (max-width: 900px) {
+          .branduri-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 768px) {
+          .branduri-promoted-banner { height: 40vh; min-height: 220px; margin-bottom: 24px; }
+          .branduri-promoted-logo { height: 28px; }
         }
       `}</style>
 
@@ -132,7 +141,7 @@ export default async function BranduriPage() {
             {brands.map(b => {
               const logo = getBrandLogo(b.name)
               return (
-                <Link key={b.id} href={getBrandHref(b.name)} className="branduri-card">
+                <Link key={b.id} href={getBrandHref(b.name)} className={`branduri-card${logo ? ' wide' : ''}`}>
                   {logo && (
                     <Image
                       src={logo.src}
@@ -149,7 +158,7 @@ export default async function BranduriPage() {
             })}
           </div>
 
-          {PROMOTED_BRANDS.map((b, i) => {
+          {featured.map((b, i) => {
             const group = promotedGroups[i]
             if (group.length === 0) return null
             // Banner is deliberately NOT the main product shot — the first
@@ -157,6 +166,7 @@ export default async function BranduriPage() {
             // an in-context/application photo than a plain catalog cutout.
             // Skips the banner (keeps the carousel) if none of them have one.
             const bannerProduct = group.find(p => p.gallery_url_1)
+            const logo = getBrandLogo(b.name)
             return (
               <div key={b.name} className="branduri-promoted">
                 {bannerProduct?.gallery_url_1 && (
@@ -171,7 +181,12 @@ export default async function BranduriPage() {
                   </div>
                 )}
                 <div className="branduri-promoted-head">
-                  <span className="branduri-promoted-title">{b.label} — selecție premium</span>
+                  <div className="branduri-promoted-heading">
+                    {logo && (
+                      <Image src={logo.src} alt={logo.alt ?? b.name} width={logo.width} height={logo.height} className="branduri-promoted-logo" />
+                    )}
+                    <h2 className="branduri-promoted-title">Selecție premium {b.name}</h2>
+                  </div>
                   <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot →</Link>
                 </div>
                 <div className="branduri-promoted-scroll">
