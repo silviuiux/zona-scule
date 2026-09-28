@@ -94,7 +94,7 @@ export default async function HomePage() {
            (HeroMark) — only where the title and search row leave it room. */
         .hero-mark-wrap {
           position: absolute; right: var(--gutter); bottom: -24px;
-          width: clamp(1140px, 93vw, 1620px); /* 3× — preview */
+          width: clamp(950px, 77.5vw, 1350px); /* 2.5× */
           pointer-events: none;
         }
         @media (max-width: 1199px) { .hero-mark-wrap { display: none; } }
