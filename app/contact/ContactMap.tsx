@@ -1,4 +1,6 @@
 import { CONTACT_MAP as M } from '@/lib/contact-map-data'
+
+const C = M.city
 import ContactMapScroller from './ContactMapScroller'
 
 /**
@@ -50,6 +52,19 @@ export default function ContactMap() {
         .cmap-svg .dr { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; stroke-linecap: round; stroke-linejoin: round; }
         .cmap-svg .st { stroke: rgba(0,0,0,0.26); stroke-width: calc(0.7px * var(--u, 1) * var(--w, 1)); }
         .cmap-svg .st.main { stroke: rgba(0,0,0,0.72); }
+        .cmap-svg .c-road { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.8px * var(--u, 1) * var(--w, 1)); }
+        .cmap-svg .c-road.a1 { stroke: rgba(0,0,0,0.5); }
+        /* river as two banks: a grey band with a paler core (widths in metres) */
+        .cmap-svg .c-river-band { stroke: rgba(0,0,0,0.16); stroke-width: 72; }
+        .cmap-svg .c-river-in { stroke: rgb(247,247,247); stroke-width: calc(72px - 2.4px * var(--u, 1)); }
+        .cmap-svg .c-river-band.thin { stroke-width: 44; }
+        .cmap-svg .c-river-in.thin { stroke-width: calc(44px - 2.4px * var(--u, 1)); }
+        .cmap-svg .c-park { stroke: rgba(0,0,0,0.22); stroke-width: calc(0.7px * var(--u, 1)); }
+        .cmap-svg .c-park-fill { fill: rgba(0,0,0,0.025); stroke: none; }
+        .cmap-svg .poi-dot { fill: rgba(0,0,0,0.45); }
+        .cmap-svg text.poi-label { font-size: 9.5px; fill: rgba(0,0,0,0.5); }
+        .cmap-svg text.road-label { font-size: 9px; fill: rgba(0,0,0,0.38); }
+        .cmap-svg text.water-label { font-size: 9px; font-style: italic; fill: rgba(0,0,0,0.35); letter-spacing: 0.3em; }
         .cmap-svg .water { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg .river { stroke: rgba(0,0,0,0.24); stroke-width: calc(1px * var(--u, 1)); }
         .cmap-svg .road { stroke: rgba(0,0,0,0.16); stroke-width: calc(0.8px * var(--u, 1)); }
@@ -116,7 +131,7 @@ export default function ContactMap() {
           .cmap { height: 280vh; }
           .cmap-svg { -webkit-mask-image: none; mask-image: none; }
           .cmap-foot { flex-direction: column; align-items: flex-start; }
-          .cmap-svg .city text { display: none; }
+          .cmap-svg .city text, .cmap-svg text.road-label, .cmap-svg text.water-label { display: none; }
         }
       `}</style>
 
@@ -162,31 +177,57 @@ export default function ContactMap() {
               </g>
             </g>
 
-            {/* 01 · the street */}
+            {/* 01 · Pitești around the shop: main roads, the A1 junction,
+                 the Argeș, parks and landmarks, the streets next door */}
             <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.33" data-out-e="0.42">
-              <path className="dr water" pathLength={1} d={M.water} data-k="draw" data-s="0.16" data-e="0.24" />
-              <g className="lbl" data-x={318} data-y={20} data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.31">
-                <text data-k="type" data-s="0.22" data-e="0.26" data-text="ARGEȘ" />
-              </g>
-              {M.streets.map((st, i) => {
-                const s = st.main ? 0.02 : 0.05 + i * 0.012
+              <path className="dr c-river-band" pathLength={1} d={C.arges} data-k="draw" data-s="0.02" data-e="0.12" />
+              <path className="dr c-river-in" pathLength={1} d={C.arges} data-k="draw" data-s="0.02" data-e="0.12" />
+              <path className="dr c-river-band thin" pathLength={1} d={C.doamnei} data-k="draw" data-s="0.06" data-e="0.12" />
+              <path className="dr c-river-in thin" pathLength={1} d={C.doamnei} data-k="draw" data-s="0.06" data-e="0.12" />
+              <path className="dr c-park" pathLength={1} d={C.parks} data-k="draw" data-s="0.14" data-e="0.2" />
+              <path className="c-park-fill" d={C.parks} data-k="fade" data-s="0.18" data-e="0.22" />
+              <path className="dr c-park" pathLength={1} d={C.vivo} data-k="draw" data-s="0.16" data-e="0.19" />
+              {C.roads.map((r, i) => {
+                const s = r.id === 'a1' ? 0.03 : 0.05 + i * 0.012
+                return (
+                  <path key={r.id} className={`dr c-road${r.id === 'a1' ? ' a1' : ''}`} pathLength={1} d={r.d}
+                    style={{ ['--w' as string]: r.w }} data-k="draw" data-s={s.toFixed(3)} data-e={(s + 0.08).toFixed(3)} />
+                )
+              })}
+              <circle className="dr c-road" pathLength={1} cx={C.junction[0]} cy={C.junction[1]} r="70" style={{ ['--w' as string]: 1 }} data-k="draw" data-s="0.12" data-e="0.15" />
+              {M.streets.filter(st => st.id !== 'dn65').map((st, i) => {
+                const s = st.main ? 0.08 : 0.1 + i * 0.008
                 return (
                   <path key={st.id} className={`dr st${st.main ? ' main' : ''}`} pathLength={1} d={st.d}
-                    style={{ ['--w' as string]: st.w }} data-k="draw" data-s={s.toFixed(3)} data-e={(s + (st.main ? 0.07 : 0.08)).toFixed(3)} />
+                    style={{ ['--w' as string]: st.w }} data-k="draw" data-s={s.toFixed(3)} data-e={(s + 0.06).toFixed(3)} />
                 )
               })}
+
+              {/* labels leave before the camera pulls out */}
               <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.31">
-              {M.streets.filter(st => st.label).map((st, i) => {
-                const s = st.main ? 0.08 : 0.13 + i * 0.01
-                return (
-                  <g key={st.id} className="lbl" data-x={st.lx} data-y={st.ly} data-a={st.ang}>
-                    <text className={st.main ? 'main' : undefined} textAnchor="middle" y="-7" data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.04).toFixed(3)} data-text={st.label} />
-                  </g>
-                )
-              })}
-              </g>
-              <g transform={`translate(${M.church[0]} ${M.church[1]})`} data-k="fade" data-s="0.2" data-e="0.24">
-                <path className="st" d="M0 -5 V5 M-3.5 -1.5 H3.5" style={{ ['--w' as string]: 1.2 }} />
+                {C.roads.filter(r => r.label).map((r, i) => {
+                  const s = 0.12 + i * 0.008
+                  return (
+                    <g key={r.id} className="lbl" data-x={r.lx} data-y={r.ly} data-a={r.ang}>
+                      <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.04).toFixed(3)} data-text={r.label} />
+                    </g>
+                  )
+                })}
+                <g className="lbl" data-x={C.argesLabel.lx} data-y={C.argesLabel.ly} data-a={C.argesLabel.ang}>
+                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.14" data-e="0.18" data-text="RÂUL ARGEȘ" />
+                </g>
+                <g className="lbl" data-x={C.doamneiLabel.lx} data-y={C.doamneiLabel.ly} data-a={C.doamneiLabel.ang}>
+                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.15" data-e="0.19" data-text="RÂUL DOAMNEI" />
+                </g>
+                {C.pois.map((poi, i) => {
+                  const s = 0.14 + i * 0.01
+                  return (
+                    <g key={poi.name} className="lbl" data-x={poi.at[0]} data-y={poi.at[1]} data-k="fade" data-s={s.toFixed(3)} data-e={(s + 0.02).toFixed(3)}>
+                      <circle className="poi-dot" r="2.4" />
+                      <text className="poi-label" x={poi.dx} y={poi.dy} textAnchor={poi.anchor as 'start' | 'middle' | 'end'} data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.03).toFixed(3)} data-text={poi.name} />
+                    </g>
+                  )
+                })}
               </g>
             </g>
 
@@ -212,8 +253,8 @@ export default function ContactMap() {
           <div className="cmap-foot">
             <div className="cmap-readout">
               <div className="cmap-stages" data-role="stages">
-                <span className="on">01 Strada</span>
-                <span>02 Pitești</span>
+                <span className="on">01 Pitești</span>
+                <span>02 Argeș</span>
                 <span>03 România</span>
               </div>
               <div className="cmap-scale">

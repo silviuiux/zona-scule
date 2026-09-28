@@ -64,6 +64,10 @@ export default function ContactMapScroller({ children }: { children: React.React
       const p = run > 0 ? clamp01(-r.top / run) : 0
       const W = svg.clientWidth || 1, H = svg.clientHeight || 1
       const cam = camera(p)
+      // narrow screens start closer in on the neighbourhood, then join the
+      // shared framing as the camera pulls out
+      const near = Math.max(0.5, Math.min(1, W / 1100))
+      if (near < 1) cam.w *= near + (1 - near) * clamp01((p - 0.28) / 0.2)
       // slice-fit: the view is cam.w wide, or taller if the box is tall
       const vw = Math.max(cam.w, (cam.w * 0.62) * (W / H))
       const vh = vw * (H / W)
