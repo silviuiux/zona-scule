@@ -28,12 +28,24 @@ export type SolutionSection =
   | { kind: 'howto'; title: string; steps: { title: string; text: string }[] }
   /** A call to action (B2B: offers, S.E.A.P., visits). */
   | { kind: 'cta'; title: string; text: string; label: string; href: string }
+  /** Product stories: the product itself — image, short description, key
+   *  features (all live from the catalog) and a link to its page. */
+  | { kind: 'product' }
+  /** Product stories: the manufacturer's application photos. */
+  | { kind: 'gallery'; title: string }
+  /** Product stories: a curated spec sheet, in groups. */
+  | { kind: 'specs'; title: string; groups: { name: string; rows: [string, string][] }[]; note?: string }
+  /** Strengths and things to know. */
+  | { kind: 'proscons'; pros: string[]; cons: string[] }
+  /** The verdict, and who the product is for. */
+  | { kind: 'verdict'; text: string; forWho: string[] }
 
-export type SolutionType = 'meserie' | 'ghid' | 'proiect'
+export type SolutionType = 'meserie' | 'ghid' | 'proiect' | 'produs'
 export const SOLUTION_TYPES: { id: SolutionType; label: string; eyebrow: string }[] = [
   { id: 'meserie', label: 'Meserii și industrii', eyebrow: 'Soluții pe domenii' },
   { id: 'ghid', label: 'Cum alegi', eyebrow: 'Ghiduri de alegere' },
   { id: 'proiect', label: 'Proiecte', eyebrow: 'Liste de scule pe proiect' },
+  { id: 'produs', label: 'Produse în detaliu', eyebrow: 'Prezentări de produs' },
 ]
 
 export type Solution = {
@@ -47,6 +59,10 @@ export type Solution = {
   /** Full hero title instead of "Zona {profession}" — guides and projects,
    *  whose H1 should read like the search it answers. */
   title?: string
+  /** Product stories: the catalog product (products.slug) they present. */
+  product?: string
+  /** Hero numbers instead of the catalog counts: [value, label]. */
+  heroStats?: [string, string][]
   /** Eyebrow / card label. */
   domain: string
   headline: string
@@ -61,6 +77,7 @@ export const solutionSubs = (s: Solution) =>
   [...new Set(s.sections.flatMap(x => (x.kind === 'carousel' ? x.subs : [])))]
 
 import { MORE_SOLUTIONS } from './solutions-more'
+import { PRODUCT_SOLUTIONS } from './solutions-products'
 
 const TEAM = 'Echipa tehnică Zona Scule'
 
@@ -317,6 +334,6 @@ const BASE_SOLUTIONS: Solution[] = [
   },
 ]
 
-export const SOLUTIONS: Solution[] = [...BASE_SOLUTIONS, ...MORE_SOLUTIONS]
+export const SOLUTIONS: Solution[] = [...BASE_SOLUTIONS, ...MORE_SOLUTIONS, ...PRODUCT_SOLUTIONS]
 
 export const getSolution = (slug: string) => SOLUTIONS.find(s => s.slug === slug) ?? null

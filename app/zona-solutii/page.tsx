@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { SOLUTIONS, SOLUTION_TYPES, solutionSubs } from '@/lib/solutions'
-import { getBrandsBySubcategories, getApplicationImage } from '@/lib/supabase'
+import { getBrandsBySubcategories, getApplicationImage, getProductDetail } from '@/lib/supabase'
 import { SOLUTIONS_CSS } from './styles'
 
 export const revalidate = 3600
@@ -20,7 +20,10 @@ const n = (v: number) => v.toLocaleString('ro-RO')
 export default async function ZonaSolutiiPage() {
   const data = await Promise.all(SOLUTIONS.map(async s => {
     const subs = solutionSubs(s)
-    const [brands, image] = await Promise.all([getBrandsBySubcategories(subs), getApplicationImage(subs)])
+    const [brands, image] = await Promise.all([
+      getBrandsBySubcategories(subs),
+      s.product ? getProductDetail(s.product).then(p => p?.applicationImages[0] ?? null) : getApplicationImage(subs),
+    ])
     return { s, image, products: brands.reduce((a, b) => a + b.cnt, 0), brands: brands.length, names: brands.map(b => b.brand_name) }
   }))
   const allBrands = new Set(data.flatMap(d => d.names))

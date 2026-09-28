@@ -6,7 +6,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { SOLUTIONS, SOLUTION_TYPES, getSolution, solutionSubs, type SolutionSection } from '@/lib/solutions'
-import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImage } from '@/lib/supabase'
+import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImage, getProductDetail } from '@/lib/supabase'
 import { getBrandHref } from '@/lib/brand-content'
 import { SOLUTIONS_CSS } from '../styles'
 
@@ -34,11 +34,14 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
   const subs = solutionSubs(story)
   const carousels = story.sections.filter((x): x is Extract<SolutionSection, { kind: 'carousel' }> => x.kind === 'carousel')
-  const [brands, image, rows] = await Promise.all([
+  const [brands, image, rows, product] = await Promise.all([
     getBrandsBySubcategories(subs),
     story.sections.some(x => x.kind === 'image') ? getApplicationImage(subs) : Promise.resolve(null),
     Promise.all(carousels.map(c => getProductsBySubcategories(c.subs))),
+    story.product ? getProductDetail(story.product) : Promise.resolve(null),
   ])
+  const features = (product?.special_features ?? '').split('|').map(f => f.trim()).filter(Boolean)
+  const productImage = product ? (product.main_image_storage_url || product.main_image_url) : null
   const rowOf = new Map(carousels.map((c, i) => [c, rows[i]]))
   const totalProducts = brands.reduce((a, b) => a + b.cnt, 0)
   const faq = story.sections.find((x): x is Extract<SolutionSection, { kind: 'faq' }> => x.kind === 'faq')
@@ -202,6 +205,95 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             </div>
           </section>
         )
+      case 'product':
+        if (!product) return null
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-product">
+              <div className="zs-product-img">
+                {productImage && <Image src={productImage} alt={product.name} fill sizes="(max-width: 1024px) 100vw, 640px" style={{ objectFit: 'contain' }} priority />}
+              </div>
+              <div className="zs-product-body">
+                <span className="zs-card-domain">{product.brand_name}</span>
+                <h2 className="zs-product-name">{product.name}</h2>
+                {product.short_description && <p className="zs-product-short">{product.short_description}</p>}
+                {features.length > 0 && (
+                  <ul className="zs-product-features">
+                    {features.map(f => <li key={f}>{f}</li>)}
+                  </ul>
+                )}
+                <Link href={`/produse/${product.slug}`} className="zs-cta-btn zs-product-btn">Vezi produsul <span aria-hidden="true">→</span></Link>
+              </div>
+            </div>
+          </section>
+        )
+      case 'gallery': {
+        const imgs = product?.applicationImages ?? []
+        if (imgs.length === 0) return null
+        return (
+          <section key={i} className="zs-section">
+            <h2 className="zs-check-title">{sec.title}</h2>
+            <div className={`zs-gallery n${Math.min(imgs.length, 3)}`}>
+              {imgs.slice(0, 3).map((src, k) => (
+                <div key={src} className="zs-gallery-item">
+                  <Image src={src} alt={`${product?.name} — în lucru ${k + 1}`} fill sizes={k === 0 ? '(max-width: 1024px) 100vw, 900px' : '(max-width: 1024px) 50vw, 460px'} style={{ objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      }
+      case 'specs':
+        return (
+          <section key={i} className="zs-section">
+            <h2 className="zs-check-title">{sec.title}</h2>
+            <div className="zs-specs">
+              {sec.groups.map(g => (
+                <div key={g.name} className="zs-spec-group">
+                  <p className="zs-spec-group-name">{g.name}</p>
+                  <dl>
+                    {g.rows.map(([k, v]) => (
+                      <div key={k} className="zs-spec-row"><dt>{k}</dt><dd>{v}</dd></div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+            {sec.note && <p className="zs-compare-note">{sec.note}</p>}
+          </section>
+        )
+      case 'proscons':
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-proscons">
+              <div className="zs-pc">
+                <h2 className="zs-pc-title"><span className="zs-pc-mark plus">+</span> Puncte forte</h2>
+                <ul>{sec.pros.map(p => <li key={p}>{p}</li>)}</ul>
+              </div>
+              <div className="zs-pc">
+                <h2 className="zs-pc-title"><span className="zs-pc-mark">!</span> De știut</h2>
+                <ul>{sec.cons.map(p => <li key={p}>{p}</li>)}</ul>
+              </div>
+            </div>
+          </section>
+        )
+      case 'verdict':
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-verdict">
+              <div>
+                <span className="eyebrow-mono">Verdict</span>
+                <p className="zs-tip-text">{sec.text}</p>
+                <span className="zs-tip-by">— Analiza echipei tehnice Zona Scule</span>
+              </div>
+              <div className="zs-verdict-for">
+                <p className="zs-spec-group-name">Pentru cine</p>
+                <ul>{sec.forWho.map(w => <li key={w}>{w}</li>)}</ul>
+                {product && <Link href={`/produse/${product.slug}`} className="zs-car-link">Vezi produsul <span aria-hidden="true">→</span></Link>}
+              </div>
+            </div>
+          </section>
+        )
       case 'faq':
         return (
           <section key={i} className="zs-section">
@@ -240,12 +332,18 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               : <h1 className="zs-title"><span className="red">Zona</span><br />{story.profession}</h1>}
             <p className="zs-headline">{story.headline}</p>
             <p className="zs-sub">{story.excerpt}</p>
-            <div className="zs-stats">
+            {story.heroStats ? (
+              <div className="zs-stats">
+                {story.heroStats.map(([v, l]) => (
+                  <div key={l} className="zs-stat"><span className="zs-stat-num">{v}</span><span className="zs-stat-label">{l}</span></div>
+                ))}
+              </div>
+            ) : <div className="zs-stats">
               <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">{story.type === 'meserie' ? 'produse relevante' : 'produse recomandate'}</span></div>
               <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">branduri</span></div>
               <div className="zs-stat"><span className="zs-stat-num">{carousels.length}</span><span className="zs-stat-label">familii de produse</span></div>
-            </div>
-            {brands.length > 0 && (
+            </div>}
+            {brands.length > 0 && !story.product && (
               <div className="zs-brands">
                 {brands.slice(0, 6).map(b => (
                   <Link key={b.brand_name} href={getBrandHref(b.brand_name)} className="zs-brand">

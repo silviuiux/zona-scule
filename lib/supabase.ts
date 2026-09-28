@@ -1029,3 +1029,31 @@ export async function getApplicationImage(subs: string[]): Promise<string | null
   }
   return null
 }
+
+export type ProductDetail = {
+  slug: string; name: string; brand_name: string | null; short_description: string | null
+  special_features: string | null; main_image_url: string | null; main_image_storage_url: string | null
+  gallery: string[]; applicationImages: string[]
+}
+
+/** One product for a Zona Soluții product story: its image, texts and the
+ *  manufacturer's application photos (storage copies preferred). */
+export async function getProductDetail(slug: string): Promise<ProductDetail | null> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('slug, name, brand_name, short_description, special_features, main_image_url, main_image_storage_url, gallery_url_1, gallery_url_2, gallery_url_3, gallery_url_4, gallery_storage_url_1, gallery_storage_url_2, gallery_storage_url_3, gallery_storage_url_4')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (error || !data) return null
+  const r = data as Record<string, string | null>
+  const pairs = [1, 2, 3, 4].map(i => ({ src: r[`gallery_url_${i}`], stored: r[`gallery_storage_url_${i}`] }))
+  const gallery = pairs.map(p => p.stored || p.src).filter((u): u is string => !!u)
+  const applicationImages = pairs
+    .filter(p => p.src && /application/i.test(p.src) && !/VERTICAL/i.test(p.src))
+    .map(p => (p.stored || p.src) as string)
+  return {
+    slug: r.slug!, name: r.name!, brand_name: r.brand_name, short_description: r.short_description,
+    special_features: r.special_features, main_image_url: r.main_image_url, main_image_storage_url: r.main_image_storage_url,
+    gallery, applicationImages,
+  }
+}
