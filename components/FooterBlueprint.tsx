@@ -13,7 +13,7 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    type themselves out; the title block fills in under the logo;
  *  • a finale plays, then an "APROBAT" stamp with today's date lands.
  *
- * Four drawings (their SVGs are sized in CSS millimetres and the viewBox
+ * Six drawings (their SVGs are sized in CSS millimetres and the viewBox
  * units are the object's mm — 1:1, except the power drill at 1:2):
  *  - "nail" (?egg=nail): a Ø3,1 × 100 nail standing on a board section, which
  *    a hammer then drives in over four scroll-driven hits until only the
@@ -34,8 +34,15 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    battery down — with balloons, a parts list and a section B–B through
  *    the motor (12-slot stator, 4-pole rotor); finale: a test spin.
  *
+ *  - "caliper" (?egg=caliper): a 0–200 × 0,05 vernier caliper at 1:2; the
+ *    slider opens, a Ø50 bar is drawn in section between the jaws, they
+ *    close on it and the reading is dimensioned; finale: a second check.
+ *  - "level" (?egg=level): an 800 mm spirit level at 1:5, drawn 4° off
+ *    (bubble towards the high end), which settles level as you scroll;
+ *    finale: the bubble swings past the marks and settles.
+ *
  * Which one shows is shuffled on every page load (never the same one twice
- * in a row) between blade, drill and power — the nail is out of the shuffle
+ * in a row) between blade, drill, power, caliper and level — the nail is out of the shuffle
  * for now; ?egg=… forces any of them.
  *
  * Every drawable carries data-s / data-e — its slice of the 0..1 progress —
@@ -49,10 +56,10 @@ const RANGE = 2600 // px of extra scrolling from blank to fully drawn
 // then — they arrive with the footer, see `arrival`).
 const P0 = 0.05
 
-type Variant = 'nail' | 'blade' | 'drill' | 'power'
-const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power']
+type Variant = 'nail' | 'blade' | 'drill' | 'power' | 'caliper' | 'level'
+const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power', 'caliper', 'level']
 // In the page-load shuffle; the rest stay reachable with ?egg=…
-const SHUFFLED: Variant[] = ['blade', 'drill', 'power']
+const SHUFFLED: Variant[] = ['blade', 'drill', 'power', 'caliper', 'level']
 type Kind = 'draw' | 'grow' | 'pop' | 'fade' | 'type'
 type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; arrive: boolean; wrap: SVGGElement | null }
 
@@ -690,16 +697,176 @@ function PowerArt() {
   )
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// Vernier caliper — 0–200 mm, 0,05 mm (1:2; viewBox units are the caliper's mm)
+// ════════════════════════════════════════════════════════════════════════════
+const CAL_Z = 30 // measuring faces when closed
+const CAL_OPEN = 62 // how far the slider opens first
+const CAL_BAR = { x: 55, y: 112, r: 25 } // Ø50 round bar, in section
+const CAL_A = 4.4, CAL_H = 1.4 // arrowheads at 1:2
+const CAL_TICKS = (() => {
+  let d = ''
+  for (let i = 0; i <= 200; i++) d += `M${CAL_Z + i} 60 V${60 - (i % 10 === 0 ? 9 : i % 5 === 0 ? 6 : 3.5)} `
+  return d.trim()
+})()
+const CAL_VERNIER = (() => {
+  let d = ''
+  for (let k = 0; k <= 20; k++) d += `M${f2(CAL_Z + k * 1.95)} 60 V${k % 10 === 0 ? 66.5 : k % 2 === 0 ? 64.5 : 63} `
+  return d.trim()
+})()
+const CAL_HATCH = (() => {
+  let d = ''
+  for (let c = -50; c <= 50; c += 5) d += `M${CAL_BAR.x + c - 30} ${CAL_BAR.y + 30} L${CAL_BAR.x + c + 30} ${CAL_BAR.y - 30} `
+  return d.trim()
+})()
+// Slider travel for scroll progress p: open, hold while the bar is drawn,
+// then close onto it.
+function calOpening(p: number) {
+  if (p < 0.5) return 0
+  if (p < 0.58) return CAL_OPEN * easeInOutCubic((p - 0.5) / 0.08)
+  if (p < 0.66) return CAL_OPEN
+  if (p < 0.76) return CAL_OPEN - (CAL_OPEN - 2 * CAL_BAR.r) * easeInOutCubic((p - 0.66) / 0.1)
+  return 2 * CAL_BAR.r
+}
+
+function CaliperArt() {
+  const bx0 = CAL_Z, bx1 = CAL_Z + 2 * CAL_BAR.r
+  return (
+    <svg className="bp-art bp-caliper" viewBox="-20 -8 400 184">
+      <Paper x={-40} y={-30} w={460} h={230} cx={CAL_Z} cy={112} r={250} unit={2} />
+      <defs>
+        <clipPath id="zs-bp-rod"><rect x="300" y="40" width="90" height="24" /></clipPath>
+        <clipPath id="zs-bp-bar"><path d={circle(CAL_BAR.x, CAL_BAR.y, CAL_BAR.r)} /></clipPath>
+      </defs>
+
+      {/* beam, fixed jaws, main scale */}
+      <path className="ln strong" pathLength={1} d="M0 40 H300 V64 H0 Z" data-k="draw" data-s="0.06" data-e="0.16" />
+      <path className="ln strong" pathLength={1} d={`M${CAL_Z} 64 V150 L0 118 V64 M${CAL_Z} 40 V12 L18 18 L14 40`} data-k="draw" data-s="0.14" data-e="0.24" />
+      <path className="ln thin" pathLength={1} d={CAL_TICKS} data-k="draw" data-s="0.2" data-e="0.34" />
+      {Array.from({ length: 21 }, (_, i) => {
+        const s = 0.3 + i * 0.004
+        return <text key={i} className="mark" x={CAL_Z + i * 10} y="49" textAnchor="middle" data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.004).toFixed(3)} data-text={String(i)} />
+      })}
+      <text className="mark" x="266" y="55" textAnchor="middle" data-k="type" data-s="0.46" data-e="0.5" data-text="ZS · 0,05 mm" />
+
+      {/* the slider: jaws, vernier, roller, lock screw */}
+      <g data-role="slider">
+        <path className="cal-fill" d="M30 34 H130 V70 H30 Z M36 44 V60 H124 V44 Z" fillRule="evenodd" data-k="fade" data-s="0.24" data-e="0.28" />
+        <path className="ln strong" pathLength={1} d="M30 34 H130 V70 H30 Z" data-k="draw" data-s="0.24" data-e="0.32" />
+        <path className="ln" pathLength={1} d="M36 44 H124 V60 H36 Z" data-k="draw" data-s="0.3" data-e="0.34" />
+        <path className="ln strong" pathLength={1} d={`M${CAL_Z} 70 V150 L60 118 V70 M${CAL_Z} 34 V12 L42 18 L46 34`} data-k="draw" data-s="0.32" data-e="0.4" />
+        <path className="ln thin" pathLength={1} d={CAL_VERNIER} data-k="draw" data-s="0.38" data-e="0.44" />
+        <path className="ln" pathLength={1} d={`${circle(104, 77, 6)} M101 71.8 V82.2 M104 71 V83 M107 71.8 V82.2`} data-k="draw" data-s="0.42" data-e="0.46" />
+        <path className="ln" pathLength={1} d="M70 34 V27 H84 V34 M72 27 V23 H82 V27" data-k="draw" data-s="0.44" data-e="0.47" />
+      </g>
+      {/* depth rod: rides with the slider, seen only past the beam's end */}
+      <g clipPath="url(#zs-bp-rod)">
+        <g data-role="rod">
+          <path className="ln strong" pathLength={1} d="M130 50 H300 L302 51 V53 L300 54 H130" data-k="draw" data-s="0.46" data-e="0.48" />
+        </g>
+      </g>
+
+      {/* Ø50 bar in section, drawn while the jaws are open */}
+      <line className="cl" x1={CAL_BAR.x - 34} y1={CAL_BAR.y} x2={CAL_BAR.x + 34} y2={CAL_BAR.y} data-axis="x" data-k="grow" data-s="0.57" data-e="0.61" />
+      <line className="cl" x1={CAL_BAR.x} y1={CAL_BAR.y - 34} x2={CAL_BAR.x} y2={CAL_BAR.y + 34} data-axis="y" data-k="grow" data-s="0.58" data-e="0.62" />
+      <path className="ln strong" pathLength={1} d={circle(CAL_BAR.x, CAL_BAR.y, CAL_BAR.r)} data-k="draw" data-s="0.58" data-e="0.64" />
+      <g clipPath="url(#zs-bp-bar)">
+        <path className="ln thin" pathLength={1} d={CAL_HATCH} data-k="draw" data-s="0.63" data-e="0.67" />
+      </g>
+
+      {/* the reading, once the jaws are closed on it */}
+      <path className="ln dim" pathLength={1} d={`M${bx0} 152 V170 M${bx1} 152 V170 M${bx0} 165 H${bx1}`} data-k="draw" data-s="0.78" data-e="0.82" />
+      <path className="arrow" d={arrow(bx0, 165, -1, 0, CAL_A, CAL_H)} data-k="pop" data-s="0.81" data-e="0.83" />
+      <path className="arrow" d={arrow(bx1, 165, 1, 0, CAL_A, CAL_H)} data-k="pop" data-s="0.8" data-e="0.82" />
+      <text className="red" x={bx1 + 6} y="167" data-k="type" data-s="0.82" data-e="0.86" data-text="Ø 50,00" />
+      <path className="ln dim" pathLength={1} d="M0 38 V-2 M300 38 V-2 M0 3 H300" data-k="draw" data-s="0.85" data-e="0.89" />
+      <path className="arrow" d={arrow(0, 3, -1, 0, CAL_A, CAL_H)} data-k="pop" data-s="0.88" data-e="0.9" />
+      <path className="arrow" d={arrow(300, 3, 1, 0, CAL_A, CAL_H)} data-k="pop" data-s="0.87" data-e="0.89" />
+      <text className="red" x="150" y="0.6" textAnchor="middle" data-k="type" data-s="0.88" data-e="0.91" data-text="300" />
+
+      <Pen scale={PX * 2} />
+    </svg>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Spirit level — 800 mm (1:5; viewBox units are the level's mm)
+// ════════════════════════════════════════════════════════════════════════════
+const LV = { len: 800, h: 64, px: 400, py: 64 } // pivot: middle of the bottom edge
+const LV_TILT = 4 // degrees off level at the start (right end up)
+const LV_BUBBLE = 6 // mm the bubble drifts per degree of tilt
+const LV_A = 11, LV_H = 3.5 // arrowheads at 1:5
+const levelTilt = (p: number) => LV_TILT * (1 - easeInOutCubic(clamp01((p - 0.62) / 0.22)))
+const capsule = (x0: number, x1: number, y0: number, y1: number) => {
+  const r = (y1 - y0) / 2
+  return `M${x0 + r} ${y0} H${x1 - r} A${r} ${r} 0 0 1 ${x1 - r} ${y1} H${x0 + r} A${r} ${r} 0 0 1 ${x0 + r} ${y0} Z`
+}
+const LV_ARC = (() => {
+  const r = 450, a = (-LV_TILT * Math.PI) / 180
+  return { d: `M${LV.px + r} ${LV.py} A${r} ${r} 0 0 0 ${f2(LV.px + r * Math.cos(a))} ${f2(LV.py + r * Math.sin(a))}`, x: LV.px + r * Math.cos(a), y: LV.py + r * Math.sin(a) }
+})()
+
+function LevelArt() {
+  return (
+    <svg className="bp-art bp-level" viewBox="-40 -60 960 200">
+      <Paper x={-80} y={-120} w={980} h={320} cx={LV.px} cy={LV.py} r={520} unit={5} />
+      <line className="cl" x1="-30" y1={LV.py} x2="830" y2={LV.py} data-axis="x" data-k="grow" data-s="0.06" data-e="0.14" />
+
+      <g data-role="level" transform={`rotate(${-LV_TILT} ${LV.px} ${LV.py})`}>
+        {/* aluminium profile with rubber end caps */}
+        <path className="ln strong" pathLength={1} d="M24 0 H776 M24 64 H776" data-k="draw" data-s="0.12" data-e="0.24" />
+        <path className="ln strong" pathLength={1} d="M24 -2 H6 Q0 -2 0 4 V60 Q0 66 6 66 H24 Z M776 -2 H794 Q800 -2 800 4 V60 Q800 66 794 66 H776 Z" data-k="draw" data-s="0.22" data-e="0.3" />
+        <path className="ln thin" pathLength={1} d="M24 8 H776 M24 56 H776" data-k="draw" data-s="0.28" data-e="0.36" />
+        {/* central vial */}
+        <path className="ln" pathLength={1} d="M354 14 H446 Q450 14 450 18 V46 Q450 50 446 50 H354 Q350 50 350 46 V18 Q350 14 354 14 Z" data-k="draw" data-s="0.34" data-e="0.4" />
+        <path className="ln" pathLength={1} d={capsule(360, 440, 24, 40)} data-k="draw" data-s="0.39" data-e="0.44" />
+        <path className="ln dim" pathLength={1} d="M387 21 V43 M413 21 V43" data-k="draw" data-s="0.44" data-e="0.46" />
+        <g data-role="bubble" transform={`translate(${LV_TILT * LV_BUBBLE} 0)`}>
+          <path className="ln strong" pathLength={1} d={`M411 32 A11 5.5 0 1 0 389 32 A11 5.5 0 1 0 411 32`} data-k="draw" data-s="0.46" data-e="0.49" />
+        </g>
+        {/* plumb vial */}
+        <path className="ln" pathLength={1} d={circle(120, 32, 19)} data-k="draw" data-s="0.4" data-e="0.44" />
+        <path className="ln" pathLength={1} d={capsule(113, 127, 17, 47)} data-k="draw" data-s="0.43" data-e="0.46" />
+        <path className="ln thin" pathLength={1} d={`M110 27 H130 M110 37 H130 ${circle(120, 22, 4)}`} data-k="draw" data-s="0.45" data-e="0.48" />
+        {/* hand grip */}
+        <path className="ln" pathLength={1} d="M578 18 H702 A14 14 0 0 1 702 46 H578 A14 14 0 0 1 578 18 Z" data-k="draw" data-s="0.47" data-e="0.53" />
+        <text className="mark" x="240" y="36" textAnchor="middle" data-k="type" data-s="0.5" data-e="0.55" data-text="ZONA SCULE · 800" />
+        <text className="mark" x="510" y="36" textAnchor="middle" data-k="type" data-s="0.52" data-e="0.56" data-text="0,5 mm/m" />
+      </g>
+
+      {/* off by 4° — the dimension goes once it's level */}
+      <g data-k="fade" data-dir="out" data-s="0.62" data-e="0.66">
+        <path className="ln dim" pathLength={1} d={LV_ARC.d} data-k="draw" data-s="0.54" data-e="0.58" />
+        <path className="arrow" d={arrow(LV_ARC.x, LV_ARC.y, Math.sin((LV_TILT * Math.PI) / 180), -1, LV_A, LV_H)} data-k="pop" data-s="0.57" data-e="0.59" />
+        <text className="red" x={LV_ARC.x + 10} y={LV_ARC.y + 18} data-k="type" data-s="0.58" data-e="0.61" data-text="α 4°" />
+      </g>
+
+      <path className="ln dim" pathLength={1} d="M0 70 V116 M800 70 V116 M0 110 H800" data-k="draw" data-s="0.84" data-e="0.88" />
+      <path className="arrow" d={arrow(0, 110, -1, 0, LV_A, LV_H)} data-k="pop" data-s="0.87" data-e="0.89" />
+      <path className="arrow" d={arrow(800, 110, 1, 0, LV_A, LV_H)} data-k="pop" data-s="0.86" data-e="0.88" />
+      <text className="red" x="400" y="104" textAnchor="middle" data-k="type" data-s="0.87" data-e="0.9" data-text="800" />
+      <path className="ln dim" pathLength={1} d="M400 14 L440 -30 H500" data-k="draw" data-s="0.88" data-e="0.91" />
+      <path className="arrow" d={arrow(400, 14, -40, 44, LV_A, LV_H)} data-k="pop" data-s="0.9" data-e="0.92" />
+      <text className="red" x="446" y="-36" data-k="type" data-s="0.9" data-e="0.94" data-text="α 0,0° · ORIZONTAL" />
+
+      <Pen scale={PX * 5} />
+    </svg>
+  )
+}
+
 const TITLE_PART: Record<Variant, string> = {
   nail: 'CUI CAP PLAT 3,1×100',
   blade: 'DISC CIRCULAR Ø216 × 30',
   drill: 'BURGHIU HSS Ø10 × 133',
   power: 'MAȘINĂ DE GĂURIT 18V',
+  caliper: 'ȘUBLER 0–200 × 0,05',
+  level: 'NIVELĂ CU BULĂ 800',
 }
-const TITLE_SCALE: Record<Variant, string> = { nail: 'SCARA 1:1', blade: 'SCARA 1:1', drill: 'SCARA 1:1', power: 'SCARA 1:2' }
+const TITLE_SCALE: Record<Variant, string> = { nail: 'SCARA 1:1', blade: 'SCARA 1:1', drill: 'SCARA 1:1', power: 'SCARA 1:2', caliper: 'SCARA 1:2', level: 'SCARA 1:5' }
 
 // A different drawing on each page load (never the same one twice in a
-// row, remembered per browser); ?egg=nail|blade|drill|power forces one.
+// row, remembered per browser); ?egg=nail|blade|drill|power|caliper|level
+// forces one.
 // The nail is out of the shuffle for now.
 let chosenVariant: Variant | null = null
 const pickVariant = (): Variant => {
@@ -865,11 +1032,31 @@ export default function FooterBlueprint() {
       powerTurn = p * 120
     }
 
+    // caliper: the slider rides on the beam; level: the whole level tilts,
+    // its bubble drifting towards the high end
+    const slider = art.querySelector<SVGGElement>('[data-role="slider"]')
+    const rod = art.querySelector<SVGGElement>('[data-role="rod"]')
+    let calO = 0
+    const setCal = (o: number) => {
+      calO = o
+      slider?.setAttribute('transform', `translate(${f2(o)} 0)`)
+      rod?.setAttribute('transform', `translate(${f2(o)} 0)`)
+    }
+    const levelG = art.querySelector<SVGGElement>('[data-role="level"]')
+    const bubble = art.querySelector<SVGGElement>('[data-role="bubble"]')
+    const setBubble = (dx: number) => bubble?.setAttribute('transform', `translate(${f2(dx)} 0)`)
+    const setLevel = (deg: number) => {
+      levelG?.setAttribute('transform', `rotate(${(-deg).toFixed(3)} ${LV.px} ${LV.py})`)
+      setBubble(deg * LV_BUBBLE)
+    }
+
     let lastP = 0
     const frameArt = (p: number) => {
       if (variant === 'blade') { setBlade(-p * BLADE_TURN); return }
       if (variant === 'drill') { frameDrill(p); return }
       if (variant === 'power') { framePower(p); return }
+      if (variant === 'caliper') { setCal(calOpening(p)); return }
+      if (variant === 'level') { setLevel(levelTilt(p)); return }
       const { depth, gap } = nailState(p)
       const tf = nailTransform(depth)
       for (const g of nailGroups) g.setAttribute('transform', tf)
@@ -975,6 +1162,16 @@ export default function FooterBlueprint() {
         // test run of the exploded drivetrain: spin up, wind down, then the stamp
         const from = powerTurn
         tween(2600, t => setPowerSpin(from + 3 * 360 * easeInOutCubic(t)), () => later(stamp, 150))
+        return
+      }
+      if (variant === 'caliper') {
+        // a second check: ease the jaws off and back onto the bar
+        tween(1400, t => setCal(calO + 6 * Math.sin(Math.PI * t)), () => { setCal(2 * CAL_BAR.r); later(stamp, 150) })
+        return
+      }
+      if (variant === 'level') {
+        // a nudge: the bubble swings past the marks and settles
+        tween(1800, t => setBubble(7 * Math.exp(-3.5 * t) * Math.sin(6 * Math.PI * t)), () => { setBubble(0); later(stamp, 150) })
         return
       }
       if (variant === 'blade') {
@@ -1143,11 +1340,35 @@ export default function FooterBlueprint() {
           bottom: calc(var(--bp-cols, 300px) + 16px); /* just above the link columns */
           --sw: 2;
         }
+        .bp-caliper {
+          overflow: hidden;
+          width: 200mm; height: 92mm;
+          right: var(--gutter);
+          bottom: calc(var(--bp-cols, 300px) + 32px);
+          --sw: 2;
+        }
+        /* 1:5 */
+        .bp-level {
+          overflow: hidden;
+          width: 192mm; height: 40mm;
+          right: var(--gutter);
+          bottom: calc(var(--bp-cols, 300px) + 72px);
+          --sw: 5;
+        }
         /* Laptop-sized screens: a touch smaller so it clears the logo and
            the link columns. */
         @media (max-width: 1365px), (max-height: 860px) {
           .bp-power { width: 172mm; height: 114mm; }
+          .bp-caliper { width: 172mm; height: 79.1mm; }
+          .bp-level { width: 168mm; height: 35mm; }
         }
+        .bp-art.bp-caliper text { font-size: 5.4px; }
+        .bp-art.bp-caliper text.mark { font-size: 4.2px; }
+        .bp-art.bp-caliper .cl { stroke-dasharray: 7.4 2.12 1.06 2.12; }
+        .bp-art .cal-fill { fill: #fff; stroke: none; opacity: 0; }
+        .bp-art.bp-level text { font-size: 13.5px; }
+        .bp-art.bp-level text.mark { font-size: 10.5px; }
+        .bp-art.bp-level .cl { stroke-dasharray: 18.5 5.3 2.65 5.3; }
         .bp-art.bp-power text { font-size: 5.4px; }
         .bp-art.bp-power text.mark { font-size: 4.2px; }
         .bp-art.bp-power text.pl { font-size: 4.4px; }
@@ -1200,7 +1421,7 @@ export default function FooterBlueprint() {
         .bp-layer .stamp-ink .stamp-date { font-size: 8.5px; letter-spacing: 0.14em; }
       `}</style>
 
-      {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : <NailArt />}
+      {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : variant === 'caliper' ? <CaliperArt /> : variant === 'level' ? <LevelArt /> : <NailArt />}
 
       {/* ── Note, title block and stamp, under the logo ── */}
       <svg ref={titleRef} className="bp-title" viewBox="0 0 460 112">

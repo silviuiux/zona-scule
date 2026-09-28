@@ -78,6 +78,14 @@ out.danube = path(rivL.filter(f => f.properties.name === 'Danube').flatMap(f => 
 const near = l => l.some(([x, y]) => Math.abs(x - LON0) < 0.9 && Math.abs(y - LAT0) < 0.6)
 const roads = G('ne_10m_roads').features.filter(f => rings(f.geometry).some(near) && /Highway|Road/.test(f.properties.type))
 out.roads = path(roads.flatMap(f => rings(f.geometry).filter(near)), 80, false)
+// National roads for the country view: Natural Earth's secondary highways
+// on E-routes (DN1, DN2, DN6, DN7, …), clipped to Romania's border
+const roRings = rings(ro10.geometry)
+const inRO = pt => roRings.some(r => inside(pt, r))
+const clipRO = l => { const out = []; let cur = []; for (const pt of l) { if (inRO(pt)) cur.push(pt); else { if (cur.length > 1) out.push(cur); cur = [] } } if (cur.length > 1) out.push(cur); return out }
+out.nationalRoads = path(G('ne_10m_roads').features
+  .filter(f => f.properties.type === 'Secondary Highway' && f.properties.name)
+  .flatMap(f => rings(f.geometry)).flatMap(clipRO), 1200, false, 100)
 // Places
 const pp = G('ne_10m_populated_places_simple').features
 const place = n => { const f = pp.find(f => f.properties.name === n && f.properties.adm0name === 'Romania'); return f ? P(f.geometry.coordinates).map(Math.round) : null }
@@ -194,9 +202,9 @@ out.city = {
     out.detail = { minor: c.minor, arterials: c.arterials, highways: c.highways, junction: c.junction, a1: c.a1, water: c.water, parks: c.parks }
   }
 }
-// The A1 across the county and the country (lon, lat), open sections solid,
-// Pitești – Sibiu (under construction) dashed. Approximate alignment through
-// the towns it serves.
+// The A1 across the county and the country (lon, lat), open sections only
+// (Pitești – Sibiu and Deva – Lugoj are still being built, and aren't
+// drawn). Approximate alignment through the towns it serves.
 const A1_OPEN = [
   [[26.005, 44.437], [25.95, 44.45], [25.80, 44.50], [25.55, 44.64], [25.32, 44.735], [25.10, 44.79], [24.98, 44.82], [24.93, 44.838], [24.895, 44.853], [24.8803, 44.865], [24.8743, 44.869], [24.82, 44.90]],
   [[24.15, 45.75], [23.90, 45.83], [23.57, 45.96], [23.20, 45.84], [23.01, 45.85], [22.90, 45.88], [22.66, 45.93]],
@@ -208,11 +216,11 @@ const A1_BUILDING = [
 ]
 const route = lines => lines.map(l => 'M' + l.map(P).map(([x, y]) => `${Math.round(x / 10) * 10} ${Math.round(y / 10) * 10}`).join('L')).join('')
 // drawn outward from Pitești: towards București first, the west later
-out.a1route = { east: route([A1_OPEN[0].slice().reverse()]), west: route(A1_OPEN.slice(1)), building: route(A1_BUILDING) }
+out.a1route = { east: route([A1_OPEN[0].slice().reverse()]), west: route(A1_OPEN.slice(1)) }
 out.a1places = Object.fromEntries([['SIBIU', [24.15, 45.79]], ['DEVA', [22.90, 45.88]], ['ARAD', [21.31, 46.18]], ['NĂDLAC', [20.75, 46.17]], ['BUCUREȘTI', [26.10, 44.43]]].map(([n, ll]) => [n, P(ll).map(Math.round)]))
 // Motorways across Romania (scripts/map/extract-motorways.py → motorways.json):
-// open and under construction; the A1's own segments are split out so it can
-// stay highlighted. East of Pitești the A1 is drawn from A1_OPEN above.
+// open sections; the A1's own segments are split out so it can stay
+// highlighted. East of Pitești the A1 is drawn from A1_OPEN above.
 {
   const mpath = require('path').join(__dirname, 'motorways.json')
   if (fs.existsSync(mpath)) {
@@ -233,8 +241,8 @@ out.a1places = Object.fromEntries([['SIBIU', [24.15, 45.79]], ['DEVA', [22.90, 4
     const eastOfPitesti = l => l.reduce((s, p) => s + p[0], 0) / l.length > 24.95
     const pick = (lines, a1) => lines.filter(l => l.length > 1 && isA1(l) === a1 && !(a1 && eastOfPitesti(l)))
     out.motorways = {
-      open: route(pick(mw.open, false)), building: route(pick(mw.building, false)),
-      a1open: route(pick(mw.open, true)), a1building: route(pick(mw.building, true)),
+      open: route(pick(mw.open, false)),
+      a1open: route(pick(mw.open, true)),
     }
   }
 }

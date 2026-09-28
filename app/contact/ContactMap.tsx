@@ -56,7 +56,6 @@ export default function ContactMap() {
         .cmap-svg .d-junction-fill { fill: rgba(0,0,0,0.035); stroke: none; }
         /* the A1, highlighted in every view */
         .cmap-svg .a1 { fill: none; stroke: rgba(217,44,43,0.78); stroke-width: calc(1.8px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
-        .cmap-svg .a1.a1-building { stroke-dasharray: calc(5px * var(--u, 1)) calc(4px * var(--u, 1)); stroke-width: calc(1.4px * var(--u, 1)); }
         .cmap-svg text.a1-label { font-size: 9.5px; fill: rgba(217,44,43,0.85); letter-spacing: 0.16em; font-weight: 500; }
         .cmap-svg .c-road { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.8px * var(--u, 1) * var(--w, 1)); }
         .cmap-svg .c-road.a1 { stroke: rgba(0,0,0,0.5); }
@@ -81,7 +80,7 @@ export default function ContactMap() {
         .cmap-svg .ro-fill { fill: rgba(217,44,43,0.04); stroke: none; }
         .cmap-svg .eu { stroke: rgba(0,0,0,0.15); stroke-width: calc(0.6px * var(--u, 1)); }
         .cmap-svg .mw { fill: none; stroke: rgba(0,0,0,0.42); stroke-width: calc(1.1px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
-        .cmap-svg .mw.mw-b { stroke: rgba(0,0,0,0.34); stroke-dasharray: calc(4px * var(--u, 1)) calc(3px * var(--u, 1)); }
+        .cmap-svg .dn { stroke: rgba(0,0,0,0.2); stroke-width: calc(0.7px * var(--u, 1)); }
         .cmap-svg .city text { font-size: 9px; }
         .cmap-svg .danube { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg text {
@@ -153,9 +152,9 @@ export default function ContactMap() {
               <path className="dr danube" pathLength={1} d={M.danube} data-k="draw" data-s="0.7" data-e="0.8" />
               <path className="ro-fill" d={M.romania} data-k="fade" data-s="0.7" data-e="0.78" />
               <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.6" data-e="0.74" />
-              {/* motorways: open solid, under construction dashed */}
+              {/* national roads between the cities, then the open motorways */}
+              <path className="dr dn" pathLength={1} d={M.nationalRoads} data-k="draw" data-s="0.8" data-e="0.95" />
               <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.82" data-e="0.94" />
-              <path className="mw mw-b" d={M.motorways.building} data-k="fade" data-s="0.88" data-e="0.94" />
               {M.cities.map((c, i) => {
                 const s = 0.86 + i * 0.004
                 return (
@@ -179,9 +178,6 @@ export default function ContactMap() {
               <path className="dr urban" pathLength={1} d={M.urban} data-k="draw" data-s="0.34" data-e="0.44" />
               <g className="lbl" data-x={9500} data-y={3500} data-a={19}>
                 <text className="a1-label" textAnchor="middle" y="-8" data-k="type" data-s="0.44" data-e="0.48" data-text="A1 → BUCUREȘTI" />
-              </g>
-              <g className="lbl" data-x={-7100} data-y={-8000} data-a={62}>
-                <text className="a1-label" textAnchor="middle" y="-8" data-k="type" data-s="0.46" data-e="0.5" data-text="A1 → SIBIU (ÎN LUCRU)" />
               </g>
               <g className="lbl" data-x={-2500} data-y={4200}>
                 <text className="big" textAnchor="end" data-k="type" data-s="0.47" data-e="0.52" data-text="PITEȘTI" />
@@ -240,11 +236,7 @@ export default function ContactMap() {
                  the motorway across the county and the country */}
             <g data-k="fade" data-s="0.3" data-e="0.34">
               <path className="dr a1" pathLength={1} d={A1.east} data-k="draw" data-s="0.32" data-e="0.62" />
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.62" data-out-e="0.68">
-                <path className="a1 a1-building" d={A1.building} data-k="fade" data-s="0.42" data-e="0.48" />
-              </g>
               <path className="dr a1" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.64" data-e="0.8" />
-              <path className="a1 a1-building" d={M.motorways.a1building} data-k="fade" data-s="0.66" data-e="0.72" />
               <g data-k="fade" data-s="0.76" data-e="0.8">
                 <g className="lbl" data-x={-85000} data-y={-122000}>
                   <text className="a1-label" textAnchor="middle" y="-10" data-k="type" data-s="0.78" data-e="0.82" data-text="A1" />
