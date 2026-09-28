@@ -1399,7 +1399,7 @@ export default function FooterBlueprint() {
         .bp-art .chips path { fill: none; stroke: rgba(0,0,0,0.45); stroke-width: 0.25; stroke-linecap: round; opacity: 0; }
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
         .bp-art text.mono-s { font-size: 2.3px; }
-        .bp-title { width: 460px; height: 112px; left: var(--gutter); top: 0; overflow: visible; }
+        .bp-title { width: 460px; height: 126px; left: var(--gutter); top: 0; overflow: visible; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings
            (0.265mm ≈ 1px, scaled by --sw during the camera zoom), px on the
@@ -1427,6 +1427,7 @@ export default function FooterBlueprint() {
         .bp-art text.big-label { font-size: 4px; font-weight: 500; }
         .bp-title text { font-size: 10px; }
         .bp-layer text.red { fill: rgba(217,44,43,0.75); }
+        .bp-layer text.note { fill: rgb(0,0,0); }
         .bp-layer text.big { fill: rgba(0,0,0,0.6); font-weight: 500; }
         .bp-title text.big { font-size: 11px; }
         .bp-blade text.label { font-size: 3.3px; letter-spacing: 0.22em; fill: rgba(0,0,0,0.32); }
@@ -1443,17 +1444,18 @@ export default function FooterBlueprint() {
       {variant === 'blade' ? <BladeArt /> : variant === 'drill' ? <DrillArt /> : variant === 'power' ? <PowerArt /> : variant === 'caliper' ? <CaliperArt /> : variant === 'level' ? <LevelArt /> : <NailArt />}
 
       {/* ── Note, title block and stamp, under the logo ── */}
-      <svg ref={titleRef} className="bp-title" viewBox="0 0 460 112">
+      <svg ref={titleRef} className="bp-title" viewBox="0 0 460 126">
         <defs>
           <filter id="zs-bp-ink" x="-10%" y="-20%" width="120%" height="140%">
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" />
             <feDisplacementMap in="SourceGraphic" scale="1.6" />
           </filter>
         </defs>
-        <text x="0" y="10" className="red" data-k="type" data-arrive="" data-s="0.35" data-e="0.75" data-text="// ai derulat până la capăt. mulțumesc." />
-        <text x="0" y="24" className="red" data-k="type" data-arrive="" data-s="0.72" data-e="0.97" data-text="// derulează în continuare." />
-        {/* title block + stamp, below the two-line note */}
-        <g transform="translate(0 16)">
+        <text x="0" y="10" className="note" data-k="type" data-arrive="" data-s="0.3" data-e="0.62" data-text="// Ai derulat până la capăt." />
+        <text x="0" y="24" className="note" data-k="type" data-arrive="" data-s="0.6" data-e="0.76" data-text="// Mulțumesc." />
+        <text x="0" y="38" className="note" data-k="type" data-arrive="" data-s="0.74" data-e="0.97" data-text="// Derulează în continuare." />
+        {/* title block + stamp, below the three-line note */}
+        <g transform="translate(0 30)">
           <path className="ln" pathLength={1} d="M0 22 H290 V88 H0 Z M0 44 H290 M0 66 H290 M180 22 V88" data-k="draw" data-s="0.88" data-e="0.93" />
           <text x="10" y="37" className="big" data-k="type" data-s="0.9" data-e="0.93" data-text="ZONA SCULE" />
           <text x="190" y="37" data-k="type" data-s="0.91" data-e="0.94" data-text="DESEN TEHNIC" />

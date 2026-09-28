@@ -41,7 +41,7 @@ import { useEffect } from 'react'
 const CONTENT_SELECTOR =
   'a, button, input, textarea, select, label, img, video, svg, canvas, iframe, ' +
   'p, h1, h2, h3, h4, h5, h6, li, dt, dd, blockquote, table, ' +
-  'nav, footer, form, [role="button"], [role="dialog"]'
+  'nav, form, [role="button"], [role="dialog"]'
 
 const DOT_TILE = 16 // must match body::before's background-size
 const DOT_CENTER = DOT_TILE / 2
@@ -82,9 +82,9 @@ export default function DotsParallax() {
 
     // Pointer-driven drift for the dot layer, in normalized 0..1 viewport
     // coordinates, resting at the center (0.5, 0.5) when idle.
-    const DOT_TX_RANGE = 6 // px, at full ±1 offset from center
-    const DOT_TY_RANGE = 6 // px
-    const DOT_SCALE_RANGE = 0.015 // added scale at full offset
+    const DOT_TX_RANGE = 9 // px, at full ±1 offset from center
+    const DOT_TY_RANGE = 9 // px
+    const DOT_SCALE_RANGE = 0.022 // added scale at full offset
     const EASE = 0.04
     const EPSILON = 0.0004
 
@@ -117,8 +117,8 @@ export default function DotsParallax() {
     const ROT_PUSH = 0.004 // deg/step of angular velocity per px of cursor travel
     const ROT_MAX_VEL = 0.12 // deg/step
     const ROT_MAX = 0.8 // deg
-    const IDLE_FADE_MS = 4000 // still cursor → the laser fades out…
-    const FADE_OUT_MS = 2000 // …slowly; other on/off changes stay quick
+    const IDLE_FADE_MS = 2000 // once the cursor is still and the cross has settled…
+    const FADE_OUT_MS = 2000 // …it fades out, slowly; other on/off changes stay quick
     const FADE_QUICK_MS = 300
     const STEP_MS = 1000 / 60 // fixed-rate steps, same feel at 60/120Hz
     const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows
@@ -165,6 +165,7 @@ export default function DotsParallax() {
         rot.angle = rot.vel = 0
         writeBeams()
         springRaf = 0
+        if (laserOn) startIdle()
       }
     }
     const runSpring = () => {
@@ -206,8 +207,8 @@ export default function DotsParallax() {
         runSpring()
       }
     }
-    // Visible only while the cursor is over empty space AND has moved within
-    // the last IDLE_FADE_MS.
+    // Visible only while the cursor is over empty space and hasn't been
+    // still (with the cross settled) for IDLE_FADE_MS.
     const syncLaser = (fadeMs = FADE_QUICK_MS) => {
       const on = overEmpty && awake
       if (on === laserOn) return
@@ -225,13 +226,17 @@ export default function DotsParallax() {
       }
     }
 
-    const resetIdle = () => {
+    // Settled and still → count down, then fade. Any move cancels it.
+    const startIdle = () => {
       window.clearTimeout(fadeTimer)
       fadeTimer = window.setTimeout(() => {
         awake = false
         syncLaser(FADE_OUT_MS)
       }, IDLE_FADE_MS)
     }
+    // (every move re-targets the beams, so the spring always runs and
+    // restarts the countdown when it settles)
+    const resetIdle = () => window.clearTimeout(fadeTimer)
 
     const tick = () => {
       curX += (targetX - curX) * EASE

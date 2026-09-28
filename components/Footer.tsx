@@ -1,18 +1,27 @@
 import Link from 'next/link'
 import { LEGAL_PAGES, ANPC_SAL_URL } from '@/lib/legal-nav'
-import { getCategoriesWithCount } from '@/lib/supabase'
+import { getBrandHref } from '@/lib/brand-content'
 import FooterBlueprint from './FooterBlueprint'
+
+// Curated quick links: label → categories.name (as stored) / products.brand_name
+const CATEGORIES: [label: string, name: string][] = [
+  ['Scule electrice', 'Scule electrice'],
+  ['Scule de mână', 'Scule de mână'],
+  ['Scule de grădină', 'Scule de gradina'],
+  ['Scule pneumatice', 'Scule pneumatice'],
+  ['Scule de măsură', 'Aparate de Masura'],
+  ['Scule pentru curățenie', 'Curatenie'],
+  ['Scule pentru construcții', 'Constructii'],
+  ['Accesorii', 'Accesorii'],
+]
+const BRANDS: [label: string, name: string][] = [
+  ['BOSCH', 'BOSCH'], ['Milwaukee', 'Milwaukee'], ['PFERD', 'PFERD'], ['Kärcher', 'Karcher'],
+  ['Ruko', 'Ruko'], ['Osborn', 'Osborn'], ['Benman', 'Benman'], ['Krause', 'KRAUSE'],
+]
 
 // `blueprint` enables the scroll-past-the-end easter egg (see
 // FooterBlueprint.tsx) — on by default, so every page with a footer has it.
-export default async function Footer({ blueprint = true }: { blueprint?: boolean } = {}) {
-  // Top 5 by product count, not sort_order — the footer is a quick-nav
-  // shortcut to the site's biggest categories, not the full curated
-  // category ordering used in the sidebar/dropdowns elsewhere.
-  const categories = (await getCategoriesWithCount())
-    .slice()
-    .sort((a, b) => b.product_count - a.product_count)
-    .slice(0, 5)
+export default function Footer({ blueprint = true }: { blueprint?: boolean } = {}) {
 
   return (
     <>
@@ -21,7 +30,9 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
            the copyright bar) stand in for the dark card's own edges. */
         .footer {
           position: relative;
-          background-color: rgb(255,255,255);
+          /* transparent: the page's dot grid (and the cursor laser that
+             runs along it) carry on through the footer */
+          background-color: transparent;
           border-top: 1px solid rgba(0,0,0,0.12);
           /* 80vh; with the easter egg (FooterBlueprint, desktop) a full
              viewport, so the page's natural stop is the whole footer in
@@ -51,15 +62,15 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
         }
         .footer-logo-icon, .footer-logo-word { display: block; height: 64px; width: auto; }
 
-        /* 12-column grid: "Zona Scule" spans 6 (its text kept to the first
-           3), then Categorii / Informatii / Contact, 2 columns each */
+        /* 12-column grid: "Zona Scule" spans 4, then Categorii / Branduri /
+           Informatii / Contact, 2 columns each (two columns on phones) */
         .footer-grid {
           position: relative; z-index: 1;
           display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px;
         }
         .footer-grid > * { grid-column: span 2; }
-        .footer-grid > .footer-col-about { grid-column: span 6; }
-        .footer-col-about > * { max-width: calc((100% - 16px) / 2); }
+        .footer-grid > .footer-col-about { grid-column: span 4; }
+        .footer-col-about > * { max-width: 320px; }
 
         .footer-desc {
           font-family: 'Recursive', sans-serif;
@@ -69,12 +80,16 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
         }
 
         .footer-col-title {
+          display: block;
           font-family: 'Neuton', serif;
           font-size: 32px; font-weight: 400; line-height: 1;
           letter-spacing: -0.01em;
           color: rgb(0,0,0);
           margin-bottom: 24px;
+          text-decoration: none;
         }
+        a.footer-col-title { transition: color 150ms; }
+        a.footer-col-title:hover { color: rgb(217,44,43); }
 
         .footer-link {
           font-family: 'Recursive', sans-serif;
@@ -120,8 +135,9 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
           .footer-main { padding: 56px var(--gutter) 40px; gap: 56px; }
           .footer-logo { gap: 24px; }
           .footer-logo-icon, .footer-logo-word { height: 40px; }
-          .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-          .footer-grid > *, .footer-grid > .footer-col-about { grid-column: auto; }
+          .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 16px; }
+          .footer-grid > * { grid-column: auto; }
+          .footer-grid > .footer-col-about { grid-column: 1 / -1; }
           .footer-col-about > * { max-width: none; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px var(--gutter); }
         }
@@ -149,14 +165,16 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
             </div>
             <div>
               <p className="footer-col-title">Categorii</p>
-              {categories.map(c => (
-                <Link
-                  key={c.id}
-                  href={`/produse?categorie=${encodeURIComponent(c.name)}`}
-                  className="footer-link"
-                >
-                  {c.name}
+              {CATEGORIES.map(([label, name]) => (
+                <Link key={name} href={`/produse?categorie=${encodeURIComponent(name)}`} className="footer-link">
+                  {label}
                 </Link>
+              ))}
+            </div>
+            <div>
+              <Link href="/branduri" className="footer-col-title">Branduri</Link>
+              {BRANDS.map(([label, name]) => (
+                <Link key={name} href={getBrandHref(name)} className="footer-link">{label}</Link>
               ))}
             </div>
             <div>
@@ -168,7 +186,7 @@ export default async function Footer({ blueprint = true }: { blueprint?: boolean
               <a href={ANPC_SAL_URL} target="_blank" rel="noopener noreferrer" className="footer-link">ANPC SAL</a>
             </div>
             <div>
-              <p className="footer-col-title">Contact</p>
+              <Link href="/contact" className="footer-col-title">Contact</Link>
               <a href="tel:0248222298" className="footer-link footer-link-underline">0248.222.298</a>
               <a href="mailto:contact@zonascule.ro" className="footer-link footer-link-underline">contact@zonascule.ro</a>
               <p className="footer-link">Sfanta Vineri 28, Pitesti</p>
