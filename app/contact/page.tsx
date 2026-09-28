@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import TestimonialsCarousel from '@/components/TestimonialsCarousel'
 import { TESTIMONIALS } from '@/lib/testimonials'
 import ContactForm from './ContactForm'
+import ContactMap from './ContactMap'
 
 export const metadata: Metadata = {
   title: 'Contact — Zona Scule',
@@ -41,79 +42,65 @@ export default function ContactPage({
         .contact-section { margin-top: var(--space-section); scroll-margin-top: 96px; }
 
         /* ── Info bar ── */
-        /* Info boxes — separate cards on a 16px gutter */
-        .contact-info-bar {
-          margin-top: 56px; /* close under the hero so the cards peek above the fold */
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
+        /* ── Hero: the letter on the left, the details on the right, a
+           plotter-pen cue at the fold that drops into the map below ── */
+        .c-hero {
+          min-height: calc(100vh - var(--nav-h));
+          display: flex; flex-direction: column;
+          padding-top: clamp(32px, 6vh, 72px);
         }
-        .info-card {
-          padding: 32px;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
-          display: flex; flex-direction: column; gap: 8px;
-          text-decoration: none;
-          transition: border-color 150ms;
+        .c-hero-grid {
+          flex: 1; align-content: center;
+          display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+          gap: clamp(48px, 8vw, 144px);
+          align-items: end;
+          padding-bottom: clamp(40px, 8vh, 96px);
         }
-        a.info-card:hover { border-color: rgba(217,44,43,0.3); }
-        .info-label {
+        .c-details { display: flex; flex-direction: column; }
+        .c-detail {
+          display: grid; grid-template-columns: 92px 1fr; align-items: baseline; gap: 16px;
+          padding: 18px 0;
+          border-top: 1px solid rgba(0,0,0,0.1);
+          text-decoration: none; color: inherit;
+        }
+        .c-detail:last-child { border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .c-detail-label {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 10.5px; font-weight: 500;
-          letter-spacing: 0.12em; text-transform: uppercase;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(0,0,0,0.4);
         }
-        .info-value {
+        .c-detail-value {
           font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
-          font-size: clamp(18px, 1.9vw, 26px); letter-spacing: -0.02em;
-          line-height: 1; color: rgb(0,0,0);
-          text-decoration: none;
-        }
-        .info-value.red { color: rgb(217,44,43); }
-        .info-note {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.4);
-        }
-
-        /* ── Map — full-bleed band under the form ── */
-        .contact-map {
-          position: relative; overflow: hidden;
-          margin-top: var(--space-section);
-          height: clamp(420px, 62vh, 720px);
-          background: rgb(220,218,214);
-        }
-        .contact-map iframe {
-          width: 100%; height: 100%;
-          display: block; border: 0;
-          /* Slight desaturation so the map sits quietly behind the badge
-             rather than competing with the red/black brand palette. */
-          filter: grayscale(0.15) contrast(1.02);
-        }
-        .contact-map-badge {
-          position: absolute; bottom: 24px;
-          left: max(var(--gutter), calc((100% - 1440px) / 2 + var(--gutter))); /* aligned with the content container */
-          display: inline-flex; align-items: center; gap: 8px;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
-          padding: 12px 18px;
-          border-radius: 4px;
-          text-decoration: none;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.14);
-          transition: color 150ms, border-color 150ms;
-        }
-        .contact-map-badge:hover { border-color: rgba(217,44,43,0.3); }
-        .contact-map-badge-text { display: flex; flex-direction: column; gap: 2px; }
-        .contact-map-badge-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(0,0,0,0.4);
-        }
-        .contact-map-badge-action {
-          font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 600;
+          font-size: clamp(15px, 1.25vw, 18px); letter-spacing: -0.01em; line-height: 1.35;
           color: rgb(0,0,0);
         }
-        .contact-map-badge:hover .contact-map-badge-action { color: rgb(217,44,43); }
+        .c-detail-value small { display: block; font-weight: 400; font-size: 12px; letter-spacing: 0; color: rgba(0,0,0,0.45); margin-top: 4px; }
+        a.c-detail .c-detail-value { transition: color 150ms; }
+        a.c-detail:hover .c-detail-value { color: rgb(217,44,43); }
+        .c-detail-value.red { color: rgb(217,44,43); }
+
+        .c-cue {
+          position: relative;
+          display: grid; grid-template-columns: 1fr auto 1fr; align-items: end;
+          padding-bottom: 20px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(0,0,0,0.4);
+        }
+        .c-cue-right { text-align: right; }
+        .c-cue-pen { position: relative; width: 33px; height: 72px; }
+        .c-cue-pen svg { position: absolute; left: 0; top: 0; }
+        .c-cue-line {
+          position: absolute; left: 16px; top: 33px; bottom: -20px; width: 1px;
+          background: rgb(217,44,43); transform-origin: top;
+          animation: c-cue-drop 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+        }
+        @keyframes c-cue-drop {
+          0% { transform: scaleY(0); opacity: 1; }
+          55% { transform: scaleY(1); opacity: 1; }
+          100% { transform: scaleY(1); opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) { .c-cue-line { animation: none; } }
 
         /* ── Despre noi ── */
         .about-grid {
@@ -153,58 +140,55 @@ export default function ContactPage({
           .contact-page { --space-section: 88px; }
           .about-grid { grid-template-columns: 1fr; gap: 24px; }
           .about-facts { grid-template-columns: 1fr; }
-          .contact-info-bar { grid-template-columns: 1fr; }
-          .contact-map { height: 360px; }
+          .c-hero { min-height: 0; padding-top: 40px; }
+          .c-hero-grid { grid-template-columns: 1fr; gap: 48px; }
+          .c-cue-left { display: none; }
+          .c-cue { grid-template-columns: auto 1fr; gap: 16px; }
         }
       `}</style>
 
       <div className="contact-page">
         <div className="contact-inner">
 
-          {/* Hero: the quote-request form */}
-          <ContactForm searchParams={searchParams} />
-
-          {/* Info bar */}
-          <div className="contact-info-bar">
-            <a href="tel:0248222298" className="info-card">
-              <span className="info-label">Telefon</span>
-              <span className="info-value red">0248.222.298</span>
-              <span className="info-note">click to call</span>
-            </a>
-            <a href="mailto:office@zonascule.ro" className="info-card">
-              <span className="info-label">Email</span>
-              <span className="info-value">office@zonascule.ro</span>
-              <span className="info-note">Raspundem in maximum 24 de ore</span>
-            </a>
-            <div className="info-card">
-              <span className="info-label">Program</span>
-              <span className="info-value">08:30 – 17:00</span>
-              <span className="info-note">Luni – Vineri</span>
+          {/* Hero: the quote-request letter + contact details */}
+          <section className="c-hero">
+            <div className="c-hero-grid">
+              <ContactForm searchParams={searchParams} />
+              <div className="c-details">
+                <a href="tel:0248222298" className="c-detail">
+                  <span className="c-detail-label">Telefon</span>
+                  <span className="c-detail-value red">0248.222.298</span>
+                </a>
+                <a href="mailto:office@zonascule.ro" className="c-detail">
+                  <span className="c-detail-label">E-mail</span>
+                  <span className="c-detail-value">office@zonascule.ro<small>Răspundem în maximum 24 de ore</small></span>
+                </a>
+                <div className="c-detail">
+                  <span className="c-detail-label">Program</span>
+                  <span className="c-detail-value">08:30 – 17:00<small>Luni – Vineri</small></span>
+                </div>
+                <div className="c-detail">
+                  <span className="c-detail-label">Adresă</span>
+                  <span className="c-detail-value">Sfânta Vineri 28<small>110024 Pitești, Argeș</small></span>
+                </div>
+              </div>
             </div>
-          </div>
+            <div className="c-cue" aria-hidden="true">
+              <span className="c-cue-left">44°51′28″N · 24°52′46″E</span>
+              <span className="c-cue-pen">
+                <svg width="33" height="33" viewBox="-16.5 -16.5 33 33">
+                  <path d="M-16 0 H-7 M7 0 H16 M0 -16 V-7 M0 7 V16" stroke="rgba(217,44,43,0.8)" fill="none" />
+                  <circle r="7" stroke="rgb(217,44,43)" fill="none" />
+                  <circle r="2.6" fill="rgb(217,44,43)" />
+                </svg>
+                <span className="c-cue-line" />
+              </span>
+              <span className="c-cue-right">Derulează · drumul până la noi</span>
+            </div>
+          </section>
         </div>
 
-        {/* Map — full-bleed */}
-        <div className="contact-map">
-          <iframe
-            src="https://www.google.com/maps?q=44.8576673,24.8794647&z=17&output=embed"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            allowFullScreen
-            title="Zona Scule — Strada Sfânta Vineri 28, Pitești"
-          />
-          <a
-            href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z/data=!4m6!3m5!1s0x40b2bc886b7beedf:0xf306c5b64dd18ca6!8m2!3d44.8576673!4d24.8794647!16s%2Fg%2F11hht09gys"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="contact-map-badge"
-          >
-            <div className="contact-map-badge-text">
-              <span className="contact-map-badge-label">Sfanta Vineri 28, Pitesti</span>
-              <span className="contact-map-badge-action">Deschide în Google Maps ↗</span>
-            </div>
-          </a>
-        </div>
+        <ContactMap />
 
         <div className="contact-inner after-map">
 
@@ -231,15 +215,10 @@ export default function ContactPage({
                 <span className="about-fact-value">S.E.A.P.</span>
                 <span className="about-fact-label">Furnizor înregistrat pentru achiziții publice</span>
               </div>
-              <a
-                href="https://www.google.com/maps/place/Strada+Sf%C3%A2nta+Vineri+28,+110024+Pite%C8%99ti/@44.8577653,24.8792311,17z"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="about-fact"
-              >
-                <span className="about-fact-value">Pitești</span>
-                <span className="about-fact-label">Strada Sfânta Vineri 28 · 110024 · deschide în Google Maps ↗</span>
-              </a>
+              <div className="about-fact">
+                <span className="about-fact-value">Național</span>
+                <span className="about-fact-label">Livrăm în toată țara</span>
+              </div>
             </div>
           </section>
 

@@ -62,24 +62,14 @@ export default function ContactForm({
   }
 
   return (
-    <section className="cf" aria-labelledby="cf-title">
+    <div className="cf">
       <style>{`
-        .cf {
-          /* Hero: fills the screen minus a strip, so the contact cards below
-             peek above the fold and hint at more to scroll to. */
-          min-height: calc(100vh - var(--nav-h) - 160px);
-          display: flex; flex-direction: column; justify-content: center;
-          padding: clamp(24px, 5vh, 64px) 0;
-          border-bottom: 1px solid rgba(0,0,0,0.12);
-        }
-        /* The letter sits straight on the container margin — no panel. */
-        .cf-panel { width: 60%; }
         .cf-eyebrow { margin-bottom: 16px; }
         .cf-title {
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(36px, 3.4vw, 48px); line-height: 1; letter-spacing: -0.015em;
+          font-size: clamp(40px, 4vw, 60px); line-height: 1; letter-spacing: -0.015em;
           color: rgb(0,0,0);
-          margin-bottom: clamp(24px, 4.5vh, 44px);
+          margin-bottom: clamp(28px, 5vh, 52px);
         }
 
         /* The sentence */
@@ -108,19 +98,12 @@ export default function ContactForm({
         .cf-input.msg { resize: none; overflow: hidden; field-sizing: content; min-height: 1.3em; }
         .cf-input::placeholder { color: rgba(0,0,0,0.22); }
         .cf-input:focus { border-bottom-color: rgb(217,44,43); }
-        .cf-label { color: rgba(0,0,0,0.45); }
 
         .cf-foot {
-          margin-top: clamp(24px, 4.5vh, 44px); padding-top: clamp(16px, 2.5vh, 24px);
-          border-top: 1px solid rgba(0,0,0,0.06);
-          display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+          margin-top: clamp(28px, 5vh, 48px);
+          display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
         }
-        .cf-note {
-          font-family: 'Montserrat', sans-serif; font-weight: 400;
-          font-size: 13px; line-height: 1.5;
-          color: rgba(0,0,0,0.5); max-width: 34ch;
-        }
-        .cf-error { font-family: 'Montserrat', sans-serif; font-size: 13px; color: rgb(217,44,43); margin-top: 8px; }
+        .cf-error { font-family: 'Montserrat', sans-serif; font-size: 13px; color: rgb(217,44,43); }
         .cf-submit {
           display: inline-flex; align-items: center; gap: 28px;
           background: rgb(0,0,0); color: rgb(255,255,255);
@@ -143,18 +126,14 @@ export default function ContactForm({
         .cf-thanks { font-family: 'Montserrat', sans-serif; font-size: 18px; line-height: 1.4; color: rgb(30,30,30); max-width: 34ch; }
         .cf-thanks em { font-style: normal; font-family: 'Neuton', serif; font-size: 20px; color: rgb(217,44,43); }
 
-        @media (max-width: 1100px) { .cf-panel { width: 80%; } }
         @media (max-width: 768px) {
           .cf-line { flex-direction: column; align-items: stretch; }
           .cf-line > span { white-space: normal; padding-bottom: 0; }
-          .cf-input, .cf-input.name { flex: 1 1 auto; width: 100%; padding-left: 0; }
-          .cf { min-height: 0; }
-          .cf-panel { width: 100%; }
+          .cf-input, .cf-input.name, .cf-input.email { flex: 0 0 auto; width: 100%; padding-left: 0; }
           .cf-submit { width: 100%; justify-content: space-between; }
         }
       `}</style>
 
-      <div className="cf-panel">
         <p className="eyebrow-mono cf-eyebrow">Cerere de ofertă</p>
         <h1 id="cf-title" className="cf-title">Hai să vorbim</h1>
 
@@ -183,30 +162,26 @@ export default function ContactForm({
                 <span>Vă rog să mă contactați la:</span>
               </div>
               <div className="cf-line">
-                <span className="cf-label">tel:</span>
+                <span>tel.</span>
                 <input className="cf-input" type="tel" autoComplete="tel" aria-label="Telefon"
                   placeholder="telefon" value={form.telefon} onChange={set('telefon')} />
-                <span className="cf-label">email:</span>
+                <span>e-mail</span>
                 <input className="cf-input email" type="email" required autoComplete="email" aria-label="Email"
                   placeholder="adresa de e-mail" value={form.email} onChange={set('email')} />
               </div>
             </div>
 
             <div className="cf-foot">
-              <div>
-                <p className="cf-note">Pregătim oferte personalizate, întotdeauna adaptate nevoilor și cerințelor dumneavoastră.</p>
-                {error && <p className="cf-error">{error}</p>}
-              </div>
               <button type="submit" className="cf-submit" disabled={sending}>
-                {sending ? 'Se trimite…' : 'Trimite mesajul'}
+                {sending ? 'Se trimite…' : 'Trimite cererea'}
                 <span className="cf-submit-icon" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </span>
               </button>
+              {error && <p className="cf-error">{error}</p>}
             </div>
           </form>
         )}
-      </div>
-    </section>
+    </div>
   )
 }
