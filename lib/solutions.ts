@@ -20,11 +20,33 @@ export type SolutionSection =
   | { kind: 'tip'; text: string; by: string }
   /** Answer-first FAQ (also emitted as FAQPage JSON-LD). */
   | { kind: 'faq'; items: { q: string; a: string }[] }
+  /** A comparison table: first column is the row label. */
+  | { kind: 'compare'; title: string; text?: string; head: string[]; rows: string[][]; note?: string }
+  /** "Dacă… → …" rules of thumb. */
+  | { kind: 'rules'; title: string; items: { when: string; then: string }[] }
+  /** Step-by-step how-to (also emitted as HowTo JSON-LD). */
+  | { kind: 'howto'; title: string; steps: { title: string; text: string }[] }
+  /** A call to action (B2B: offers, S.E.A.P., visits). */
+  | { kind: 'cta'; title: string; text: string; label: string; href: string }
+
+export type SolutionType = 'meserie' | 'ghid' | 'proiect'
+export const SOLUTION_TYPES: { id: SolutionType; label: string; eyebrow: string }[] = [
+  { id: 'meserie', label: 'Meserii și industrii', eyebrow: 'Soluții pe domenii' },
+  { id: 'ghid', label: 'Cum alegi', eyebrow: 'Ghiduri de alegere' },
+  { id: 'proiect', label: 'Proiecte', eyebrow: 'Liste de scule pe proiect' },
+]
 
 export type Solution = {
   slug: string
-  /** Who it's for — the hero's big word ("Zona Electricieni"). */
+  type: SolutionType
+  /** Shown first and large on /zona-solutii. */
+  featured?: boolean
+  /** Short name — the hero's big word ("Zona Electricieni") on domain
+   *  stories, the card title everywhere. */
   profession: string
+  /** Full hero title instead of "Zona {profession}" — guides and projects,
+   *  whose H1 should read like the search it answers. */
+  title?: string
   /** Eyebrow / card label. */
   domain: string
   headline: string
@@ -38,12 +60,15 @@ export type Solution = {
 export const solutionSubs = (s: Solution) =>
   [...new Set(s.sections.flatMap(x => (x.kind === 'carousel' ? x.subs : [])))]
 
+import { MORE_SOLUTIONS } from './solutions-more'
+
 const TEAM = 'Echipa tehnică Zona Scule'
 
-export const SOLUTIONS: Solution[] = [
+const BASE_SOLUTIONS: Solution[] = [
   // ── Electricieni ──────────────────────────────────────────────────────────
   {
     slug: 'scule-pentru-electricieni',
+    type: 'meserie',
     profession: 'Electricieni',
     domain: 'Lucrări electrice',
     headline: 'De la traseu la tablou, fără surprize la recepție.',
@@ -93,6 +118,7 @@ export const SOLUTIONS: Solution[] = [
   // ── Instalatori ───────────────────────────────────────────────────────────
   {
     slug: 'scule-pentru-instalatori',
+    type: 'meserie',
     profession: 'Instalatori',
     domain: 'Instalații sanitare și termice',
     headline: 'Îmbinări etanșe la prima probă de presiune.',
@@ -130,6 +156,7 @@ export const SOLUTIONS: Solution[] = [
   // ── Construcții ───────────────────────────────────────────────────────────
   {
     slug: 'scule-pentru-constructii',
+    type: 'meserie',
     profession: 'Constructori',
     domain: 'Construcții și renovări',
     headline: 'Beton, zidărie și finisaje — la cotă și la termen.',
@@ -178,6 +205,7 @@ export const SOLUTIONS: Solution[] = [
   // ── Tâmplărie ─────────────────────────────────────────────────────────────
   {
     slug: 'scule-pentru-tamplarie',
+    type: 'meserie',
     profession: 'Tâmplari',
     domain: 'Tâmplărie și prelucrarea lemnului',
     headline: 'Tăieturi curate, îmbinări strânse, suprafețe fine.',
@@ -215,6 +243,7 @@ export const SOLUTIONS: Solution[] = [
   // ── Prelucrarea metalelor ─────────────────────────────────────────────────
   {
     slug: 'scule-pentru-prelucrarea-metalelor',
+    type: 'meserie',
     profession: 'Lăcătuși',
     domain: 'Prelucrarea metalelor',
     headline: 'Tăiere, polizare și găurire în oțel și inox.',
@@ -253,6 +282,7 @@ export const SOLUTIONS: Solution[] = [
   // ── Curățenie profesională ────────────────────────────────────────────────
   {
     slug: 'echipamente-curatenie-profesionala',
+    type: 'meserie',
     profession: 'Curățenie',
     domain: 'Curățenie profesională',
     headline: 'Suprafețe mari, timp puțin, rezultate care se văd.',
@@ -286,5 +316,7 @@ export const SOLUTIONS: Solution[] = [
     ],
   },
 ]
+
+export const SOLUTIONS: Solution[] = [...BASE_SOLUTIONS, ...MORE_SOLUTIONS]
 
 export const getSolution = (slug: string) => SOLUTIONS.find(s => s.slug === slug) ?? null

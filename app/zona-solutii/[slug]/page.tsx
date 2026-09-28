@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { SOLUTIONS, getSolution, solutionSubs, type SolutionSection } from '@/lib/solutions'
+import { SOLUTIONS, SOLUTION_TYPES, getSolution, solutionSubs, type SolutionSection } from '@/lib/solutions'
 import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImage } from '@/lib/supabase'
 import { getBrandHref } from '@/lib/brand-content'
 import { SOLUTIONS_CSS } from '../styles'
@@ -42,7 +42,11 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   const rowOf = new Map(carousels.map((c, i) => [c, rows[i]]))
   const totalProducts = brands.reduce((a, b) => a + b.cnt, 0)
   const faq = story.sections.find((x): x is Extract<SolutionSection, { kind: 'faq' }> => x.kind === 'faq')
-  const related = SOLUTIONS.filter(s => s.slug !== story.slug).slice(0, 3)
+  const howto = story.sections.find((x): x is Extract<SolutionSection, { kind: 'howto' }> => x.kind === 'howto')
+  // same kind of story first, then the rest
+  const others = SOLUTIONS.filter(s => s.slug !== story.slug)
+  const related = [...others.filter(s => s.type === story.type), ...others.filter(s => s.type !== story.type)].slice(0, 3)
+  const typeInfo = SOLUTION_TYPES.find(t => t.id === story.type)!
 
   const jsonLd = [
     {
@@ -52,6 +56,10 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         { '@type': 'ListItem', position: 2, name: story.domain, item: `https://www.zonascule.ro/zona-solutii/${story.slug}` },
       ],
     },
+    ...(howto ? [{
+      '@context': 'https://schema.org', '@type': 'HowTo', name: story.title ?? story.profession,
+      step: howto.steps.map((st, k) => ({ '@type': 'HowToStep', position: k + 1, name: st.title, text: st.text })),
+    }] : []),
     ...(faq ? [{
       '@context': 'https://schema.org', '@type': 'FAQPage',
       mainEntity: faq.items.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
@@ -133,6 +141,67 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             </blockquote>
           </section>
         )
+      case 'compare':
+        return (
+          <section key={i} className="zs-section">
+            <h2 className="zs-check-title">{sec.title}</h2>
+            {sec.text && <p className="zs-car-text zs-compare-text">{sec.text}</p>}
+            <div className="zs-compare-wrap">
+              <table className="zs-compare">
+                <thead><tr>{sec.head.map((h, k) => <th key={k} scope="col">{h}</th>)}</tr></thead>
+                <tbody>
+                  {sec.rows.map((r, k) => (
+                    <tr key={k}>{r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {sec.note && <p className="zs-compare-note">{sec.note}</p>}
+          </section>
+        )
+      case 'rules':
+        return (
+          <section key={i} className="zs-section">
+            <h2 className="zs-check-title">{sec.title}</h2>
+            <div className="zs-rules">
+              {sec.items.map(r => (
+                <div key={r.when} className="zs-rule">
+                  <span className="zs-rule-if">Dacă</span>
+                  <p className="zs-rule-when">{r.when}</p>
+                  <span className="zs-rule-arrow" aria-hidden="true">→</span>
+                  <p className="zs-rule-then">{r.then}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      case 'howto':
+        return (
+          <section key={i} className="zs-section">
+            <h2 className="zs-check-title">{sec.title}</h2>
+            <ol className="zs-howto">
+              {sec.steps.map((st, k) => (
+                <li key={st.title} className="zs-howto-step">
+                  <span className="zs-howto-n">{pad(k)}</span>
+                  <p className="zs-step-t">{st.title}</p>
+                  <p className="zs-step-p">{st.text}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      case 'cta':
+        return (
+          <section key={i} className="zs-section">
+            <div className="zs-cta">
+              <div>
+                <h2 className="zs-cta-title">{sec.title}</h2>
+                <p className="zs-cta-text">{sec.text}</p>
+              </div>
+              <Link href={sec.href} className="zs-cta-btn">{sec.label} <span aria-hidden="true">→</span></Link>
+            </div>
+          </section>
+        )
       case 'faq':
         return (
           <section key={i} className="zs-section">
@@ -163,14 +232,16 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <nav className="zs-crumbs" aria-label="Breadcrumb">
               <Link href="/zona-solutii" className="zs-crumb">Zona Soluții</Link>
               <span className="zs-crumb-sep">/</span>
-              <span className="zs-crumb-cur">{story.domain}</span>
+              <span className="zs-crumb-cur">{typeInfo.label}</span>
             </nav>
             <span className="eyebrow-mono">{story.domain}</span>
-            <h1 className="zs-title"><span className="red">Zona</span><br />{story.profession}</h1>
+            {story.title
+              ? <h1 className="zs-title zs-title-long">{story.title}</h1>
+              : <h1 className="zs-title"><span className="red">Zona</span><br />{story.profession}</h1>}
             <p className="zs-headline">{story.headline}</p>
             <p className="zs-sub">{story.excerpt}</p>
             <div className="zs-stats">
-              <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">produse relevante</span></div>
+              <div className="zs-stat"><span className="zs-stat-num">{n(totalProducts)}</span><span className="zs-stat-label">{story.type === 'meserie' ? 'produse relevante' : 'produse recomandate'}</span></div>
               <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">branduri</span></div>
               <div className="zs-stat"><span className="zs-stat-num">{carousels.length}</span><span className="zs-stat-label">familii de produse</span></div>
             </div>
@@ -194,7 +265,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card">
                   <div className="zs-card-body">
                     <span className="zs-card-domain">{r.domain}</span>
-                    <span className="zs-card-title">{r.profession}</span>
+                    <span className="zs-card-title">{r.title ?? r.profession}</span>
                     <span className="zs-card-text">{r.excerpt}</span>
                     <span className="zs-card-meta"><span>Zona Soluții</span><b>Citește →</b></span>
                   </div>
