@@ -117,8 +117,8 @@ export default function DotsParallax() {
     const ROT_PUSH = 0.004 // deg/step of angular velocity per px of cursor travel
     const ROT_MAX_VEL = 0.12 // deg/step
     const ROT_MAX = 0.8 // deg
-    const IDLE_FADE_MS = 2000 // once the cursor is still and the cross has settled…
-    const FADE_OUT_MS = 2000 // …it fades out, slowly; other on/off changes stay quick
+    const IDLE_FADE_MS = 1000 // once the cursor is still and the cross has settled…
+    const FADE_OUT_MS = 1000 // …it fades out (ease-out); other on/off changes stay quick
     const FADE_QUICK_MS = 300
     const STEP_MS = 1000 / 60 // fixed-rate steps, same feel at 60/120Hz
     const SNAP_HYSTERESIS = 4 // px past the midpoint before switching rows

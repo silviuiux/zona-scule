@@ -86,7 +86,7 @@ body::before {
 }
 
 /* ─── CROSS-LINE LASER ─────────────────────────────────────────────────────
-   While the cursor rests on empty page space, two faint red (32%) hairlines
+   While the cursor rests on empty page space, two faint red (16%) hairlines
    cross at it, running edge to edge along the dot row and dot column
    through the cursor — the dots themselves stay untouched. .laser shares
    body::before's transform (cursor drift) so the beams stay registered on
@@ -101,11 +101,11 @@ body::before {
    drift translate nor the tilt can pull a line's end inside the screen. */
 .laser {
   --laser-bleed: 64px;
-  --laser-color: rgba(217,44,43,0.32);
+  --laser-color: rgba(217,44,43,0.16);
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   transform: translate3d(var(--dot-tx, 0px), var(--dot-ty, 0px), 0) scale(var(--dot-scale, 1));
   opacity: var(--laser-on, 0);
-  transition: opacity var(--laser-fade, 300ms) ease;
+  transition: opacity var(--laser-fade, 300ms) ease-out;
 }
 .laser-h, .laser-v {
   position: absolute; inset: calc(-1 * var(--laser-bleed));
