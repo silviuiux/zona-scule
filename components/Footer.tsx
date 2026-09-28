@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LEGAL_PAGES, ANPC_SAL_URL } from '@/lib/legal-nav'
+import { ANPC_SAL_URL } from '@/lib/legal-nav'
 import { getBrandHref } from '@/lib/brand-content'
 import FooterBlueprint from './FooterBlueprint'
 
@@ -62,15 +62,24 @@ export default function Footer({ blueprint = true }: { blueprint?: boolean } = {
         }
         .footer-logo-icon, .footer-logo-word { display: block; height: 64px; width: auto; }
 
-        /* 12-column grid: "Zona Scule" spans 4, then Categorii / Branduri /
-           Informatii / Contact, 2 columns each (two columns on phones) */
+        /* 12-column grid: "Zona Scule" spans 6 (its legal links sit at the
+           bottom), then Branduri / Categorii / Contact, 2 columns each (two
+           columns on phones) */
         .footer-grid {
           position: relative; z-index: 1;
           display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px;
         }
         .footer-grid > * { grid-column: span 2; }
-        .footer-grid > .footer-col-about { grid-column: span 4; }
+        .footer-grid > .footer-col-about {
+          grid-column: span 6;
+          display: flex; flex-direction: column;
+        }
         .footer-col-about > * { max-width: 320px; }
+        .footer-legal {
+          margin-top: auto; padding-top: 40px; max-width: none;
+          display: flex; flex-wrap: wrap; gap: 8px 28px;
+        }
+        .footer-legal .footer-link { margin-bottom: 0; }
 
         .footer-desc {
           font-family: 'Recursive', sans-serif;
@@ -139,6 +148,7 @@ export default function Footer({ blueprint = true }: { blueprint?: boolean } = {
           .footer-grid > * { grid-column: auto; }
           .footer-grid > .footer-col-about { grid-column: 1 / -1; }
           .footer-col-about > * { max-width: none; }
+          .footer-legal { padding-top: 24px; }
           .footer-bottom { flex-direction: column; gap: 6px; text-align: center; padding: 16px var(--gutter); }
         }
       `}</style>
@@ -162,14 +172,11 @@ export default function Footer({ blueprint = true }: { blueprint?: boolean } = {
               <p className="footer-desc">
                 Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.
               </p>
-            </div>
-            <div>
-              <p className="footer-col-title">Categorii</p>
-              {CATEGORIES.map(([label, name]) => (
-                <Link key={name} href={`/produse?categorie=${encodeURIComponent(name)}`} className="footer-link">
-                  {label}
-                </Link>
-              ))}
+              <div className="footer-legal">
+                <Link href="/termeni-si-conditii" className="footer-link">Termeni și condiții</Link>
+                <a href="#" className="footer-link">Achiziții S.E.A.P.</a>
+                <a href={ANPC_SAL_URL} target="_blank" rel="noopener noreferrer" className="footer-link">ANPC SAL</a>
+              </div>
             </div>
             <div>
               <Link href="/branduri" className="footer-col-title">Branduri</Link>
@@ -178,12 +185,12 @@ export default function Footer({ blueprint = true }: { blueprint?: boolean } = {
               ))}
             </div>
             <div>
-              <p className="footer-col-title">Informatii</p>
-              {LEGAL_PAGES.map(l => (
-                <Link key={l.href} href={l.href} className="footer-link">{l.label}</Link>
+              <p className="footer-col-title">Categorii</p>
+              {CATEGORIES.map(([label, name]) => (
+                <Link key={name} href={`/produse?categorie=${encodeURIComponent(name)}`} className="footer-link">
+                  {label}
+                </Link>
               ))}
-              <a href="#" className="footer-link">Achizitii S.E.A.P.</a>
-              <a href={ANPC_SAL_URL} target="_blank" rel="noopener noreferrer" className="footer-link">ANPC SAL</a>
             </div>
             <div>
               <Link href="/contact" className="footer-col-title">Contact</Link>
