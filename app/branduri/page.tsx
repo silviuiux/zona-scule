@@ -141,16 +141,9 @@ export default async function BranduriPage() {
           border-radius: 10px; overflow: hidden; margin-bottom: 40px;
           background: rgb(238,238,238);
         }
-        /* Logo, title and link sit in three corners of the banner: logo
-           top-left (no backdrop), title bottom-left and link bottom-right on
-           solid plates. */
+        /* Title bottom-left and link bottom-right, on solid plates. */
         .branduri-promoted-banner > * { z-index: 1; }
         .branduri-promoted-banner > img { z-index: 0; }
-        .branduri-promoted-logo {
-          position: absolute; top: 24px; left: 24px;
-          display: block; height: 40px; width: auto; max-width: 40%;
-          object-fit: contain; object-position: left center;
-        }
         .branduri-promoted-title {
           position: absolute; left: 24px; bottom: 24px; max-width: calc(100% - 280px);
           margin: 0; padding: 14px 20px 16px;
@@ -184,7 +177,6 @@ export default async function BranduriPage() {
         }
         @media (max-width: 768px) {
           .branduri-promoted-banner { height: 40vh; min-height: 260px; margin-bottom: 24px; }
-          .branduri-promoted-logo { height: 28px; top: 16px; left: 16px; }
           .branduri-promoted-title { left: 16px; bottom: 76px; max-width: calc(100% - 32px); font-size: 26px; padding: 10px 14px 12px; }
           .branduri-promoted-link { left: 16px; right: auto; bottom: 16px; height: 44px; }
         }
@@ -242,10 +234,9 @@ export default async function BranduriPage() {
             // gallery/alt image found among the sampled products, closer to
             // an in-context/application photo than a plain catalog cutout.
             // Brands with a configured application photo (getBrandBanner) use
-            // that. With none, the banner keeps its plain grey ground so the logo,
-            // title and link still have a home.
+            // that. With none, the banner keeps its plain grey ground so the title
+            // and link still have a home.
             const bannerSrc = getBrandBanner(b.name) ?? group.find(p => p.gallery_url_1)?.gallery_url_1
-            const logo = getBrandLogo(b.name)
             return (
               <div key={b.name} className="branduri-promoted">
                 <div className="branduri-promoted-banner">
@@ -257,9 +248,6 @@ export default async function BranduriPage() {
                       sizes="100vw"
                       style={{ objectFit: 'cover' }}
                     />
-                  )}
-                  {logo && (
-                    <Image src={logo.src} alt={logo.alt ?? b.name} width={logo.width} height={logo.height} className="branduri-promoted-logo" />
                   )}
                   <h2 className="branduri-promoted-title">Selecție premium {b.name}</h2>
                   <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot <span aria-hidden="true">→</span></Link>

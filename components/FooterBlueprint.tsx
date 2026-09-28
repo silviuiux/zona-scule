@@ -1094,6 +1094,8 @@ export default function FooterBlueprint() {
     const render = (p: number) => {
       placeTitle()
       frameArt(p)
+      // the note steps aside, in place, as soon as the drawing starts
+      if (noteRef.current) noteRef.current.classList.toggle('gone', p > 0.002)
 
       let pen: { wrap: SVGGElement; xy: [number, number] } | null = null
       for (const it of items) {
@@ -1279,13 +1281,30 @@ export default function FooterBlueprint() {
       return true
     }
 
+    // The nav, pushed away by the footer, comes back on a small scroll up
+    // (PEEK px of upward intent — even while the wheel is rewinding the
+    // drawing) and leaves again on the same amount down.
+    const PEEK = 48
+    let upAcc = 0, downAcc = 0
+    const peek = (delta: number) => {
+      if (delta < 0) {
+        upAcc -= delta; downAcc = 0
+        if (upAcc > PEEK && lastEgg > 0) doc.dataset.navPeek = '1'
+      } else if (delta > 0) {
+        downAcc += delta; upAcc = 0
+        if (downAcc > PEEK) delete doc.dataset.navPeek
+      }
+    }
     const onWheel = (e: WheelEvent) => {
-      if (push(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) && e.cancelable) e.preventDefault()
+      const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
+      peek(d)
+      if (push(d) && e.cancelable) e.preventDefault()
     }
     let touchY = 0
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY }
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY
+      peek((touchY - y) * 2)
       if (push((touchY - y) * 2) && e.cancelable) e.preventDefault()
       touchY = y
     }
@@ -1307,12 +1326,12 @@ export default function FooterBlueprint() {
       scrollRaf = requestAnimationFrame(() => {
         scrollRaf = 0
         if (!footer || hidden()) {
-          if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg') }
+          if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg'); delete doc.dataset.navPeek }
           return
         }
         const top = footer.getBoundingClientRect().top
         const vh = window.innerHeight
-        if (top >= vh) { if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg') } return }
+        if (top >= vh) { if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg'); delete doc.dataset.navPeek } return }
         const navH = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 68
         const egg = clamp01((navH - top) / navH)
         if (Math.abs(egg - lastEgg) > 1e-3) { lastEgg = egg; doc.style.setProperty('--egg', egg.toFixed(4)) }
@@ -1327,6 +1346,7 @@ export default function FooterBlueprint() {
       if (scrollRaf) cancelAnimationFrame(scrollRaf)
       doc.style.removeProperty('--egg')
       delete doc.dataset.eggHold
+      delete doc.dataset.navPeek
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
@@ -1411,7 +1431,8 @@ export default function FooterBlueprint() {
         .bp-art text.mark { font-size: 2.1px; letter-spacing: 0.14em; fill: rgba(0,0,0,0.38); }
         .bp-art text.mono-s { font-size: 2.3px; }
         .bp-title { width: 460px; height: 126px; left: var(--gutter); top: 0; overflow: visible; }
-        .bp-note { width: 240px; height: 44px; left: 0; top: 0; overflow: visible; }
+        .bp-note { width: 240px; height: 44px; left: 0; top: 0; overflow: visible; transition: opacity 700ms ease; }
+        .bp-note.gone { opacity: 0; }
         .bp-note text { font-size: 10px; }
 
         /* Stroke widths are in each SVG's own units — mm on the drawings

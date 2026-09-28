@@ -105,16 +105,23 @@ export default function BrandLandingTemplate({
         .badge-seap  { background: rgba(21,128,61,0.08); color: rgb(21,128,61); border-color: rgba(21,128,61,0.22); }
 
         /* ══════════════════ HERO ══════════════════ */
-        /* Plain white hero — logo, title, subtitle, one CTA, subcategory
+        /* Plain white hero — title, subtitle, one CTA, subcategory
            pills. No watermark/dot-grid/badges; the brand's own photography
            (the full-bleed section right after) carries the visual weight
            now instead of a decorative hero background. */
         .bp-hero { background: rgb(255,255,255); padding-top: var(--nav-h); }
         .bp-hero-inner { padding: 96px var(--gutter) 56px; max-width: 1440px; margin: 0 auto; }
         .bp-hero-copy { max-width: 1120px; }
-        /* Fixed height (not clamped) per spec — every brand mark, square or
-           wide, lands at the same visual weight. */
-        .bp-hero-logo { display: block; height: 160px; width: auto; margin-bottom: 32px; }
+        /* The brand's mark: small, top-right of the hero, in the same
+           160×48 box for every brand (square marks and wide wordmarks
+           alike), so it reads as a signature rather than a headline. */
+        .bp-hero-inner { position: relative; }
+        .bp-hero-mark {
+          position: absolute; top: 96px; right: var(--gutter);
+          width: 160px; height: 48px; display: flex; align-items: center; justify-content: flex-end;
+        }
+        .bp-hero-inner:has(.bp-hero-mark) .bp-hero-copy { max-width: min(1120px, calc(100% - 200px)); }
+        .bp-hero-mark img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
         .bp-hero-title {
           font-family: 'Neuton', serif; font-weight: 400;
           font-size: clamp(40px, 5.5vw, 80px);
@@ -152,7 +159,8 @@ export default function BrandLandingTemplate({
         .bp-hero-pill:hover { color: var(--brand-accent); }
 
         @media (max-width: 640px) {
-          .bp-hero-logo { height: 96px; }
+          .bp-hero-inner:has(.bp-hero-mark) .bp-hero-copy { max-width: none; }
+          .bp-hero-mark { position: static; width: 120px; height: 36px; justify-content: flex-start; margin-bottom: 32px; }
         }
 
         /* Still used by the "Ask a Specialist" section's CTA further down
@@ -397,17 +405,12 @@ export default function BrandLandingTemplate({
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="bp-hero">
         <div className="bp-hero-inner">
+        {config.logo && (
+          <div className="bp-hero-mark">
+            <Image src={config.logo.src} alt={config.logo.alt} width={config.logo.width} height={config.logo.height} priority />
+          </div>
+        )}
         <div className="bp-hero-copy">
-          {config.logo && (
-            <Image
-              src={config.logo.src}
-              alt={config.logo.alt}
-              width={config.logo.width}
-              height={config.logo.height}
-              className="bp-hero-logo"
-              priority
-            />
-          )}
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
               <span key={i}>

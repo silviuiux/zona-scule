@@ -7,6 +7,7 @@ import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
 import CatalogFilterPills from './CatalogFilterPills'
+import CatalogFilterTiles from './CatalogFilterTiles'
 import CatalogLayout from './CatalogLayout'
 import { ViewModeProvider } from './ViewModeContext'
 import ViewSwitcherButton from './ViewSwitcherButton'
@@ -487,6 +488,17 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               brands={brands}
               activeCats={catSel}
               activeBrands={brandSel}
+              search={sp.q}
+            />
+          }
+          tiles={
+            <CatalogFilterTiles
+              categories={pillCategories}
+              brands={brands}
+              activeCats={catSel}
+              activeBrands={brandSel}
+              activeSub={sp.subcategorie}
+              subs={categorySubs}
               search={sp.q}
             />
           }

@@ -2,12 +2,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
 const STORAGE_KEY = 'produse-view-mode'
-export type ViewMode = 'sidebar' | 'pills'
+export type ViewMode = 'pills' | 'tiles' | 'sidebar'
+/** The switcher steps through the filter layouts in this order. */
+export const VIEW_MODES: ViewMode[] = ['pills', 'tiles', 'sidebar']
 
 const ViewModeContext = createContext<{ mode: ViewMode; toggleMode: () => void } | null>(null)
 
 /**
- * Owns the /produse sidebar-vs-pills view mode so the switcher button can
+ * Owns the /produse filter layout (pill rows, category tiles or sidebar) so the switcher button can
  * live anywhere in the tree — CatalogLayout (to toggle sidebar visibility +
  * grid columns) and ViewSwitcherButton (rendered as the first item of the
  * subcategory pill row) both consume this via useViewMode() instead of
@@ -19,12 +21,12 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === 'pills' || saved === 'sidebar') setMode(saved)
+    if (VIEW_MODES.includes(saved as ViewMode)) setMode(saved as ViewMode)
   }, [])
 
   const toggleMode = () => {
     setMode(prev => {
-      const next: ViewMode = prev === 'sidebar' ? 'pills' : 'sidebar'
+      const next = VIEW_MODES[(VIEW_MODES.indexOf(prev) + 1) % VIEW_MODES.length]
       localStorage.setItem(STORAGE_KEY, next)
       return next
     })
