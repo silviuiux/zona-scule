@@ -92,7 +92,7 @@ for (const k of Object.keys(out)) console.log(k, typeof out[k] === 'string' ? ou
 const K = 156543.03392 * Math.cos(LAT0 * rad) / 2 ** 17 / 2
 const T = ([x, y]) => [Math.round((x - 996) * K * 10) / 10, Math.round((y - 378) * K * 10) / 10]
 const streets = {
-  dn65: { pts: [[0,20],[200,160],[430,322],[640,500],[824,668],[905,751]], w: 3, label: 'DN 65', at: 0.3 },
+  dn65: { pts: [[0,20],[200,160],[430,322],[640,500],[824,668],[905,751]], w: 3, label: 'B-DUL I. C. BRĂTIANU', at: 0.3 },
   sfv: { pts: [[866,462],[935,378],[1050,236],[1240,0]], w: 2, label: 'STR. SFÂNTA VINERI', at: 0.62, main: true },
   pasaj: { pts: [[700,562],[866,462]], w: 1, label: '', at: 0.5 },
   milea: { pts: [[560,751],[640,640],[700,562]], w: 1.5, label: '', at: 0.5 },

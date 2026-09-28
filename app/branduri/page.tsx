@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getBrands, getRandomExpensiveProductsByBrand } from '@/lib/supabase'
+import { getBrands, getRandomExpensiveProductsByBrand, getBrandSubcategoryNames } from '@/lib/supabase'
 import { getBrandHref, getBrandLogo } from '@/lib/brand-content'
 
 export const revalidate = 3600
@@ -21,7 +21,11 @@ export const metadata: Metadata = {
 export default async function BranduriPage() {
   const brands = await getBrands()
   const featured = brands.filter(b => getBrandLogo(b.name))
-  const promotedGroups = await Promise.all(featured.map(b => getRandomExpensiveProductsByBrand(b.name)))
+  const [promotedGroups, tickers] = await Promise.all([
+    Promise.all(featured.map(b => getRandomExpensiveProductsByBrand(b.name))),
+    Promise.all(brands.map(b => getBrandSubcategoryNames(b.name))),
+  ])
+  const totalProducts = brands.reduce((n, b) => n + b.product_count, 0)
 
   return (
     <>
@@ -33,20 +37,29 @@ export default async function BranduriPage() {
         }
         .branduri-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 64px var(--gutter) 96px;
+          padding: 0 var(--gutter) var(--space-section);
         }
+        /* Hero — same rhythm as the catalog / contact heroes: roomy top,
+           mono eyebrow, big Neuton title, short description, mono stats */
+        .branduri-hero { padding: clamp(72px, 12vh, 128px) 0 clamp(56px, 8vh, 96px); }
+        .branduri-hero .eyebrow-mono { margin-bottom: 20px; }
         .branduri-title {
-          font-family: 'Neuton', serif;
-          font-size: clamp(40px, 5vw, 64px);
-          line-height: 1.05;
+          font-family: 'Neuton', serif; font-weight: 400;
+          font-size: clamp(56px, 7.5vw, 112px);
+          line-height: 0.92; letter-spacing: -0.015em;
           color: rgb(0,0,0);
-          margin-bottom: 12px;
+          margin-bottom: 24px;
         }
         .branduri-sub {
           font-family: 'Recursive', sans-serif;
-          font-size: 15px; color: rgba(0,0,0,0.5);
-          margin-bottom: 40px;
+          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.55);
+          max-width: 560px;
+          margin-bottom: 32px;
         }
+        .branduri-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+        .branduri-stat { display: flex; align-items: baseline; gap: 8px; }
+        .branduri-stat-num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 22px; letter-spacing: -0.02em; color: rgb(0,0,0); }
+        .branduri-stat-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
         .branduri-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -55,9 +68,10 @@ export default async function BranduriPage() {
           margin-bottom: var(--space-section);
         }
         .branduri-card {
-          display: flex; flex-direction: column; gap: 6px;
-          min-height: 150px;
-          padding: 20px 22px;
+          position: relative; overflow: hidden;
+          display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
+          min-height: 240px;
+          padding: 24px 24px 60px;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
           border-radius: 6px;
@@ -69,14 +83,47 @@ export default async function BranduriPage() {
           box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
         .branduri-card-logo {
-          display: block; height: 28px; width: auto;
+          display: block; height: 48px; width: auto; max-width: 70%;
           object-fit: contain; object-position: left center;
-          margin-bottom: 4px;
+          margin-bottom: auto; /* logo at the top, name + count at the bottom */
         }
-        /* Featured (logo) brands span two columns, logo up front */
-        .branduri-card.wide { grid-column: span 2; justify-content: space-between; }
-        .branduri-card.wide .branduri-card-logo { height: 44px; max-width: 60%; margin-bottom: 20px; }
-        .branduri-card.wide .branduri-card-name { font-size: 17px; }
+        /* Featured (logo) brands span two columns */
+        .branduri-card.wide { grid-column: span 2; }
+        .branduri-card.wide .branduri-card-logo { height: 72px; max-width: 55%; }
+        .branduri-card.wide .branduri-card-name { font-size: 18px; }
+
+        /* Subcategory ticker — slides in along the card's bottom edge on
+           hover and scrolls the brand's subcategories, biggest first */
+        .bt-ticker {
+          position: absolute; left: 0; right: 0; bottom: 0; height: 40px;
+          border-top: 1px solid rgba(0,0,0,0.06);
+          overflow: hidden;
+          display: flex; align-items: center;
+          opacity: 0; transform: translateY(100%);
+          transition: opacity 250ms ease, transform 350ms cubic-bezier(0.22,1,0.36,1);
+          -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+                  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+        }
+        .bt-track {
+          display: flex; flex-shrink: 0; white-space: nowrap;
+          animation: bt-scroll var(--bt-dur, 30s) linear infinite;
+          animation-play-state: paused;
+        }
+        .bt-item {
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(0,0,0,0.5);
+          padding: 0 14px;
+        }
+        .bt-item::after { content: '·'; margin-left: 28px; color: rgb(217,44,43); }
+        @keyframes bt-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .branduri-card:hover .bt-ticker, .branduri-card:focus-visible .bt-ticker { opacity: 1; transform: none; }
+        .branduri-card:hover .bt-track, .branduri-card:focus-visible .bt-track { animation-play-state: running; }
+        @media (hover: none) {
+          .bt-ticker { opacity: 1; transform: none; }
+          .bt-track { animation-play-state: running; }
+        }
+        @media (prefers-reduced-motion: reduce) { .bt-track { animation: none; } }
         .branduri-card-name {
           font-family: 'Inter', sans-serif;
           font-size: 15px; font-weight: 600;
@@ -133,13 +180,24 @@ export default async function BranduriPage() {
 
       <div className="branduri-page">
         <div className="branduri-inner">
-          <h1 className="branduri-title">Branduri</h1>
-          <p className="branduri-sub">{brands.length} producători disponibili în catalog.</p>
+          <section className="branduri-hero">
+            <span className="eyebrow-mono">Producători</span>
+            <h1 className="branduri-title">Branduri</h1>
+            <p className="branduri-sub">
+              Scule electrice, abrazive, accesorii și echipamente profesionale de la producătorii
+              pe care îi distribuim — alege un brand pentru gama completă.
+            </p>
+            <div className="branduri-stats">
+              <div className="branduri-stat"><span className="branduri-stat-num">{brands.length}</span><span className="branduri-stat-label">producători</span></div>
+              <div className="branduri-stat"><span className="branduri-stat-num">{totalProducts.toLocaleString('ro')}</span><span className="branduri-stat-label">produse</span></div>
+            </div>
+          </section>
 
           <h2 className="branduri-grid-title">Toate brandurile</h2>
           <div className="branduri-grid">
-            {brands.map(b => {
+            {brands.map((b, bi) => {
               const logo = getBrandLogo(b.name)
+              const subs = tickers[bi]
               return (
                 <Link key={b.id} href={getBrandHref(b.name)} className={`branduri-card${logo ? ' wide' : ''}`}>
                   {logo && (
@@ -153,6 +211,13 @@ export default async function BranduriPage() {
                   )}
                   <span className="branduri-card-name">{b.name}</span>
                   <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
+                  {subs.length > 0 && (
+                    <div className="bt-ticker" aria-hidden="true">
+                      <div className="bt-track" style={{ ['--bt-dur' as string]: `${Math.max(14, subs.join('').length * 0.28)}s` }}>
+                        {[...subs, ...subs].map((name, i) => <span key={i} className="bt-item">{name}</span>)}
+                      </div>
+                    </div>
+                  )}
                 </Link>
               )
             })}

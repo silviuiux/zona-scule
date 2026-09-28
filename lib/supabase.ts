@@ -750,6 +750,18 @@ export async function getSubcategoriesByBrandName(brandName: string): Promise<Su
     .sort((a, b) => b.product_count - a.product_count)
 }
 
+/** A brand's subcategory names, most products first (for the brands-page
+ *  card ticker). Skips the catch-all "Altele". */
+export async function getBrandSubcategoryNames(brandName: string, limit = 12): Promise<string[]> {
+  const { data, error } = await supabase.rpc('get_subcategories_by_brand', { p_brand: brandName })
+  if (error || !data) return []
+  return (data as { subcategory_text: string | null; cnt: number }[])
+    .filter(r => r.subcategory_text && r.subcategory_text.trim().toLowerCase() !== 'altele')
+    .sort((a, b) => b.cnt - a.cnt)
+    .slice(0, limit)
+    .map(r => r.subcategory_text!.trim())
+}
+
 export type FeaturedSubcategoryWithImage = {
   id: string
   name: string

@@ -48,31 +48,31 @@ export default function ContactMap() {
         /* --u = metres per screen px, set every frame: keeps line weights and
            type the same on screen whatever the zoom. */
         .cmap-svg .dr { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; stroke-linecap: round; stroke-linejoin: round; }
-        .cmap-svg .st { stroke: rgba(0,0,0,0.42); stroke-width: calc(1px * var(--u, 1) * var(--w, 1)); }
-        .cmap-svg .st.main { stroke: rgb(0,0,0); }
-        .cmap-svg .water { stroke: rgba(0,0,0,0.3); stroke-width: calc(1px * var(--u, 1)); }
-        .cmap-svg .river { stroke: rgba(0,0,0,0.35); stroke-width: calc(1.2px * var(--u, 1)); }
-        .cmap-svg .road { stroke: rgba(0,0,0,0.28); stroke-width: calc(1px * var(--u, 1)); }
-        .cmap-svg .urban { stroke: rgba(217,44,43,0.55); stroke-width: calc(1px * var(--u, 1)); }
-        .cmap-svg .urban-fill { fill: rgba(217,44,43,0.05); stroke: none; }
-        .cmap-svg .county { stroke: rgba(0,0,0,0.4); stroke-width: calc(1px * var(--u, 1)); }
-        .cmap-svg .ro { stroke: rgb(0,0,0); stroke-width: calc(1.4px * var(--u, 1)); }
-        .cmap-svg .ro-fill { fill: rgba(217,44,43,0.06); stroke: none; }
-        .cmap-svg .eu { stroke: rgba(0,0,0,0.26); stroke-width: calc(0.8px * var(--u, 1)); }
-        .cmap-svg .danube { stroke: rgba(0,0,0,0.3); stroke-width: calc(1px * var(--u, 1)); }
+        .cmap-svg .st { stroke: rgba(0,0,0,0.26); stroke-width: calc(0.7px * var(--u, 1) * var(--w, 1)); }
+        .cmap-svg .st.main { stroke: rgba(0,0,0,0.72); }
+        .cmap-svg .water { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
+        .cmap-svg .river { stroke: rgba(0,0,0,0.24); stroke-width: calc(1px * var(--u, 1)); }
+        .cmap-svg .road { stroke: rgba(0,0,0,0.16); stroke-width: calc(0.8px * var(--u, 1)); }
+        .cmap-svg .urban { stroke: rgba(217,44,43,0.38); stroke-width: calc(0.8px * var(--u, 1)); }
+        .cmap-svg .urban-fill { fill: rgba(217,44,43,0.03); stroke: none; }
+        .cmap-svg .county { stroke: rgba(0,0,0,0.22); stroke-width: calc(0.8px * var(--u, 1)); stroke-dasharray: none; }
+        .cmap-svg .ro { stroke: rgba(0,0,0,0.62); stroke-width: calc(1px * var(--u, 1)); }
+        .cmap-svg .ro-fill { fill: rgba(217,44,43,0.04); stroke: none; }
+        .cmap-svg .eu { stroke: rgba(0,0,0,0.15); stroke-width: calc(0.6px * var(--u, 1)); }
+        .cmap-svg .danube { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg text {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 10.5px;
-          letter-spacing: 0.12em; fill: rgba(0,0,0,0.5);
+          font-size: 10px;
+          letter-spacing: 0.12em; fill: rgba(0,0,0,0.4);
           paint-order: stroke; stroke: rgba(255,255,255,0.92); stroke-width: 3px; stroke-linejoin: round;
         }
-        .cmap-svg text.main { fill: rgb(217,44,43); font-weight: 500; }
-        .cmap-svg text.big { font-size: 15px; letter-spacing: 0.3em; fill: rgba(0,0,0,0.7); font-weight: 500; }
+        .cmap-svg text.main { fill: rgba(217,44,43,0.85); font-weight: 500; }
+        .cmap-svg text.big { font-size: 14px; letter-spacing: 0.3em; fill: rgba(0,0,0,0.55); font-weight: 400; }
         .cmap-svg text.red { fill: rgb(217,44,43); }
-        .cmap-svg .dot { fill: rgba(0,0,0,0.55); }
+        .cmap-svg .dot { fill: rgba(0,0,0,0.4); }
         .cmap-svg .pin-ring { fill: none; stroke: rgb(217,44,43); stroke-width: 1; }
         .cmap-svg .pin-dot { fill: rgb(217,44,43); }
-        .cmap-svg .pin-cross { stroke: rgba(217,44,43,0.8); stroke-width: 1; fill: none; }
+        .cmap-svg .pin-cross { stroke: rgba(217,44,43,0.6); stroke-width: 0.8; fill: none; }
         .cmap-svg .pin-pulse { fill: none; stroke: rgba(217,44,43,0.5); stroke-width: 1; transform-box: fill-box; transform-origin: center; animation: cmap-pulse 2.4s ease-out infinite; }
         @keyframes cmap-pulse { from { transform: scale(0.4); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
         @media (prefers-reduced-motion: reduce) { .cmap-svg .pin-pulse { animation: none; opacity: 0; } }
