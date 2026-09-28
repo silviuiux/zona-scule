@@ -198,32 +198,30 @@ export default function SubcategoryPillScroller({
            own — no negative-margin breakout needed since we want the row
            to shrink into the existing footprint, not for the wrapper to
            grow past it. */
-        /* Arrows sit just outside the content edge, in the page gutter
-           (32px) — the rows keep the full container width. Bare chevrons;
-           a white rounded-rectangle backdrop only on hover. Desktop only. */
+        /* Arrows: square buttons as tall as the pills (52px), at the row's
+           two ends; the pills scroll between them. Desktop only. */
         .subcat-arrow {
           display: none;
           position: absolute;
           top: 50%; transform: translateY(-50%);
-          /* Above both this row's own sticky z-index (50) and the filter
-             row's (51) — otherwise the sticky pill row painted on top of it
-             and the arrows looked like they were sitting "behind" the pills. */
+          /* above the sticky rows (z-index 50/51) */
           z-index: 60;
-          width: 28px; height: 40px;
+          width: 52px; height: 52px;
           align-items: center; justify-content: center;
           border-radius: 4px;
-          background: rgba(255,255,255,0);
-          border: none;
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.07);
           color: rgb(0,0,0);
           cursor: pointer;
-          transition: background 150ms;
+          transition: border-color 150ms;
         }
-        .subcat-arrow:hover { background: rgb(255,255,255); }
-        .subcat-arrow-left { left: -30px; }
-        .subcat-arrow-right { right: -30px; }
+        .subcat-arrow:hover { border-color: rgba(0,0,0,0.22); }
+        .subcat-arrow-left { left: 0; }
+        .subcat-arrow-right { right: 0; }
 
         @media (min-width: 1024px) {
           .subcat-arrow { display: flex; }
+          .subcat-scroller, .subcat-scroller.is-sticky { padding-left: 60px; padding-right: 60px; }
         }
       `}</style>
 

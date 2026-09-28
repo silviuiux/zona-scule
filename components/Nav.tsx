@@ -146,18 +146,21 @@ export default function Nav() {
         .nav-logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; height: 100%; margin-right: auto; }
         .nav.search-open .nav-logo { margin-right: 32px; }
 
-        /* Shared button look: Oswald, wide tracking, hairline outline */
+        /* Shared button look: Oswald, wide tracking, hairline outline; as
+           tall as the logo (28px), with a larger invisible hit area */
         .nav-btn {
-          display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-          height: 40px; padding: 0 20px; flex-shrink: 0;
+          position: relative;
+          display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+          height: 28px; padding: 0 14px; flex-shrink: 0;
           border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background: rgb(255,255,255);
           font-family: 'Oswald', 'Inter', sans-serif; font-weight: 400;
-          font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+          font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
           color: rgb(20,20,20); text-decoration: none; white-space: nowrap; cursor: pointer;
           transition: border-color 150ms, color 150ms, background 150ms;
         }
+        .nav-btn::after { content: ''; position: absolute; inset: -8px -3px; }
         .nav-btn:hover { border-color: rgba(0,0,0,0.45); }
-        .nav-btn.solid { background: rgb(18,18,18); border-color: rgb(18,18,18); color: rgb(255,255,255); padding: 0 32px; }
+        .nav-btn.solid { background: rgb(18,18,18); border-color: rgb(18,18,18); color: rgb(255,255,255); padding: 0 22px; }
         .nav-btn.solid:hover { background: rgb(217,44,43); border-color: rgb(217,44,43); }
         /* while typing, the links step back to plain grey text */
         .nav.typing .nav-links .nav-btn:not(.solid) { border-color: transparent; background: transparent; color: rgba(0,0,0,0.38); }
@@ -168,18 +171,18 @@ export default function Nav() {
         .nav.search-open .nav-search-wrap { flex: 1 1 auto; min-width: 0; margin-right: 12px; }
         .nav-search-trigger svg { flex-shrink: 0; }
         .nav-search-form {
-          flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px;
-          height: 40px; padding: 0 20px;
+          flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;
+          height: 28px; padding: 0 14px;
           border: 1px solid rgb(18,18,18); border-radius: 4px; background: rgb(255,255,255);
         }
         .nav-search-icon { flex-shrink: 0; color: rgb(18,18,18); display: flex; }
         .nav-search-input {
           flex: 1; min-width: 0; border: none; outline: none; background: transparent;
-          font-family: 'Recursive', sans-serif; font-size: 14px; color: rgb(0,0,0);
+          font-family: 'Recursive', sans-serif; font-size: 13px; color: rgb(0,0,0);
         }
         .nav-search-go {
           flex-shrink: 0; background: none; border: none; cursor: pointer; padding: 0;
-          font-family: 'Oswald', 'Inter', sans-serif; font-size: 13px; letter-spacing: 0.22em;
+          font-family: 'Oswald', 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.22em;
           text-transform: uppercase; color: rgb(20,20,20);
         }
         .nav-search-go:hover { color: rgb(217,44,43); }
@@ -220,16 +223,15 @@ export default function Nav() {
 
         /* ── Tablets: tighter buttons ── */
         @media (max-width: 1180px) {
-          .nav-btn { padding: 0 14px; letter-spacing: 0.16em; }
-          .nav-btn.solid { padding: 0 20px; }
+          .nav-btn { padding: 0 11px; letter-spacing: 0.16em; }
+          .nav-btn.solid { padding: 0 16px; }
           .nav-inner, .nav-links { gap: 8px; }
         }
         /* ── Phones: search opens as a row under the bar; links collapse ── */
         @media (max-width: 768px) {
           .nav-links .nav-btn:not(.solid) { display: none; }
-          .nav-btn { height: 36px; }
-          .nav-btn.solid { padding: 0 16px; font-size: 12px; letter-spacing: 0.16em; }
-          .nav-search-trigger { padding: 0; width: 40px; border-color: transparent; }
+          .nav-btn.solid { padding: 0 14px; letter-spacing: 0.16em; }
+          .nav-search-trigger { padding: 0; width: 32px; border-color: transparent; }
           .nav-search-trigger span { display: none; }
           .nav.search-open .nav-search-wrap {
             position: absolute; top: 100%; left: 0; right: 0; margin: 0;
@@ -247,7 +249,7 @@ export default function Nav() {
       <nav ref={navRef} className={`nav${scrolled ? ' scrolled' : ''}${searchOpen ? ' search-open' : ''}${typing ? ' typing' : ''}`}>
         <div ref={innerRef} className="nav-inner" style={{ ['--indent' as string]: `${indent + 12}px` }}>
           <Link href="/" className="nav-logo" aria-label="Zona Scule — acasă">
-            <svg width="120" height="23" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="144" height="28" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18.213 12.0338L30.8793 0.5C24.2231 0.503334 17.8019 3.0075 12.8326 7.53234L0 19.2162H13.7136L1.32144 30.5C7.62846 30.5 13.7038 28.0759 18.3403 23.7111L23.1138 19.2162L31 12.0338H18.213Z" fill="#D92C2B"/>
               <path d="M0 12.4575V0.506836H12.4901L0 12.4575Z" fill="#D92C2B"/>
               <path d="M17.1201 30.5H31.0001V18.4727L17.1201 30.5Z" fill="#D92C2B"/>

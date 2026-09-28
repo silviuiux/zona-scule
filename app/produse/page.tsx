@@ -446,11 +446,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               <span className="cat-hero-stat-num">{heroTotal.toLocaleString('ro')}</span>
               <span className="cat-hero-stat-label">Produse</span>
             </div>
-            {brands.length > 0 && (
+            {/* one brand picked: the count would just say "1" */}
+            {brands.length > 0 && brandSel.length !== 1 && (
               <>
                 <div className="cat-hero-stat-div" />
                 <div className="cat-hero-stat">
-                  <span className="cat-hero-stat-num">{brands.length}</span>
+                  <span className="cat-hero-stat-num">{brandSel.length || brands.length}</span>
                   <span className="cat-hero-stat-label">Branduri</span>
                 </div>
               </>
