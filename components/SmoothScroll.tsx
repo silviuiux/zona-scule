@@ -30,6 +30,9 @@ export default function SmoothScroll() {
       // ahead of fast wheel flicks.
       wheelMultiplier: 0.9,
       touchMultiplier: 1.5,
+      // The footer easter egg (FooterBlueprint) takes the wheel while its
+      // drawing is out, so scrolling up rewinds it instead of the page.
+      virtualScroll: () => document.documentElement.dataset.eggHold !== '1',
     })
 
     let raf = 0

@@ -816,15 +816,15 @@ export default function FooterBlueprint() {
       flutes?.setAttribute('transform', `translate(${f2(turn % DR_PITCH)} 0)`)
       section?.setAttribute('transform', `rotate(${((turn / DR_LEAD) * 360).toFixed(2)} ${SEC.x} ${SEC.y})`)
     }
-    let maxDepth = 0
+    const depthAt = (feed: number) => Math.max(0, Math.min(PLATE.x1 - PLATE.x0, PLATE.x1 - (DR.tip - feed + DR.pointLen * 0.5)))
     const frameDrill = (p: number) => {
       const { feed, turn } = drillState(p)
       drill?.setAttribute('transform', `translate(${f2(-feed)} 0)`)
       setSpin(turn)
-      // hole depth follows the full-diameter part of the point, never shrinks
-      const depth = Math.max(0, Math.min(PLATE.x1 - PLATE.x0, PLATE.x1 - (DR.tip - feed + DR.pointLen * 0.5)))
-      maxDepth = Math.max(maxDepth, depth)
-      const x = PLATE.x1 - maxDepth
+      // hole depth follows the full-diameter part of the point; it stays cut
+      // while the drill backs out (and un-cuts if you scroll back up)
+      const depth = depthAt(feed)
+      const x = PLATE.x1 - depthAt(drillState(Math.min(p, DRILL_THROUGH)).feed)
       hole?.setAttribute('d', `M${PLATE.x1} ${DR.y - DR.r} H${f2(x)} V${DR.y + DR.r} H${PLATE.x1}`)
       const cutting = p > DRILL_START && p < DRILL_THROUGH && depth > 0 && depth < PLATE.x1 - PLATE.x0
       chips.forEach((c, i) => {
@@ -916,6 +916,7 @@ export default function FooterBlueprint() {
 
     // ── Finale ──
     let finished = false
+    const artViewBox = art.getAttribute('viewBox')
     let animRaf = 0
     const timers: number[] = []
     const later = (fn: () => void, ms: number) => { timers.push(window.setTimeout(fn, ms)) }
@@ -989,7 +990,20 @@ export default function FooterBlueprint() {
       }, () => later(() => retypeScale(`DET. A · ${NAIL_ZOOM}:1`, () => later(stamp, 150)), 250))
     }
 
-    // ── Scroll-past-the-end input → eased progress ──
+    // Scrolling back up past the finale: drop everything it added, so the
+    // scroll-driven frames can play the drawing backwards from here.
+    const undoFinale = () => {
+      finished = false
+      timers.forEach(t => window.clearTimeout(t)); timers.length = 0
+      if (animRaf) { cancelAnimationFrame(animRaf); animRaf = 0 }
+      layer.getAnimations({ subtree: true }).forEach(a => a.cancel())
+      if (stampRef.current) stampRef.current.style.opacity = ''
+      if (artViewBox) art.setAttribute('viewBox', artViewBox)
+      art.style.removeProperty('--sw')
+      ribs?.setAttribute('d', chuckRibs(0))
+    }
+
+    // ── Scroll-past-the-end input → eased progress (both ways) ──
     let overscroll = 0
     let target = 0
     let cur = 0
@@ -1000,44 +1014,65 @@ export default function FooterBlueprint() {
       render(cur)
       if (cur === target) {
         raf = 0
+        setHold()
         if (cur >= 1 && !finished) finale()
       } else {
         raf = requestAnimationFrame(frame)
       }
     }
+    const atEnd = () => window.scrollY + window.innerHeight >= doc.scrollHeight - 2
+    // While any of the drawing is out, the wheel belongs to it: down draws
+    // on, up rewinds — the page itself only scrolls again once it's back at
+    // zero. SmoothScroll (Lenis) reads this flag and stands aside.
+    const setHold = () => {
+      if ((overscroll > 0 || cur > 0) && atEnd()) doc.dataset.eggHold = '1'
+      else delete doc.dataset.eggHold
+    }
+    // Returns true when the event was consumed by the drawing.
     const push = (delta: number) => {
-      if (delta <= 0 || finished) return
-      if (getComputedStyle(layer).display === 'none') return // no room for it on small screens
-      if (window.scrollY + window.innerHeight < doc.scrollHeight - 2) return
-      overscroll += delta
+      if (getComputedStyle(layer).display === 'none') return false // no room for it on small screens
+      if (!atEnd()) return false
+      if (delta > 0) {
+        if (finished) return true
+        overscroll = Math.min(overscroll + delta, DEAD_ZONE + RANGE)
+      } else {
+        if (overscroll <= 0) return cur > 0 // still rewinding: hold the page
+        overscroll = Math.max(0, overscroll + delta)
+      }
       const next = clamp01((overscroll - DEAD_ZONE) / RANGE)
-      target = reduce && next > 0 ? 1 : Math.max(target, next)
+      target = reduce ? (next > 0 ? 1 : 0) : next
+      if (finished && target < 1) undoFinale()
+      setHold()
       if (!raf) raf = requestAnimationFrame(frame)
+      return true
     }
 
-    const onWheel = (e: WheelEvent) => push(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY)
+    const onWheel = (e: WheelEvent) => {
+      if (push(e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY) && e.cancelable) e.preventDefault()
+    }
     let touchY = 0
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY }
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY
-      push((touchY - y) * 2)
+      if (push((touchY - y) * 2) && e.cancelable) e.preventDefault()
       touchY = y
     }
-    window.addEventListener('wheel', onWheel, { passive: true })
+    window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('resize', placeTitle)
     // The nav is only away while the drawing is in view: scrolling back up
     // brings it back, returning to the bottom hides it again.
     const onScroll = () => {
+      setHold()
       if (!lastGrow) return
-      const atEnd = window.scrollY + window.innerHeight >= doc.scrollHeight - 2
-      doc.style.setProperty('--egg', atEnd ? lastGrow.toFixed(4) : '0')
+      doc.style.setProperty('--egg', atEnd() ? lastGrow.toFixed(4) : '0')
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       doc.style.removeProperty('--egg')
+      delete doc.dataset.eggHold
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
