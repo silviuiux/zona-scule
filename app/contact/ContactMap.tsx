@@ -4,6 +4,15 @@ const C = M.city
 const D = M.detail
 const SFV = M.streets.find(r => r.id === 'sfv')
 const CHURCH = C.pois.find(p => p.name.startsWith('BISERICA'))
+// Pitești landmarks for the town view (metres from the shop; north is −y)
+const LANDMARKS: { name: string; at: [number, number]; anchor: 'start' | 'middle' | 'end'; dx: number; dy: number }[] = [
+  { name: 'CENTRU', at: [-340, 50], anchor: 'end', dx: -8, dy: 4 },
+  { name: 'PIAȚA CEAIR', at: [-330, -400], anchor: 'end', dx: -8, dy: 4 },
+  { name: 'HOTEL RAMADA', at: [-108, -520], anchor: 'end', dx: -8, dy: 4 },
+  { name: 'PARCUL LUNCA ARGEȘULUI', at: [-471, -868], anchor: 'end', dx: -8, dy: 4 },
+  { name: 'MALL VIVO!', at: [219, -596], anchor: 'start', dx: 8, dy: 4 },
+  { name: 'PARCUL ȘTRAND', at: [320, 60], anchor: 'middle', dx: 0, dy: 16 },
+]
 import ContactMapScroller from './ContactMapScroller'
 
 /**
@@ -11,7 +20,8 @@ import ContactMapScroller from './ContactMapScroller'
  * embed, in the same draughting style as the footer easter egg. While the
  * section is pinned, scrolling:
  *   01  draws Strada Sfânta Vineri alone, the shop and the church on it,
- *   02  pulls the camera out to Pitești (main streets and roads, the Argeș),
+ *   02  pulls the camera out to Pitești (main streets and roads, the Argeș,
+ *       the A1, landmarks: centre, Ceair market, Ramada, VIVO, the parks),
  *   03  and out again to Romania (border, national roads, motorways, cities).
  * Every road is black; only the shop's pin is red.
  * Geometry (metres, centred on the shop) lives in lib/contact-map-data.ts;
@@ -170,6 +180,24 @@ export default function ContactMap() {
               <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.36" data-e="0.48" />
               <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.34" data-e="0.44" />
               <path className="dr mw" pathLength={1} d={D.a1} data-k="draw" data-s="0.34" data-e="0.44" />
+              {/* landmarks leave before the camera pulls out to Romania */}
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.6" data-out-e="0.63">
+                {LANDMARKS.map((l, i) => {
+                  const st = 0.46 + i * 0.012
+                  return (
+                    <g key={l.name} className="lbl" data-x={l.at[0]} data-y={l.at[1]} data-k="fade" data-s={st.toFixed(3)} data-e={(st + 0.02).toFixed(3)}>
+                      <circle className="poi-dot" r="2.4" />
+                      <text className="poi-label" x={l.dx} y={l.dy} textAnchor={l.anchor} data-k="type" data-s={st.toFixed(3)} data-e={(st + 0.03).toFixed(3)} data-text={l.name} />
+                    </g>
+                  )
+                })}
+                <g className="lbl" data-x={529} data-y={-263} data-a={51}>
+                  <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.44" data-e="0.48" data-text="AUTOSTRADA A1" />
+                </g>
+                <g className="lbl" data-x={C.argesLabel.lx} data-y={C.argesLabel.ly} data-a={C.argesLabel.ang}>
+                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.45" data-e="0.49" data-text="RÂUL ARGEȘ" />
+                </g>
+              </g>
               <g className="lbl" data-x={900} data-y={700}>
                 <text className="big" textAnchor="start" data-k="type" data-s="0.46" data-e="0.52" data-text="PITEȘTI" />
               </g>
