@@ -78,7 +78,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         text: 'O mașină de impact pentru îmbinări mari, care înlocuiește cheia cu braț lung și, pe multe șantiere, pneumaticul. Merită acolo unde se strâng și se desfac zilnic șuruburi M16–M24; pentru montaj ușor, o mașină de 1/2″ e mai potrivită.',
         forWho: ['Construcții metalice', 'Montaj conducte și instalații industriale', 'Service de camioane și utilaje', 'Construcții grele din lemn'],
       },
-      { kind: 'carousel', title: 'Alte mașini de înșurubat cu impact', text: 'Pentru prinderi de 1/4″ și 1/2″ și cupluri mai mici.', subs: ['Surubelniţă cu impact cu acumulator'] },
+      { kind: 'carousel', title: 'Alte mașini de înșurubat cu impact', text: 'Pentru prinderi de 1/4″ și 1/2″ și cupluri mai mici.', subs: ['Șurubelnițe cu impact cu acumulator'] },
     ],
   },
   {
@@ -140,7 +140,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
           'La 125 mm, adâncimea de tăiere e limitată — pentru beton gros, un polizor de 230 mm.',
         ],
       },
-      { kind: 'carousel', title: 'Discuri de tăiere', text: 'Pentru oțel, inox, armătură.', subs: ['Discuri de Tăiere', 'Discuri de tăiere'] },
+      { kind: 'carousel', title: 'Discuri de tăiere', text: 'Pentru oțel, inox, armătură.', subs: ['Discuri de tăiere'] },
       { kind: 'carousel', title: 'Discuri lamelare', text: 'Degroșare și finisaj în aceeași trecere.', subs: ['Discuri Lamelare', 'Discuri evantai'] },
       {
         kind: 'verdict',
@@ -222,7 +222,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         text: 'Pentru echipele care taie pe șantier — montaj de parchet și tâmplărie, construcții din lemn, profile — și vor capacitatea unui ferăstrău de atelier fără generator sau prelungitoare. Pentru lucrări mici, un model de 216 mm e mai ușor de purtat.',
         forWho: ['Tâmplari și montatori', 'Echipe de construcții din lemn', 'Montaj pardoseli și lambriuri', 'Ateliere mobile'],
       },
-      { kind: 'carousel', title: 'Alte ferăstraie staționare', text: 'Ferăstraie de retezat și bancuri de lucru.', subs: ['Ferăstraie circulare staţionare şi bancuri de lucru'] },
+      { kind: 'carousel', title: 'Alte ferăstraie staționare', text: 'Ferăstraie de retezat și bancuri de lucru.', subs: ['Ferăstraie circulare staționare și bancuri de lucru'] },
     ],
   },
   {

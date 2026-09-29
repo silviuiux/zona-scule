@@ -680,7 +680,7 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
         code: '03',
         title: 'Discuri și Corpuri Abrazive',
         desc: 'Șlefuire, tăiere și finisare, cu granulație și liant potrivite pentru fiecare suprafață.',
-        bullets: ['Discuri de șlefuit', 'Discuri de tăiere cu diamant', 'Foaie abrazivă'],
+        bullets: ['Discuri de șlefuit', 'Discuri de tăiere cu diamant', 'Foi abrazive'],
         q: 'discuri slefuit',
       },
       {

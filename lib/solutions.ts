@@ -105,8 +105,8 @@ const BASE_SOLUTIONS: Solution[] = [
           { title: 'Conectare în siguranță', text: 'Șurubelnițe și clești izolați VDE, testați la 10 000 V pentru lucru până la 1 000 V — o cerință, nu un moft.' },
         ],
       },
-      { kind: 'carousel', title: 'Șurubelnițe izolate și de precizie', text: 'VDE 1 000 V pentru tablou și prize, profile PH, PZ și plat pentru cleme și aparataj.', subs: ['Șurubelnițe VDE', 'Șurubelnițe', 'Şurubelniţe'] },
-      { kind: 'carousel', title: 'Clești pentru cablu', text: 'Dezizolare, sertizare, tăiere — cleștele potrivit pentru fiecare secțiune de conductor.', subs: ['Clești', 'Cleşte', 'Clești - Dispozitive de tăiat - Lanterne pivotante'] },
+      { kind: 'carousel', title: 'Șurubelnițe izolate și de precizie', text: 'VDE 1 000 V pentru tablou și prize, profile PH, PZ și plat pentru cleme și aparataj.', subs: ['Șurubelnițe VDE', 'Șurubelnițe'] },
+      { kind: 'carousel', title: 'Clești pentru cablu', text: 'Dezizolare, sertizare, tăiere — cleștele potrivit pentru fiecare secțiune de conductor.', subs: ['Clești', 'Clește', 'Clești - Dispozitive de tăiat - Lanterne pivotante'] },
       { kind: 'image' },
       { kind: 'carousel', title: 'Detectare, măsură și inspecție', text: 'Detectoare de materiale, telemetre și camere termice care arată conexiunile supraîncălzite înainte să devină o problemă.', subs: ['Detectoare', 'Aparate de măsură', 'Diagnosticare și inspecție', 'Camere termice şi termodetectoare'] },
       {
@@ -197,7 +197,7 @@ const BASE_SOLUTIONS: Solution[] = [
       { kind: 'carousel', title: 'Ciocane rotopercutoare și de demolare', text: 'SDS-plus pentru găurire, SDS-max pentru spargere și demolări.', subs: ['Ciocane rotopercutoare', 'Găurire și spargere', 'Construcţii', 'Beton'] },
       { kind: 'carousel', title: 'Burghie SDS pentru beton și zidărie', text: 'Vârfuri din carbură, cu 2 sau 4 tăișuri, pentru găuri precise prin armături.', subs: ['Burghie pentru zidărie și beton', 'Burghie pentru beton', 'Burghie pentru zidărie'] },
       { kind: 'carousel', title: 'Dălți', text: 'Ascuțite, plate și late — pentru spargere, șlițuri și îndepărtat faianță.', subs: ['Dălți ascuțite', 'Dălți plate', 'Dălți late', 'Dăltuire', 'Alte dălți și accesorii'] },
-      { kind: 'carousel', title: 'Discuri diamantate', text: 'Tăiere uscată sau umedă prin beton, zidărie, gresie și piatră.', subs: ['Discuri de Tăiere cu Diamant'] },
+      { kind: 'carousel', title: 'Discuri diamantate', text: 'Tăiere uscată sau umedă prin beton, zidărie, gresie și piatră.', subs: ['Discuri de tăiere diamantate'] },
       {
         kind: 'checklist',
         title: 'Esențialele de șantier',
@@ -248,7 +248,7 @@ const BASE_SOLUTIONS: Solution[] = [
       { kind: 'carousel', title: 'Freze pentru lemn', text: 'Drepte, pentru muchii, pentru lambă și seturi complete.', subs: ['Freze drepte', 'Freze pentru realizarea muchiilor', 'Freze de profilat canturi pentru frezare coplanară la nivel', 'Freze pentru lambă', 'Seturi de freze de profilat canturi'] },
       { kind: 'carousel', title: 'Burghie pentru lemn', text: 'Cu vârf de centrare, spirale lungi și burghie Forstner.', subs: ['Burghie pentru lemn'] },
       { kind: 'tip', text: 'Pentru PAL melaminat, o pânză cu dinți trapezoidali-plați (TF) și peste 48 de dinți pe Ø 216 elimină aproape complet ciupirea muchiei.', by: TEAM },
-      { kind: 'carousel', title: 'Șlefuire', text: 'Foi, discuri și benzi abrazive, plus talpa potrivită mașinii.', subs: ['Foaie abrazivă', 'Discuri de șlefuit', 'Benzi de șlefuit', 'Disc-suport pentru șlefuitor orbital'] },
+      { kind: 'carousel', title: 'Șlefuire', text: 'Foi, discuri și benzi abrazive, plus talpa potrivită mașinii.', subs: ['Foi abrazive', 'Discuri de șlefuit', 'Benzi de șlefuit', 'Disc-suport pentru șlefuitor orbital'] },
       { kind: 'carousel', title: 'Mașini pentru lemn', text: 'Mașini de șlefuit cu excentric și scule dedicate prelucrării lemnului.', subs: ['Prelucrarea lemnului', 'Şlefuitoare cu excentric', 'Șlefuire'] },
       {
         kind: 'faq',
@@ -282,7 +282,7 @@ const BASE_SOLUTIONS: Solution[] = [
       },
       { kind: 'image' },
       { kind: 'carousel', title: 'Polizoare', text: 'Unghiulare, drepte și pneumatice.', subs: ['Polizoare și mașini de lustruit', 'Polizoare unghiulare mici', 'Polizoare Pneumatice'] },
-      { kind: 'carousel', title: 'Discuri de tăiere și degroșare', text: 'Subțiri pentru tăieri rapide, groase pentru degroșare, lamelare pentru finisaj.', subs: ['Discuri de Tăiere', 'Discuri de tăiere', 'Discuri de degroșare', 'Discuri Lamelare', 'Discuri evantai'] },
+      { kind: 'carousel', title: 'Discuri de tăiere și degroșare', text: 'Subțiri pentru tăieri rapide, groase pentru degroșare, lamelare pentru finisaj.', subs: ['Discuri de tăiere', 'Discuri de degroșare', 'Discuri Lamelare', 'Discuri evantai'] },
       { kind: 'carousel', title: 'Burghie pentru metal', text: 'HSS, HSS-Co și în trepte — pentru oțel, inox și tablă.', subs: ['Burghie pentru metal', 'Burghie Elicoidale', 'Seturi de burghie pentru metal', 'Burghie Treptate'] },
       { kind: 'tip', text: 'La inox, lucrează la turație mică și presiune constantă, cu răcire. Un burghiu care „fluieră” pe inox s-a încins deja — și își pierde tăișul.', by: TEAM },
       { kind: 'carousel', title: 'Freze din carbură', text: 'Pentru debavurare, ajustaj și prelucrarea sudurilor.', subs: ['Freze din Carbură'] },
