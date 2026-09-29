@@ -188,19 +188,42 @@ export const SOLUTIONS_CSS = `
   .zs-cta-btn:hover { background: rgb(190,35,34); }
 
   /* ── Index: featured story + groups ── */
-  .zs-featured {
-    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); overflow: hidden;
-    border-radius: 10px; background: rgb(18,18,18); color: rgb(255,255,255); text-decoration: none; margin-bottom: 16px;
+  /* Featured story: a full-width grey band — the story large (photo that
+     drifts and sharpens as it comes in), then its series of sub-stories */
+  .zs-feature { position: relative; width: 100vw; margin-left: calc(50% - 50vw); background: rgb(240,240,240); }
+  .zs-feature-inner { max-width: 1440px; margin: 0 auto; padding: clamp(72px, 11vh, 128px) var(--gutter); }
+  .zs-feature-main { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: stretch; text-decoration: none; color: rgb(0,0,0); }
+  .zs-feature-img { grid-column: span 7; position: relative; min-height: min(78vh, 760px); border-radius: 4px; overflow: hidden; background: rgb(226,226,226); }
+  .zs-feature-img > div { position: absolute; inset: 0; transform: scale(1.12); will-change: transform; }
+  .zs-feature-img img { transition: filter 600ms ease; }
+  .zs-feature-main:hover .zs-feature-img img { filter: brightness(1.04); }
+  .zs-feature-body { grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 20px; padding: 16px 0; }
+  .zs-feature-kicker { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgb(217,44,43); }
+  .zs-feature-kicker::before { content: ''; width: 24px; height: 1px; background: rgb(217,44,43); }
+  .zs-feature-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(56px, 6.4vw, 104px); line-height: 0.92; letter-spacing: -0.02em; }
+  .zs-feature-head { font-family: 'Neuton', serif; font-size: clamp(22px, 1.8vw, 28px); line-height: 1.2; }
+  .zs-feature-text { font-family: 'Recursive', sans-serif; font-size: 15px; line-height: 1.65; color: rgba(0,0,0,0.6); }
+  .zs-feature-meta { margin-top: auto; display: flex; flex-direction: column; gap: 20px; }
+  .zs-feature-count { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+  .zs-feature-btn {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; height: 52px; padding: 0 28px;
+    background: rgb(18,18,18); color: rgb(255,255,255); border-radius: 4px;
+    font-family: 'Oswald', 'Inter', sans-serif; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    transition: background 150ms;
   }
-  .zs-featured-img { grid-column: span 7; position: relative; min-height: 420px; background: rgb(40,40,40); }
-  .zs-featured-body { grid-column: span 5; display: flex; flex-direction: column; gap: 14px; padding: 40px; }
-  .zs-featured .zs-card-domain { color: rgb(217,44,43); }
-  .zs-featured-title { font-family: 'Neuton', serif; font-size: clamp(40px, 4vw, 64px); line-height: 0.95; }
-  .zs-featured-head { font-family: 'Neuton', serif; font-size: 22px; line-height: 1.25; color: rgba(255,255,255,0.85); }
-  .zs-featured-text { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.6); }
-  .zs-featured .zs-card-meta { color: rgba(255,255,255,0.5); }
-  .zs-featured .zs-card-meta b { color: rgb(255,255,255); }
-  .zs-featured:hover .zs-card-meta b { color: rgb(217,44,43); }
+  .zs-feature-main:hover .zs-feature-btn { background: rgb(217,44,43); }
+  .zs-feature-series { margin-top: clamp(64px, 9vh, 112px); }
+  .zs-feature-series-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.12); margin-bottom: 28px; }
+  .zs-feature-series-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(28px, 2.6vw, 40px); line-height: 1; }
+  .zs-feature-subs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+  .zs-sub { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: rgb(0,0,0); }
+  .zs-sub-img { position: relative; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; background: rgb(226,226,226); }
+  .zs-sub-img img { transition: transform 900ms cubic-bezier(0.2, 0.7, 0.1, 1); }
+  .zs-sub:hover .zs-sub-img img { transform: scale(1.05); }
+  .zs-sub-n { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; color: rgb(217,44,43); }
+  .zs-sub-title { font-family: 'Neuton', serif; font-size: 24px; line-height: 1.05; }
+  .zs-sub:hover .zs-sub-title { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+  .zs-sub-text { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.55; color: rgba(0,0,0,0.55); }
   .zs-group { padding-top: var(--space-section); }
   .zs-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 28px; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 24px; }
   .zs-group-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(32px, 3.4vw, 52px); line-height: 1; color: rgb(0,0,0); }
@@ -248,8 +271,9 @@ export const SOLUTIONS_CSS = `
     .zs-product-img, .zs-product-body, .zs-verdict > div:first-child, .zs-verdict-for { grid-column: 1 / -1; }
     .zs-specs, .zs-proscons { grid-template-columns: 1fr; }
     .zs-howto { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .zs-featured-img, .zs-featured-body { grid-column: 1 / -1; }
-    .zs-featured-img { min-height: 280px; }
+    .zs-feature-img, .zs-feature-body { grid-column: 1 / -1; }
+    .zs-feature-img { min-height: 56vh; }
+    .zs-feature-subs { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 40px; }
     .zs-cards, .zs-check { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .zs-lead { grid-column: 1 / -1; padding-right: 0; }
     .zs-steps { grid-column: 1 / -1; margin-top: 16px; }
@@ -262,7 +286,8 @@ export const SOLUTIONS_CSS = `
     .zs-pc { padding: 24px; }
     .zs-rules, .zs-howto { grid-template-columns: 1fr; }
     .zs-cta { flex-direction: column; align-items: flex-start; padding: 28px; }
-    .zs-featured-body { padding: 28px; }
+    .zs-feature-subs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .zs-sub-title { font-size: 20px; }
     .zs-cards, .zs-check { grid-template-columns: 1fr; }
     .zs-car-head { flex-direction: column; align-items: flex-start; }
     .zs-image { height: 44vh; }

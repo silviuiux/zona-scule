@@ -53,6 +53,9 @@ export type Solution = {
   type: SolutionType
   /** Shown first and large on /zona-solutii. */
   featured?: boolean
+  /** A sub-story: the slug of the story it belongs to (shown with it,
+   *  not in the index groups). */
+  parent?: string
   /** Short name — the hero's big word ("Zona Electricieni") on domain
    *  stories, the card title everywhere. */
   profession: string

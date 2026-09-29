@@ -60,7 +60,14 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   const howto = story.sections.find((x): x is Extract<SolutionSection, { kind: 'howto' }> => x.kind === 'howto')
   // same kind of story first, then the rest
   const others = SOLUTIONS.filter(s => s.slug !== story.slug)
-  const related = [...others.filter(s => s.type === story.type), ...others.filter(s => s.type !== story.type)].slice(0, 3)
+  // a series (a story and its sub-stories) points within itself first
+  const parent = story.parent ? SOLUTIONS.find(s => s.slug === story.parent) : undefined
+  const seriesRoot = parent ?? story
+  const series = SOLUTIONS.filter(s => s.parent === seriesRoot.slug && s.slug !== story.slug)
+  const inSeries = [...(parent ? [parent] : []), ...series]
+  const related = inSeries.length > 0
+    ? inSeries
+    : [...others.filter(s => s.type === story.type), ...others.filter(s => s.type !== story.type)].slice(0, 3)
   const typeInfo = SOLUTION_TYPES.find(t => t.id === story.type)!
 
   const jsonLd = [
@@ -312,7 +319,9 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <nav className="zs-crumbs" aria-label="Breadcrumb" data-reveal>
               <Link href="/zona-solutii" className="zs-crumb">Zona Soluții</Link>
               <span className="zs-crumb-sep">/</span>
-              <span className="zs-crumb-cur">{typeInfo.label}</span>
+              {parent
+                ? <Link href={`/zona-solutii/${parent.slug}`} className="zs-crumb">{parent.profession}</Link>
+                : <span className="zs-crumb-cur">{typeInfo.label}</span>}
             </nav>
             <span className="eyebrow-mono" data-reveal style={stagger(1)}>{story.domain}</span>
             {story.title
@@ -351,7 +360,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           {story.sections.map(render)}
 
           <section className="zs-block zs-end">
-            {chapter("Alte soluții")}
+            {chapter(inSeries.length > 0 ? `Din seria ${seriesRoot.profession}` : 'Alte soluții')}
             <div className="zs-cards">
               {related.map((r, k) => (
                 <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card" data-reveal style={stagger(k)}>
@@ -359,7 +368,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                     <span className="zs-card-domain">{r.domain}</span>
                     <span className="zs-card-title">{r.title ?? r.profession}</span>
                     <span className="zs-card-text">{r.excerpt}</span>
-                    <span className="zs-card-meta"><span>Zona Soluții</span><b>Citește →</b></span>
+                    <span className="zs-card-meta"><span>{r === parent ? 'Povestea principală' : 'Zona Soluții'}</span><b>Citește →</b></span>
                   </div>
                 </Link>
               ))}
