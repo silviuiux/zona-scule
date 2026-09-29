@@ -95,6 +95,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   const { chapter, sequence, fullBleed, expand } = editorial()
 
   let checklistNo = 0
+  const firstList = story.sections.findIndex(x => x.kind === 'checklist')
   const render = (sec: SolutionSection, i: number) => {
     switch (sec.kind) {
       case 'intro':
@@ -359,9 +360,13 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <span className="zs-scroll-cue" aria-hidden="true">Derulează <span>↓</span></span>
           </header>
 
+          {/* the tool list comes first (chapter 01), straight after the hero
+              and ahead of the big photo */}
+          {firstList >= 0 && render(story.sections[firstList], firstList)}
+
           {heroPhoto && expand(heroPhoto, `${story.title ?? story.profession} — în lucru`, story.domain, story.headline)}
 
-          {story.sections.map(render)}
+          {story.sections.map((sec, i) => (i === firstList ? null : render(sec, i)))}
 
           <section className="zs-block zs-end">
             {chapter(inSeries.length > 0 ? `Din seria ${seriesRoot.profession}` : 'Alte soluții')}

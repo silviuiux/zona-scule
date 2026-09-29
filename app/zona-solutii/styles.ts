@@ -92,7 +92,7 @@ export const SOLUTIONS_CSS = `
     border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: rgb(255,255,255);
     text-decoration: none; transition: box-shadow 150ms, border-color 150ms;
   }
-  .zs-check-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.14); }
+  .zs-check-item:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.035); border-color: rgba(0,0,0,0.16); }
   .zs-check-n { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: rgb(217,44,43); letter-spacing: 0.1em; }
   .zs-check-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: rgb(0,0,0); }
   .zs-check-why { font-family: 'Recursive', sans-serif; font-size: 13px; line-height: 1.6; color: rgba(0,0,0,0.55); }
@@ -126,7 +126,7 @@ export const SOLUTIONS_CSS = `
     border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: rgb(255,255,255);
     text-decoration: none; transition: box-shadow 150ms, border-color 150ms;
   }
-  .zs-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.14); }
+  .zs-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.035); border-color: rgba(0,0,0,0.16); }
   .zs-card-img { position: relative; aspect-ratio: 4 / 3; background: rgb(238,238,238); overflow: hidden; }
   .zs-card-img img { transition: transform 600ms cubic-bezier(0.22,1,0.36,1); }
   .zs-card:hover .zs-card-img img { transform: scale(1.03); }

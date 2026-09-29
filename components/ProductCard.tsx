@@ -80,6 +80,9 @@ export default function ProductCard({ product }: { product: Product }) {
         .pcard-link { text-decoration: none; display: flex; flex-direction: column; height: 100%; min-width: 0; }
         .pcard {
           background: rgb(255, 255, 255);
+          /* the same grey outline as the spec chips inside: white on the
+             white page still reads as a card */
+          border: 1px solid rgba(0,0,0,0.14);
           border-radius: 8px;
           overflow: hidden;
           display: flex; flex-direction: column;
@@ -87,10 +90,11 @@ export default function ProductCard({ product }: { product: Product }) {
           min-width: 0;
           position: relative;
           isolation: isolate;
-          transition: box-shadow 200ms, transform 200ms;
+          transition: box-shadow 200ms, transform 200ms, border-color 200ms;
         }
         .pcard-link:hover .pcard {
-          box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+          border-color: rgba(0,0,0,0.24);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.04);
           transform: translateY(-2px);
         }
 
