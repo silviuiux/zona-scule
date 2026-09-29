@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Fragment, type CSSProperties, type ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,6 +10,7 @@ import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationIma
 import { getBrandHref } from '@/lib/brand-content'
 import { SOLUTIONS_CSS, STORY_CSS } from '../styles'
 import StoryMotion from '../StoryMotion'
+import { editorial, pad, stagger } from '../editorial'
 
 // One template for every story in lib/solutions.ts, laid out as an
 // editorial long-read: a quiet hero, a full-bleed photo, then the story's
@@ -31,8 +31,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 const n = (v: number) => v.toLocaleString('ro-RO')
-const pad = (i: number) => String(i + 1).padStart(2, '0')
-const stagger = (i: number) => ({ ['--i' as string]: i }) as CSSProperties
 
 export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {
   const story = getSolution((await params).slug)
@@ -83,77 +81,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
     }] : []),
   ]
 
-  // each word in its own mask, so a title can rise into view word by word
-  const words = (t: string) => t.split(' ').map((w, k, all) => (
-    <Fragment key={k}><span className="zs-w"><span style={{ '--w': k } as CSSProperties}>{w}</span></span>{k < all.length - 1 ? ' ' : ''}</Fragment>
-  ))
-
-  // numbered chapters: "01 — Șurubelnițe izolate…"
-  let chapterNo = 0
-  const chapter = (title: string, text?: string, aside?: ReactNode) => {
-    chapterNo++
-    return (
-      <header className="zs-chapter" data-reveal>
-        <span className="zs-chapter-n">{String(chapterNo).padStart(2, '0')}</span>
-        <div className="zs-chapter-main">
-          <h2 className="zs-chapter-title">{words(title)}</h2>
-          {text && <p className="zs-chapter-text">{text}</p>}
-        </div>
-        {aside}
-      </header>
-    )
-  }
-
-  // a sequence that lights up one step at a time as it scrolls past
-  const sequence = ({ label, lead, steps, big }: { label: string; lead: string; steps: { title: string; text: string }[]; big?: boolean }) => (
-    <div className="zs-seq" data-steps>
-      <div className="zs-seq-side">
-        <div className="zs-seq-sticky">
-          <span className="eyebrow-mono">{label}</span>
-          <p className={big ? 'zs-seq-lead big' : 'zs-seq-lead'}>{lead}</p>
-          <p className="zs-seq-count"><span data-step-current>01</span> / {String(steps.length).padStart(2, '0')}</p>
-        </div>
-      </div>
-      <ol className="zs-seq-steps">
-        {steps.map((st, k) => (
-          <li key={st.title} className="zs-seq-step" data-step={pad(k)}>
-            <span className="zs-seq-n">{pad(k)}</span>
-            <p className="zs-seq-t">{st.title}</p>
-            <p className="zs-seq-p">{st.text}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-
-  const fullBleed = ({ src, alt, caption, tall, key }: { src: string; alt: string; caption?: string; tall?: boolean; key?: string | number }) => (
-    <figure key={key} className={`zs-bleed${tall ? ' tall' : ''}`} data-open>
-      <div className="zs-bleed-frame" data-parallax>
-        <div className="zs-bleed-img">
-          <Image src={src} alt={alt} fill sizes="100vw" style={{ objectFit: 'cover' }} />
-        </div>
-        {caption && <figcaption className="zs-bleed-cap"><span>{caption}</span></figcaption>}
-      </div>
-    </figure>
-  )
-
-  // the first photo: pinned while it grows from a framed picture to the
-  // whole screen, the headline surfacing over it
-  const expand = (src: string, alt: string, line: string) => (
-    <section className="zs-expand" data-expand>
-      <div className="zs-expand-stick">
-        <div className="zs-expand-frame">
-          <div className="zs-expand-img">
-            <Image src={src} alt={alt} fill sizes="100vw" style={{ objectFit: 'cover' }} priority />
-          </div>
-          <div className="zs-expand-copy">
-            <span className="zs-expand-kicker">{story.domain}</span>
-            <p className="zs-expand-line">{line}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+  const { chapter, sequence, fullBleed, expand } = editorial()
 
   let checklistNo = 0
   const render = (sec: SolutionSection, i: number) => {
@@ -418,7 +346,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <span className="zs-scroll-cue" aria-hidden="true">Derulează <span>↓</span></span>
           </header>
 
-          {heroPhoto && expand(heroPhoto, `${story.title ?? story.profession} — în lucru`, story.headline)}
+          {heroPhoto && expand(heroPhoto, `${story.title ?? story.profession} — în lucru`, story.domain, story.headline)}
 
           {story.sections.map(render)}
 

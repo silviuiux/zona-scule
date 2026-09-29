@@ -1,7 +1,6 @@
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getProductBySlug, getAdjacentProducts, getFamilyVariantsFull } from '@/lib/supabase'
-import Image from 'next/image'
+import { getProductBySlug, getAdjacentProducts, getFamilyVariantsFull, getApplicationImages } from '@/lib/supabase'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
@@ -9,13 +8,23 @@ import HeroImage from './HeroImage'
 import ProductNavArrows from './ProductNavArrows'
 import ShortDescription from '@/components/ShortDescription'
 import SkuCopyField from './SkuCopyField'
-import ScrollAnimations from './ScrollAnimations'
 import VariantSelector from './VariantSelector'
+import StickyOfferBar from './StickyOfferBar'
 import ProductVariantCarousel from '@/components/ProductVariantCarousel'
+import StoryMotion from '@/app/zona-solutii/StoryMotion'
+import { SOLUTIONS_CSS, STORY_CSS } from '@/app/zona-solutii/styles'
+import { editorial, pad, stagger } from '@/app/zona-solutii/editorial'
 
 export const revalidate = 3600
 export const dynamicParams = true
 
+/**
+ * Product page, in the Zona Soluții story language: a quiet split hero
+ * (text left, the product right), then the manufacturer's application
+ * photo growing to the whole screen, numbered chapters for the specs, a
+ * step sequence for the features, full-bleed photos between them and an
+ * offer block to close. A slim offer bar follows once the hero is gone.
+ */
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const [product, adjacent] = await Promise.all([
@@ -25,19 +34,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound()
   const { prevSlug, nextSlug } = adjacent
 
-  // sibling variants in the same family (empty if no family / single variant).
-  // One query returns full Product rows — reused for both the dropdown
-  // (slim fields below) and the variant carousel (needs the full row for
-  // ProductCard's image/specs/brand).
-  const familyVariants = product.family_id
-    ? await getFamilyVariantsFull(product.family_id)
-    : []
+  // sibling variants in the same family (empty if no family / single variant)
+  const familyVariants = product.family_id ? await getFamilyVariantsFull(product.family_id) : []
   const variants = familyVariants.map(v => ({
     slug: v.slug, sku: v.sku, name: v.name, variant_label: v.variant_label,
     specs: v.specs, ean: v.ean,
   }))
 
   const mainImg = product.main_image_storage_url || product.main_image_url
+  const title = product.name || product.model || product.sku || product.slug
+  const model = product.model || product.sku || product.name
 
   const specs = [
     { label: product.st1_label, value: product.st1_value, detail: product.st1_details },
@@ -46,10 +52,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ].filter(s => s.label && s.value)
 
   const caracteristici = [
-    { title: product.c1_title, detail: product.c1_details },
-    { title: product.c2_title, detail: product.c2_details },
-    { title: product.c3_title, detail: product.c3_details },
-  ].filter(c => c.title)
+    { title: product.c1_title, text: product.c1_details },
+    { title: product.c2_title, text: product.c2_details },
+    { title: product.c3_title, text: product.c3_details },
+  ].filter(c => c.title).map(c => ({ title: c.title!, text: c.text ?? '' }))
 
   const aplicatii = [
     { title: product.app_01_title, detail: product.app_01_details },
@@ -57,419 +63,227 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     { title: product.app_03_title, detail: product.app_03_details },
   ].filter(a => a.title)
 
-  const galleryImgs = [
-    product.gallery_storage_url_1 ?? product.gallery_url_1,
-    product.gallery_storage_url_2 ?? product.gallery_url_2,
-    product.gallery_storage_url_3 ?? product.gallery_url_3,
-    product.gallery_storage_url_4 ?? product.gallery_url_4,
-  ].filter(Boolean) as string[]
+  // Gallery: the manufacturer's application photos (Bosch "application"
+  // shots, not the tall VERTICAL crops) become the full-bleed photos; the
+  // rest stay in the gallery grid.
+  const pairs = [1, 2, 3, 4].map(i => {
+    const src = product[`gallery_url_${i}` as keyof typeof product] as string | null
+    const stored = product[`gallery_storage_url_${i}` as keyof typeof product] as string | null
+    return { src, url: stored ?? src }
+  }).filter(p => p.url)
+  const isApplication = (p: { src: string | null }) => !!p.src && /application/i.test(p.src) && !/VERTICAL/i.test(p.src)
+  const ownPhotos = pairs.filter(isApplication).map(p => p.url as string)
+  const galleryImgs = pairs.filter(p => !isApplication(p)).map(p => p.url as string)
+  // no photos of its own: borrow the atmosphere from its subcategory
+  const photos = ownPhotos.length > 0
+    ? ownPhotos
+    : product.subcategory_text ? await getApplicationImages([product.subcategory_text], 2).catch(() => []) : []
+  const ownPhotosShown = ownPhotos.length > 0
 
-  // Breadcrumbs — #10: radius 4px, links to listing with category/subcategory
-  const breadcrumbs = [
-    { href: '/produse', label: 'Catalog' },
-    product.category_text ? {
-      href: `/produse?categorie=${encodeURIComponent(product.category_text)}`,
-      label: product.category_text
-    } : null,
-    product.subcategory_text ? {
-      href: `/produse?categorie=${encodeURIComponent(product.category_text ?? '')}&subcategorie=${encodeURIComponent(product.subcategory_text)}`,
-      label: product.subcategory_text
-    } : null,
-  ].filter(Boolean) as { href: string; label: string }[]
+  const catalogHref = (params: Record<string, string | null | undefined>) => {
+    const q = new URLSearchParams()
+    for (const [k, v] of Object.entries(params)) if (v) q.set(k, v)
+    return `/produse?${q.toString()}`
+  }
+  const offerHref = `/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`
+
+  const { chapter, sequence, fullBleed, expand } = editorial()
 
   return (
     <>
       <Nav />
-      <style>{`
-        .pdp { padding-top: var(--nav-h); background: rgb(244,244,244); }
-
-        /* ── TOP WHITE SECTION ── */
-        /* #4: full white background, no border on image */
-        .pdp-top {
-          background: rgb(255,255,255);
-          border-bottom: 1px solid rgba(0,0,0,0.06);
+      <style>{SOLUTIONS_CSS + STORY_CSS + `
+        /* ── Hero: text left, the product right, a full first screen ── */
+        .pd-hero {
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: center;
+          min-height: calc(100vh - var(--nav-h));
+          padding: clamp(56px, 9vh, 112px) 0 clamp(72px, 11vh, 128px);
         }
-        .pdp-top-inner {
-          max-width: 1440px; margin: 0 auto;
-          padding: 40px var(--gutter) 60px;
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 80px;
-          /* #6: vertically center left content */
-          align-items: center;
+        .pd-copy { grid-column: 1 / span 6; }
+        .pd-media { grid-column: 8 / span 5; position: relative; }
+        .pd-brand {
+          display: inline-flex; align-items: center; gap: 12px; margin-bottom: 28px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500;
+          letter-spacing: 0.16em; text-transform: uppercase; color: rgb(217,44,43); text-decoration: none;
         }
-
-        /* Left content */
-        .bc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
-        /* #10: breadcrumb pills with border-radius 4px */
-        .bc-pill {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.5);
-          padding: 4px 12px;
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 4px;
-          text-decoration: none;
-          transition: border-color 150ms, color 150ms;
-          white-space: nowrap;
-        }
-        .bc-pill:hover { border-color: rgb(0,0,0); color: rgb(0,0,0); }
-        .bc-sep { color: rgba(0,0,0,0.2); font-size: 12px; }
-
-        .pdp-brand {
-          font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-weight: 500; font-size: 12px; color: rgb(217,44,43);
-          margin-bottom: 14px; letter-spacing: 0.12em; text-transform: uppercase;
-          text-decoration: none; display: inline-block;
-        }
-        .pdp-brand:hover { text-decoration: underline; }
-        .pdp-sku {
+        .pd-brand::before { content: ''; width: 24px; height: 1px; background: rgb(217,44,43); }
+        .pd-brand:hover { text-decoration: underline; text-underline-offset: 4px; }
+        .pd-title {
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(36px, 4vw, 56px); letter-spacing: -0.01em;
-          color: rgb(0,0,0); line-height: 1.02;
-          margin-bottom: 16px;
+          font-size: clamp(40px, 4.6vw, 76px); line-height: 0.98; letter-spacing: -0.015em;
+          color: rgb(0,0,0); margin-bottom: 28px;
         }
-        .pdp-desc {
-          font-family: 'Recursive', sans-serif;
-          font-size: 14px; color: rgba(0,0,0,0.5);
-          line-height: 1.65; margin-bottom: 28px;
-        }
-        .pdp-desc p { margin: 0 0 10px; }
-        .pdp-desc p:last-child { margin-bottom: 0; }
-        .pdp-desc strong { font-weight: 700; color: rgba(0,0,0,0.75); }
-        .pdp-desc em { font-style: italic; }
-        .pdp-desc ul, .pdp-desc ol {
-          margin: 8px 0 0; padding-left: 18px;
-        }
-        .pdp-desc ul { list-style: disc; }
-        .pdp-desc li { margin-bottom: 4px; }
-        .pdp-desc li:last-child { margin-bottom: 0; }
-        .cere-btn {
-          display: block; width: 100%; padding: 10px;
-          background: rgb(217,44,43); color: rgb(255,255,255); border: none;
-          border-radius: 3px; font-family: 'Inter', sans-serif;
-          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
-          text-transform: uppercase; text-align: center;
-          text-decoration: none; cursor: pointer; transition: background 150ms;
-        }
-        .cere-btn:hover { background: rgb(190,35,34); }
-
-        /* ── DARK SPECS — #3: comes right after hero, before gallery ── */
-        /* #9: padding 96px top/bottom for sections */
-        .pdp-specs { background: rgb(30,30,30); }
-        .pdp-specs-inner {
-          max-width: 1440px; margin: 0 auto; padding: 96px var(--gutter);
-        }
-        .specs-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.3); margin-bottom: 28px;
-        }
-        .specs-grid { display: grid; gap: 16px; }
-        /* #9: spec cards — 96px top, 32px bottom padding */
-        .spec-card {
-          background: rgb(255,255,255); border-radius: 4px;
-          padding: 96px 24px 32px;
-        }
-        .spec-card-label {
-          font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(0,0,0,0.45); margin-bottom: 10px;
-        }
-        .spec-card-value {
-          font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
-          font-size: 26px;
-          letter-spacing: -0.02em; color: rgb(0,0,0);
-          line-height: 1; margin-bottom: 6px;
-        }
-        .spec-card-detail {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.5;
-        }
-
-        /* ── INFO CARDS ── */
-        /* #9: section padding 96px */
-        .info-section {
-          max-width: 1440px; margin: 0 auto; padding: 96px var(--gutter);
-        }
-        .info-section-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(0,0,0,0.35); margin-bottom: 24px;
-        }
-        .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        /* #9: info cards — 96px top, 32px bottom */
-        .info-card {
-          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.06);
-          border-radius: 4px; padding: 96px 24px 32px;
-          display: flex; flex-direction: column; gap: 6px;
-        }
-        .info-num {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px; color: rgba(0,0,0,0.3); font-weight: 500;
-        }
-        .info-title {
-          font-family: 'Recursive', sans-serif;
-          font-size: 17px; font-weight: 500;
-          color: rgb(0,0,0); letter-spacing: -0.02em; line-height: 1.25;
-        }
-        .info-body {
-          font-family: 'Recursive', sans-serif;
-          font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.6;
-        }
-
-        /* ── CTA BANNER ── */
-        .cta-banner { max-width: 1440px; margin: 0 auto; padding: 72px var(--gutter); }
-        .cta-banner-inner {
-          background: rgb(30,30,30); border-radius: 4px;
-          padding: 32px 40px;
-          display: flex; justify-content: space-between; align-items: center; gap: 24px;
-        }
-        .cta-banner-eyebrow {
-          font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(255,255,255,0.45); margin-bottom: 10px;
-        }
-        .cta-banner-title {
-          font-family: 'Neuton', serif; font-weight: 400;
-          font-size: 32px;
-          color: rgb(255,255,255); line-height: 1; letter-spacing: -0.01em;
-        }
-        .cta-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
-        .cta-primary {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 8px 20px; background: rgb(217,44,43); color: rgb(255,255,255);
-          border-radius: 3px; font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
-          text-transform: uppercase; text-decoration: none; white-space: nowrap;
+        .pd-desc { font-family: 'Recursive', sans-serif; font-size: 16px; line-height: 1.65; color: rgba(0,0,0,0.55); max-width: 560px; margin-bottom: 40px; }
+        .pd-desc p { margin: 0 0 10px; }
+        .pd-desc p:last-child { margin-bottom: 0; }
+        .pd-desc strong { font-weight: 600; color: rgba(0,0,0,0.75); }
+        .pd-desc ul { margin: 8px 0 0; padding-left: 18px; list-style: disc; }
+        .pd-desc li { margin-bottom: 4px; }
+        .pd-hero .zs-stats { margin-bottom: 40px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.08); }
+        .pd-actions { display: flex; flex-direction: column; gap: 4px; max-width: 460px; }
+        .pd-actions .sku-field { margin-bottom: 8px; }
+        .pd-offer {
+          display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 52px; margin-top: 8px;
+          background: rgb(18,18,18); color: rgb(255,255,255); border-radius: 4px; text-decoration: none;
+          font-family: 'Oswald', 'Inter', sans-serif; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
           transition: background 150ms;
         }
-        .cta-primary:hover { background: rgb(190,35,34); }
-        .cta-secondary {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 8px 20px;
-          border: 1px solid rgba(255,255,255,0.2); color: rgb(255,255,255);
-          border-radius: 3px; font-family: 'Inter', sans-serif;
-          font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
-          text-transform: uppercase; text-decoration: none; white-space: nowrap;
-          transition: border-color 150ms;
+        .pd-offer:hover { background: rgb(217,44,43); }
+        .pd-media .hero-img-wrap { aspect-ratio: 4 / 5; border-radius: 4px; }
+        .pd-media .hero-img-wrap img { padding: 8% !important; }
+        .pd-media-cap {
+          display: flex; justify-content: space-between; margin-top: 16px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.4);
         }
-        .cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
+        .pd-hero .zs-scroll-cue { bottom: clamp(32px, 5vh, 56px); right: auto; left: 0; }
+        .pd-hero { position: relative; }
 
-        /* ══ SCROLL ANIMATIONS ══════════════════════════════════════ */
+        /* ── Specs: three big numbers ── */
+        .pd-specs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .pd-spec { border-top: 1px solid rgba(0,0,0,0.14); padding-top: 28px; }
+        .pd-spec-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.45); margin-bottom: 20px; }
+        .pd-spec-value { font-family: 'Neuton', serif; font-size: clamp(48px, 5.6vw, 92px); line-height: 0.95; letter-spacing: -0.02em; color: rgb(0,0,0); margin-bottom: 20px; }
+        .pd-spec-detail { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(0,0,0,0.55); max-width: 360px; }
 
-        /* Fade + lift */
-        .reveal {
-          opacity: 0;
-          transform: translateY(20px);
-          transition:
-            opacity  660ms cubic-bezier(0.16, 1, 0.3, 1),
-            transform 660ms cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal.in-view {
-          opacity: 1;
-          transform: none;
-        }
+        /* ── Gallery: full width, in the page's rhythm ── */
+        .pd-gallery { width: 100vw; margin-left: calc(50% - 50vw); }
 
-        /* Fade + lift + subtle scale-up (cards) */
-        /* transition-delay is set per-element via JS (el.style.transitionDelay) */
-        .reveal-scale {
-          opacity: 0;
-          transform: translateY(26px) scale(0.965);
-          transition:
-            opacity  580ms cubic-bezier(0.16, 1, 0.3, 1),
-            transform 580ms cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-scale.in-view {
-          opacity: 1;
-          transform: none;
-        }
+        /* ── Applications: numbered cards ── */
+        .pd-apps .zs-check-item { cursor: default; }
+        .pd-apps .zs-check-name { font-family: 'Neuton', serif; font-weight: 400; font-size: 28px; line-height: 1.05; }
 
-        /* Hero image column — clip overflow from parallax translateY */
-        .pdp-img-col {
-          overflow: hidden;
-          will-change: transform;
-          /* Slightly taller clip area so bottom of image isn't cropped */
-          margin-bottom: -30px;
-          padding-bottom: 30px;
+        @media (max-width: 1024px) {
+          .pd-copy, .pd-media { grid-column: 1 / -1; }
+          .pd-media { order: -1; max-width: 520px; }
+          .pd-hero { min-height: auto; }
+          .pd-hero .zs-scroll-cue { display: none; }
         }
-
-        /* Disable will-change after in-view to free GPU layer */
-        .reveal.in-view, .reveal-scale.in-view {
-          will-change: auto;
-        }
-
-        /* ══ RESPONSIVE ═════════════════════════════════════════════ */
-        @media (max-width: 768px) {
-          .pdp-top-inner {
-            grid-template-columns: 1fr !important;
-            gap: 32px; padding: 32px var(--gutter) 40px;
-          }
-          .pdp-top-inner > :last-child { order: -1; }
-          .pdp-sku { font-size: clamp(30px, 8vw, 44px); }
-          .specs-grid {
-            display: flex !important;
-            overflow-x: auto; gap: 10px; padding-bottom: 8px;
-          }
-          .spec-card { min-width: 220px; padding: 40px 20px 24px; }
-          .pdp-specs-inner { padding: 48px var(--gutter); }
-          .info-grid { grid-template-columns: 1fr !important; }
-          .info-section { padding: 48px var(--gutter); }
-          .cta-banner-inner {
-            flex-direction: column; align-items: flex-start;
-            padding: 24px 20px; gap: 16px;
-          }
-          .cta-banner-btns { flex-direction: column; width: 100%; }
-          .cta-primary, .cta-secondary { text-align: center; justify-content: center; }
+        @media (max-width: 640px) {
+          .pd-specs { grid-template-columns: 1fr; gap: 40px; }
+          .pd-media .hero-img-wrap { aspect-ratio: 1 / 1; }
+          .pd-hero { padding-top: 32px; }
         }
       `}</style>
 
       <ProductNavArrows prevSlug={prevSlug} nextSlug={nextSlug} />
-      <ScrollAnimations />
+      <StoryMotion />
+      <div className="zs-progress" aria-hidden="true"><span /></div>
+      <StickyOfferBar brand={product.brand_name} title={model ?? title} href={offerHref} />
 
-      <div className="pdp">
-
-        {/* ── TOP: info left (centered) + hero image right ── */}
-        <div className="pdp-top">
-          <div className="pdp-top-inner">
-
-            {/* LEFT — staggered reveals on each text block */}
-            <div>
-              {/* Static breadcrumb — category/subcategory editing was removed
-                  from the PDP; reassignment now only happens from /admin. */}
-              <div className="bc-row reveal" style={{ transitionDelay: '0ms' }}>
-                {breadcrumbs.map((b, i) => (
-                  <span key={b.href + b.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {i > 0 && <span className="bc-sep">/</span>}
-                    <Link href={b.href} className="bc-pill">{b.label}</Link>
-                  </span>
-                ))}
-              </div>
-              <Link
-                href={`/produse?brand=${encodeURIComponent(product.brand_name ?? '')}`}
-                className="pdp-brand reveal"
-                style={{ transitionDelay: '80ms' }}
-              >
-                {product.brand_name}
-              </Link>
-              <h1
-                className="pdp-sku reveal"
-                style={{ transitionDelay: '150ms' }}
-              >
-                {product.name || product.model || product.sku || product.slug}
-              </h1>
-              {product.short_description && (
-                <ShortDescription
-                  text={product.short_description}
-                  className="pdp-desc reveal"
-                  style={{ transitionDelay: '210ms' }}
-                />
+      <main className="zs-page zs-story">
+        <div className="zs-wrap">
+          <header className="pd-hero" data-offer-watch>
+            <div className="pd-copy">
+              <nav className="zs-crumbs" aria-label="Breadcrumb" data-reveal>
+                <Link href="/produse" className="zs-crumb">Catalog</Link>
+                {product.category_text && <>
+                  <span className="zs-crumb-sep">/</span>
+                  <Link href={catalogHref({ categorie: product.category_text })} className="zs-crumb">{product.category_text}</Link>
+                </>}
+                {product.subcategory_text && <>
+                  <span className="zs-crumb-sep">/</span>
+                  <Link href={catalogHref({ categorie: product.category_text, subcategorie: product.subcategory_text })} className="zs-crumb">{product.subcategory_text}</Link>
+                </>}
+              </nav>
+              {product.brand_name && (
+                <Link href={catalogHref({ brand: product.brand_name })} className="pd-brand" data-reveal style={stagger(1)}>{product.brand_name}</Link>
               )}
-              <div className="reveal" style={{ transitionDelay: '270ms' }}>
+              <h1 className="pd-title" data-reveal style={stagger(2)}>{title}</h1>
+              {product.short_description && (
+                <div data-reveal style={stagger(3)}>
+                  <ShortDescription text={product.short_description} className="pd-desc" />
+                </div>
+              )}
+              {specs.length > 0 && (
+                <div className="zs-stats" data-reveal style={stagger(4)}>
+                  {specs.map(s => (
+                    <div key={s.label} className="zs-stat"><span className="zs-stat-num">{s.value}</span><span className="zs-stat-label">{s.label}</span></div>
+                  ))}
+                </div>
+              )}
+              <div className="pd-actions" data-reveal style={stagger(5)}>
                 <SkuCopyField sku={product.sku ?? product.slug ?? ''} />
-              </div>
-
-              {/* Variant dropdown — only renders when the family has >1 variant */}
-              <div className="reveal" style={{ transitionDelay: '300ms' }}>
                 <VariantSelector variants={variants} currentSlug={product.slug} />
+                <Link href={offerHref} className="pd-offer">Cere ofertă <span aria-hidden="true">→</span></Link>
               </div>
-              <Link
-                href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`}
-                className="cere-btn reveal"
-                style={{ transitionDelay: '330ms' }}
-              >
-                CERE OFERTA
-              </Link>
             </div>
-
-            {/* RIGHT: parallax column — overflow clipped, image drifts at 0.14× scroll speed */}
-            <div className="pdp-img-col">
+            <div className="pd-media" data-reveal style={stagger(2)}>
               <HeroImage src={mainImg} alt={product.name} />
+              <p className="pd-media-cap"><span>{product.brand_name}</span><span>{product.sku}</span></p>
             </div>
-          </div>
+            <span className="zs-scroll-cue" aria-hidden="true">Derulează <span>↓</span></span>
+          </header>
+
+          {photos[0] && expand(
+            photos[0],
+            `${title} — în lucru`,
+            ownPhotosShown ? `${product.brand_name ?? ''} · în lucru` : `${product.subcategory_text} · în lucru`,
+            caracteristici[0]?.title ?? product.subcategory_text ?? title,
+          )}
+
+          {specs.length > 0 && (
+            <section className="zs-block">
+              {chapter('Specificații tehnice', 'Cifrele care contează la alegere — detaliile complete sunt în fișa producătorului.')}
+              <div className="pd-specs">
+                {specs.map((s, k) => (
+                  <div key={s.label} className="pd-spec" data-reveal style={stagger(k)}>
+                    <p className="pd-spec-label">{s.label}</p>
+                    <p className="pd-spec-value">{s.value}</p>
+                    {s.detail && <p className="pd-spec-detail">{s.detail}</p>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {caracteristici.length > 0 && (
+            <section className="zs-block">
+              {sequence({ label: 'Caracteristici', lead: `Ce face diferența la ${model}.`, steps: caracteristici })}
+            </section>
+          )}
+
+          {photos[1] && fullBleed({ src: photos[1], alt: `${title} — aplicație`, caption: `${product.subcategory_text ?? product.brand_name ?? ''} · în lucru` })}
+
+          {galleryImgs.length > 0 && (
+            <section className="zs-block">
+              {chapter('Galerie', 'Click pe o imagine pentru a o vedea mărită.')}
+              <div className="pd-gallery" data-reveal>
+                <GallerySection images={galleryImgs} productName={product.name} />
+              </div>
+            </section>
+          )}
+
+          {aplicatii.length > 0 && (
+            <section className="zs-block">
+              {chapter('Aplicații recomandate')}
+              <div className="zs-check pd-apps">
+                {aplicatii.map((a, k) => (
+                  <div key={a.title} className="zs-check-item" data-reveal style={stagger(k)}>
+                    <span className="zs-check-n">{pad(k)}</span>
+                    <span className="zs-check-name">{a.title}</span>
+                    {a.detail && <span className="zs-check-why">{a.detail}</span>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="zs-block zs-end">
+            <div className="zs-cta" data-reveal>
+              <div>
+                <h2 className="zs-cta-title">Cere oferta pentru {product.brand_name} {model}</h2>
+                <p className="zs-cta-text">Preț pentru firme, disponibilitate și termen de livrare — îți răspundem cu oferta, nu doar cu un link. Sau sună-ne la 0248.222.298.</p>
+              </div>
+              <Link href={offerHref} className="zs-cta-btn">Cere ofertă <span aria-hidden="true">→</span></Link>
+            </div>
+          </section>
         </div>
 
-        {/* ── #3: SPECS come immediately after hero ── */}
-        {specs.length > 0 && (
-          <div className="pdp-specs">
-            <div className="pdp-specs-inner">
-              <p className="specs-label reveal">{`Specificatii tehnice`}</p>
-              <div className="specs-grid" style={{ gridTemplateColumns: `repeat(${Math.min(specs.length, 3)}, 1fr)` }}>
-                {specs.map((s, i) => (
-                  <div key={i} className="spec-card reveal-scale">
-                    <p className="spec-card-label">{s.label}</p>
-                    <p className="spec-card-value">{s.value}</p>
-                    {s.detail && <p className="spec-card-detail">{s.detail}</p>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── GALLERY: 80vh split columns — after specs ── */}
-        {galleryImgs.length > 0 && (
-          <div className="reveal">
-            <GallerySection images={galleryImgs} productName={product.name} />
-          </div>
-        )}
-
-        {/* ── CARACTERISTICI ── */}
-        {caracteristici.length > 0 && (
-          <div className="pdp-char-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-            <div className="info-section">
-              <p className="info-section-label reveal">Caracteristici</p>
-              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(caracteristici.length, 3)}, 1fr)` }}>
-                {caracteristici.map((c, i) => (
-                  <div key={i} className="info-card reveal-scale">
-                    <span className="info-num">0{i + 1}</span>
-                    <span className="info-title">{c.title}</span>
-                    {c.detail && <span className="info-body">{c.detail}</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── APLICATII ── */}
-        {aplicatii.length > 0 && (
-          <div className="pdp-app-section" style={{ background: 'rgb(244,244,244)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-            <div className="info-section">
-              <p className="info-section-label reveal">Aplicatii recomandate</p>
-              <div className="info-grid" style={{ gridTemplateColumns: `repeat(${Math.min(aplicatii.length, 3)}, 1fr)` }}>
-                {aplicatii.map((a, i) => (
-                  <div key={i} className="info-card reveal-scale">
-                    <span className="info-num">0{i + 1}</span>
-                    <span className="info-title">{a.title}</span>
-                    {a.detail && <span className="info-body">{a.detail}</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── CTA BANNER ── */}
-        <div className="cta-banner">
-          <div className="cta-banner-inner reveal-scale">
-            <div>
-              <p className="cta-banner-eyebrow">Cere o oferta personalizata</p>
-              <p className="cta-banner-title">{product.brand_name} {product.sku ?? product.slug}</p>
-            </div>
-            <div className="cta-banner-btns">
-              <Link href={`/contact?sku=${encodeURIComponent(product.sku ?? '')}&brand=${encodeURIComponent(product.brand_name ?? '')}&model=${encodeURIComponent(product.model ?? product.sku ?? '')}`} className="cta-primary">CERE OFERTA PERSONALIZATA</Link>
-              <a href="tel:0248222298" className="cta-secondary">SUNA LA 0248.222.298</a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── VARIANT CAROUSEL — only renders when the family has >4 variants ── */}
+        {/* only renders when the family has >4 variants */}
         <ProductVariantCarousel variants={familyVariants} />
+      </main>
 
-        <Footer />
-
-      </div>
+      <Footer />
     </>
   )
 }

@@ -17,7 +17,7 @@ const ViewModeContext = createContext<{ mode: ViewMode; toggleMode: () => void }
  * related.
  */
 export function ViewModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<ViewMode>('pills')
+  const [mode, setMode] = useState<ViewMode>('tiles')
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)

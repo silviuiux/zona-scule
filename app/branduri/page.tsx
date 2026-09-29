@@ -6,11 +6,14 @@ import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import { getBrands, getRandomExpensiveProductsByBrand, getBrandSubcategoryNames } from '@/lib/supabase'
 import { getBrandHref, getBrandLogo, getBrandBanner } from '@/lib/brand-content'
+import StoryMotion from '@/app/zona-solutii/StoryMotion'
+import { SOLUTIONS_CSS, STORY_CSS } from '@/app/zona-solutii/styles'
+import { editorial, stagger } from '@/app/zona-solutii/editorial'
 
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Branduri — Toți Producătorii | Zona Scule',
+  title: 'Zona Branduri — toți producătorii | Zona Scule',
   description: 'Toate brandurile disponibile în catalogul Zona Scule — de la Bosch și Milwaukee la Karcher, PFERD, Osborn și RUKO.',
 }
 
@@ -26,11 +29,12 @@ export default async function BranduriPage() {
     Promise.all(brands.map(b => getBrandSubcategoryNames(b.name))),
   ])
   const totalProducts = brands.reduce((n, b) => n + b.product_count, 0)
+  const { chapter, fullBleed } = editorial()
 
   return (
     <>
       <Nav />
-      <style>{`
+      <style>{SOLUTIONS_CSS + STORY_CSS + `
         .branduri-page {
           padding-top: var(--nav-h);
           min-height: 100vh;
@@ -39,27 +43,15 @@ export default async function BranduriPage() {
           max-width: 1440px; margin: 0 auto;
           padding: 0 var(--gutter) var(--space-section);
         }
-        /* Hero — same rhythm as the catalog / contact heroes: roomy top,
-           mono eyebrow, big Neuton title, short description, mono stats */
-        .branduri-hero { padding: clamp(72px, 12vh, 128px) 0 clamp(56px, 8vh, 96px); }
-        .branduri-hero .eyebrow-mono { margin-bottom: 20px; }
-        .branduri-title {
-          font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(56px, 7.5vw, 112px);
-          line-height: 0.92; letter-spacing: -0.015em;
-          color: rgb(0,0,0);
-          margin-bottom: 24px;
+        /* Hero — the same quiet first screen as the stories and the catalog */
+        .branduri-hero {
+          min-height: calc(88vh - var(--nav-h));
+          display: flex; flex-direction: column; justify-content: flex-end;
+          padding: clamp(72px, 12vh, 128px) 0 clamp(72px, 11vh, 128px);
         }
-        .branduri-sub {
-          font-family: 'Recursive', sans-serif;
-          font-size: 16px; line-height: 1.6; color: rgba(0,0,0,0.55);
-          max-width: 560px;
-          margin-bottom: 32px;
-        }
-        .branduri-stats { display: flex; gap: 32px; flex-wrap: wrap; }
-        .branduri-stat { display: flex; align-items: baseline; gap: 8px; }
-        .branduri-stat-num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 22px; letter-spacing: -0.02em; color: rgb(0,0,0); }
-        .branduri-stat-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .branduri-hero .eyebrow-mono { margin-bottom: 28px; }
+        .branduri-hero .zs-title { margin-bottom: 40px; }
+        .branduri-hero .zs-sub { margin-bottom: 40px; }
         .branduri-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -69,28 +61,21 @@ export default async function BranduriPage() {
         }
         .branduri-card {
           position: relative; overflow: hidden;
-          display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
-          min-height: 240px;
-          padding: 24px 24px 60px;
+          display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+          min-height: 260px;
+          padding: 28px 28px 64px;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 6px;
+          border-radius: 4px;
           text-decoration: none;
-          transition: border-color 150ms, box-shadow 150ms;
+          transition: border-color 200ms, box-shadow 300ms, transform 300ms cubic-bezier(0.2, 0.7, 0.1, 1);
         }
-        .branduri-card:hover {
-          box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        }
-        .branduri-card-logo {
-          display: block; height: 48px; width: auto; max-width: 70%;
-          object-fit: contain; object-position: left center;
-          margin-bottom: auto; /* logo at the top, name + count at the bottom */
-        }
+        .branduri-card:hover { border-color: rgba(0,0,0,0.16); box-shadow: 0 16px 40px rgba(0,0,0,0.07); transform: translateY(-3px); }
+        /* every mark in the same 160×48 box, top-left */
+        .branduri-card-mark { width: 160px; height: 48px; margin-bottom: auto; display: flex; align-items: center; }
+        .branduri-card-logo { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
         /* Featured (logo) brands span two columns */
         .branduri-card.wide { grid-column: span 2; }
-        .branduri-card.wide .branduri-card-logo { height: 72px; max-width: 55%; }
-        .branduri-card.wide .branduri-card-name { font-size: 18px; }
-
         /* Subcategory ticker — slides in along the card's bottom edge on
            hover and scrolls the brand's subcategories, biggest first */
         .bt-ticker {
@@ -124,142 +109,91 @@ export default async function BranduriPage() {
         }
         @media (prefers-reduced-motion: reduce) { .bt-track { animation: none; } }
         .branduri-card-name {
-          font-family: 'Inter', sans-serif;
-          font-size: 15px; font-weight: 600;
-          color: rgb(0,0,0);
-        }
-        .branduri-card-count {
-          font-family: 'Recursive', sans-serif;
-          font-size: 12px; color: rgba(0,0,0,0.4);
-        }
-
-        /* ── Promoted brand widgets (banner + carousel) ── */
-        .branduri-promoted { margin-bottom: var(--space-section); }
-        .branduri-promoted:last-child { margin-bottom: 0; }
-        .branduri-promoted-banner {
-          position: relative; width: 100%; height: 55vh; min-height: 320px; max-height: 620px;
-          border-radius: 10px; overflow: hidden; margin-bottom: 40px;
-          background: rgb(238,238,238);
-        }
-        /* Title bottom-left and link bottom-right, on solid plates. */
-        .branduri-promoted-banner > * { z-index: 1; }
-        .branduri-promoted-banner > img { z-index: 0; }
-        .branduri-promoted-title {
-          position: absolute; left: 24px; bottom: 24px; max-width: calc(100% - 280px);
-          margin: 0; padding: 14px 20px 16px;
-          background: rgb(255,255,255); border-radius: 4px;
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(28px, 3vw, 44px); line-height: 1; letter-spacing: -0.015em;
+          font-size: 30px; line-height: 1; letter-spacing: -0.01em;
           color: rgb(0,0,0);
         }
-        .branduri-promoted-link {
-          position: absolute; right: 24px; bottom: 24px;
-          display: inline-flex; align-items: center; gap: 10px;
-          height: 48px; padding: 0 20px;
-          background: rgb(0,0,0); color: rgb(255,255,255); border-radius: 4px;
-          font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
-          letter-spacing: 0.08em; text-transform: uppercase;
-          text-decoration: none; transition: background 150ms;
+        .branduri-card.wide .branduri-card-name { font-size: 36px; }
+        .branduri-card-count {
+          font-family: 'JetBrains Mono', ui-monospace, monospace;
+          font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4);
         }
-        .branduri-promoted-link:hover { background: rgb(217,44,43); }
-        .branduri-promoted-scroll {
-          display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
-          scroll-snap-type: x mandatory; scrollbar-width: thin;
-        }
-        .branduri-promoted-scroll > * { flex: 0 0 240px; scroll-snap-align: start; }
+        .branduri-card:hover .branduri-card-name { color: rgb(217,44,43); }
 
-        .branduri-grid-title {
-          font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
-          color: rgb(0,0,0); margin-bottom: 14px;
-        }
+        .branduri-grid { margin-bottom: 0; }
+        .branduri-promoted .zs-bleed { margin-top: 0; }
+        .branduri-promoted .zs-scroll { margin-top: 40px; }
         @media (max-width: 900px) {
           .branduri-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-        @media (max-width: 768px) {
-          .branduri-promoted-banner { height: 40vh; min-height: 260px; margin-bottom: 24px; }
-          .branduri-promoted-title { left: 16px; bottom: 76px; max-width: calc(100% - 32px); font-size: 26px; padding: 10px 14px 12px; }
-          .branduri-promoted-link { left: 16px; right: auto; bottom: 16px; height: 44px; }
-        }
       `}</style>
 
-      <div className="branduri-page">
+      <StoryMotion />
+      <div className="zs-progress" aria-hidden="true"><span /></div>
+      <main className="branduri-page zs-story">
         <div className="branduri-inner">
-          <section className="branduri-hero">
-            <span className="eyebrow-mono">Producători</span>
-            <h1 className="branduri-title">Branduri</h1>
-            <p className="branduri-sub">
+          <header className="branduri-hero">
+            <span className="eyebrow-mono" data-reveal>Producători</span>
+            <h1 className="zs-title" data-reveal style={stagger(1)}><span className="red">Zona</span><br />Branduri</h1>
+            <p className="zs-sub" data-reveal style={stagger(2)}>
               Scule electrice, abrazive, accesorii și echipamente profesionale de la producătorii
               pe care îi distribuim — alege un brand pentru gama completă.
             </p>
-            <div className="branduri-stats">
-              <div className="branduri-stat"><span className="branduri-stat-num">{brands.length}</span><span className="branduri-stat-label">producători</span></div>
-              <div className="branduri-stat"><span className="branduri-stat-num">{totalProducts.toLocaleString('ro')}</span><span className="branduri-stat-label">produse</span></div>
+            <div className="zs-stats" data-reveal style={stagger(3)}>
+              <div className="zs-stat"><span className="zs-stat-num">{brands.length}</span><span className="zs-stat-label">producători</span></div>
+              <div className="zs-stat"><span className="zs-stat-num">{totalProducts.toLocaleString('ro')}</span><span className="zs-stat-label">produse</span></div>
+            </div>
+          </header>
+
+          <section>
+            {chapter('Toate brandurile', 'Cei cu pagină proprie apar mari; treci cu mouse-ul peste un brand pentru gama lui.')}
+            <div className="branduri-grid">
+              {brands.map((b, bi) => {
+                const logo = getBrandLogo(b.name)
+                const subs = tickers[bi]
+                return (
+                  <Link key={b.id} href={getBrandHref(b.name)} className={`branduri-card${logo ? ' wide' : ''}`} data-reveal style={stagger(bi % 4)}>
+                    {logo && (
+                      <span className="branduri-card-mark">
+                        <Image src={logo.src} alt="" width={logo.width} height={logo.height} className="branduri-card-logo" />
+                      </span>
+                    )}
+                    <span className="branduri-card-name">{b.name}</span>
+                    <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
+                    {subs.length > 0 && (
+                      <div className="bt-ticker" aria-hidden="true">
+                        <div className="bt-track" style={{ ['--bt-dur' as string]: `${Math.max(14, subs.join('').length * 0.28)}s` }}>
+                          {[...subs, ...subs].map((name, i) => <span key={i} className="bt-item">{name}</span>)}
+                        </div>
+                      </div>
+                    )}
+                  </Link>
+                )
+              })}
             </div>
           </section>
-
-          <h2 className="branduri-grid-title">Toate brandurile</h2>
-          <div className="branduri-grid">
-            {brands.map((b, bi) => {
-              const logo = getBrandLogo(b.name)
-              const subs = tickers[bi]
-              return (
-                <Link key={b.id} href={getBrandHref(b.name)} className={`branduri-card${logo ? ' wide' : ''}`}>
-                  {logo && (
-                    <Image
-                      src={logo.src}
-                      alt=""
-                      width={logo.width}
-                      height={logo.height}
-                      className="branduri-card-logo"
-                    />
-                  )}
-                  <span className="branduri-card-name">{b.name}</span>
-                  <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
-                  {subs.length > 0 && (
-                    <div className="bt-ticker" aria-hidden="true">
-                      <div className="bt-track" style={{ ['--bt-dur' as string]: `${Math.max(14, subs.join('').length * 0.28)}s` }}>
-                        {[...subs, ...subs].map((name, i) => <span key={i} className="bt-item">{name}</span>)}
-                      </div>
-                    </div>
-                  )}
-                </Link>
-              )
-            })}
-          </div>
 
           {featured.map((b, i) => {
             const group = promotedGroups[i]
             if (group.length === 0) return null
-            // Banner is deliberately NOT the main product shot — the first
-            // gallery/alt image found among the sampled products, closer to
-            // an in-context/application photo than a plain catalog cutout.
-            // Brands with a configured application photo (getBrandBanner) use
-            // that. With none, the banner keeps its plain grey ground so the title
-            // and link still have a home.
+            // The brand's configured application photo, else the first
+            // gallery image among the sampled products (closer to an
+            // in-context shot than the plain catalog cutout).
             const bannerSrc = getBrandBanner(b.name) ?? group.find(p => p.gallery_url_1)?.gallery_url_1
             return (
-              <div key={b.name} className="branduri-promoted">
-                <div className="branduri-promoted-banner">
-                  {bannerSrc && (
-                    <Image
-                      src={bannerSrc}
-                      alt=""
-                      fill
-                      sizes="100vw"
-                      style={{ objectFit: 'cover' }}
-                    />
-                  )}
-                  <h2 className="branduri-promoted-title">Selecție premium {b.name}</h2>
-                  <Link href={getBrandHref(b.name)} className="branduri-promoted-link">Vezi tot <span aria-hidden="true">→</span></Link>
-                </div>
-                <div className="branduri-promoted-scroll">
+              <section key={b.name} className="zs-block branduri-promoted">
+                {chapter(`Selecție premium ${b.name}`, undefined, (
+                  <Link href={getBrandHref(b.name)} className="zs-car-link">Vezi tot <span aria-hidden="true">→</span></Link>
+                ))}
+                {bannerSrc && fullBleed({ src: bannerSrc, alt: '', caption: `${b.name} · în lucru` })}
+                <div className="zs-scroll" data-reveal>
                   {group.map(p => <ProductCard key={p.id} product={p} />)}
                 </div>
-              </div>
+              </section>
             )
           })}
         </div>
-      </div>
+      </main>
       <Footer />
     </>
   )

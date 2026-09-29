@@ -2,12 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { unstable_cache } from 'next/cache'
 import { SOLUTIONS, SOLUTION_TYPES, solutionSubs, type Solution } from '@/lib/solutions'
+import StoriesShuffle from './StoriesShuffle'
 import { getApplicationImage, getProductDetail } from '@/lib/supabase'
 
 /**
- * "Zona Soluții" teaser above the footer: the featured story, large, and two
- * more that change daily. Covers are the same application photos the
- * stories' own cards use, cached for a day.
+ * "Zona Soluții" teaser above the footer: three stories, a different random
+ * three on every visit (the first one large). Every story is in the markup
+ * — pages are cached, so the pick happens in the browser (StoriesShuffle);
+ * the hidden ones cost nothing, their images are lazy. Covers are the same
+ * application photos the stories' own cards use, cached for a day.
  */
 const cover = unstable_cache(
   async (slug: string) => {
@@ -21,21 +24,12 @@ const cover = unstable_cache(
   { revalidate: 86400 },
 )
 
-function pick(): Solution[] {
-  const featured = SOLUTIONS.find(s => s.featured) ?? SOLUTIONS[0]
-  const rest = SOLUTIONS.filter(s => s !== featured)
-  const day = Math.floor(Date.now() / 86400000)
-  const a = rest[day % rest.length]
-  // the second one from a different kind of story than the first
-  const others = rest.filter(s => s.type !== a.type)
-  const b = others[day % others.length] ?? rest[(day + 1) % rest.length]
-  return [featured, a, b]
-}
-
 const typeLabel = (s: Solution) => SOLUTION_TYPES.find(t => t.id === s.type)?.eyebrow ?? ''
 
 export default async function StoriesTeaser() {
-  const stories = pick()
+  // a fixed order for the server render (the featured story first); the
+  // browser reshuffles
+  const stories = [...SOLUTIONS].sort((a, b) => Number(!!b.featured) - Number(!!a.featured))
   const images = await Promise.all(stories.map(s => cover(s.slug).catch(() => null)))
 
   return (
@@ -78,7 +72,9 @@ export default async function StoriesTeaser() {
         .st-all:hover { border-color: rgba(0,0,0,0.45); }
 
         .st-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; row-gap: 56px; }
-        .st-card { grid-column: span 3; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+        .st-card { grid-column: span 3; display: none; flex-direction: column; text-decoration: none; color: inherit; }
+        .st-card[data-show] { display: flex; }
+        .st-card.lead[data-show] { display: grid; }
         .st-card.lead { grid-column: span 6; }
         .st-img {
           position: relative; overflow: hidden; border-radius: 4px;
@@ -87,7 +83,7 @@ export default async function StoriesTeaser() {
         .st-card.lead .st-img { aspect-ratio: auto; height: 100%; min-height: 420px; }
         .st-img img { transition: transform 900ms cubic-bezier(0.2, 0, 0, 1); }
         .st-card:hover .st-img img { transform: scale(1.04); }
-        .st-card.lead { display: grid; grid-template-rows: 1fr auto; }
+        .st-card.lead { grid-template-rows: 1fr auto; }
         .st-body { padding-top: 24px; display: flex; flex-direction: column; gap: 12px; }
         .st-kind {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -123,23 +119,24 @@ export default async function StoriesTeaser() {
 
       <div className="st-head">
         <span className="st-eyebrow">Zona Soluții</span>
-        <h2 id="st-teaser-title" className="st-title">Scule alese pentru <em>meseria</em> ta.</h2>
+        <h2 id="st-teaser-title" className="st-title">Cum lucrează <em>profesioniștii</em> și ce scule aleg.</h2>
         <div className="st-lead">
-          <p>Cum lucrează electricienii, service-urile auto și liniile de asamblare; ghiduri „Cum alegi…” și liste de scule pe proiect.</p>
+          <p>Povești din meserii și industrie, ghiduri „Cum alegi…”, liste de scule pe proiect și produse prezentate în detaliu.</p>
           <Link href="/zona-solutii" className="st-all">Toate soluțiile <span aria-hidden="true">→</span></Link>
         </div>
       </div>
 
+      <StoriesShuffle />
       <div className="st-grid">
         {stories.map((s, i) => (
-          <Link key={s.slug} href={`/zona-solutii/${s.slug}`} className={`st-card${i === 0 ? ' lead' : ''}`}>
+          <Link key={s.slug} href={`/zona-solutii/${s.slug}`} className={`st-card${i === 0 ? ' lead' : ''}`} data-show={i < 3 ? '' : undefined}>
             <div className="st-img">
               {images[i] && (
                 <Image
                   src={images[i]!}
                   alt=""
                   fill
-                  sizes={i === 0 ? '(max-width: 1024px) 100vw, 700px' : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 340px'}
+                  sizes="(max-width: 1024px) 100vw, 700px"
                   style={{ objectFit: 'cover' }}
                 />
               )}
