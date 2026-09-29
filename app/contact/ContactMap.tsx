@@ -2,17 +2,18 @@ import { CONTACT_MAP as M } from '@/lib/contact-map-data'
 
 const C = M.city
 const D = M.detail
-const A1 = M.a1route
+const SFV = M.streets.find(r => r.id === 'sfv')
+const CHURCH = C.pois.find(p => p.name.startsWith('BISERICA'))
 import ContactMapScroller from './ContactMapScroller'
 
 /**
  * "Unde ne găsești" — a full-height, scroll-driven drawing instead of a map
  * embed, in the same draughting style as the footer easter egg. While the
  * section is pinned, scrolling:
- *   01  draws Strada Sfânta Vineri and the streets around no. 28,
- *   02  pulls the camera out to Pitești (urban area, Argeș, main roads,
- *       Argeș county),
- *   03  and out again to Romania's border within Europe.
+ *   01  draws Strada Sfânta Vineri alone, the shop and the church on it,
+ *   02  pulls the camera out to Pitești (main streets and roads, the Argeș),
+ *   03  and out again to Romania (border, national roads, motorways, cities).
+ * Every road is black; only the shop's pin is red.
  * Geometry (metres, centred on the shop) lives in lib/contact-map-data.ts;
  * the camera / drawing is driven by ContactMapScroller. The SVG is rendered
  * here on the server so the geometry never ships as JS.
@@ -54,9 +55,8 @@ export default function ContactMap() {
         .cmap-svg .d-hw { stroke: rgba(0,0,0,0.4); stroke-width: calc(1.2px * var(--u, 1)); }
         .cmap-svg .d-junction { stroke: rgba(0,0,0,0.42); stroke-width: calc(0.6px * var(--u, 1)); }
         .cmap-svg .d-junction-fill { fill: rgba(0,0,0,0.035); stroke: none; }
-        /* the A1, highlighted in every view */
-        .cmap-svg .a1 { fill: none; stroke: rgba(217,44,43,0.78); stroke-width: calc(1.8px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
-        .cmap-svg text.a1-label { font-size: 9.5px; fill: rgba(217,44,43,0.85); letter-spacing: 0.16em; font-weight: 500; }
+        .cmap-svg .sfv { stroke: rgb(0,0,0); stroke-width: calc(2.2px * var(--u, 1)); }
+        .cmap-svg .church { fill: none; stroke: rgba(0,0,0,0.6); stroke-width: 1; }
         .cmap-svg .c-road { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.8px * var(--u, 1) * var(--w, 1)); }
         .cmap-svg .c-road.a1 { stroke: rgba(0,0,0,0.5); }
         /* river as two banks: a grey band with a paler core (widths in metres) */
@@ -73,14 +73,12 @@ export default function ContactMap() {
         .cmap-svg .water { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg .river { stroke: rgba(0,0,0,0.24); stroke-width: calc(1px * var(--u, 1)); }
         .cmap-svg .road { stroke: rgba(0,0,0,0.16); stroke-width: calc(0.8px * var(--u, 1)); }
-        .cmap-svg .urban { stroke: rgba(217,44,43,0.38); stroke-width: calc(0.8px * var(--u, 1)); }
-        .cmap-svg .urban-fill { fill: rgba(217,44,43,0.03); stroke: none; }
+        .cmap-svg .urban { stroke: rgba(0,0,0,0.22); stroke-width: calc(0.8px * var(--u, 1)); stroke-dasharray: none; }
         .cmap-svg .county { stroke: rgba(0,0,0,0.22); stroke-width: calc(0.8px * var(--u, 1)); stroke-dasharray: none; }
         .cmap-svg .ro { stroke: rgba(0,0,0,0.62); stroke-width: calc(1px * var(--u, 1)); }
-        .cmap-svg .ro-fill { fill: rgba(217,44,43,0.04); stroke: none; }
         .cmap-svg .eu { stroke: rgba(0,0,0,0.15); stroke-width: calc(0.6px * var(--u, 1)); }
-        .cmap-svg .mw { fill: none; stroke: rgba(0,0,0,0.42); stroke-width: calc(1.1px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
-        .cmap-svg .dn { stroke: rgba(0,0,0,0.2); stroke-width: calc(0.7px * var(--u, 1)); }
+        .cmap-svg .mw { fill: none; stroke: rgba(0,0,0,0.7); stroke-width: calc(1.1px * var(--u, 1)); stroke-linecap: round; stroke-linejoin: round; }
+        .cmap-svg .dn { stroke: rgba(0,0,0,0.3); stroke-width: calc(0.7px * var(--u, 1)); }
         .cmap-svg .city text { font-size: 9px; }
         .cmap-svg .danube { stroke: rgba(0,0,0,0.18); stroke-width: calc(0.8px * var(--u, 1)); }
         .cmap-svg text {
@@ -146,15 +144,12 @@ export default function ContactMap() {
       <div className="cmap-sticky">
         <ContactMapScroller>
           <svg className="cmap-svg" viewBox="-550 -300 1100 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            {/* 03 · Europe and Romania */}
-            <g data-k="fade" data-s="0.58" data-e="0.64">
-              <path className="dr eu" pathLength={1} d={M.europe} data-k="draw" data-s="0.66" data-e="0.84" />
-              <path className="dr danube" pathLength={1} d={M.danube} data-k="draw" data-s="0.7" data-e="0.8" />
-              <path className="ro-fill" d={M.romania} data-k="fade" data-s="0.7" data-e="0.78" />
-              <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.6" data-e="0.74" />
-              {/* national roads between the cities, then the open motorways */}
-              <path className="dr dn" pathLength={1} d={M.nationalRoads} data-k="draw" data-s="0.8" data-e="0.95" />
-              <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.82" data-e="0.94" />
+            {/* 03 · Romania: the border, national roads and motorways, cities */}
+            <g data-k="fade" data-s="0.6" data-e="0.64">
+              <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.64" data-e="0.8" />
+              <path className="dr dn" pathLength={1} d={M.nationalRoads} data-k="draw" data-s="0.76" data-e="0.92" />
+              <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.78" data-e="0.92" />
+              <path className="dr mw" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.76" data-e="0.88" />
               {M.cities.map((c, i) => {
                 const s = 0.86 + i * 0.004
                 return (
@@ -164,95 +159,50 @@ export default function ContactMap() {
                   </g>
                 )
               })}
-              <g className="lbl" data-x={30000} data-y={-150000} data-k="fade" data-s="0" data-e="0.001" data-out-s="0.84" data-out-e="0.88">
-                <text className="big" textAnchor="middle" data-k="type" data-s="0.74" data-e="0.8" data-text="ROMÂNIA" />
+              <g className="lbl" data-x={30000} data-y={-150000}>
+                <text className="big" textAnchor="middle" data-k="type" data-s="0.8" data-e="0.86" data-text="ROMÂNIA" />
               </g>
             </g>
 
-            {/* 02 · Pitești and Argeș county */}
-            <g data-k="fade" data-s="0.3" data-e="0.36" data-out-s="0.62" data-out-e="0.7">
-              <path className="dr county" pathLength={1} d={M.county} data-k="draw" data-s="0.37" data-e="0.5" />
-              <path className="dr road" pathLength={1} d={M.roads} data-k="draw" data-s="0.38" data-e="0.5" />
-              <path className="dr river" pathLength={1} d={M.arges} data-k="draw" data-s="0.36" data-e="0.46" />
-              <path className="urban-fill" d={M.urban} data-k="fade" data-s="0.46" data-e="0.5" />
-              <path className="dr urban" pathLength={1} d={M.urban} data-k="draw" data-s="0.34" data-e="0.44" />
-              <g className="lbl" data-x={9500} data-y={3500} data-a={19}>
-                <text className="a1-label" textAnchor="middle" y="-8" data-k="type" data-s="0.44" data-e="0.48" data-text="A1 → BUCUREȘTI" />
-              </g>
-              <g className="lbl" data-x={-2500} data-y={4200}>
-                <text className="big" textAnchor="end" data-k="type" data-s="0.47" data-e="0.52" data-text="PITEȘTI" />
-              </g>
-              <g className="lbl" data-x={-19000} data-y={13000}>
-                <text data-k="type" data-s="0.5" data-e="0.55" data-text="JUD. ARGEȘ" />
-              </g>
-              <g className="lbl" data-x={6000} data-y={8500}>
-                <text data-k="type" data-s="0.49" data-e="0.53" data-text="R. ARGEȘ" />
+            {/* 02 · Pitești: the Argeș, the town's main streets and roads, the A1 */}
+            <g data-k="fade" data-s="0.3" data-e="0.34" data-out-s="0.62" data-out-e="0.7">
+              <path className="dr river" pathLength={1} d={M.arges} data-k="draw" data-s="0.36" data-e="0.48" />
+              <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.36" data-e="0.48" />
+              <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.34" data-e="0.44" />
+              <path className="dr mw" pathLength={1} d={D.a1} data-k="draw" data-s="0.34" data-e="0.44" />
+              <g className="lbl" data-x={900} data-y={700}>
+                <text className="big" textAnchor="start" data-k="type" data-s="0.46" data-e="0.52" data-text="PITEȘTI" />
               </g>
             </g>
 
-            {/* 01 · Pitești around the shop: main roads, the A1 junction,
-                 the Argeș, parks and landmarks, the streets next door */}
-            <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.33" data-out-e="0.42">
-              {/* traced from map references: pale water and green areas, then
-                  streets by class, the A1 junction as road outlines, the A1 */}
-              <path className="d-water" d={D.water} data-k="fade" data-s="0.02" data-e="0.08" />
-              <path className="d-park" d={D.parks} data-k="fade" data-s="0.04" data-e="0.1" />
-              <path className="dr d-minor" pathLength={1} d={D.minor} data-k="draw" data-s="0.08" data-e="0.2" />
-              <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.05" data-e="0.15" />
-              <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.03" data-e="0.11" />
-              <path className="d-junction-fill" d={D.junction} data-k="fade" data-s="0.12" data-e="0.16" />
-              <path className="dr d-junction" pathLength={1} d={D.junction} data-k="draw" data-s="0.06" data-e="0.15" />
-              <path className="dr a1" pathLength={1} d={D.a1} data-k="draw" data-s="0.02" data-e="0.1" />
-
-              {/* labels leave before the camera pulls out */}
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.31">
-                {C.roads.filter(r => r.label).map((r, i) => {
-                  const s = 0.12 + i * 0.008
-                  return (
-                    <g key={r.id} className="lbl" data-x={r.lx} data-y={r.ly} data-a={r.ang}>
-                      <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.04).toFixed(3)} data-text={r.label} />
-                    </g>
-                  )
-                })}
-                <g className="lbl" data-x={C.argesLabel.lx} data-y={C.argesLabel.ly} data-a={C.argesLabel.ang}>
-                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.14" data-e="0.18" data-text="RÂUL ARGEȘ" />
-                </g>
-                <g className="lbl" data-x={C.doamneiLabel.lx} data-y={C.doamneiLabel.ly} data-a={C.doamneiLabel.ang}>
-                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.15" data-e="0.19" data-text="RÂUL DOAMNEI" />
-                </g>
-                {C.pois.map((poi, i) => {
-                  const s = 0.14 + i * 0.01
-                  return (
-                    <g key={poi.name} className="lbl" data-x={poi.at[0]} data-y={poi.at[1]} data-k="fade" data-s={s.toFixed(3)} data-e={(s + 0.02).toFixed(3)}>
-                      <circle className="poi-dot" r="2.4" />
-                      <text className="poi-label" x={poi.dx} y={poi.dy} textAnchor={poi.anchor as 'start' | 'middle' | 'end'} data-k="type" data-s={s.toFixed(3)} data-e={(s + 0.03).toFixed(3)} data-text={poi.name} />
-                    </g>
-                  )
-                })}
-              </g>
-            </g>
-
-            {/* A1 — highlighted at every zoom: the city trace above, then
-                 the motorway across the county and the country */}
-            <g data-k="fade" data-s="0.3" data-e="0.34">
-              <path className="dr a1" pathLength={1} d={A1.east} data-k="draw" data-s="0.32" data-e="0.62" />
-              <path className="dr a1" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.64" data-e="0.8" />
-              <g data-k="fade" data-s="0.76" data-e="0.8">
-                <g className="lbl" data-x={-85000} data-y={-122000}>
-                  <text className="a1-label" textAnchor="middle" y="-10" data-k="type" data-s="0.78" data-e="0.82" data-text="A1" />
-                </g>
+            {/* 01 · Strada Sfânta Vineri: the street, the shop, the church */}
+            <g data-k="fade" data-s="0" data-e="0.001">
+              {SFV && <path className="dr sfv" pathLength={1} d={SFV.d} data-k="draw" data-s="0.02" data-e="0.14" />}
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.32">
+                {SFV && (
+                  <g className="lbl" data-x={SFV.lx} data-y={SFV.ly} data-a={SFV.ang}>
+                    <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.1" data-e="0.16" data-text="STR. SFÂNTA VINERI" />
+                  </g>
+                )}
+                {CHURCH && (
+                  <g className="lbl" data-x={CHURCH.at[0]} data-y={CHURCH.at[1]} data-k="fade" data-s="0.14" data-e="0.17">
+                    <path className="church" d="M0 -9 V-3 M-3 -6.5 H3" />
+                    <circle className="poi-dot" r="2.4" />
+                    <text className="poi-label" x={CHURCH.dx} y={CHURCH.dy} textAnchor={CHURCH.anchor as 'start' | 'middle' | 'end'} data-k="type" data-s="0.15" data-e="0.2" data-text="BISERICA SF. VINERI" />
+                  </g>
+                )}
               </g>
             </g>
 
             {/* the shop — constant size on screen, scaled by the scroller */}
-            <g data-role="pin" data-k="fade" data-s="0.02" data-e="0.05">
+            <g data-role="pin" data-k="fade" data-s="0.06" data-e="0.09">
               <circle className="pin-pulse" r="10" />
               <path className="pin-cross" d="M-16 0 H-7 M7 0 H16 M0 -16 V-7 M0 7 V16" />
               <circle className="pin-ring" r="7" />
               <circle className="pin-dot" r="2.6" />
               <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.62" data-out-e="0.68">
-                <text className="pin-label" x="22" y="-4" data-k="type" data-s="0.05" data-e="0.11" data-text="ZONA SCULE" />
-                <text className="pin-sub" x="22" y="11" data-k="type" data-s="0.08" data-e="0.14" data-text="SFÂNTA VINERI 28" />
+                <text className="pin-label" x="22" y="-4" data-k="type" data-s="0.08" data-e="0.13" data-text="ZONA SCULE" />
+                <text className="pin-sub" x="22" y="11" data-k="type" data-s="0.11" data-e="0.16" data-text="SFÂNTA VINERI 28" />
               </g>
             </g>
           </svg>
@@ -266,8 +216,8 @@ export default function ContactMap() {
           <div className="cmap-foot">
             <div className="cmap-readout">
               <div className="cmap-stages" data-role="stages">
-                <span className="on">01 Pitești</span>
-                <span>02 Argeș</span>
+                <span className="on">01 Sfânta Vineri</span>
+                <span>02 Pitești</span>
                 <span>03 România</span>
               </div>
               <div className="cmap-scale">

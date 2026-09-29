@@ -90,7 +90,7 @@ export default function ContactMapScroller({ children }: { children: React.React
             it.el.textContent = it.text.slice(0, n) + (raw > 0 && raw < 1 ? '_' : '')
           }
         }
-        const stage = p < 0.34 ? 0 : p < 0.62 ? 1 : 2
+        const stage = p < 0.3 ? 0 : p < 0.62 ? 1 : 2
         stages.forEach((s, i) => s.classList.toggle('on', i === stage))
       }
       // scale bar: a round distance close to 120 px

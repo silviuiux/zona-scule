@@ -51,12 +51,18 @@ export default function ContactPage({
         }
         .c-hero-grid {
           flex: 1; align-content: center;
-          display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-          gap: clamp(48px, 8vw, 144px);
+          /* 12 columns: the form on 4, two empty, the details on 4, two empty */
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+          column-gap: 16px; row-gap: 48px;
           align-items: end;
           padding-bottom: clamp(40px, 8vh, 96px);
         }
-        .c-details { display: flex; flex-direction: column; }
+        .c-hero-grid > .cf { grid-column: 1 / span 4; }
+        .c-details { grid-column: 7 / span 4; display: flex; flex-direction: column; }
+        @media (max-width: 1100px) {
+          .c-hero-grid > .cf { grid-column: 1 / span 6; }
+          .c-details { grid-column: 8 / span 5; }
+        }
         .c-detail {
           display: grid; grid-template-columns: 92px 1fr; align-items: baseline; gap: 16px;
           padding: 18px 0;
@@ -142,6 +148,7 @@ export default function ContactPage({
           .about-facts { grid-template-columns: 1fr; }
           .c-hero { min-height: 0; padding-top: 40px; }
           .c-hero-grid { grid-template-columns: 1fr; gap: 48px; }
+          .c-hero-grid > .cf, .c-details { grid-column: 1 / -1; }
           .c-cue-left { display: none; }
           .c-cue { grid-template-columns: auto 1fr; gap: 16px; }
         }
