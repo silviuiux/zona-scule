@@ -45,7 +45,7 @@ import { usePathname } from 'next/navigation'
  *    finale: the bubble swings past the marks and settles.
  *
  * Which one shows is shuffled on every page (a new pick on each navigation,
- * never the same one twice in a row) between blade, drill, power, caliper and level — the nail is out of the shuffle
+ * never the same one twice in a row) between nail, blade, drill, power and level — the caliper is out of the shuffle
  * for now; ?egg=… forces any of them.
  *
  * Every drawable carries data-s / data-e — its slice of the 0..1 progress —
@@ -68,7 +68,7 @@ const SETTLED = 2000 // ms at the bottom
 type Variant = 'nail' | 'blade' | 'drill' | 'power' | 'caliper' | 'level'
 const VARIANTS: Variant[] = ['nail', 'blade', 'drill', 'power', 'caliper', 'level']
 // In the page-load shuffle; the rest stay reachable with ?egg=…
-const SHUFFLED: Variant[] = ['blade', 'drill', 'power', 'caliper', 'level']
+const SHUFFLED: Variant[] = ['nail', 'blade', 'drill', 'power', 'level']
 type Kind = 'draw' | 'grow' | 'pop' | 'fade' | 'type'
 type Item = { el: SVGGraphicsElement; s: number; e: number; kind: Kind; text: string; len: number; out: boolean; arrive: boolean; wrap: SVGGElement | null }
 
@@ -877,7 +877,7 @@ const TITLE_SCALE: Record<Variant, string> = { nail: 'SCARA 1:1', blade: 'SCARA 
 // (client-side navigation included), never the same one twice in a row
 // (remembered per browser, so reloads vary too); ?egg=nail|blade|drill|
 // power|caliper|level forces one.
-// The nail is out of the shuffle for now.
+// The caliper is out of the shuffle (reachable with ?egg=caliper).
 let current: { path: string; v: Variant } | null = null
 const pickVariant = (): Variant => {
   const forced = new URLSearchParams(window.location.search).get('egg')
