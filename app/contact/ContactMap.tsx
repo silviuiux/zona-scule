@@ -2,8 +2,15 @@ import { CONTACT_MAP as M } from '@/lib/contact-map-data'
 
 const C = M.city
 const D = M.detail
-const SFV = M.streets.find(r => r.id === 'sfv')
-const CHURCH = C.pois.find(p => p.name.startsWith('BISERICA'))
+// Strada Sfânta Vineri as it runs: the long diagonal past no. 28, then the
+// bend south at its lower end (read off the traced street grid)
+const SFV = {
+  d: 'M104 -138L81 -119L50 -74L31 -53L8 -24L-52 42L-48 49L-38.5 78L-25 108.5L-8 133.5',
+  lx: 66, ly: -97, ang: -55,
+}
+const CHURCH = { at: [60, -58] as [number, number], anchor: 'start' as const, dx: 8, dy: 4 }
+// Mioveni, for the Dacia platform (metres from the shop)
+const MIOVENI: [number, number] = [4770, -10820]
 // Pitești landmarks for the town view (metres from the shop; north is −y)
 const LANDMARKS: { name: string; at: [number, number]; anchor: 'start' | 'middle' | 'end'; dx: number; dy: number }[] = [
   { name: 'CENTRU', at: [-340, 50], anchor: 'end', dx: -8, dy: 4 },
@@ -22,6 +29,7 @@ import ContactMapScroller from './ContactMapScroller'
  *   01  draws Strada Sfânta Vineri alone, the shop and the church on it,
  *   02  pulls the camera out to Pitești (main streets and roads, the Argeș,
  *       the A1, landmarks: centre, Ceair market, Ramada, VIVO, the parks),
+ *       then a little further, to Mioveni and the Dacia platform,
  *   03  and out again to Romania (border, national roads, motorways, cities).
  * Every road is black; only the shop's pin is red.
  * Geometry (metres, centred on the shop) lives in lib/contact-map-data.ts;
@@ -38,7 +46,7 @@ export default function ContactMap() {
   return (
     <section className="cmap" aria-label="Locația Zona Scule: Strada Sfânta Vineri 28, Pitești">
       <style>{`
-        .cmap { position: relative; height: 340vh; }
+        .cmap { position: relative; height: 420vh; }
         .cmap-sticky {
           position: sticky; top: var(--nav-h);
           height: calc(100vh - var(--nav-h));
@@ -155,13 +163,13 @@ export default function ContactMap() {
         <ContactMapScroller>
           <svg className="cmap-svg" viewBox="-550 -300 1100 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             {/* 03 · Romania: the border, national roads and motorways, cities */}
-            <g data-k="fade" data-s="0.6" data-e="0.64">
-              <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.64" data-e="0.8" />
-              <path className="dr dn" pathLength={1} d={M.nationalRoads} data-k="draw" data-s="0.76" data-e="0.92" />
-              <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.78" data-e="0.92" />
-              <path className="dr mw" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.76" data-e="0.88" />
+            <g data-k="fade" data-s="0.66" data-e="0.7">
+              <path className="dr ro" pathLength={1} d={M.romania} data-k="draw" data-s="0.7" data-e="0.84" />
+              <path className="dr dn" pathLength={1} d={M.nationalRoads} data-k="draw" data-s="0.8" data-e="0.94" />
+              <path className="dr mw" pathLength={1} d={M.motorways.open} data-k="draw" data-s="0.82" data-e="0.94" />
+              <path className="dr mw" pathLength={1} d={M.motorways.a1open} data-k="draw" data-s="0.8" data-e="0.9" />
               {M.cities.map((c, i) => {
-                const s = 0.86 + i * 0.004
+                const s = 0.88 + i * 0.004
                 return (
                   <g key={c.n} className="lbl city" data-x={c.at[0]} data-y={c.at[1]} data-k="fade" data-s={s.toFixed(3)} data-e={(s + 0.03).toFixed(3)}>
                     <circle className="dot" r="2.2" />
@@ -170,20 +178,20 @@ export default function ContactMap() {
                 )
               })}
               <g className="lbl" data-x={30000} data-y={-150000}>
-                <text className="big" textAnchor="middle" data-k="type" data-s="0.8" data-e="0.86" data-text="ROMÂNIA" />
+                <text className="big" textAnchor="middle" data-k="type" data-s="0.84" data-e="0.9" data-text="ROMÂNIA" />
               </g>
             </g>
 
             {/* 02 · Pitești: the Argeș, the town's main streets and roads, the A1 */}
-            <g data-k="fade" data-s="0.3" data-e="0.34" data-out-s="0.62" data-out-e="0.7">
-              <path className="dr river" pathLength={1} d={M.arges} data-k="draw" data-s="0.36" data-e="0.48" />
-              <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.36" data-e="0.48" />
-              <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.34" data-e="0.44" />
-              <path className="dr mw" pathLength={1} d={D.a1} data-k="draw" data-s="0.34" data-e="0.44" />
+            <g data-k="fade" data-s="0.22" data-e="0.26" data-out-s="0.66" data-out-e="0.72">
+              <path className="dr river" pathLength={1} d={M.arges} data-k="draw" data-s="0.28" data-e="0.4" />
+              <path className="dr d-art" pathLength={1} d={D.arterials} data-k="draw" data-s="0.28" data-e="0.4" />
+              <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.26" data-e="0.36" />
+              <path className="dr mw" pathLength={1} d={D.a1} data-k="draw" data-s="0.26" data-e="0.36" />
               {/* landmarks leave before the camera pulls out to Romania */}
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.6" data-out-e="0.63">
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.48" data-out-e="0.52">
                 {LANDMARKS.map((l, i) => {
-                  const st = 0.46 + i * 0.012
+                  const st = 0.36 + i * 0.012
                   return (
                     <g key={l.name} className="lbl" data-x={l.at[0]} data-y={l.at[1]} data-k="fade" data-s={st.toFixed(3)} data-e={(st + 0.02).toFixed(3)}>
                       <circle className="poi-dot" r="2.4" />
@@ -192,33 +200,40 @@ export default function ContactMap() {
                   )
                 })}
                 <g className="lbl" data-x={529} data-y={-263} data-a={51}>
-                  <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.44" data-e="0.48" data-text="AUTOSTRADA A1" />
+                  <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.34" data-e="0.38" data-text="AUTOSTRADA A1" />
                 </g>
                 <g className="lbl" data-x={C.argesLabel.lx} data-y={C.argesLabel.ly} data-a={C.argesLabel.ang}>
-                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.45" data-e="0.49" data-text="RÂUL ARGEȘ" />
+                  <text className="water-label" textAnchor="middle" y="4" data-k="type" data-s="0.35" data-e="0.39" data-text="RÂUL ARGEȘ" />
                 </g>
               </g>
               <g className="lbl" data-x={900} data-y={700}>
-                <text className="big" textAnchor="start" data-k="type" data-s="0.46" data-e="0.52" data-text="PITEȘTI" />
+                <text className="big" textAnchor="start" data-k="type" data-s="0.38" data-e="0.44" data-text="PITEȘTI" />
+              </g>
+
+              {/* …then out to Mioveni and the Dacia platform: the two towns'
+                  outline, the regional roads, the A1 on */}
+              <path className="dr urban" pathLength={1} d={M.urban} data-k="draw" data-s="0.5" data-e="0.62" />
+              <path className="dr road" pathLength={1} d={M.roads} data-k="draw" data-s="0.52" data-e="0.64" />
+              <path className="dr mw" pathLength={1} d={M.a1route.east} data-k="draw" data-s="0.5" data-e="0.62" />
+              <g className="lbl" data-x={MIOVENI[0]} data-y={MIOVENI[1]} data-k="fade" data-s="0.58" data-e="0.6">
+                <circle className="dot" r="2.6" />
+                <text className="big" x="12" y="5" data-k="type" data-s="0.58" data-e="0.63" data-text="MIOVENI" />
+                <text x="12" y="22" data-k="type" data-s="0.6" data-e="0.64" data-text="PLATFORMA DACIA" />
               </g>
             </g>
 
             {/* 01 · Strada Sfânta Vineri: the street, the shop, the church */}
             <g data-k="fade" data-s="0" data-e="0.001">
-              {SFV && <path className="dr sfv" pathLength={1} d={SFV.d} data-k="draw" data-s="0.02" data-e="0.14" />}
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.28" data-out-e="0.32">
-                {SFV && (
-                  <g className="lbl" data-x={SFV.lx} data-y={SFV.ly} data-a={SFV.ang}>
-                    <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.1" data-e="0.16" data-text="STR. SFÂNTA VINERI" />
-                  </g>
-                )}
-                {CHURCH && (
-                  <g className="lbl" data-x={CHURCH.at[0]} data-y={CHURCH.at[1]} data-k="fade" data-s="0.14" data-e="0.17">
-                    <path className="church" d="M0 -9 V-3 M-3 -6.5 H3" />
-                    <circle className="poi-dot" r="2.4" />
-                    <text className="poi-label" x={CHURCH.dx} y={CHURCH.dy} textAnchor={CHURCH.anchor as 'start' | 'middle' | 'end'} data-k="type" data-s="0.15" data-e="0.2" data-text="BISERICA SF. VINERI" />
-                  </g>
-                )}
+              <path className="dr sfv" pathLength={1} d={SFV.d} data-k="draw" data-s="0.02" data-e="0.14" />
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.2" data-out-e="0.24">
+                <g className="lbl" data-x={SFV.lx} data-y={SFV.ly} data-a={SFV.ang}>
+                  <text className="road-label" textAnchor="middle" y="-8" data-k="type" data-s="0.1" data-e="0.16" data-text="STR. SFÂNTA VINERI" />
+                </g>
+                <g className="lbl" data-x={CHURCH.at[0]} data-y={CHURCH.at[1]} data-k="fade" data-s="0.14" data-e="0.17">
+                  <path className="church" d="M0 -9 V-3 M-3 -6.5 H3" />
+                  <circle className="poi-dot" r="2.4" />
+                  <text className="poi-label" x={CHURCH.dx} y={CHURCH.dy} textAnchor={CHURCH.anchor} data-k="type" data-s="0.15" data-e="0.2" data-text="BISERICA SF. VINERI" />
+                </g>
               </g>
             </g>
 
@@ -228,7 +243,7 @@ export default function ContactMap() {
               <path className="pin-cross" d="M-16 0 H-7 M7 0 H16 M0 -16 V-7 M0 7 V16" />
               <circle className="pin-ring" r="7" />
               <circle className="pin-dot" r="2.6" />
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.62" data-out-e="0.68">
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.66" data-out-e="0.7">
                 <text className="pin-label" x="22" y="-4" data-k="type" data-s="0.08" data-e="0.13" data-text="ZONA SCULE" />
                 <text className="pin-sub" x="22" y="11" data-k="type" data-s="0.11" data-e="0.16" data-text="SFÂNTA VINERI 28" />
               </g>

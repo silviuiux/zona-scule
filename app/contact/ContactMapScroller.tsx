@@ -67,7 +67,7 @@ export default function ContactMapScroller({ children }: { children: React.React
       // narrow screens start closer in on the neighbourhood, then join the
       // shared framing as the camera pulls out
       const near = Math.max(0.5, Math.min(1, W / 1100))
-      if (near < 1) cam.w *= near + (1 - near) * clamp01((p - 0.28) / 0.2)
+      if (near < 1) cam.w *= near + (1 - near) * clamp01((p - 0.2) / 0.18)
       // slice-fit: the view is cam.w wide, or taller if the box is tall
       const vw = Math.max(cam.w, (cam.w * 0.62) * (W / H))
       const vh = vw * (H / W)
@@ -90,7 +90,7 @@ export default function ContactMapScroller({ children }: { children: React.React
             it.el.textContent = it.text.slice(0, n) + (raw > 0 && raw < 1 ? '_' : '')
           }
         }
-        const stage = p < 0.3 ? 0 : p < 0.62 ? 1 : 2
+        const stage = p < 0.22 ? 0 : p < 0.68 ? 1 : 2
         stages.forEach((s, i) => s.classList.toggle('on', i === stage))
       }
       // scale bar: a round distance close to 120 px
