@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import { SOLUTIONS, SOLUTION_TYPES, solutionSubs } from '@/lib/solutions'
 import { getBrandsBySubcategories, getApplicationImage, getProductDetail } from '@/lib/supabase'
 import { SOLUTIONS_CSS, STORY_CSS } from './styles'
+import { SOLUTION_COVERS } from '@/lib/solution-covers'
 import StoryMotion from './StoryMotion'
 import { stagger } from './editorial'
 
@@ -24,7 +25,7 @@ export default async function ZonaSolutiiPage() {
     const subs = solutionSubs(s)
     const [brands, image] = await Promise.all([
       getBrandsBySubcategories(subs),
-      s.product ? getProductDetail(s.product).then(p => p?.applicationImages[0] ?? null) : getApplicationImage(subs),
+      SOLUTION_COVERS[s.slug] ?? (s.product ? getProductDetail(s.product).then(p => p?.applicationImages[0] ?? null) : getApplicationImage(subs)),
     ])
     return { s, image, products: brands.reduce((a, b) => a + b.cnt, 0), brands: brands.length, names: brands.map(b => b.brand_name) }
   }))

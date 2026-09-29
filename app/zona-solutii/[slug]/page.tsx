@@ -9,6 +9,7 @@ import { SOLUTIONS, SOLUTION_TYPES, getSolution, solutionSubs, type SolutionSect
 import { getProductsBySubcategories, getBrandsBySubcategories, getApplicationImages, getProductDetail } from '@/lib/supabase'
 import { getBrandHref } from '@/lib/brand-content'
 import { SOLUTIONS_CSS, STORY_CSS } from '../styles'
+import { SOLUTION_COVERS } from '@/lib/solution-covers'
 import StoryMotion from '../StoryMotion'
 import { editorial, pad, stagger } from '../editorial'
 
@@ -47,7 +48,10 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   ])
   // photos: the first opens the story under the hero, the rest go to the
   // story's image sections (product stories: the product's own photos)
-  const photos = product ? product.applicationImages : pool
+  // the story's own cover first (a photo of a product it's about), then the
+  // rest of the pool without it
+  const cover = SOLUTION_COVERS[story.slug]
+  const photos = product ? product.applicationImages : cover ? [cover, ...pool.filter(u => u !== cover)] : pool
   const heroPhoto = photos[0] ?? null
   const galleryPhotos = product ? photos.slice(1) : []
   let photoNo = 1

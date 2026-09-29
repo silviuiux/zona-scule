@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 import { SOLUTIONS, SOLUTION_TYPES, solutionSubs, type Solution } from '@/lib/solutions'
 import StoriesShuffle from './StoriesShuffle'
 import { getApplicationImage, getProductDetail } from '@/lib/supabase'
+import { SOLUTION_COVERS } from '@/lib/solution-covers'
 
 /**
  * "Zona Soluții" teaser above the footer: every story in a carousel that
@@ -16,11 +17,12 @@ const cover = unstable_cache(
   async (slug: string) => {
     const s = SOLUTIONS.find(x => x.slug === slug)
     if (!s) return null
+    if (SOLUTION_COVERS[slug]) return SOLUTION_COVERS[slug]
     return s.product
       ? (await getProductDetail(s.product))?.applicationImages[0] ?? null
       : getApplicationImage(solutionSubs(s))
   },
-  ['story-cover'],
+  ['story-cover-v2'],
   { revalidate: 86400 },
 )
 
