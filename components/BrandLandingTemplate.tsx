@@ -4,6 +4,9 @@ import type { Brand, ApplicationGroup } from '@/lib/supabase'
 import type { SubcategoryWithCount } from '@/lib/supabase'
 import type { BrandPageConfig } from '@/lib/brand-content'
 import ProductCard from './ProductCard'
+import StoryMotion from '@/app/zona-solutii/StoryMotion'
+import { STORY_CSS } from '@/app/zona-solutii/styles'
+import { editorial } from '@/app/zona-solutii/editorial'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Brand Landing Page — shared template
@@ -65,6 +68,12 @@ export default function BrandLandingTemplate({
     ? (heroImageProduct.main_image_storage_url || heroImageProduct.main_image_url)
     : null)
 
+  const { expand } = editorial()
+  const n = (v: number) => v.toLocaleString('ro-RO')
+  // the brand's catalog in numbers, for the "Explorează gama" intro
+  const liveSubs = subcategories.filter(x => x.product_count > 0)
+  const topSub = [...liveSubs].sort((a, b) => b.product_count - a.product_count)[0]
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -77,7 +86,8 @@ export default function BrandLandingTemplate({
 
   return (
     <div style={{ ['--brand-accent' as string]: accent }}>
-      <style>{`
+      <StoryMotion />
+      <style>{STORY_CSS + `
         /* ══════════════════ SHARED ══════════════════ */
         .bp-section { max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter); }
         .bp-eyebrow {
@@ -223,6 +233,34 @@ export default function BrandLandingTemplate({
         }
         .bp-rail-chip:hover { border-color: rgba(0,0,0,0.25); color: rgb(0,0,0); }
         .bp-rail-chip .cnt { color: rgba(0,0,0,0.4); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
+
+        .bp-hero-brand {
+          display: inline-flex; align-items: center; gap: 12px; margin-bottom: 24px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500;
+          letter-spacing: 0.16em; text-transform: uppercase; color: rgb(217,44,43);
+        }
+        .bp-hero-brand::before { content: ''; width: 24px; height: 1px; background: rgb(217,44,43); }
+
+        /* ══════════════════ SECTION INTROS ══════════════════ */
+        /* A section's own opening, set apart from the carousels after it:
+           big title, the lead, the brand's numbers */
+        .bp-intro {
+          max-width: 1440px; margin: 0 auto;
+          padding: clamp(112px, 16vh, 200px) var(--gutter) clamp(80px, 12vh, 140px);
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; row-gap: 56px; align-items: end;
+        }
+        .bp-intro-head { grid-column: 1 / span 8; display: flex; flex-direction: column; gap: 24px; }
+        .bp-intro-title { font-family: 'Neuton', serif; font-weight: 400; font-size: clamp(44px, 5.6vw, 92px); line-height: 0.96; letter-spacing: -0.02em; color: rgb(0,0,0); }
+        .bp-intro-sub { font-family: 'Recursive', sans-serif; font-size: 17px; line-height: 1.6; color: rgba(0,0,0,0.55); max-width: 620px; }
+        .bp-intro-stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .bp-intro-stat { border-top: 1px solid rgba(0,0,0,0.14); padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .bp-intro-num { font-family: 'Neuton', serif; font-size: clamp(40px, 4.4vw, 68px); line-height: 0.95; letter-spacing: -0.02em; color: rgb(0,0,0); }
+        .bp-intro-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.45); }
+        .bp-intro + .bp-usecase-section { padding-top: 0; }
+        @media (max-width: 900px) {
+          .bp-intro-head { grid-column: 1 / -1; }
+          .bp-intro-stats { grid-template-columns: 1fr; gap: 28px; }
+        }
 
         /* ══════════════════ SECTION HEADS ══════════════════ */
         .bp-section-head { margin-bottom: 36px; max-width: 900px; text-align: left; }
@@ -411,6 +449,7 @@ export default function BrandLandingTemplate({
           </div>
         )}
         <div className="bp-hero-copy">
+          <span className="bp-hero-brand">{config.brandName}</span>
           <h1 className="bp-hero-title">
             {config.heroTitle.map((line, i) => (
               <span key={i}>
@@ -446,16 +485,13 @@ export default function BrandLandingTemplate({
       </section>
 
       {/* ══════════════════ FULL-BLEED IMAGE ══════════════════ */}
-      {heroImageUrl && (
-        <section className="bp-hero-image">
-          <Image
-            src={heroImageUrl}
-            alt={`${config.brandName} — produse profesionale`}
-            fill
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-          />
-        </section>
+      {/* Same move as the stories' first photo: pinned, growing from a
+          framed picture to the whole screen, a line surfacing over it */}
+      {heroImageUrl && expand(
+        heroImageUrl,
+        `${config.brandName} — produse profesionale`,
+        `${config.brandName} · în lucru`,
+        `${n(totalProductCount)} de produse ${config.brandName}, de la un distribuitor autorizat.`,
       )}
 
       {/* ══════════════════ TECHNICAL GLOSSARY ══════════════════ */}
@@ -592,12 +628,20 @@ export default function BrandLandingTemplate({
           brands (Karcher, Milwaukee) have real data for. A brand can render
           both, either, or neither. */}
       {config.useSubcategoryCarousels && subcategoryGroups.length > 0 && (
-        <section id="explorare" className="bp-usecase-section bp-section">
-          <div className="bp-section-head">
+        <>
+        <header id="explorare" className="bp-intro">
+          <div className="bp-intro-head">
             <span className="bp-eyebrow" style={{ color: 'rgba(0,0,0,0.4)' }}>Explorează gama</span>
-            <h2 className="bp-section-title">{config.subcategorySectionTitle ?? 'Descoperă pe subcategorii'}</h2>
-            <p className="bp-section-sub">{config.subcategorySectionSub ?? 'Produsele grupate exact cum sunt organizate în catalog.'}</p>
+            <h2 className="bp-intro-title">{config.subcategorySectionTitle ?? 'Descoperă pe subcategorii'}</h2>
+            <p className="bp-intro-sub">{config.subcategorySectionSub ?? 'Produsele grupate exact cum sunt organizate în catalog.'}</p>
           </div>
+          <div className="bp-intro-stats">
+            <div className="bp-intro-stat"><span className="bp-intro-num">{n(totalProductCount)}</span><span className="bp-intro-label">Produse {config.brandName} în catalog</span></div>
+            <div className="bp-intro-stat"><span className="bp-intro-num">{n(liveSubs.length)}</span><span className="bp-intro-label">Subcategorii</span></div>
+            {topSub && <div className="bp-intro-stat"><span className="bp-intro-num">{n(topSub.product_count)}</span><span className="bp-intro-label">{topSub.name} · cea mai mare familie</span></div>}
+          </div>
+        </header>
+        <section className="bp-usecase-section bp-section">
           {subcategoryGroups.map((group, i) => (
             <div key={group.title} className={`bp-usecase-group${i % 2 ? ' alt' : ''}`}>
               <div className="bp-usecase-head">
@@ -615,6 +659,7 @@ export default function BrandLandingTemplate({
             </div>
           ))}
         </section>
+        </>
       )}
 
       {/* ══════════════════ ASK A SPECIALIST ══════════════════ */}

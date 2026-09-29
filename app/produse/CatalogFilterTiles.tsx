@@ -59,17 +59,6 @@ export default function CatalogFilterTiles({
     <div className={`ft${picked ? ' picked' : ''}`}>
       <style>{`
         .ft { margin: 24px 0 40px; }
-        .ft-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .ft-hint {
-          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em;
-          text-transform: uppercase; color: rgba(0,0,0,0.4);
-        }
-        .ft-reset {
-          margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em;
-          text-transform: uppercase; color: rgb(0,0,0); text-decoration: none;
-        }
-        .ft-reset:hover { color: rgb(217,44,43); }
-
         .ft-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
         .ft-tile {
           position: relative; display: flex; flex-direction: column; justify-content: flex-end;
@@ -124,12 +113,7 @@ export default function CatalogFilterTiles({
         items={brandItems}
         allHref={href([], activeCats)}
         noneOn={activeBrands.length === 0}
-        label={activeBrands.length > 1 ? `Branduri · ${activeBrands.length} alese` : 'Branduri'}
-        reset={(picked || activeBrands.length > 0) ? <Link href={href([], [])} className="ft-reset">× Resetează</Link> : undefined}
       />
-      <div className="ft-bar">
-        <span className="ft-hint">{picked ? 'Alege o subcategorie sau altă categorie' : 'Alege o categorie'}</span>
-      </div>
 
       <div className="ft-tiles">
         {cats.map(c => {

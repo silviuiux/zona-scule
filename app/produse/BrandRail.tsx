@@ -6,20 +6,17 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
  * The tiles filter's brand row: one pill per brand (name only), toggling
  * like the pill rows (several brands OR together), "Toate" first. A
  * carousel sized so six and a half pills show — the half says "there's
- * more"; the square arrows on the right of the heading scroll it.
+ * more". The arrows sit just outside the row, in the page gutter, like the
+ * catalog's other carousels.
  */
 export default function BrandRail({
   items,
   allHref,
   noneOn,
-  label,
-  reset,
 }: {
   items: { name: string; on: boolean; href: string }[]
   allHref: string
   noneOn: boolean
-  label: string
-  reset?: React.ReactNode
 }) {
   const track = useRef<HTMLDivElement>(null)
   const [edge, setEdge] = useState({ start: true, end: false })
@@ -39,22 +36,7 @@ export default function BrandRail({
   return (
     <div className="br">
       <style>{`
-        .br { margin-bottom: 40px; }
-        .br-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .br-label {
-          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em;
-          text-transform: uppercase; color: rgba(0,0,0,0.4);
-        }
-        .br-arrows { margin-left: auto; display: flex; gap: 8px; }
-        .br-head > .ft-reset { margin-left: auto; margin-right: 12px; }
-        .br-head > .ft-reset ~ .br-arrows { margin-left: 0; }
-        .br-arrow {
-          width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; cursor: pointer; color: rgb(0,0,0);
-          transition: border-color 150ms, opacity 150ms;
-        }
-        .br-arrow:hover { border-color: rgba(0,0,0,0.3); }
-        .br-arrow:disabled { opacity: 0.35; cursor: default; }
+        .br { position: relative; margin-bottom: 12px; }
         .br-track {
           display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity;
           scrollbar-width: none; -ms-overflow-style: none;
@@ -73,26 +55,32 @@ export default function BrandRail({
         }
         .br-pill:hover { border-color: rgba(0,0,0,0.35); }
         .br-pill.on { background: rgb(0,0,0); border-color: rgb(0,0,0); color: rgb(255,255,255); }
+        /* bare chevrons in the gutter, a white square behind them on hover */
+        .br-arrow {
+          position: absolute; top: 0; z-index: 2;
+          width: 28px; height: 48px; display: flex; align-items: center; justify-content: center;
+          background: transparent; border: none; border-radius: 4px; cursor: pointer; color: rgb(0,0,0);
+          transition: background 150ms, opacity 150ms;
+        }
+        .br-arrow:hover { background: rgb(255,255,255); }
+        .br-arrow:disabled { opacity: 0.25; cursor: default; background: transparent; }
+        .br-arrow.prev { left: -30px; }
+        .br-arrow.next { right: -30px; }
         @media (max-width: 1200px) { .br-pill { flex-basis: calc((100% - 4 * 12px) / 4.5); } }
+        @media (max-width: 1023px) { .br-arrow { display: none; } }
       `}</style>
-      <div className="br-head">
-        <span className="br-label">{label}</span>
-        {reset}
-        <div className="br-arrows">
-          <button type="button" className="br-arrow" onClick={() => by(-1)} disabled={edge.start} aria-label="Brandurile anterioare">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-          </button>
-          <button type="button" className="br-arrow" onClick={() => by(1)} disabled={edge.end} aria-label="Brandurile următoare">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
-          </button>
-        </div>
-      </div>
+      <button type="button" className="br-arrow prev" onClick={() => by(-1)} disabled={edge.start} aria-label="Brandurile anterioare">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+      </button>
       <div ref={track} className="br-track">
         <Link href={allHref} className={`br-pill${noneOn ? ' on' : ''}`} aria-pressed={noneOn}>Toate</Link>
         {items.map(b => (
           <Link key={b.name} href={b.href} className={`br-pill${b.on ? ' on' : ''}`} aria-pressed={b.on}>{b.name}</Link>
         ))}
       </div>
+      <button type="button" className="br-arrow next" onClick={() => by(1)} disabled={edge.end} aria-label="Brandurile următoare">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+      </button>
     </div>
   )
 }
