@@ -39,7 +39,7 @@ export default function Footer({ blueprint = true, stories = true }: { blueprint
           border-top: 1px solid rgba(0,0,0,0.12);
           /* 80vh; with the easter egg (FooterBlueprint, desktop) a full
              viewport, so the page's natural stop is the whole footer in
-             view — the nav has slid away by then — and the next scroll
+             view (under the sticky nav) and the next scroll
              starts the drawing. */
           min-height: 80vh;
           display: flex; flex-direction: column;

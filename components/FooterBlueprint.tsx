@@ -4,14 +4,15 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
 /**
  * Footer easter egg (every page, desktop). The footer is a full viewport
  * tall, so ordinary scrolling comes to rest on all of it: on the way in its
- * top edge pushes the nav up and away and a note types itself under the
+ * top edge slides under the (sticky) nav and a note types itself under the
  * logo — "derulează în continuare", the only hint. A fresh scroll from that
  * stop (after a short beat, see DEAD_ZONE) starts drafting a technical
  * drawing on faint grid paper, driven by how far you keep scrolling
  * (scrolling back rewinds it):
  *
- *  • a red "pen" crosshair traces the drawing line by line while labels
- *    type themselves out; the title block fills in under the logo;
+ *  • the footer logo lifts away to make room; a red "pen" crosshair traces
+ *    the drawing line by line while labels type themselves out; the title
+ *    block fills in where the logo was;
  *  • a finale plays, then an "APROBAT" stamp with today's date lands.
  *
  * Six drawings (their SVGs are sized in CSS millimetres and the viewBox
@@ -939,10 +940,14 @@ export default function FooterBlueprint() {
     const heads = Array.from(layer.querySelectorAll<SVGGElement>('.head'))
 
     // Title block sits just under the logo, wherever the logo row is.
+    // (measured where the logo would be at rest: it lifts away as the
+    // drawing starts, and the title block and note stay put)
+    let logoLift = 0
     const placeTitle = () => {
       const logo = footer?.querySelector('.footer-logo')
       if (!logo) return
-      const l = logo.getBoundingClientRect()
+      const r = logo.getBoundingClientRect()
+      const l = { left: r.left, bottom: r.bottom + logoLift }
       const box = layer.getBoundingClientRect()
       title.style.left = `${(l.left - box.left).toFixed(1)}px`
       title.style.top = `${(l.bottom - box.top + 40).toFixed(1)}px`
@@ -1091,7 +1096,21 @@ export default function FooterBlueprint() {
     // travels the upper half of the screen, 1 at the natural stop): the
     // note arrives with it, ahead of any drawing.
     let arrival = 0
+    // The footer logo scrolls away as the drawing starts, making room for
+    // it (the nav stays where it is): up and out over the first stretch.
+    const LOGO_OUT = 0.12
+    const liftLogo = (p: number) => {
+      const logo = footer?.querySelector<HTMLElement>('.footer-logo')
+      if (!logo || !footer) return
+      const k = easeInOutSine(clamp01(p / LOGO_OUT))
+      const rest = logo.getBoundingClientRect().bottom + logoLift - footer.getBoundingClientRect().top
+      logoLift = k * rest
+      logo.style.transform = k > 0 ? `translateY(${(-logoLift).toFixed(1)}px)` : ''
+      logo.style.opacity = k > 0 ? String(1 - k) : ''
+      logo.style.pointerEvents = k > 0.5 ? 'none' : ''
+    }
     const render = (p: number) => {
+      liftLogo(p)
       placeTitle()
       frameArt(p)
       // the note steps aside, in place, as soon as the drawing starts
@@ -1281,30 +1300,14 @@ export default function FooterBlueprint() {
       return true
     }
 
-    // The nav, pushed away by the footer, comes back on a small scroll up
-    // (PEEK px of upward intent — even while the wheel is rewinding the
-    // drawing) and leaves again on the same amount down.
-    const PEEK = 48
-    let upAcc = 0, downAcc = 0
-    const peek = (delta: number) => {
-      if (delta < 0) {
-        upAcc -= delta; downAcc = 0
-        if (upAcc > PEEK && lastEgg > 0) doc.dataset.navPeek = '1'
-      } else if (delta > 0) {
-        downAcc += delta; upAcc = 0
-        if (downAcc > PEEK) delete doc.dataset.navPeek
-      }
-    }
     const onWheel = (e: WheelEvent) => {
       const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
-      peek(d)
       if (push(d) && e.cancelable) e.preventDefault()
     }
     let touchY = 0
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY }
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY
-      peek((touchY - y) * 2)
       if (push((touchY - y) * 2) && e.cancelable) e.preventDefault()
       touchY = y
     }
@@ -1313,11 +1316,10 @@ export default function FooterBlueprint() {
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     const onResize = () => { placeTitle(); measureCols() }
     window.addEventListener('resize', onResize)
-    // Ordinary scrolling brings the footer in: as its top edge reaches the
-    // nav, the nav is pushed up and away, and the note arrives —
-    // so the natural stop at the bottom is already the blank sheet, and
+    // Ordinary scrolling brings the footer in, and the note arrives with
+    // it — so the natural stop at the bottom is already the blank sheet, and
     // the very next scroll draws. Scrolling back up reverses all of it.
-    let lastEgg = -1, scrollRaf = 0
+    let scrollRaf = 0
     const onScroll = () => {
       setHold()
       if (!atEnd()) endSince = Infinity
@@ -1325,16 +1327,10 @@ export default function FooterBlueprint() {
       if (scrollRaf) return
       scrollRaf = requestAnimationFrame(() => {
         scrollRaf = 0
-        if (!footer || hidden()) {
-          if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg'); delete doc.dataset.navPeek }
-          return
-        }
+        if (!footer || hidden()) return
         const top = footer.getBoundingClientRect().top
         const vh = window.innerHeight
-        if (top >= vh) { if (lastEgg !== 0) { lastEgg = 0; doc.style.removeProperty('--egg'); delete doc.dataset.navPeek } return }
-        const navH = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 68
-        const egg = clamp01((navH - top) / navH)
-        if (Math.abs(egg - lastEgg) > 1e-3) { lastEgg = egg; doc.style.setProperty('--egg', egg.toFixed(4)) }
+        if (top >= vh) return
         const a = atEnd() ? 1 : clamp01(1 - top / (vh / 2))
         if (a !== arrival) { arrival = a; if (!raf) render(cur) }
       })
@@ -1344,9 +1340,9 @@ export default function FooterBlueprint() {
     return () => {
       window.removeEventListener('scroll', onScroll)
       if (scrollRaf) cancelAnimationFrame(scrollRaf)
-      doc.style.removeProperty('--egg')
       delete doc.dataset.eggHold
-      delete doc.dataset.navPeek
+      const logo = footer?.querySelector<HTMLElement>('.footer-logo')
+      if (logo) { logo.style.transform = ''; logo.style.opacity = ''; logo.style.pointerEvents = '' }
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)

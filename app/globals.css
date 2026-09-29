@@ -231,3 +231,21 @@ p, li, dd, blockquote, figcaption,
 [class*="desc"], [class*="sub"], [class*="lead"], [class*="text"], [class*="excerpt"], [class*="label"] {
   text-wrap: pretty;
 }
+
+/* ── Cards sit above the dot grid ───────────────────────────────────────────
+   body::before (the dots) and .laser are fixed layers at z-index 0, which
+   paint over ordinary content — so white cards showed dots through them.
+   Every card, pill and panel gets its own layer above them (:where keeps
+   this at zero specificity: a component's own position still wins, e.g. the
+   absolutely placed category cards). Outline-only pills get a white fill. */
+:where(
+  .pcard, .zs-card, .zs-check-item, .zs-faq-item, .zs-rule, .zs-pc, .zs-cta, .zs-sub,
+  .branduri-card, .ft-panel, .br-pill, .fp-pill, .subcat-pill, .cat-bc-pill, .zs-crumb,
+  .sub-card, .tm-card, .cat-card, .sv-card, .service-card, .bp-pillar-card, .bp-specialist,
+  .bp-faq-item, .skel-card, .lm-skel-card, .cf, .view-switcher-btn, .st-arrow, .st-all,
+  .zs-car-link, .zs-brand, .bp-hero-pill, .sku-field
+) {
+  position: relative;
+  z-index: 1;
+}
+:where(.cat-bc-pill, .zs-crumb, .zs-car-link, .st-all) { background-color: rgb(255,255,255); }
