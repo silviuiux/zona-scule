@@ -9,8 +9,6 @@ const SFV = {
   lx: 66, ly: -97, ang: -55,
 }
 const CHURCH = { at: [60, -58] as [number, number], anchor: 'start' as const, dx: 8, dy: 4 }
-// Mioveni, for the Dacia platform (metres from the shop)
-const MIOVENI: [number, number] = [4770, -10820]
 // Pitești landmarks for the town view (metres from the shop; north is −y)
 const LANDMARKS: { name: string; at: [number, number]; anchor: 'start' | 'middle' | 'end'; dx: number; dy: number }[] = [
   { name: 'CENTRU', at: [-340, 50], anchor: 'end', dx: -8, dy: 4 },
@@ -29,7 +27,6 @@ import ContactMapScroller from './ContactMapScroller'
  *   01  draws Strada Sfânta Vineri alone, the shop and the church on it,
  *   02  pulls the camera out to Pitești (main streets and roads, the Argeș,
  *       the A1, landmarks: centre, Ceair market, Ramada, VIVO, the parks),
- *       then a little further, to Mioveni and the Dacia platform,
  *   03  and out again to Romania (border, national roads, motorways, cities).
  * Every road is black; only the shop's pin is red.
  * Geometry (metres, centred on the shop) lives in lib/contact-map-data.ts;
@@ -46,7 +43,7 @@ export default function ContactMap() {
   return (
     <section className="cmap" aria-label="Locația Zona Scule: Strada Sfânta Vineri 28, Pitești">
       <style>{`
-        .cmap { position: relative; height: 420vh; }
+        .cmap { position: relative; height: 380vh; }
         .cmap-sticky {
           position: sticky; top: var(--nav-h);
           height: calc(100vh - var(--nav-h));
@@ -189,7 +186,7 @@ export default function ContactMap() {
               <path className="dr d-hw" pathLength={1} d={D.highways} data-k="draw" data-s="0.26" data-e="0.36" />
               <path className="dr mw" pathLength={1} d={D.a1} data-k="draw" data-s="0.26" data-e="0.36" />
               {/* landmarks leave before the camera pulls out to Romania */}
-              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.48" data-out-e="0.52">
+              <g data-k="fade" data-s="0" data-e="0.001" data-out-s="0.6" data-out-e="0.64">
                 {LANDMARKS.map((l, i) => {
                   const st = 0.36 + i * 0.012
                   return (
@@ -208,17 +205,6 @@ export default function ContactMap() {
               </g>
               <g className="lbl" data-x={900} data-y={700}>
                 <text className="big" textAnchor="start" data-k="type" data-s="0.38" data-e="0.44" data-text="PITEȘTI" />
-              </g>
-
-              {/* …then out to Mioveni and the Dacia platform: the two towns'
-                  outline, the regional roads, the A1 on */}
-              <path className="dr urban" pathLength={1} d={M.urban} data-k="draw" data-s="0.5" data-e="0.62" />
-              <path className="dr road" pathLength={1} d={M.roads} data-k="draw" data-s="0.52" data-e="0.64" />
-              <path className="dr mw" pathLength={1} d={M.a1route.east} data-k="draw" data-s="0.5" data-e="0.62" />
-              <g className="lbl" data-x={MIOVENI[0]} data-y={MIOVENI[1]} data-k="fade" data-s="0.58" data-e="0.6">
-                <circle className="dot" r="2.6" />
-                <text className="big" x="12" y="5" data-k="type" data-s="0.58" data-e="0.63" data-text="MIOVENI" />
-                <text x="12" y="22" data-k="type" data-s="0.6" data-e="0.64" data-text="PLATFORMA DACIA" />
               </g>
             </g>
 
