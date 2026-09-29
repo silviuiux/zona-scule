@@ -12,7 +12,15 @@ import { useRouter } from 'next/navigation'
  *  3. typing: the bar turns light grey, the links drop their outlines, and
  *     a panel opens below with query completions from /api/search — the
  *     typed part regular, the completion bold; × dismisses a suggestion.
+ * On phones the links fold into a hamburger that opens a fullscreen menu:
+ * the pages as big numbered lines, the contact details at the bottom.
  */
+const MENU = [
+  { href: '/produse', label: 'Catalog', note: 'Toate produsele' },
+  { href: '/branduri', label: 'Branduri', note: 'Zona Branduri' },
+  { href: '/zona-solutii', label: 'Zona Soluții', note: 'Meserii, ghiduri, proiecte' },
+  { href: '/contact', label: 'Contact', note: 'Cere o ofertă' },
+]
 export default function Nav() {
   const [q, setQ] = useState('')
   const [scrolled, setScrolled] = useState(false)
@@ -22,6 +30,7 @@ export default function Nav() {
   const [activeIdx, setActiveIdx] = useState(-1)
   const [fetching, setFetching] = useState(false)
   const [indent, setIndent] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -39,6 +48,17 @@ export default function Nav() {
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
+
+  // ── mobile menu: the page stays put underneath; Escape closes ─────────────
+  useEffect(() => {
+    if (!menuOpen) return
+    const root = document.documentElement
+    const prev = root.style.overflow
+    root.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => { root.style.overflow = prev; window.removeEventListener('keydown', onKey) }
+  }, [menuOpen])
 
   // ── click outside the nav → collapse an empty search ───────────────────────
   useEffect(() => {
@@ -245,10 +265,66 @@ export default function Nav() {
           .nav-panel { top: calc(100% + 61px); padding: 12px 0 16px; }
           .nav-panel-list { padding-left: 0; }
           .nav-term { font-size: 17px; gap: 12px; }
+          .nav-links { display: none; }
+          .nav.menu-open { box-shadow: none; }
+        }
+
+        /* ── Phones: hamburger + fullscreen menu ── */
+        .nav-burger {
+          display: none; position: relative; align-items: center; justify-content: center;
+          width: 40px; height: 40px; margin-right: -8px; flex-shrink: 0;
+          background: none; border: none; cursor: pointer; padding: 0;
+        }
+        .nav-burger span {
+          position: absolute; left: 10px; right: 10px; height: 1.5px; background: rgb(0,0,0);
+          transition: transform 350ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 200ms;
+        }
+        .nav-burger span:nth-child(1) { transform: translateY(-4px); }
+        .nav-burger span:nth-child(2) { transform: translateY(4px); }
+        .nav.menu-open .nav-burger span:nth-child(1) { transform: rotate(45deg); }
+        .nav.menu-open .nav-burger span:nth-child(2) { transform: rotate(-45deg); }
+        @media (max-width: 768px) { .nav-burger { display: flex; } }
+
+        .nav-menu {
+          position: fixed; inset: 0; z-index: 99;
+          padding: calc(var(--nav-h) + 40px) var(--gutter) calc(32px + env(safe-area-inset-bottom));
+          background: rgb(255,255,255);
+          display: flex; flex-direction: column;
+          opacity: 0; visibility: hidden; pointer-events: none;
+          transition: opacity 300ms ease, visibility 0s linear 300ms;
+        }
+        .nav-menu.open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 300ms ease; }
+        .nav-menu-list { list-style: none; display: flex; flex-direction: column; }
+        .nav-menu-item { border-top: 1px solid rgba(0,0,0,0.08); overflow: hidden; }
+        .nav-menu-item:last-child { border-bottom: 1px solid rgba(0,0,0,0.08); }
+        .nav-menu-link {
+          display: grid; grid-template-columns: 36px 1fr auto; align-items: baseline; gap: 8px;
+          padding: 18px 0; text-decoration: none; color: rgb(0,0,0);
+          transform: translateY(100%); opacity: 0;
+          transition: transform 600ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 400ms ease;
+          transition-delay: calc(60ms + var(--i) * 60ms);
+        }
+        .nav-menu.open .nav-menu-link { transform: none; opacity: 1; }
+        .nav-menu-n { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; color: rgb(217,44,43); }
+        .nav-menu-label { font-family: 'Neuton', serif; font-size: clamp(38px, 11vw, 56px); line-height: 1; letter-spacing: -0.015em; }
+        .nav-menu-note { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); text-align: right; max-width: 110px; }
+        .nav-menu-link:active .nav-menu-label { color: rgb(217,44,43); }
+        .nav-menu-foot {
+          margin-top: auto; padding-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 16px;
+          opacity: 0; transform: translateY(12px);
+          transition: opacity 500ms ease 320ms, transform 600ms cubic-bezier(0.2, 0.7, 0.1, 1) 320ms;
+        }
+        .nav-menu.open .nav-menu-foot { opacity: 1; transform: none; }
+        .nav-menu-foot span { display: block; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); margin-bottom: 6px; }
+        .nav-menu-foot a, .nav-menu-foot p { font-family: 'Recursive', sans-serif; font-size: 14px; color: rgb(0,0,0); text-decoration: none; }
+        .nav-menu-foot a.red { color: rgb(217,44,43); }
+        @media (min-width: 769px) { .nav-menu { display: none; } }
+        @media (prefers-reduced-motion: reduce) {
+          .nav-menu-link, .nav-menu-foot { transition: none; transform: none; }
         }
       `}</style>
 
-      <nav ref={navRef} className={`nav${scrolled ? ' scrolled' : ''}${searchOpen ? ' search-open' : ''}${typing ? ' typing' : ''}`}>
+      <nav ref={navRef} className={`nav${scrolled ? ' scrolled' : ''}${searchOpen ? ' search-open' : ''}${typing ? ' typing' : ''}${menuOpen ? ' menu-open' : ''}`}>
         <div ref={innerRef} className="nav-inner" style={{ ['--indent' as string]: `${indent + 12}px` }}>
           <Link href="/" className="nav-logo" aria-label="Zona Scule — acasă">
             <svg width="144" height="28" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -292,6 +368,10 @@ export default function Nav() {
             <Link href="/contact" className="nav-btn solid">Contact</Link>
           </div>
 
+          <button type="button" className="nav-burger" aria-label={menuOpen ? 'Închide meniul' : 'Deschide meniul'} aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => { setMenuOpen(o => !o); setSearchOpen(false) }}>
+            <span /><span />
+          </button>
+
           {panelOpen && (
             <div className="nav-panel" role="listbox" aria-label="Sugestii de căutare">
               {fetching && <div className="nav-panel-loading" />}
@@ -314,6 +394,26 @@ export default function Nav() {
           )}
         </div>
       </nav>
+
+      <div id="nav-menu" className={`nav-menu${menuOpen ? ' open' : ''}`} aria-hidden={!menuOpen}>
+        <ol className="nav-menu-list">
+          {MENU.map((m, i) => (
+            <li key={m.href} className="nav-menu-item">
+              <Link href={m.href} className="nav-menu-link" style={{ ['--i' as string]: i }} tabIndex={menuOpen ? 0 : -1} onClick={() => setMenuOpen(false)}>
+                <span className="nav-menu-n">{String(i + 1).padStart(2, '0')}</span>
+                <span className="nav-menu-label">{m.label}</span>
+                <span className="nav-menu-note">{m.note}</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <div className="nav-menu-foot">
+          <div><span>Telefon</span><a href="tel:0248222298" className="red" tabIndex={menuOpen ? 0 : -1}>0248.222.298</a></div>
+          <div><span>E-mail</span><a href="mailto:office@zonascule.ro" tabIndex={menuOpen ? 0 : -1}>office@zonascule.ro</a></div>
+          <div><span>Program</span><p>L–V · 08:30–17:00</p></div>
+          <div><span>Adresă</span><p>Sfânta Vineri 28, Pitești</p></div>
+        </div>
+      </div>
     </>
   )
 }
