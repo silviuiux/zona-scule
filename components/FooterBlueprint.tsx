@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { usePathname } from 'next/navigation'
 
 /**
  * Footer easter egg (every page, desktop). The footer is a full viewport
@@ -43,8 +44,8 @@ import { useEffect, useRef, useSyncExternalStore } from 'react'
  *    (bubble towards the high end), which settles level as you scroll;
  *    finale: the bubble swings past the marks and settles.
  *
- * Which one shows is shuffled on every page load (never the same one twice
- * in a row) between blade, drill, power, caliper and level — the nail is out of the shuffle
+ * Which one shows is shuffled on every page (a new pick on each navigation,
+ * never the same one twice in a row) between blade, drill, power, caliper and level — the nail is out of the shuffle
  * for now; ?egg=… forces any of them.
  *
  * Every drawable carries data-s / data-e — its slice of the 0..1 progress —
@@ -872,27 +873,32 @@ const TITLE_PART: Record<Variant, string> = {
 }
 const TITLE_SCALE: Record<Variant, string> = { nail: 'SCARA 1:1', blade: 'SCARA 1:1', drill: 'SCARA 1:1', power: 'SCARA 1:2', caliper: 'SCARA 1:2', level: 'SCARA 1:5' }
 
-// A different drawing on each page load (never the same one twice in a
-// row, remembered per browser); ?egg=nail|blade|drill|power|caliper|level
-// forces one.
+// A different drawing on every page: a new pick each time the path changes
+// (client-side navigation included), never the same one twice in a row
+// (remembered per browser, so reloads vary too); ?egg=nail|blade|drill|
+// power|caliper|level forces one.
 // The nail is out of the shuffle for now.
-let chosenVariant: Variant | null = null
+let current: { path: string; v: Variant } | null = null
 const pickVariant = (): Variant => {
   const forced = new URLSearchParams(window.location.search).get('egg')
   if (VARIANTS.includes(forced as Variant)) return forced as Variant
-  let last: string | null = null
-  try { last = localStorage.getItem('zs-egg') } catch {}
+  let last: string | null = current?.v ?? null
+  try { last = last ?? localStorage.getItem('zs-egg') } catch {}
   const pool = SHUFFLED.filter(v => v !== last)
   const v = pool[Math.floor(Math.random() * pool.length)]
   try { localStorage.setItem('zs-egg', v) } catch {}
   return v
 }
 const subscribe = () => () => {}
-const readVariant = (): Variant => (chosenVariant ??= pickVariant())
+const readVariant = (path: string): Variant => {
+  if (!current || current.path !== path) current = { path, v: pickVariant() }
+  return current.v
+}
 const serverVariant = (): Variant => 'nail'
 
 export default function FooterBlueprint() {
-  const variant = useSyncExternalStore(subscribe, readVariant, serverVariant)
+  const pathname = usePathname()
+  const variant = useSyncExternalStore(subscribe, () => readVariant(pathname), serverVariant)
   const layerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<SVGSVGElement>(null)
   const noteRef = useRef<SVGSVGElement>(null)
