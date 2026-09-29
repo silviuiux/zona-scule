@@ -17,8 +17,8 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
   const [activeIdx, setActiveIdx] = useState(0)
   const [phase, setPhase] = useState<'visible' | 'exiting'>('visible')
 
-  // The word's thin underline fills while it stays up (hover pauses it);
-  // when it's full, the word swaps — the underline is the clock.
+  // An invisible CSS animation times each word (hover pauses it); when it
+  // ends, the word swaps.
   const next = () => {
     setPhase('exiting')
     window.setTimeout(() => {
@@ -126,16 +126,17 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
           opacity: 0;
           transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease;
         }
-        /* the clock: a hairline under the word that fills while it's up */
+        /* the clock: an invisible pseudo-element whose animation times how
+           long the word stays up (hover or focus pauses it, so the word
+           holds still while you go for it) */
         .hero-animated-word::after {
-          content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
-          background: currentColor; opacity: 0.28;
-          transform: scaleX(0); transform-origin: left center;
+          content: ''; position: absolute; left: 0; bottom: 0; width: 1px; height: 1px;
+          opacity: 0; pointer-events: none;
         }
         .hero-animated-word.visible::after { animation: hero-dwell 3400ms linear forwards; }
         .hero-animated-word:hover::after,
-        .hero-animated-word:focus-visible::after { animation-play-state: paused; opacity: 0.6; }
-        @keyframes hero-dwell { to { transform: scaleX(1); } }
+        .hero-animated-word:focus-visible::after { animation-play-state: paused; }
+        @keyframes hero-dwell { to { transform: translateX(0); } }
         .hero-animated-word.visible {
           transform: translateY(0%);
           opacity: 1;

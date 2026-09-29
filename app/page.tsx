@@ -179,10 +179,13 @@ export default async function HomePage() {
         }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
-          font-weight: 400;
-          font-size: 18px; color: rgba(0,0,0,0.5);
-          line-height: 1.4;
-          max-width: 720px;
+          /* quieter than the title, clearly: smaller, light, a touch more
+             air — so the eye goes title → search, with this as a caption */
+          font-weight: 300;
+          font-size: 16px; color: rgba(0,0,0,0.55);
+          line-height: 1.6; letter-spacing: 0.005em;
+          margin-top: 6px;
+          max-width: 640px;
         }
         @media (max-width: 768px) {
           /* Full width instead of the desktop 50% cap — lets the subtitle

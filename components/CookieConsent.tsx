@@ -31,8 +31,8 @@ const SettingsIcon = (
 )
 
 // EU-mandated cookie consent: nothing non-essential runs until the visitor
-// chooses. A slim white bar floating 16px off the bottom and sides of the
-// page, with three actions in a row — icon-only "Personalizează" (opens a
+// chooses. A slim white bar floating 16px off the bottom, as wide as the
+// nav's content, with three actions in a row — icon-only "Personalizează" (opens a
 // small popover with the actual toggle), "Doar necesare", "Accept tot".
 // The single real toggle (analytics — see AnalyticsGate.tsx for what it
 // gates) lives in that popover. The footer's "Setări cookie-uri" link
@@ -87,8 +87,9 @@ export default function CookieConsent() {
     <>
       <style>{`
         .cc-bar {
-          /* a white card floating 16px off the bottom and sides */
-          position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 10000;
+          /* a white card 16px off the bottom, as wide as the nav's content */
+          position: fixed; left: 0; right: 0; bottom: 16px; z-index: 10000;
+          width: calc(min(100%, 1440px) - 2 * var(--gutter)); margin: 0 auto;
           background: rgb(255,255,255);
           border: 1px solid rgba(0,0,0,0.12);
           border-radius: 6px;
