@@ -11,28 +11,28 @@ import {
 // Cookie icon (chocolate-chip circle) — sits before the "Cookie-uri" label.
 const CookieIcon = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="1.6" />
-    <circle cx="8.5" cy="10" r="1.1" fill="white" />
-    <circle cx="13" cy="8.5" r="1" fill="white" />
-    <circle cx="15.5" cy="13" r="1.1" fill="white" />
-    <circle cx="10" cy="15" r="1" fill="white" />
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="8.5" cy="10" r="1.1" fill="currentColor" />
+    <circle cx="13" cy="8.5" r="1" fill="currentColor" />
+    <circle cx="15.5" cy="13" r="1.1" fill="currentColor" />
+    <circle cx="10" cy="15" r="1" fill="currentColor" />
   </svg>
 )
 
 // "Personalizează" is icon-only — two toggle tracks, standing in for
 // the settings/preferences panel it opens.
 const SettingsIcon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <line x1="4" y1="7" x2="20" y2="7" />
-    <circle cx="15" cy="7" r="2" fill="white" stroke="none" />
+    <circle cx="15" cy="7" r="2" fill="currentColor" stroke="none" />
     <line x1="4" y1="17" x2="20" y2="17" />
-    <circle cx="9" cy="17" r="2" fill="white" stroke="none" />
+    <circle cx="9" cy="17" r="2" fill="currentColor" stroke="none" />
   </svg>
 )
 
 // EU-mandated cookie consent: nothing non-essential runs until the visitor
-// chooses. A slim full-width bar at the bottom of the page (not a floating
-// card) with three actions in a row — icon-only "Personalizează" (opens a
+// chooses. A slim white bar floating 16px off the bottom and sides of the
+// page, with three actions in a row — icon-only "Personalizează" (opens a
 // small popover with the actual toggle), "Doar necesare", "Accept tot".
 // The single real toggle (analytics — see AnalyticsGate.tsx for what it
 // gates) lives in that popover. The footer's "Setări cookie-uri" link
@@ -87,13 +87,16 @@ export default function CookieConsent() {
     <>
       <style>{`
         .cc-bar {
-          position: fixed; left: 0; right: 0; bottom: 0; z-index: 10000;
-          background: rgba(0,0,0,0.96);
-          border-top: 1px solid rgba(255,255,255,0.1);
+          /* a white card floating 16px off the bottom and sides */
+          position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 10000;
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.12);
+          border-radius: 6px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
         .cc-bar-inner {
           max-width: 1440px; margin: 0 auto;
-          padding: 14px 24px;
+          padding: 14px 20px;
           display: flex; align-items: center; justify-content: space-between;
           gap: 24px;
         }
@@ -101,20 +104,20 @@ export default function CookieConsent() {
           display: flex; align-items: center; gap: 10px;
           min-width: 0;
         }
-        .cc-icon { flex-shrink: 0; display: flex; }
+        .cc-icon { flex-shrink: 0; display: flex; color: rgb(217,44,43); }
         .cc-text {
           font-family: 'Recursive', sans-serif;
           font-size: 12.5px; line-height: 1.5;
-          color: rgba(255,255,255,0.55);
+          color: rgba(0,0,0,0.6);
         }
         .cc-text strong {
           font-family: 'Inter', sans-serif;
           font-size: 11px; font-weight: 700;
           letter-spacing: 0.08em; text-transform: uppercase;
-          color: rgba(255,255,255,0.9);
+          color: rgb(0,0,0);
         }
-        .cc-text a { color: rgba(255,255,255,0.85); text-decoration: underline; text-underline-offset: 2px; }
-        .cc-text a:hover { color: rgb(237,90,89); }
+        .cc-text a { color: rgb(0,0,0); text-decoration: underline; text-underline-offset: 2px; }
+        .cc-text a:hover { color: rgb(217,44,43); }
 
         .cc-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
         .cc-btn {
@@ -128,63 +131,64 @@ export default function CookieConsent() {
         }
         .cc-btn-primary { background: rgb(217,44,43); color: rgb(255,255,255); }
         .cc-btn-primary:hover { background: rgb(190,35,34); }
-        .cc-btn-secondary { background: transparent; color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
-        .cc-btn-secondary:hover { border-color: rgba(255,255,255,0.5); color: rgb(255,255,255); }
+        .cc-btn-secondary { background: rgb(255,255,255); color: rgb(0,0,0); border-color: rgba(0,0,0,0.14); }
+        .cc-btn-secondary:hover { border-color: rgba(0,0,0,0.45); }
 
         .cc-icon-btn {
           flex-shrink: 0;
           width: 34px; height: 34px;
           display: flex; align-items: center; justify-content: center;
-          background: transparent; border: 1px solid rgba(255,255,255,0.2);
+          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.14);
+          color: rgb(0,0,0);
           border-radius: 3px; cursor: pointer;
           transition: border-color 150ms, background 150ms;
         }
         .cc-icon-btn:hover, .cc-icon-btn[aria-expanded="true"] {
-          border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06);
+          border-color: rgba(0,0,0,0.45); background: rgb(246,246,246);
         }
 
         .cc-settings-wrap { position: relative; flex-shrink: 0; }
         .cc-popover {
           position: absolute; right: 0; bottom: calc(100% + 10px);
           width: 320px;
-          background: rgb(17,17,17);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 8px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.12);
+          border-radius: 6px;
+          box-shadow: 0 12px 32px rgba(0,0,0,0.08);
           padding: 18px;
         }
         .cc-popover-title {
           font-family: 'Inter', sans-serif;
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.4);
+          color: rgba(0,0,0,0.45);
           margin-bottom: 12px;
         }
         .cc-prefs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
         .cc-pref-row {
           display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
           padding: 12px 14px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 6px;
+          background: rgb(248,248,248);
+          border: 1px solid rgba(0,0,0,0.06);
+          border-radius: 4px;
         }
         .cc-pref-label {
           font-family: 'Inter', sans-serif;
           font-size: 12px; font-weight: 600;
-          color: rgba(255,255,255,0.9);
+          color: rgb(0,0,0);
           margin-bottom: 4px;
         }
         .cc-pref-desc {
           font-family: 'Recursive', sans-serif;
           font-size: 11.5px; line-height: 1.5;
-          color: rgba(255,255,255,0.45);
+          color: rgba(0,0,0,0.5);
         }
         .cc-switch {
           position: relative; flex-shrink: 0;
           width: 36px; height: 21px;
           border-radius: 999px;
           border: none; cursor: pointer;
-          background: rgba(255,255,255,0.15);
+          background: rgba(0,0,0,0.15);
           transition: background 150ms;
         }
         .cc-switch.on { background: rgb(217,44,43); }
@@ -208,7 +212,7 @@ export default function CookieConsent() {
         @media (max-width: 480px) {
           .cc-actions { flex-wrap: wrap; justify-content: stretch; }
           .cc-btn { flex: 1; text-align: center; }
-          .cc-popover { right: -24px; width: calc(100vw - 32px); }
+          .cc-popover { right: -20px; width: calc(100vw - 32px); }
         }
       `}</style>
 
@@ -217,9 +221,9 @@ export default function CookieConsent() {
           <div className="cc-text-row">
             <span className="cc-icon">{CookieIcon}</span>
             <p className="cc-text">
-              <strong>Accepti cookies?</strong>{' — '}
-              Unele cookie-uri sunt necesare. Cu voia ta tinem site-ul ca uns cu ajutorul
-              cookie-urilor de analiza.{' '}
+              <strong>Cookie-uri</strong>{' — '}
+              Folosim cookie-urile necesare funcționării site-ului și, doar cu acordul tău,
+              cookie-uri de analiză care ne ajută să-l îmbunătățim.{' '}
               <Link href="/politica-de-cookie-uri">Politica de cookie-uri</Link>.
             </p>
           </div>

@@ -3,28 +3,36 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getBrandHref } from '@/lib/brand-content'
 
-const WORDS = [
-  { text: 'sculele',       href: '/produse?categorie=Scule%20de%20m%C3%A2n%C4%83' },
-  { text: 'accesoriile',   href: '/produse?categorie=Accesorii%20%26%20Abrazive' },
-  { text: 'aparatele',     href: '/produse?categorie=Aparate%20de%20Masura' },
-]
+/** One word of the rotating headline ("Toate ___ de care ai nevoie"), with
+ *  what the catalog actually holds behind it. */
+export type HeroWord = { text: string; href: string; count: number; noun: string }
+
+/** Fired on window each time the word changes; HeroSearch listens and rolls
+ *  its "caută în N de …" count to match. */
+export const HERO_WORD_EVENT = 'zs-hero-word'
 
 type Brand = { name: string; product_count: number }
 
-export default function AnimatedHero({ brands }: { brands: Brand[] }) {
+export default function AnimatedHero({ brands, words }: { brands: Brand[]; words: HeroWord[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [phase, setPhase] = useState<'visible' | 'exiting'>('visible')
 
+  // The word's thin underline fills while it stays up (hover pauses it);
+  // when it's full, the word swaps — the underline is the clock.
+  const next = () => {
+    setPhase('exiting')
+    window.setTimeout(() => {
+      setActiveIdx(i => (i + 1) % words.length)
+      setPhase('visible')
+    }, 320)
+  }
+
   useEffect(() => {
-    const t = setInterval(() => {
-      setPhase('exiting')
-      setTimeout(() => {
-        setActiveIdx(i => (i + 1) % WORDS.length)
-        setPhase('visible')
-      }, 320)
-    }, 2500)
-    return () => clearInterval(t)
-  }, [])
+    const w = words[activeIdx]
+    if (w) window.dispatchEvent(new CustomEvent(HERO_WORD_EVENT, { detail: { count: w.count, noun: w.noun } }))
+  }, [activeIdx, words])
+
+  const word = words[activeIdx]
 
   const topBrands = ['Bosch', 'Karcher', 'Milwaukee', 'Makita', 'Pferd', 'FFGroup']
     .map(name => brands.find(b => b.name.toLowerCase() === name.toLowerCase()))
@@ -98,7 +106,7 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
            line box to the very top — sitting visibly higher than "Toate".
            Centering it here lands both words on the same baseline. */
         .hero-word-clip {
-          height: 128px;
+          height: 128px; padding-bottom: 4px; box-sizing: content-box;
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -111,13 +119,23 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
           line-height: 96px;
           color: rgb(217,44,43);
           text-decoration: none;
-          display: block;
+          display: block; position: relative;
           white-space: nowrap;
           /* starts hidden above */
           transform: translateY(-110%);
           opacity: 0;
           transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease;
         }
+        /* the clock: a hairline under the word that fills while it's up */
+        .hero-animated-word::after {
+          content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+          background: currentColor; opacity: 0.28;
+          transform: scaleX(0); transform-origin: left center;
+        }
+        .hero-animated-word.visible::after { animation: hero-dwell 3400ms linear forwards; }
+        .hero-animated-word:hover::after,
+        .hero-animated-word:focus-visible::after { animation-play-state: paused; opacity: 0.6; }
+        @keyframes hero-dwell { to { transform: scaleX(1); } }
         .hero-animated-word.visible {
           transform: translateY(0%);
           opacity: 1;
@@ -196,17 +214,20 @@ export default function AnimatedHero({ brands }: { brands: Brand[] }) {
         <div className="hero-line1">
           <span className="hero-word-toate">Toate</span>
           <div className="hero-word-clip">
-            <Link
-              href={WORDS[activeIdx].href}
-              className={`hero-animated-word ${phase}`}
-            >
-              {WORDS[activeIdx].text}
-            </Link>
+            {word && (
+              <Link
+                href={word.href}
+                className={`hero-animated-word ${phase}`}
+                onAnimationEnd={e => { if (e.animationName === 'hero-dwell') next() }}
+              >
+                {word.text}
+              </Link>
+            )}
           </div>
         </div>
 
         {/* Line 2 */}
-        <span className="hero-line2">de care ai nevoie</span>
+        <span className="hero-line2">de care ai nevoie.</span>
       </div>
     </>
   )

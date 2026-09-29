@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { getCategoriesWithCount, getBrands, getFeaturedSubcategoriesWithImage, getRawProductCount } from '@/lib/supabase'
-import AnimatedHero from '@/components/AnimatedHero'
+import AnimatedHero, { type HeroWord } from '@/components/AnimatedHero'
 import HeroSearch from '@/components/HeroSearch'
 import CountUp from '@/components/CountUp'
 import CategoryGrid from '@/components/CategoryGrid'
@@ -47,6 +47,18 @@ export default async function HomePage() {
 
   // Hide the catch-all "Necategorizat" bucket from the homepage categories grid
   const categories = categoriesRaw.filter(c => c.name.toLowerCase() !== 'necategorizat')
+
+  // The hero's rotating word, each with the catalog behind it (the search
+  // placeholder quotes that count as the word changes)
+  const heroWord = (text: string, noun: string, cats: string[]): HeroWord => {
+    const count = categories.filter(c => cats.includes(c.name)).reduce((a, c) => a + (c.product_count ?? 0), 0)
+    return { text, noun, count, href: `/produse?categorie=${cats.map(encodeURIComponent).join(',')}` }
+  }
+  const heroWords = [
+    heroWord('sculele', 'scule', ['Scule electrice', 'Scule de mână', 'Scule pneumatice', 'Scule de gradina']),
+    heroWord('accesoriile', 'accesorii', ['Accesorii']),
+    heroWord('aparatele', 'aparate de măsură', ['Aparate de Masura']),
+  ].filter(w => w.count > 0)
 
   // Enrich subcategories with their parent category name for correct deep-link URLs
   const enrichedSubs = featuredSubs.map(s => ({
@@ -170,7 +182,7 @@ export default async function HomePage() {
           font-weight: 400;
           font-size: 18px; color: rgba(0,0,0,0.5);
           line-height: 1.4;
-          max-width: 50%;
+          max-width: 720px;
         }
         @media (max-width: 768px) {
           /* Full width instead of the desktop 50% cap — lets the subtitle
@@ -220,7 +232,7 @@ export default async function HomePage() {
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.35);
         }
-        .hero-search-placeholder-count { color: rgb(0,0,0); }
+        .hero-search-placeholder-count { color: rgb(0,0,0); font-variant-numeric: tabular-nums; }
         .hero-catalog-cta {
           display: flex; align-items: center;
           background: rgb(217, 44, 43); color: rgb(255,255,255);
@@ -597,10 +609,10 @@ export default async function HomePage() {
       {/* ── HERO ── */}
       <section className="hero">
         <div className="hero-inner">
-          <AnimatedHero brands={brands} />
-          <p className="hero-sub">Lider in furnizarea de scule electrice<br />industriale si de constructii de peste 26 de ani</p>
+          <AnimatedHero brands={brands} words={heroWords} />
+          <p className="hero-sub">Scule electrice, abrazive și echipamente pentru industrie și construcții.<br />Branduri alese de profesioniști, de peste 26 de ani.</p>
           <div className="hero-cta-row">
-            <HeroSearch totalCount={totalCount} />
+            <HeroSearch totalCount={totalCount} initial={heroWords[0] && { count: heroWords[0].count, noun: heroWords[0].noun }} />
           </div>
         </div>
       </section>

@@ -1,9 +1,39 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { HERO_WORD_EVENT } from './AnimatedHero'
 
-export default function HeroSearch({ totalCount }: { totalCount?: number }) {
+/**
+ * The hero's search field. Its placeholder follows the rotating headline
+ * word: "Toate sculele…" → "caută în 8.191 de scule", the count rolling to
+ * the next figure whenever the word changes.
+ */
+export default function HeroSearch({ totalCount, initial }: { totalCount?: number; initial?: { count: number; noun: string } }) {
   const [q, setQ] = useState('')
+  const [noun, setNoun] = useState(initial?.noun ?? 'produse')
+  const [shown, setShown] = useState(initial?.count ?? totalCount ?? 0)
+  const shownRef = useRef(shown)
+
+  useEffect(() => {
+    let raf = 0
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const onWord = (e: Event) => {
+      const { count, noun } = (e as CustomEvent<{ count: number; noun: string }>).detail
+      setNoun(noun)
+      cancelAnimationFrame(raf)
+      const from = shownRef.current, t0 = performance.now(), D = 700
+      const step = (now: number) => {
+        const k = reduce ? 1 : Math.min(1, (now - t0) / D)
+        const v = Math.round(from + (count - from) * (1 - Math.pow(1 - k, 3)))
+        shownRef.current = v
+        setShown(v)
+        if (k < 1) raf = requestAnimationFrame(step)
+      }
+      raf = requestAnimationFrame(step)
+    }
+    window.addEventListener(HERO_WORD_EVENT, onWord)
+    return () => { window.removeEventListener(HERO_WORD_EVENT, onWord); cancelAnimationFrame(raf) }
+  }, [])
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -45,14 +75,14 @@ export default function HeroSearch({ totalCount }: { totalCount?: number }) {
           type="button"
           className="hero-search-icon hero-search-clear"
           onClick={clear}
-          aria-label="Sterge cautarea"
+          aria-label="Șterge căutarea"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
       ) : (
-        <button type="submit" className="hero-search-icon" aria-label="Cauta">
+        <button type="submit" className="hero-search-icon" aria-label="Caută">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
@@ -71,9 +101,9 @@ export default function HeroSearch({ totalCount }: { totalCount?: number }) {
         />
         {!q && (
           <span className="hero-search-placeholder">
-            {totalCount ? (
-              <>cauta in <span className="hero-search-placeholder-count">{totalCount.toLocaleString('ro')}</span> de scule, unelte sau accesorii</>
-            ) : 'cauta scule, branduri, accesorii'}
+            {shown ? (
+              <>caută în <span className="hero-search-placeholder-count">{shown.toLocaleString('ro')}</span> de {noun}</>
+            ) : 'caută scule, branduri, accesorii'}
           </span>
         )}
       </div>
