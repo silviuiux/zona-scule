@@ -38,9 +38,9 @@ export default function Footer({ blueprint = true, stories = true }: { blueprint
           background-color: transparent;
           border-top: 1px solid rgba(0,0,0,0.12);
           /* 80vh; with the easter egg (FooterBlueprint, desktop) a full
-             viewport, so the page's natural stop is the whole footer in
-             view (under the sticky nav) and the next scroll
-             starts the drawing. */
+             viewport plus the logo's row, so at the page's natural stop the
+             logo has scrolled away under the sticky nav, the sheet below
+             is blank and the next scroll starts the drawing. */
           min-height: 80vh;
           display: flex; flex-direction: column;
         }
@@ -51,7 +51,7 @@ export default function Footer({ blueprint = true, stories = true }: { blueprint
            page stays pinned to the bottom, so the logo rises with the
            footer's top edge). Positioned so the blueprint layer
            (FooterBlueprint) can sit behind. */
-        @media (min-width: 1024px) { .footer.footer-bp { min-height: 100vh; } }
+        @media (min-width: 1024px) { .footer.footer-bp { min-height: calc(100vh + 160px); } } /* 96px padding + 64px logo */
         .footer-main {
           position: relative;
           flex: 1;

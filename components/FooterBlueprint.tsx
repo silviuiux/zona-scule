@@ -939,15 +939,15 @@ export default function FooterBlueprint() {
     })
     const heads = Array.from(layer.querySelectorAll<SVGGElement>('.head'))
 
-    // Title block sits just under the logo, wherever the logo row is.
-    // (measured where the logo would be at rest: it lifts away as the
-    // drawing starts, and the title block and note stay put)
-    let logoLift = 0
+    // Title block sits just under the logo row (or the nav, see below).
+    // At rest the logo row has scrolled away under the nav, so whichever
+    // is lower — logo or nav — is the line to hang them from.
     const placeTitle = () => {
       const logo = footer?.querySelector('.footer-logo')
       if (!logo) return
       const r = logo.getBoundingClientRect()
-      const l = { left: r.left, bottom: r.bottom + logoLift }
+      const navB = document.querySelector('.nav')?.getBoundingClientRect().bottom ?? 0
+      const l = { left: r.left, bottom: Math.max(r.bottom, navB) }
       const box = layer.getBoundingClientRect()
       title.style.left = `${(l.left - box.left).toFixed(1)}px`
       title.style.top = `${(l.bottom - box.top + 40).toFixed(1)}px`
@@ -1092,25 +1092,28 @@ export default function FooterBlueprint() {
       lastP = p
     }
 
-    // How far the footer has come into view (0 → 1 as its top edge
-    // travels the upper half of the screen, 1 at the natural stop): the
-    // note arrives with it, ahead of any drawing.
-    let arrival = 0
-    // The footer logo scrolls away as the drawing starts, making room for
-    // it (the nav stays where it is): up and out over the first stretch.
-    const LOGO_OUT = 0.12
-    const liftLogo = (p: number) => {
-      const logo = footer?.querySelector<HTMLElement>('.footer-logo')
-      if (!logo || !footer) return
-      const k = easeInOutSine(clamp01(p / LOGO_OUT))
-      const rest = logo.getBoundingClientRect().bottom + logoLift - footer.getBoundingClientRect().top
-      logoLift = k * rest
-      logo.style.transform = k > 0 ? `translateY(${(-logoLift).toFixed(1)}px)` : ''
-      logo.style.opacity = k > 0 ? String(1 - k) : ''
-      logo.style.pointerEvents = k > 0.5 ? 'none' : ''
+    // The note types itself out once the page has come to rest at the
+    // bottom (the footer logo has scrolled away under the nav by then —
+    // the footer is taller than the screen by the logo's row): arrival
+    // runs 0 → 1 in time, not scroll, and runs back fast on the way up.
+    let arrival = 0, arrivalTo = 0, arrRaf = 0, arrLast = 0
+    const ARRIVE_MS = 2600, LEAVE_MS = 450
+    const stepArrival = (now: number) => {
+      const dt = now - arrLast
+      arrLast = now
+      arrival = arrivalTo > arrival
+        ? Math.min(arrivalTo, arrival + dt / ARRIVE_MS)
+        : Math.max(arrivalTo, arrival - dt / LEAVE_MS)
+      if (!raf) render(cur)
+      arrRaf = arrival !== arrivalTo ? requestAnimationFrame(stepArrival) : 0
+    }
+    const arriveTo = (to: number) => {
+      if (to === arrivalTo) return
+      arrivalTo = to
+      if (reduce) { arrival = to; if (!raf) render(cur); return }
+      if (!arrRaf) { arrLast = performance.now(); arrRaf = requestAnimationFrame(stepArrival) }
     }
     const render = (p: number) => {
-      liftLogo(p)
       placeTitle()
       frameArt(p)
       // the note steps aside, in place, as soon as the drawing starts
@@ -1316,8 +1319,9 @@ export default function FooterBlueprint() {
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     const onResize = () => { placeTitle(); measureCols() }
     window.addEventListener('resize', onResize)
-    // Ordinary scrolling brings the footer in, and the note arrives with
-    // it — so the natural stop at the bottom is already the blank sheet, and
+    // Ordinary scrolling brings the footer in (its logo scrolls on up and
+    // away under the nav), and at the bottom the note types itself — so
+    // the natural stop at the bottom is already the blank sheet, and
     // the very next scroll draws. Scrolling back up reverses all of it.
     let scrollRaf = 0
     const onScroll = () => {
@@ -1330,9 +1334,8 @@ export default function FooterBlueprint() {
         if (!footer || hidden()) return
         const top = footer.getBoundingClientRect().top
         const vh = window.innerHeight
-        if (top >= vh) return
-        const a = atEnd() ? 1 : clamp01(1 - top / (vh / 2))
-        if (a !== arrival) { arrival = a; if (!raf) render(cur) }
+        if (top >= vh) { arriveTo(0); return }
+        arriveTo(atEnd() ? 1 : 0)
       })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -1340,9 +1343,8 @@ export default function FooterBlueprint() {
     return () => {
       window.removeEventListener('scroll', onScroll)
       if (scrollRaf) cancelAnimationFrame(scrollRaf)
+      if (arrRaf) cancelAnimationFrame(arrRaf)
       delete doc.dataset.eggHold
-      const logo = footer?.querySelector<HTMLElement>('.footer-logo')
-      if (logo) { logo.style.transform = ''; logo.style.opacity = ''; logo.style.pointerEvents = '' }
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
@@ -1475,9 +1477,9 @@ export default function FooterBlueprint() {
 
       {/* ── Three-line note: right of the logo's end, halfway down the gap ── */}
       <svg ref={noteRef} className="bp-note" viewBox="0 0 240 44">
-        <text x="0" y="10" className="note" data-k="type" data-arrive="" data-s="0.3" data-e="0.62" data-text="// Ai derulat până la capăt." />
-        <text x="0" y="24" className="note" data-k="type" data-arrive="" data-s="0.6" data-e="0.76" data-text="// Mulțumesc." />
-        <text x="0" y="38" className="note" data-k="type" data-arrive="" data-s="0.74" data-e="0.97" data-text="// Derulează în continuare." />
+        <text x="0" y="10" className="note" data-k="type" data-arrive="" data-s="0.04" data-e="0.4" data-text="// Ai derulat până la capăt." />
+        <text x="0" y="24" className="note" data-k="type" data-arrive="" data-s="0.46" data-e="0.6" data-text="// Mulțumesc." />
+        <text x="0" y="38" className="note" data-k="type" data-arrive="" data-s="0.66" data-e="1" data-text="// Derulează în continuare." />
         <Pen />
       </svg>
 

@@ -146,7 +146,6 @@ export default async function BranduriPage() {
           </header>
 
           <section>
-            {chapter('Toate brandurile', 'Cei cu pagină proprie apar mari; treci cu mouse-ul peste un brand pentru gama lui.')}
             <div className="branduri-grid">
               {brands.map((b, bi) => {
                 const logo = getBrandLogo(b.name)
