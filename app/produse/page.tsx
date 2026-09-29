@@ -149,7 +149,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-zona,
         .cat-hero-name {
           font-family: 'Neuton', serif; font-weight: 400;
-          font-size: clamp(56px, 7.5vw, 112px);
+          /* the same title as every page hero (.zs-title) */
+          font-size: clamp(56px, 8vw, 128px);
           letter-spacing: -0.015em;
           line-height: 0.92;
         }
@@ -277,8 +278,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
         @media (max-width: 768px) {
           .cat-hero-inner { padding: var(--hero-top) var(--gutter) 40px; }
-          .cat-hero-zona, .cat-hero-name { font-size: 40px; }
-          .cat-breadcrumb { margin-bottom: 20px; }
+
           .cat-hero-brand-link { margin-left: 0; }
 
           /* Sidebar becomes a fixed-position overlay drawer below, so
