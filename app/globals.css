@@ -13,9 +13,13 @@
   /* One spacing unit for page rhythm: the gap between sections and between
      a section's heading and its content. */
   --space-section: 120px;
-  /* Height of the fixed site nav; everything that clears or sticks under
-     it (page top paddings, sticky bars, full-height footer) uses this. */
-  --nav-h: 68px;
+  /* The site nav: a bar --nav-bar-h tall floating --nav-top below the top
+     edge. --nav-h is where it ends — everything that clears or sticks
+     under it (page top paddings, sticky bars, full-height footer) uses
+     that. html.nav-bar (?nav=bar) brings back the full-width bar. */
+  --nav-bar-h: 68px;
+  --nav-top: 16px;
+  --nav-h: calc(var(--nav-bar-h) + var(--nav-top));
   /* Side gutter of every 1440px content container AND the nav, so page
      content always lines up with the nav logo. A bit less on phones. */
   --gutter: 32px;
@@ -32,11 +36,12 @@
 }
 
 @media (max-width: 768px) {
-  :root { --space-section: 64px; --nav-h: 56px; }
+  :root { --space-section: 64px; --nav-bar-h: 56px; }
 }
 @media (max-width: 600px) {
   :root { --gutter: 20px; }
 }
+html.nav-bar { --nav-top: 0px; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Lenis drives smooth scrolling in JS; native scroll-behavior must stay auto to

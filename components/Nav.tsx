@@ -24,6 +24,15 @@ const MENU = [
 export default function Nav() {
   const [q, setQ] = useState('')
   const [scrolled, setScrolled] = useState(false)
+
+  // ?nav=bar / ?nav=float picks the nav style (remembered per browser)
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('nav')
+    try { if (q === 'bar' || q === 'float') localStorage.setItem('zs-nav', q) } catch {}
+    let mode = q
+    try { mode = mode ?? localStorage.getItem('zs-nav') } catch {}
+    document.documentElement.classList.toggle('nav-bar', mode === 'bar')
+  }, [])
   const [searchOpen, setSearchOpen] = useState(false)
   const [terms, setTerms] = useState<string[]>([])
   const [dismissed, setDismissed] = useState<string[]>([])
@@ -142,16 +151,33 @@ export default function Nav() {
   return (
     <>
       <style>{`
+        /* A white card floating --nav-top (16px) below the top edge, as
+           wide as the page content — the same card as the cookie bar */
         .nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          height: var(--nav-h);
+          position: fixed; top: var(--nav-top); left: 0; right: 0; z-index: 100;
+          width: calc(min(100%, 1440px) - 2 * var(--gutter)); margin: 0 auto;
+          height: var(--nav-bar-h);
           background: rgb(255,255,255);
-          box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
+          border: 1px solid rgba(0,0,0,0.12); border-radius: 6px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.04);
           display: flex; align-items: stretch;
           transition: box-shadow 200ms, background 200ms;
         }
-        .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
+        .nav.scrolled { box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
         .nav.typing { background: rgb(243,243,243); }
+        .nav .nav-inner { padding: 0 20px; }
+        .nav .nav-panel { left: -1px; right: -1px; top: calc(100% + 8px); padding: 24px 20px 28px; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; }
+        .nav .nav-panel::before { display: none; }
+
+        /* ?nav=bar — the full-width bar */
+        html.nav-bar .nav {
+          top: 0; width: auto; margin: 0; border: none; border-radius: 0;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.025), 0 10px 28px rgba(0,0,0,0.03);
+        }
+        html.nav-bar .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
+        html.nav-bar .nav .nav-inner { padding: 0 var(--gutter); }
+        html.nav-bar .nav .nav-panel { left: var(--gutter); right: var(--gutter); top: 100%; padding: 24px 0 28px; border: none; border-top: 1px solid rgba(0,0,0,0.14); border-bottom: 1px solid rgba(0,0,0,0.14); border-radius: 0; }
+        html.nav-bar .nav .nav-panel::before { display: block; }
 
         .nav-inner {
           position: relative;
@@ -257,7 +283,7 @@ export default function Nav() {
           }
           .nav.typing .nav-search-wrap { background: rgb(243,243,243); }
           .nav.search-open .nav-logo { margin-right: auto; }
-          .nav-panel { top: calc(100% + 61px); padding: 12px 0 16px; }
+          .nav-panel, .nav .nav-panel, html.nav-bar .nav .nav-panel { top: calc(100% + 61px); padding: 12px 20px 16px; }
           .nav-panel-list { padding-left: 0; }
           .nav-term { font-size: 17px; gap: 12px; }
           .nav-links { display: none; }
