@@ -82,13 +82,10 @@ export default async function HomePage() {
              of the first category row on short/laptop screens (fixes cards
              not showing at all). Capped at 280px so tall screens keep the
              roomy composition and simply reveal MORE of the cards below. */
-          padding-top: clamp(88px, calc(100vh - 540px - var(--space-section) + 24px), 280px);
+          padding-top: calc(var(--nav-h) + var(--hero-top));
           padding-bottom: var(--space-section);
           background: transparent;
-          min-height: max(320px, calc(100vh - 395px));
-          /* Content sits on the bottom padding (not centred), so the gap to
-             the category grid is exactly --space-section. */
-          display: flex; align-items: flex-end;
+          display: flex;
           overflow: hidden;
         }
         .hero-inner {
@@ -179,13 +176,12 @@ export default async function HomePage() {
         }
         .hero-sub {
           font-family: 'Recursive', sans-serif;
-          /* quieter than the title, clearly: smaller, light, a touch more
-             air — so the eye goes title → search, with this as a caption */
-          font-weight: 300;
-          font-size: 16px; color: rgba(0,0,0,0.55);
-          line-height: 1.6; letter-spacing: 0.005em;
+          /* the shared page subtitle (see .zs-sub) */
+          font-weight: 400;
+          font-size: 16px; color: rgb(0,0,0);
+          line-height: 1.6;
           margin-top: 6px;
-          max-width: 640px;
+          max-width: 620px;
         }
         @media (max-width: 768px) {
           /* Full width instead of the desktop 50% cap — lets the subtitle
@@ -533,7 +529,7 @@ export default async function HomePage() {
         @media (min-width: 769px) and (max-width: 1366px) {
           .hero {
             min-height: 0;
-            padding-top: calc(var(--nav-h) + clamp(32px, 7vh, 72px));
+            padding-top: calc(var(--nav-h) + var(--hero-top));
             padding-bottom: clamp(56px, 8vh, 88px);
           }
           .hero-inner { gap: 22px; }

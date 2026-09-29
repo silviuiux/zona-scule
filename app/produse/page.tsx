@@ -95,7 +95,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-inner {
           max-width: 1440px;
           margin: 0 auto;
-          padding: 112px var(--gutter) 56px;
+          padding: var(--hero-top) var(--gutter) 56px; /* same start as every page hero */
           width: 100%;
         }
 
@@ -143,7 +143,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           display: flex;
           flex-direction: column;
           gap: 0;
-          margin-bottom: 20px;
+          margin-bottom: 28px;
           line-height: 1;
         }
         .cat-hero-zona,
@@ -157,12 +157,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .cat-hero-name { color: rgb(0, 0, 0); }
 
         /* Description */
+        /* the shared page subtitle (see .zs-sub) */
         .cat-hero-desc {
           font-family: 'Recursive', sans-serif;
-          font-size: 15px;
-          color: rgba(0,0,0,0.5);
+          font-size: 16px; font-weight: 400;
+          color: rgb(0,0,0);
           line-height: 1.6;
-          max-width: 560px;
+          max-width: 620px;
           margin: 0 0 28px;
         }
 
@@ -275,7 +276,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         .sidebar-backdrop { display: none; }
 
         @media (max-width: 768px) {
-          .cat-hero-inner { padding: 80px var(--gutter) 40px; }
+          .cat-hero-inner { padding: var(--hero-top) var(--gutter) 40px; }
           .cat-hero-zona, .cat-hero-name { font-size: 40px; }
           .cat-breadcrumb { margin-bottom: 20px; }
           .cat-hero-brand-link { margin-left: 0; }

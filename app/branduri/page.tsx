@@ -45,12 +45,9 @@ export default async function BranduriPage() {
         }
         /* Hero — the same quiet first screen as the stories and the catalog */
         .branduri-hero {
-          min-height: calc(88vh - var(--nav-h));
-          display: flex; flex-direction: column; justify-content: flex-end;
-          padding: clamp(72px, 12vh, 128px) 0 clamp(72px, 11vh, 128px);
+          padding: var(--hero-top) 0 clamp(72px, 11vh, 128px);
         }
-        .branduri-hero .eyebrow-mono { margin-bottom: 28px; }
-        .branduri-hero .zs-title { margin-bottom: 40px; }
+        .branduri-hero .eyebrow-mono { min-height: 28px; margin-bottom: 32px; }
         .branduri-hero .zs-sub { margin-bottom: 40px; }
         .branduri-grid {
           display: grid;

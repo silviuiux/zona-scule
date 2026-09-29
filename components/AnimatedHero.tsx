@@ -41,8 +41,11 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
   return (
     <>
       <style>{`
+        /* the hero's first row: 28px tall, 32px above the title (the
+           same start as the breadcrumb / eyebrow on the other pages) */
         .brand-chips {
-          display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+          display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+          min-height: 28px; margin-bottom: 6px; /* + the hero's 26px gap */
         }
         .brand-chips-label {
           font-family: 'Recursive', sans-serif;
@@ -54,10 +57,10 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
           font-size: 12px; font-weight: 500;
           color: rgb(0,0,0);
           text-decoration: none;
-          padding: 6px 14px;
+          height: 28px; padding: 0 14px;
           border-radius: 4px;
           background: #f4f4f4;
-          display: inline-flex; align-items: baseline; gap: 5px;
+          display: inline-flex; align-items: center; gap: 5px;
           transition: color 150ms, background-color 150ms;
         }
         .brand-chip:hover {

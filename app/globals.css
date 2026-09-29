@@ -23,6 +23,11 @@
   /* Side gutter of every 1440px content container AND the nav, so page
      content always lines up with the nav logo. A bit less on phones. */
   --gutter: 32px;
+  /* Page heroes (home, catalog, brands, solutions): the first row —
+     brand chips / breadcrumb / eyebrow, 28px tall — starts --hero-top
+     below the nav and sits 32px above the title, so every page's title
+     lands at the same height. */
+  --hero-top: clamp(72px, 12vh, 128px);
 
   /*
     Noise texture — matches Figma Noise plugin settings:
@@ -36,7 +41,7 @@
 }
 
 @media (max-width: 768px) {
-  :root { --space-section: 64px; --nav-bar-h: 56px; }
+  :root { --space-section: 64px; --nav-bar-h: 56px; --hero-top: clamp(32px, 6vh, 56px); }
 }
 @media (max-width: 600px) {
   :root { --gutter: 20px; }

@@ -6,7 +6,7 @@ export const SOLUTIONS_CSS = `
   .zs-section { padding-top: var(--space-section); }
 
   /* ── Hero ── */
-  .zs-hero { padding: clamp(72px, 12vh, 128px) 0 clamp(48px, 7vh, 88px); }
+  .zs-hero { padding: var(--hero-top) 0 clamp(48px, 7vh, 88px); }
   .zs-crumbs { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
   .zs-crumb {
     display: inline-flex; align-items: center; height: 28px; padding: 0 14px;
@@ -21,7 +21,7 @@ export const SOLUTIONS_CSS = `
     letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.45);
   }
   .zs-crumb-sep { color: rgba(0,0,0,0.25); }
-  .zs-hero .eyebrow-mono { margin-bottom: 20px; }
+  .zs-hero .eyebrow-mono { min-height: 28px; margin-bottom: 32px; }
   .zs-title {
     font-family: 'Neuton', serif; font-weight: 400;
     font-size: clamp(56px, 8vw, 128px); line-height: 0.92; letter-spacing: -0.015em;
@@ -33,9 +33,11 @@ export const SOLUTIONS_CSS = `
     font-size: clamp(24px, 2.4vw, 34px); line-height: 1.15; color: rgb(0,0,0);
     max-width: 760px; margin-bottom: 16px;
   }
+  /* The page subtitle — the same on every page hero (home, catalog,
+     brands, solutions): Recursive 16px, black, loose leading */
   .zs-sub {
-    font-family: 'Recursive', sans-serif; font-size: 16px; line-height: 1.6;
-    color: rgba(0,0,0,0.55); max-width: 620px; margin-bottom: 36px;
+    font-family: 'Recursive', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.6;
+    color: rgb(0,0,0); max-width: 620px; margin-bottom: 36px;
   }
   .zs-stats { display: flex; gap: 32px; flex-wrap: wrap; align-items: baseline; }
   .zs-stat { display: flex; align-items: baseline; gap: 8px; }
