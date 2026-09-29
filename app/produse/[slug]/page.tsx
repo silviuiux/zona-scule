@@ -10,6 +10,7 @@ import ShortDescription from '@/components/ShortDescription'
 import SkuCopyField from './SkuCopyField'
 import VariantSelector from './VariantSelector'
 import StickyOfferBar from './StickyOfferBar'
+import TrackRecent from './TrackRecent'
 import ProductVariantCarousel from '@/components/ProductVariantCarousel'
 import StoryMotion from '@/app/zona-solutii/StoryMotion'
 import { SOLUTIONS_CSS, STORY_CSS } from '@/app/zona-solutii/styles'
@@ -92,6 +93,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <Nav />
+      <TrackRecent slug={product.slug} name={title} brand={product.brand_name ?? null} sku={product.sku ?? null} image={mainImg ?? null} />
       <style>{SOLUTIONS_CSS + STORY_CSS + `
         /* ── Hero: text left, the product right, a full first screen ── */
         .pd-hero {

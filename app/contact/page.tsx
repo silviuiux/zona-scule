@@ -7,20 +7,18 @@ import ContactForm from './ContactForm'
 import ContactMap from './ContactMap'
 import CountUp from '@/components/CountUp'
 import { unstable_cache } from 'next/cache'
-import { getRawProductCount, getCategoriesWithCount, getAllSubcategoriesWithCount, getBrands } from '@/lib/supabase'
+import { getRawProductCount, getCategoriesWithCount, getBrands } from '@/lib/supabase'
 
 // The catalog in four numbers, for "Despre noi" (cached for an hour)
 const catalogStats = unstable_cache(async () => {
-  const [products, cats, subs, brands] = await Promise.all([
+  const [products, cats, brands] = await Promise.all([
     getRawProductCount().catch(() => 0),
     getCategoriesWithCount().catch(() => []),
-    getAllSubcategoriesWithCount().catch(() => []),
     getBrands().catch(() => []),
   ])
   return {
     products,
     categories: cats.filter(c => c.product_count > 0 && c.name.toLowerCase() !== 'necategorizat').length,
-    subcategories: subs.filter(s => s.product_count > 0).length,
     brands: brands.filter(b => b.product_count > 0).length,
   }
 }, ['contact-catalog-stats'], { revalidate: 3600, tags: ['catalog'] })
@@ -40,7 +38,6 @@ export default async function ContactPage({
     { value: stats.products, label: 'Produse în catalog', href: '/produse' },
     { value: stats.brands, label: 'Branduri distribuite', href: '/branduri' },
     { value: stats.categories, label: 'Categorii', href: '/produse' },
-    { value: stats.subcategories, label: 'Subcategorii', href: '/produse' },
   ]
   return (
     <>
@@ -77,14 +74,14 @@ export default async function ContactPage({
         }
         .c-hero-grid {
           flex: 1; align-content: center;
-          /* 12 columns: the form on 4, two empty, the details on 4, two empty */
+          /* 12 columns: the form on 5, two empty, the details on 4, one empty */
           display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
           column-gap: 16px; row-gap: 48px;
           align-items: end;
           padding-bottom: clamp(40px, 8vh, 96px);
         }
-        .c-hero-grid > .cf { grid-column: 1 / span 4; }
-        .c-details { grid-column: 7 / span 4; display: flex; flex-direction: column; }
+        .c-hero-grid > .cf { grid-column: 1 / span 5; }
+        .c-details { grid-column: 8 / span 4; display: flex; flex-direction: column; }
         @media (max-width: 1100px) {
           .c-hero-grid > .cf { grid-column: 1 / span 6; }
           .c-details { grid-column: 8 / span 5; }
@@ -153,9 +150,12 @@ export default async function ContactPage({
           font-size: 17px; line-height: 1.7; color: rgba(0,0,0,0.6);
         }
         .about-facts {
-          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+          /* products on 6 columns, brands and categories on 3 each */
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
           gap: 16px;
         }
+        .about-fact { grid-column: span 3; }
+        .about-fact:first-child { grid-column: span 6; }
         .about-fact {
           display: flex; flex-direction: column; gap: 20px;
           padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.14);
@@ -177,7 +177,9 @@ export default async function ContactPage({
         .about-fact:hover .about-fact-label b { opacity: 1; }
         @media (max-width: 1024px) {
           .about-grid .section-head, .about-lead { grid-column: 1 / -1; }
-          .about-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 56px; }
+          .about-facts { row-gap: 56px; }
+          .about-fact, .about-fact:first-child { grid-column: span 6; }
+          .about-fact:first-child { grid-column: 1 / -1; }
         }
 
         @media (max-width: 768px) {
