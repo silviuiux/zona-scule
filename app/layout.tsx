@@ -5,6 +5,7 @@ import { NavigationProgressProvider } from '@/components/NavigationProgress'
 import AnalyticsGate from '@/components/AnalyticsGate'
 import CookieConsent from '@/components/CookieConsent'
 import PlainHeadings from '@/components/PlainHeadings'
+import NoOrphans from '@/components/NoOrphans'
 
 export const metadata: Metadata = {
   title: 'Zona Scule — Scule și Echipamente Profesionale',
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CookieConsent />
         <AnalyticsGate />
         <PlainHeadings />
+        <NoOrphans />
       </body>
     </html>
   )

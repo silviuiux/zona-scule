@@ -217,3 +217,17 @@ body::before {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* ── No orphans ─────────────────────────────────────────────────────────────
+   Site-wide rule: a line of text never ends with a single word left alone on
+   its last line. Titles are balanced across their lines; running text gets
+   the browser's orphan-avoiding wrap. components/NoOrphans.tsx backs this up
+   where text-wrap isn't supported (it ties the last two words together). */
+h1, h2, h3, h4, h5, h6,
+[class*="title"], [class*="headline"], [class*="-name"], [class*="-head"] {
+  text-wrap: balance;
+}
+p, li, dd, blockquote, figcaption,
+[class*="desc"], [class*="sub"], [class*="lead"], [class*="text"], [class*="excerpt"], [class*="label"] {
+  text-wrap: pretty;
+}
