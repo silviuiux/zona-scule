@@ -45,7 +45,7 @@ const easeInOut = (t: number) =>
 // offset * --destagger, so at destagger:0 the card sits at `top` (padded +
 // staggered) and at :1 it lands exactly on rowIndex * (CARD_HEIGHT + GAP) —
 // a genuinely tight grid, not just destaggered-but-still-padded.
-type Slot = { cat: Cat; col: number; span: number; top: number; offset: number }
+type Slot = { cat: Cat; col: number; span: number; top: number; offset: number; row: number }
 type RowSlot = { cat: Cat; colStart: number }
 
 // ── Row builder ───────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ function buildGrid(cats: Cat[]): { slots: Slot[]; totalHeight: number; tightHeig
       const span = cat.featured ? 2 : 1
       const stagger = COLUMN_STAGGER[colStart] ?? 0
       const offset = cumExtra[rowIndex] + stagger
-      slots.push({ cat, col: colStart, span, top: tightBase + offset, offset })
+      slots.push({ cat, col: colStart, span, top: tightBase + offset, offset, row: rowIndex })
     })
   })
 
@@ -217,7 +217,8 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
     if (!root) return
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card'))
+    // the first row is rendered already in view (no entrance) — see below
+    const allCards = Array.from(root.querySelectorAll<HTMLElement>('.cat-card:not(.in-view)'))
     if (allCards.length === 0) return
 
     if (reduce) { allCards.forEach(el => el.classList.add('in-view')); return }
@@ -250,7 +251,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
 
   return (
     <div ref={rootRef} className="cats-masonry" style={{ height: containerHeight }} data-total-height={totalHeight}>
-      {slots.map(({ cat, col, span, top, offset }, i) => {
+      {slots.map(({ cat, col, span, top, offset, row }, i) => {
         const cardStyle: CSSProperties = {
           position: 'absolute',
           top,
@@ -267,6 +268,7 @@ export default function CategoryGrid({ categories }: { categories: Cat[] }) {
             cat={cat}
             fallbackColor={`hsl(${(col * 90 + i * 22) % 360}, 6%, 74%)`}
             style={cardStyle}
+            first={row === 0}
           />
         )
       })}
@@ -284,10 +286,13 @@ function CategoryCard({
   cat,
   fallbackColor,
   style,
+  first = false,
 }: {
   cat: Cat
   fallbackColor: string
   style: CSSProperties
+  /** first row: visible from the start (it sits at the fold), no fade-in */
+  first?: boolean
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -305,14 +310,14 @@ function CategoryCard({
   return (
     <Link
       href={`/produse?categorie=${encodeURIComponent(cat.name)}`}
-      className="cat-card"
+      className={first ? 'cat-card in-view' : 'cat-card'}
       style={style}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
       <div className="cat-card-img-wrap">
         {cat.hero_image_url ? (
-          <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading="lazy" />
+          <img src={cat.hero_image_url} alt={cat.name} className="cat-card-img" loading={first ? 'eager' : 'lazy'} />
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: fallbackColor }} />
         )}
