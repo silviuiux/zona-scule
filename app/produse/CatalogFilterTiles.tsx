@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element -- category photos come from hosts outside next/image's list */
 import { TransitionLink as Link } from '@/components/NavigationProgress'
 import type { CategoryWithCount, BrandWithCount, SubcategoryWithCount } from '@/lib/supabase'
-import BrandMenu from './BrandMenu'
+import BrandRail from './BrandRail'
 
 /**
  * Tiles-mode filters for /produse (desktop): the catalog as a shop floor.
- * A compact brand menu, then one photo tile per category (count on it);
+ * A carousel of brand pills first, then one photo tile per category (count on it);
  * picking a category opens its subcategories in a panel right under the
  * tiles, and the tiles shrink to a strip so the products stay close.
  * Categories are single-pick here (a store aisle at a time); brands toggle
@@ -51,9 +51,8 @@ export default function CatalogFilterTiles({
     .map(b => {
       const on = has(activeBrands, b.name)
       const next = on ? activeBrands.filter(v => norm(v) !== norm(b.name)) : [...activeBrands, b.name]
-      return { name: b.name, count: b.product_count, on, href: href(next, activeCats) }
+      return { name: b.name, on, href: href(next, activeCats) }
     })
-  const brandLabel = activeBrands.length === 0 ? 'Toate' : activeBrands.length === 1 ? activeBrands[0] : `${activeBrands.length} branduri`
   const shownSubs = subs.filter(s => s.product_count > 0)
 
   return (
@@ -121,10 +120,15 @@ export default function CatalogFilterTiles({
         @media (max-width: 1200px) { .ft-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } .ft-subs { columns: 3; } }
       `}</style>
 
+      <BrandRail
+        items={brandItems}
+        allHref={href([], activeCats)}
+        noneOn={activeBrands.length === 0}
+        label={activeBrands.length > 1 ? `Branduri · ${activeBrands.length} alese` : 'Branduri'}
+        reset={(picked || activeBrands.length > 0) ? <Link href={href([], [])} className="ft-reset">× Resetează</Link> : undefined}
+      />
       <div className="ft-bar">
-        <BrandMenu items={brandItems} label={brandLabel} clearHref={activeBrands.length ? href([], activeCats) : null} />
         <span className="ft-hint">{picked ? 'Alege o subcategorie sau altă categorie' : 'Alege o categorie'}</span>
-        {(picked || activeBrands.length > 0) && <Link href={href([], [])} className="ft-reset">× Resetează</Link>}
       </div>
 
       <div className="ft-tiles">
