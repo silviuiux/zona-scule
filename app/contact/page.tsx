@@ -5,17 +5,43 @@ import TestimonialsCarousel from '@/components/TestimonialsCarousel'
 import { TESTIMONIALS } from '@/lib/testimonials'
 import ContactForm from './ContactForm'
 import ContactMap from './ContactMap'
+import CountUp from '@/components/CountUp'
+import { unstable_cache } from 'next/cache'
+import { getRawProductCount, getCategoriesWithCount, getAllSubcategoriesWithCount, getBrands } from '@/lib/supabase'
+
+// The catalog in four numbers, for "Despre noi" (cached for an hour)
+const catalogStats = unstable_cache(async () => {
+  const [products, cats, subs, brands] = await Promise.all([
+    getRawProductCount().catch(() => 0),
+    getCategoriesWithCount().catch(() => []),
+    getAllSubcategoriesWithCount().catch(() => []),
+    getBrands().catch(() => []),
+  ])
+  return {
+    products,
+    categories: cats.filter(c => c.product_count > 0 && c.name.toLowerCase() !== 'necategorizat').length,
+    subcategories: subs.filter(s => s.product_count > 0).length,
+    brands: brands.filter(b => b.product_count > 0).length,
+  }
+}, ['contact-catalog-stats'], { revalidate: 3600, tags: ['catalog'] })
 
 export const metadata: Metadata = {
   title: 'Contact — Zona Scule',
   description: 'Technology Production SRL (Zona Scule) este distribuitor autorizat de scule profesionale cu peste 26 de ani de experiență în România.',
 }
 
-export default function ContactPage({
+export default async function ContactPage({
   searchParams,
 }: {
   searchParams: Promise<{ sku?: string; brand?: string; model?: string }>
 }) {
+  const stats = await catalogStats()
+  const facts = [
+    { value: stats.products, label: 'Produse în catalog', href: '/produse' },
+    { value: stats.brands, label: 'Branduri distribuite', href: '/branduri' },
+    { value: stats.categories, label: 'Categorii', href: '/produse' },
+    { value: stats.subcategories, label: 'Subcategorii', href: '/produse' },
+  ]
   return (
     <>
       <Nav />
@@ -108,44 +134,55 @@ export default function ContactPage({
         }
         @media (prefers-reduced-motion: reduce) { .c-cue-line { animation: none; } }
 
-        /* ── Despre noi ── */
-        .about-grid {
-          display: grid; grid-template-columns: 7fr 5fr; gap: 64px;
-          align-items: end; margin-bottom: 48px;
+        /* ── Despre noi: a tall, quiet section — the title, then the
+           catalog in four big numbers ── */
+        .about {
+          min-height: 100vh;
+          display: flex; flex-direction: column; justify-content: center;
+          padding: clamp(96px, 16vh, 200px) 0;
         }
+        .about-grid {
+          display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; row-gap: 40px;
+          align-items: end; margin-bottom: clamp(96px, 16vh, 180px);
+        }
+        .about-grid .section-head { grid-column: 1 / span 7; }
         .about-title .red { color: rgb(217,44,43); }
         .about-lead {
+          grid-column: 9 / span 4;
           font-family: 'Recursive', sans-serif;
-          font-size: 17px; line-height: 1.6; color: rgba(0,0,0,0.6);
-          max-width: 56ch;
+          font-size: 17px; line-height: 1.7; color: rgba(0,0,0,0.6);
         }
         .about-facts {
-          display: grid; grid-template-columns: repeat(3, 1fr);
+          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 16px;
         }
         .about-fact {
-          padding: 32px;
-          background: rgb(255,255,255);
-          border: 1px solid rgba(0,0,0,0.08);
-          display: flex; flex-direction: column; gap: 12px;
-          text-decoration: none;
+          display: flex; flex-direction: column; gap: 20px;
+          padding-top: 28px; border-top: 1px solid rgba(0,0,0,0.14);
+          text-decoration: none; color: inherit;
         }
-        a.about-fact { transition: border-color 150ms; }
-        a.about-fact:hover { border-color: rgba(217,44,43,0.3); }
         .about-fact-value {
           font-family: 'Neuton', serif;
-          font-size: 48px; line-height: 1; color: rgb(217,44,43);
+          font-size: clamp(56px, 6.4vw, 104px); line-height: 0.9; letter-spacing: -0.02em;
+          color: rgb(0,0,0); font-variant-numeric: tabular-nums;
+          transition: color 200ms;
         }
+        .about-fact:hover .about-fact-value { color: rgb(217,44,43); }
         .about-fact-label {
           font-family: 'JetBrains Mono', ui-monospace, monospace;
-          font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+          font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
           line-height: 1.6; color: rgba(0,0,0,0.5);
+        }
+        .about-fact-label b { font-weight: 400; color: rgb(217,44,43); margin-left: 6px; opacity: 0; transition: opacity 200ms; }
+        .about-fact:hover .about-fact-label b { opacity: 1; }
+        @media (max-width: 1024px) {
+          .about-grid .section-head, .about-lead { grid-column: 1 / -1; }
+          .about-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 56px; }
         }
 
         @media (max-width: 768px) {
           .contact-page { --space-section: 88px; }
-          .about-grid { grid-template-columns: 1fr; gap: 24px; }
-          .about-facts { grid-template-columns: 1fr; }
+          .about { min-height: 0; padding: 56px 0; }
           .c-hero { min-height: 0; padding-top: 40px; }
           .c-hero-grid { grid-template-columns: 1fr; gap: 48px; }
           .c-hero-grid > .cf, .c-details { grid-column: 1 / -1; }
@@ -200,7 +237,7 @@ export default function ContactPage({
         <div className="contact-inner after-map">
 
           {/* Despre noi (was /despre-noi, which now redirects here) */}
-          <section id="despre-noi" className="contact-section">
+          <section id="despre-noi" className="contact-section about">
             <div className="about-grid">
               <div className="section-head">
                 <span className="eyebrow-mono">Despre noi</span>
@@ -214,18 +251,12 @@ export default function ContactPage({
               </p>
             </div>
             <div className="about-facts">
-              <div className="about-fact">
-                <span className="about-fact-value">26+</span>
-                <span className="about-fact-label">Ani de experiență pe piața din România</span>
-              </div>
-              <div className="about-fact">
-                <span className="about-fact-value">S.E.A.P.</span>
-                <span className="about-fact-label">Furnizor înregistrat pentru achiziții publice</span>
-              </div>
-              <div className="about-fact">
-                <span className="about-fact-value">Național</span>
-                <span className="about-fact-label">Livrăm în toată țara</span>
-              </div>
+              {facts.map(f => (
+                <a key={f.label} href={f.href} className="about-fact">
+                  <span className="about-fact-value">{f.value > 0 ? <CountUp value={f.value} onView /> : '—'}</span>
+                  <span className="about-fact-label">{f.label}<b aria-hidden="true">→</b></span>
+                </a>
+              ))}
             </div>
           </section>
 

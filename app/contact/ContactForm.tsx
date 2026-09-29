@@ -64,6 +64,20 @@ export default function ContactForm({
   return (
     <div className="cf">
       <style>{`
+        /* A sheet of paper left on the desk: white, a soft shadow, turned a
+           little counter-clockwise — it straightens up while you write */
+        .cf {
+          position: relative;
+          background: rgb(255,255,255);
+          border: 1px solid rgba(0,0,0,0.06);
+          padding: clamp(36px, 4vw, 56px) clamp(28px, 3vw, 48px) clamp(40px, 4vw, 56px);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 14px 32px rgba(0,0,0,0.07), 0 40px 80px rgba(0,0,0,0.05);
+          transform: rotate(-2deg);
+          transform-origin: 40% 60%;
+          transition: transform 600ms cubic-bezier(0.2, 0.7, 0.1, 1), box-shadow 600ms ease;
+        }
+        .cf:focus-within { transform: rotate(-0.5deg); box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 18px 40px rgba(0,0,0,0.08), 0 48px 96px rgba(0,0,0,0.06); }
+        @media (prefers-reduced-motion: reduce) { .cf { transition: none; } }
         .cf-eyebrow { margin-bottom: 16px; }
         .cf-title {
           font-family: 'Neuton', serif; font-weight: 400;
@@ -93,7 +107,8 @@ export default function ContactForm({
           transition: border-color 150ms;
         }
         .cf-input.name { flex: 0 1 30%; min-width: 160px; }
-        .cf-input.email { flex: 2 1 220px; }
+        .cf-line.nowrap { flex-wrap: nowrap; }
+        .cf-label { flex: 0 0 52px; }
         .cf-input.full { padding-left: 0; }
         .cf-input.msg { resize: none; overflow: hidden; field-sizing: content; min-height: 1.3em; }
         .cf-input::placeholder { color: rgba(0,0,0,0.22); }
@@ -129,7 +144,9 @@ export default function ContactForm({
         @media (max-width: 768px) {
           .cf-line { flex-direction: column; align-items: stretch; }
           .cf-line > span { white-space: normal; padding-bottom: 0; }
-          .cf-input, .cf-input.name, .cf-input.email { flex: 0 0 auto; width: 100%; padding-left: 0; }
+          .cf-input, .cf-input.name { flex: 0 0 auto; width: 100%; padding-left: 0; }
+          .cf-label { flex: 0 0 auto; }
+          .cf { transform: rotate(-1deg); }
           .cf-submit { width: 100%; justify-content: space-between; }
         }
       `}</style>
@@ -161,12 +178,14 @@ export default function ContactForm({
               <div className="cf-line gap-top">
                 <span>Vă rog să mă contactați la:</span>
               </div>
-              <div className="cf-line">
-                <span>tel.</span>
+              <div className="cf-line nowrap">
+                <span className="cf-label">tel.</span>
                 <input className="cf-input" type="tel" autoComplete="tel" aria-label="Telefon"
                   placeholder="telefon" value={form.telefon} onChange={set('telefon')} />
-                <span>e-mail</span>
-                <input className="cf-input email" type="email" required autoComplete="email" aria-label="Email"
+              </div>
+              <div className="cf-line nowrap">
+                <span className="cf-label">e-mail</span>
+                <input className="cf-input" type="email" required autoComplete="email" aria-label="Email"
                   placeholder="adresa de e-mail" value={form.email} onChange={set('email')} />
               </div>
             </div>
