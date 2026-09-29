@@ -117,6 +117,10 @@ export type Subcategory = {
  *  names never contain commas (subcategory names can, so they stay single). */
 export const filterList = (v?: string | string[] | null): string[] =>
   (Array.isArray(v) ? v : v ? v.split(',') : []).map(s => s.trim()).filter(Boolean)
+/** Several subcategories ride in one param separated by "|" (their names
+ *  can hold commas): ?subcategorie=A|B */
+export const subList = (v?: string | string[] | null): string[] =>
+  (Array.isArray(v) ? v : v ? v.split('|') : []).map(s => s.trim()).filter(Boolean)
 
 export async function getProducts({
   page = 1,
@@ -131,7 +135,7 @@ export async function getProducts({
   pageSize?: number
   brandName?: string | string[]
   categoryText?: string | string[]
-  subcategoryText?: string
+  subcategoryText?: string | string[]
   search?: string
   featured?: boolean
 } = {}) {
@@ -185,7 +189,9 @@ export async function getProducts({
   else if (brands.length > 1) query = query.in('brand_name', brands)
   if (cats.length === 1) query = query.eq('category_text', cats[0])
   else if (cats.length > 1) query = query.in('category_text', cats)
-  if (subcategoryText) query = query.eq('subcategory_text', subcategoryText)
+  const subs = subList(subcategoryText)
+  if (subs.length === 1) query = query.eq('subcategory_text', subs[0])
+  else if (subs.length > 1) query = query.in('subcategory_text', subs)
   if (search) {
     // Use the generated `search_vector` tsvector column with the existing GIN
     // index (`products_search_idx`). Build a prefix tsquery so partial words
@@ -581,6 +587,10 @@ export async function getBrandsByFilter({
   search?: string
 } = {}): Promise<BrandWithCount[]> {
   const cats = filterList(categoryText)
+  // several subcategories: the brand list isn't narrowed by them (the RPCs
+  // take one)
+  const subs = subList(subcategoryText)
+  subcategoryText = subs.length === 1 ? subs[0] : undefined
   const [{ data: brands, error }, { data: counts }] = await Promise.all([
     supabase.from('brands').select('*').order('name'),
     cats.length > 1

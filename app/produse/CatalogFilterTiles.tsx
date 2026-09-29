@@ -1,13 +1,14 @@
 /* eslint-disable @next/next/no-img-element -- category photos come from hosts outside next/image's list */
 import { TransitionLink as Link } from '@/components/NavigationProgress'
-import type { CategoryWithCount, BrandWithCount, SubcategoryWithCount } from '@/lib/supabase'
+import { subList, type CategoryWithCount, type BrandWithCount, type SubcategoryWithCount } from '@/lib/supabase'
 import BrandRail from './BrandRail'
 
 /**
  * Tiles-mode filters for /produse (desktop): the catalog as a shop floor.
  * A carousel of brand pills first, then one photo tile per category (count on it);
- * picking a category opens its subcategories in a panel right under the
- * tiles, and the tiles shrink to a strip so the products stay close.
+ * picking a category shows its subcategories in a panel right under the
+ * tiles — collapsed to one line with the count until opened, A→Z, several
+ * can be ticked (?subcategorie=A|B) — and the tiles shrink to a strip.
  * Categories are single-pick here (a store aisle at a time); brands toggle
  * like in the pill rows. Same URL as the other modes:
  * ?brand=A,B&categorie=X&subcategorie=Y.
@@ -32,13 +33,13 @@ export default function CatalogFilterTiles({
 }) {
   const norm = (s: string) => s.toLowerCase().trim()
   const has = (list: string[], name: string) => list.some(v => norm(v) === norm(name))
-  const href = (b: string[], c: string[], sub?: string) => {
+  const href = (b: string[], c: string[], subs: string[] = []) => {
     const p = new URLSearchParams()
     if (b.length) p.set('brand', b.join(','))
     if (c.length) p.set('categorie', c.join(','))
-    if (sub) p.set('subcategorie', sub)
+    if (subs.length) p.set('subcategorie', subs.join('|'))
     if (search) p.set('q', search)
-    const qs = p.toString().replace(/%2C/g, ',')
+    const qs = p.toString().replace(/%2C/g, ',').replace(/%7C/g, '|')
     return qs ? `/produse?${qs}` : '/produse'
   }
 
@@ -53,7 +54,11 @@ export default function CatalogFilterTiles({
       const next = on ? activeBrands.filter(v => norm(v) !== norm(b.name)) : [...activeBrands, b.name]
       return { name: b.name, on, href: href(next, activeCats) }
     })
-  const shownSubs = subs.filter(s => s.product_count > 0)
+  const subSel = subList(activeSub)
+  const isSub = (name: string) => subSel.some(v => norm(v) === norm(name))
+  const shownSubs = subs
+    .filter(s => s.product_count > 0 || isSub(s.name))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ro'))
 
   return (
     <div className={`ft${picked ? ' picked' : ''}`}>
@@ -83,15 +88,31 @@ export default function CatalogFilterTiles({
         .ft.picked .ft-tile-name { font-size: 12.5px; }
 
         .ft-panel {
-          margin-top: 16px; padding: 28px 32px 32px;
+          position: relative;
+          margin-top: 16px; padding: 0 32px;
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.07); border-radius: 4px;
           animation: ft-open 450ms cubic-bezier(0.2, 0.7, 0.1, 1);
         }
         @keyframes ft-open { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-        .ft-panel-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 20px; }
+        .ft-panel-head {
+          display: flex; align-items: baseline; gap: 16px; padding: 24px 0; padding-right: 120px;
+          cursor: pointer; list-style: none;
+        }
+        .ft-panel-head::-webkit-details-marker { display: none; }
+        .ft-panel-toggle {
+          display: inline-flex; align-items: center; gap: 8px; margin-left: 8px;
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(0,0,0);
+        }
+        .ft-panel-toggle svg { transition: transform 200ms; }
+        .ft-panel-d[open] .ft-panel-toggle svg { transform: rotate(180deg); }
+        .ft-panel-toggle .when-open { display: none; }
+        .ft-panel-d[open] .ft-panel-toggle .when-open { display: inline; }
+        .ft-panel-d[open] .ft-panel-toggle .when-closed { display: none; }
+        .ft-panel-sel { color: rgb(217,44,43); }
+        .ft-panel-d[open] .ft-subs { padding-bottom: 32px; }
         .ft-panel-title { font-family: 'Neuton', serif; font-size: 36px; line-height: 1; color: rgb(0,0,0); }
         .ft-panel-meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; color: rgba(0,0,0,0.45); text-transform: uppercase; }
-        .ft-panel-close { margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(0,0,0); text-decoration: none; }
+        .ft-panel-close { position: absolute; top: 30px; right: 32px; z-index: 1; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(0,0,0); text-decoration: none; }
         .ft-panel-close:hover { color: rgb(217,44,43); }
         .ft-subs { list-style: none; columns: 4; column-gap: 32px; }
         .ft-sub { break-inside: avoid; }
@@ -102,6 +123,14 @@ export default function CatalogFilterTiles({
           transition: color 150ms;
         }
         .ft-sub a:hover { color: rgb(0,0,0); }
+        .ft-sub a i {
+          flex: 0 0 auto; width: 12px; height: 12px; border: 1px solid rgba(0,0,0,0.3); border-radius: 2px;
+          align-self: center; position: relative; transition: border-color 150ms, background 150ms;
+        }
+        .ft-sub a:hover i { border-color: rgba(0,0,0,0.6); }
+        .ft-sub.on a i { background: rgb(217,44,43); border-color: rgb(217,44,43); }
+        .ft-sub.on a i::after { content: ''; position: absolute; left: 3px; top: 0; width: 4px; height: 7px; border: solid rgb(255,255,255); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+        .ft-sub.all a i { display: none; }
         .ft-sub a span { margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: rgba(0,0,0,0.35); }
         .ft-sub.on a { color: rgb(217,44,43); }
         .ft-sub.on a span { color: rgb(217,44,43); }
@@ -132,24 +161,34 @@ export default function CatalogFilterTiles({
 
       {catOne && shownSubs.length > 0 && (
         <div className="ft-panel">
-          <div className="ft-panel-head">
+        <Link href={href(activeBrands, [])} className="ft-panel-close">× Închide</Link>
+        <details className="ft-panel-d" open={subSel.length > 0}>
+          <summary className="ft-panel-head">
             <span className="ft-panel-title">{catOne.name}</span>
-            <span className="ft-panel-meta">{shownSubs.length} subcategorii</span>
-            <Link href={href(activeBrands, [])} className="ft-panel-close">× Închide</Link>
-          </div>
+            <span className="ft-panel-meta">
+              {shownSubs.length} subcategorii
+              {subSel.length > 0 && <span className="ft-panel-sel"> · {subSel.length} {subSel.length === 1 ? 'aleasă' : 'alese'}</span>}
+            </span>
+            <span className="ft-panel-toggle">
+              <span className="when-closed">Arată</span><span className="when-open">Ascunde</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </span>
+          </summary>
           <ul className="ft-subs">
-            <li className={`ft-sub${!activeSub ? ' on' : ''}`}>
+            <li className={`ft-sub all${subSel.length === 0 ? ' on' : ''}`}>
               <Link href={href(activeBrands, [catOne.name])}>Toate<span>{catOne.product_count.toLocaleString('ro')}</span></Link>
             </li>
             {shownSubs.map(s => {
-              const on = !!activeSub && norm(activeSub) === norm(s.name)
+              const on = isSub(s.name)
+              const next = on ? subSel.filter(v => norm(v) !== norm(s.name)) : [...subSel, s.name]
               return (
                 <li key={s.id} className={`ft-sub${on ? ' on' : ''}`}>
-                  <Link href={href(activeBrands, [catOne.name], on ? undefined : s.name)}>{s.name}<span>{s.product_count.toLocaleString('ro')}</span></Link>
+                  <Link href={href(activeBrands, [catOne.name], next)} aria-pressed={on} scroll={false}><i aria-hidden="true" />{s.name}<span>{s.product_count.toLocaleString('ro')}</span></Link>
                 </li>
               )
             })}
           </ul>
+        </details>
         </div>
       )}
     </div>

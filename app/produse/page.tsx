@@ -2,7 +2,7 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount, getCategoriesByBrands, filterList } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount, getCategoriesByBrands, filterList, subList } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -381,7 +381,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             {sp.subcategorie && (
               <>
                 <span className="cat-bc-sep">/</span>
-                <span className="cat-bc-current">{sp.subcategorie}</span>
+                <span className="cat-bc-current">{subList(sp.subcategorie).join(' · ')}</span>
               </>
             )}
             {!multi && brandOne && !catOne && (

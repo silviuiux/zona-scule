@@ -31,7 +31,7 @@ import {
 import { useRouter } from 'next/navigation'
 import NextLink from 'next/link'
 
-type NavCtxValue = { pending: boolean; navigate: (href: string) => void }
+type NavCtxValue = { pending: boolean; navigate: (href: string, opts?: { scroll?: boolean }) => void }
 const NavCtx = createContext<NavCtxValue>({ pending: false, navigate: () => {} })
 
 export function useNavigation() {
@@ -90,8 +90,8 @@ export function NavigationProgressProvider({ children }: { children: ReactNode }
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const navigate = (href: string) => {
-    startTransition(() => router.push(href))
+  const navigate = (href: string, opts?: { scroll?: boolean }) => {
+    startTransition(() => router.push(href, opts))
   }
 
   return (
@@ -107,6 +107,8 @@ type TransitionLinkProps = {
   className?: string
   children: ReactNode
   onClick?: () => void
+  /** false keeps the scroll position (e.g. toggling a filter in place) */
+  scroll?: boolean
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'onClick'>
 
 /**
@@ -114,7 +116,7 @@ type TransitionLinkProps = {
  * modifier-clicks / middle-clicks (new tab, etc.) so ctrl/cmd-click still
  * works as expected.
  */
-export function TransitionLink({ href, className, children, onClick, ...rest }: TransitionLinkProps) {
+export function TransitionLink({ href, className, children, onClick, scroll, ...rest }: TransitionLinkProps) {
   const { navigate } = useNavigation()
   return (
     <NextLink
@@ -124,8 +126,9 @@ export function TransitionLink({ href, className, children, onClick, ...rest }: 
         if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
         e.preventDefault()
         onClick?.()
-        navigate(href)
+        navigate(href, scroll === false ? { scroll: false } : undefined)
       }}
+      scroll={scroll}
       {...rest}
     >
       {children}
