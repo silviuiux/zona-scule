@@ -5,8 +5,9 @@ import { HERO_WORD_EVENT } from './AnimatedHero'
 
 /**
  * The hero's search field. Its placeholder follows the rotating headline
- * word: "Toate sculele…" → "caută în 8.191 de scule", the count rolling to
- * the next figure whenever the word changes.
+ * word: "Toate sculele…" → "caută în 8.191 de scule și alte 49.136 de
+ * produse" (the rest of the catalog), both counts rolling to the next
+ * figures whenever the word changes.
  */
 export default function HeroSearch({ totalCount, initial }: { totalCount?: number; initial?: { count: number; noun: string } }) {
   const [q, setQ] = useState('')
@@ -102,7 +103,12 @@ export default function HeroSearch({ totalCount, initial }: { totalCount?: numbe
         {!q && (
           <span className="hero-search-placeholder">
             {shown ? (
-              <>caută în <span className="hero-search-placeholder-count">{shown.toLocaleString('ro')}</span> de {noun}</>
+              <>
+                caută în <span className="hero-search-placeholder-count">{shown.toLocaleString('ro')}</span> de {noun}
+                {totalCount && totalCount > shown ? (
+                  <> și alte <span className="hero-search-placeholder-count">{(totalCount - shown).toLocaleString('ro')}</span> de produse</>
+                ) : null}
+              </>
             ) : 'caută scule, branduri, accesorii'}
           </span>
         )}

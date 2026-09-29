@@ -227,7 +227,7 @@ export default async function HomePage() {
         .hero-search-placeholder {
           position: absolute; left: 0; top: 50%; transform: translateY(-50%);
           pointer-events: none; white-space: nowrap;
-          overflow: hidden; max-width: 100%;
+          overflow: hidden; text-overflow: ellipsis; max-width: 100%;
           font-family: 'Recursive', sans-serif;
           font-size: 14px; color: rgba(0,0,0,0.35);
         }
