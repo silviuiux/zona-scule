@@ -13,6 +13,20 @@ import Image from 'next/image'
 export const pad = (i: number) => String(i + 1).padStart(2, '0')
 export const stagger = (i: number) => ({ ['--i' as string]: i }) as CSSProperties
 
+/**
+ * Card grids run three to a row (4 of 12 columns); so no row is left with a
+ * lone card, some cards go wide (6 columns, two to a row): with one card
+ * over, the first two and the last two; with two over, the last two.
+ * Returns whether card i of n is wide.
+ */
+export const wideCard = (i: number, n: number) => {
+  if (n <= 2) return true
+  const r = n % 3
+  if (r === 2) return i >= n - 2
+  if (r === 1) return i < 2 || i >= n - 2
+  return false
+}
+
 // each word in its own mask, so a title can rise into view word by word
 export const words = (t: string) => t.split(' ').map((w, k, all) => (
   <Fragment key={k}><span className="zs-w"><span style={{ '--w': k } as CSSProperties}>{w}</span></span>{k < all.length - 1 ? ' ' : ''}</Fragment>

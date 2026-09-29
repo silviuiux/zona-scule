@@ -8,7 +8,7 @@ import { getBrandsBySubcategories, getApplicationImage, getProductDetail } from 
 import { SOLUTIONS_CSS, STORY_CSS } from './styles'
 import { SOLUTION_COVERS } from '@/lib/solution-covers'
 import StoryMotion from './StoryMotion'
-import { stagger } from './editorial'
+import { stagger, wideCard } from './editorial'
 
 export const revalidate = 3600
 
@@ -35,8 +35,8 @@ export default async function ZonaSolutiiPage() {
   const series = featured ? data.filter(d => d.s.parent === featured.s.slug) : []
   type Row = (typeof data)[number]
 
-  const card = ({ s, image, products, brands }: Row, compact = false) => (
-    <Link key={s.slug} href={`/zona-solutii/${s.slug}`} className={`zs-card${compact ? ' compact' : ''}`}>
+  const card = ({ s, image, products, brands }: Row, compact = false, wide = false) => (
+    <Link key={s.slug} href={`/zona-solutii/${s.slug}`} className={`zs-card${compact ? ' compact' : ''}${wide ? ' wide' : ''}`}>
       <div className="zs-card-img">
         {image && <Image src={image} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 460px" style={{ objectFit: 'cover' }} />}
       </div>
@@ -124,7 +124,7 @@ export default async function ZonaSolutiiPage() {
                   <h2 className="zs-group-title">{t.label}</h2>
                   <span className="zs-group-count">{t.eyebrow} · {rows.length}</span>
                 </div>
-                <div className="zs-cards">{rows.map(r => card(r, t.id !== 'meserie'))}</div>
+                <div className="zs-cards">{rows.map((r, k) => card(r, t.id !== 'meserie', wideCard(k, rows.length)))}</div>
               </section>
             )
           })}

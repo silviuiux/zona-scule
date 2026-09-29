@@ -11,7 +11,7 @@ import { getBrandHref } from '@/lib/brand-content'
 import { SOLUTIONS_CSS, STORY_CSS } from '../styles'
 import { SOLUTION_COVERS } from '@/lib/solution-covers'
 import StoryMotion from '../StoryMotion'
-import { editorial, pad, stagger } from '../editorial'
+import { editorial, pad, stagger, wideCard } from '../editorial'
 
 // One template for every story in lib/solutions.ts, laid out as an
 // editorial long-read: a quiet hero, a full-bleed photo, then the story's
@@ -372,7 +372,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             {chapter(inSeries.length > 0 ? `Din seria ${seriesRoot.profession}` : 'Alte soluții')}
             <div className="zs-cards">
               {related.map((r, k) => (
-                <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className="zs-card" data-reveal style={stagger(k)}>
+                <Link key={r.slug} href={`/zona-solutii/${r.slug}`} className={`zs-card${wideCard(k, related.length) ? ' wide' : ''}`} data-reveal style={stagger(k)}>
                   <div className="zs-card-body">
                     <span className="zs-card-domain">{r.domain}</span>
                     <span className="zs-card-title">{r.title ?? r.profession}</span>

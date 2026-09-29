@@ -122,7 +122,13 @@ export const SOLUTIONS_CSS = `
   .zs-faq-item p { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.7; color: rgba(0,0,0,0.6); padding: 0 0 24px; max-width: 640px; }
 
   /* ── Story cards (index + related) ── */
-  .zs-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  /* three to a row on 12 columns; .wide cards take 6 (see wideCard) so no
+     row is left with a single card. A wide card's photo is 2:1, so it
+     stands as tall as its 4:3 neighbours. */
+  .zs-cards { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  .zs-cards > .zs-card { grid-column: span 4; }
+  .zs-cards > .zs-card.wide { grid-column: span 6; }
+  .zs-card.wide .zs-card-img { aspect-ratio: 2 / 1; }
   .zs-card {
     display: flex; flex-direction: column; overflow: hidden;
     border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: rgb(255,255,255);
@@ -277,6 +283,8 @@ export const SOLUTIONS_CSS = `
     .zs-feature-img { min-height: 56vh; }
     .zs-feature-subs { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 40px; }
     .zs-cards, .zs-check { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .zs-cards > .zs-card, .zs-cards > .zs-card.wide { grid-column: auto; }
+    .zs-card.wide .zs-card-img { aspect-ratio: 4 / 3; }
     .zs-lead { grid-column: 1 / -1; padding-right: 0; }
     .zs-steps { grid-column: 1 / -1; margin-top: 16px; }
     .zs-faq-title, .zs-faq-list { grid-column: 1 / -1; }
