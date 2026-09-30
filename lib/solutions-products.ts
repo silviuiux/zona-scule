@@ -294,7 +294,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         text: 'Mașina a doua ideală pentru orice profesionist — sau prima, pentru cei care montează toată ziua. Pentru găuri mari sau zidărie, rămâne nevoie de o mașină de 18 V.',
         forWho: ['Electricieni', 'Instalatori', 'Montatori de mobilier și uși', 'Montaj HVAC'],
       },
-      { kind: 'carousel', title: 'Alte scule pe 12 V', text: 'Aceeași platformă, aceiași acumulatori.', subs: ['Sistemul de 12 V'] },
+      { kind: 'carousel', title: 'Alte scule pe 12 V', text: 'Aceeași platformă, aceiași acumulatori.', subs: ['Maşini de găurit/înşurubat cu acumulator', 'Şurubelniţe cu acumulator'] },
     ],
   },
   {
@@ -369,7 +369,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         forWho: ['Instalatori (încălzire, încălzire în pardoseală)', 'Electricieni (tablouri, conexiuni)', 'Mentenanță industrială', 'Service auto și HVAC'],
       },
       { kind: 'carousel', title: 'Detectare și inspecție', text: 'Detectoare, camere de inspecție și alte aparate de diagnostic.', subs: ['Diagnosticare și inspecție', 'Detectoare', 'Camere termice şi termodetectoare'] },
-      { kind: 'carousel', title: 'Sistemul de 12 V', text: 'Acumulatori și scule pe aceeași platformă.', subs: ['Sistemul de 12 V'] },
+      { kind: 'carousel', title: 'Sistemul de 12 V', text: 'Acumulatori și scule pe aceeași platformă.', subs: ['Maşini de găurit/înşurubat cu acumulator', 'Baterii & încărcătoare'] },
     ],
   },
 ]
