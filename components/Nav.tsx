@@ -123,6 +123,16 @@ export default function Nav() {
     inputRef.current?.blur()
   }, [router])
 
+  const [menuQ, setMenuQ] = useState('')
+  const submitMenuSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const t = menuQ.trim()
+    if (!t) return
+    router.push(`/produse?q=${encodeURIComponent(t)}`)
+    setMenuQ('')
+    setMenuOpen(false)
+  }
+
   const openSearch = () => { setSearchOpen(true); setTimeout(() => inputRef.current?.focus(), 30) }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -302,19 +312,41 @@ export default function Nav() {
         }
         .nav-burger span:nth-child(1) { transform: translateY(-4px); }
         .nav-burger span:nth-child(2) { transform: translateY(4px); }
+        .nav.menu-open .nav-search-wrap { visibility: hidden; }
         .nav.menu-open .nav-burger span:nth-child(1) { transform: rotate(45deg); }
         .nav.menu-open .nav-burger span:nth-child(2) { transform: rotate(-45deg); }
         @media (max-width: 768px) { .nav-burger { display: flex; } }
 
         .nav-menu {
           position: fixed; inset: 0; z-index: 99;
-          padding: calc(var(--nav-h) + 40px) var(--gutter) calc(32px + env(safe-area-inset-bottom));
+          padding: calc(var(--nav-h) + 24px) var(--gutter) calc(32px + env(safe-area-inset-bottom));
+          overflow-y: auto; overscroll-behavior: contain;
           background: rgb(255,255,255);
           display: flex; flex-direction: column;
           opacity: 0; visibility: hidden; pointer-events: none;
           transition: opacity 300ms ease, visibility 0s linear 300ms;
         }
         .nav-menu.open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 300ms ease; }
+        .nav-menu-search {
+          display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 8px 0 16px; margin-bottom: 24px;
+          border: 1px solid rgba(0,0,0,0.16); border-radius: 6px; background: rgb(255,255,255); color: rgb(18,18,18);
+          opacity: 0; transform: translateY(8px);
+          transition: opacity 400ms ease 40ms, transform 600ms cubic-bezier(0.2, 0.7, 0.1, 1) 40ms, border-color 200ms;
+        }
+        .nav-menu.open .nav-menu-search { opacity: 1; transform: none; }
+        .nav-menu-search:focus-within { border-color: rgb(18,18,18); }
+        .nav-menu-search svg { flex-shrink: 0; }
+        .nav-menu-search input {
+          flex: 1 1 auto; min-width: 0; border: none; outline: none; background: none;
+          font-family: 'Recursive', sans-serif; font-size: 16px; color: rgb(18,18,18);
+        }
+        .nav-menu-search input::placeholder { color: rgba(0,0,0,0.4); }
+        .nav-menu-search input::-webkit-search-cancel-button { display: none; }
+        .nav-menu-search button {
+          flex-shrink: 0; height: 40px; padding: 0 14px; border: none; border-radius: 4px; cursor: pointer;
+          background: rgb(18,18,18); color: rgb(255,255,255);
+          font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+        }
         .nav-menu-list { list-style: none; display: flex; flex-direction: column; }
         .nav-menu-item { border-top: 1px solid rgba(0,0,0,0.08); overflow: hidden; }
         .nav-menu-item:last-child { border-bottom: 1px solid rgba(0,0,0,0.08); }
@@ -341,7 +373,7 @@ export default function Nav() {
         .nav-menu-foot a.red { color: rgb(217,44,43); }
         @media (min-width: 769px) { .nav-menu { display: none; } }
         @media (prefers-reduced-motion: reduce) {
-          .nav-menu-link, .nav-menu-foot { transition: none; transform: none; }
+          .nav-menu-link, .nav-menu-foot, .nav-menu-search { transition: none; transform: none; }
         }
       `}</style>
 
@@ -417,6 +449,19 @@ export default function Nav() {
       </nav>
 
       <div id="nav-menu" className={`nav-menu${menuOpen ? ' open' : ''}`} aria-hidden={!menuOpen}>
+        <form className="nav-menu-search" role="search" onSubmit={submitMenuSearch}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input
+            type="search"
+            value={menuQ}
+            onChange={e => setMenuQ(e.target.value)}
+            placeholder="Caută în catalog…"
+            aria-label="Caută produse"
+            enterKeyHint="search"
+            tabIndex={menuOpen ? 0 : -1}
+          />
+          <button type="submit" tabIndex={menuOpen ? 0 : -1}>Caută</button>
+        </form>
         <ol className="nav-menu-list">
           {MENU.map((m, i) => (
             <li key={m.href} className="nav-menu-item">
