@@ -14,17 +14,40 @@ export const pad = (i: number) => String(i + 1).padStart(2, '0')
 export const stagger = (i: number) => ({ ['--i' as string]: i }) as CSSProperties
 
 /**
- * Card grids run three to a row (4 of 12 columns); so no row is left with a
- * lone card, some cards go wide (6 columns, two to a row): with one card
- * over, the first two and the last two; with two over, the last two.
- * Returns whether card i of n is wide.
+ * Card grids on 12 columns, laid out in rows so no row is left with a lone
+ * card: rows of three mix one wide card (6 columns) with two narrow ones
+ * (3 + 3), the wide one alternating left and right; where the count doesn't
+ * split into threes, rows of four narrow cards (3 × 4) take the rest (two
+ * wide ones side by side only when nothing else fits: 2 or 5 cards).
+ * Returns the column span of card i of n.
  */
-export const wideCard = (i: number, n: number) => {
-  if (n <= 2) return true
-  const r = n % 3
-  if (r === 2) return i >= n - 2
-  if (r === 1) return i < 2 || i >= n - 2
-  return false
+export const cardSpan = (i: number, n: number): 3 | 6 => {
+  // rows of 3 and 4 (fewest fours); 2-card rows only for n = 1, 2, 5
+  let fours = 0
+  while (fours * 4 <= n && (n - fours * 4) % 3 !== 0) fours++
+  let rows: number[]
+  if (fours * 4 > n) rows = n <= 2 ? [n] : [...Array(Math.floor((n - 2) / 3)).fill(3), 2]
+  else {
+    const threes = (n - fours * 4) / 3
+    rows = []
+    // alternate three / four, starting with a three
+    for (let t = threes, f = fours; t + f > 0;) {
+      if (t > 0 && (rows.length % 2 === 0 || f === 0)) { rows.push(3); t-- } else { rows.push(4); f-- }
+    }
+  }
+  let start = 0, threeNo = 0
+  for (const size of rows) {
+    if (i < start + size) {
+      const k = i - start
+      if (size === 4) return 3
+      if (size <= 2) return 6
+      const wideFirst = threeNo % 2 === 0
+      return (wideFirst ? k === 0 : k === 2) ? 6 : 3
+    }
+    if (size === 3) threeNo++
+    start += size
+  }
+  return 3
 }
 
 // each word in its own mask, so a title can rise into view word by word
