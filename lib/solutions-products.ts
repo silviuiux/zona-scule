@@ -72,7 +72,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         ],
       },
       { kind: 'carousel', title: 'Chei tubulare', text: 'Tubulare de impact pentru prinderea de 3/4″ și adaptoare.', subs: ['Chei tubulare'] },
-      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'ProCORE18V de mare capacitate pentru cuplu maxim.', subs: ['Acumulatori şi încărcătoare', 'Acumulatori'] },
+      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'ProCORE18V de mare capacitate pentru cuplu maxim.', subs: ['Baterii & încărcătoare', 'Acumulatori'] },
       {
         kind: 'verdict',
         text: 'O mașină de impact pentru îmbinări mari, care înlocuiește cheia cu braț lung și, pe multe șantiere, pneumaticul. Merită acolo unde se strâng și se desfac zilnic șuruburi M16–M24; pentru montaj ușor, o mașină de 1/2″ e mai potrivită.',
@@ -147,7 +147,7 @@ export const PRODUCT_SOLUTIONS: Solution[] = [
         text: 'Un polizor pe acumulator care nu cere compromis la putere, cu cele mai complete funcții de siguranță din clasă. Potrivit ca polizor principal pe șantier și în atelier, oriunde un cablu încurcă.',
         forWho: ['Lăcătuși și sudori', 'Instalatori', 'Constructori și montatori', 'Echipe de mentenanță'],
       },
-      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'ProCORE18V pentru putere maximă.', subs: ['Acumulatori şi încărcătoare', 'Acumulatori'] },
+      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'ProCORE18V pentru putere maximă.', subs: ['Baterii & încărcătoare', 'Acumulatori'] },
     ],
   },
   {

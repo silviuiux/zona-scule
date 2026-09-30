@@ -106,7 +106,7 @@ const BASE_SOLUTIONS: Solution[] = [
         ],
       },
       { kind: 'carousel', title: 'Șurubelnițe izolate și de precizie', text: 'VDE 1 000 V pentru tablou și prize, profile PH, PZ și plat pentru cleme și aparataj.', subs: ['Șurubelnițe VDE', 'Șurubelnițe'] },
-      { kind: 'carousel', title: 'Clești pentru cablu', text: 'Dezizolare, sertizare, tăiere — cleștele potrivit pentru fiecare secțiune de conductor.', subs: ['Clești', 'Clește', 'Clești - Dispozitive de tăiat - Lanterne pivotante'] },
+      { kind: 'carousel', title: 'Clești pentru cablu', text: 'Dezizolare, sertizare, tăiere — cleștele potrivit pentru fiecare secțiune de conductor.', subs: ['Clești', 'Clești - Dispozitive de tăiat - Lanterne pivotante'] },
       { kind: 'image' },
       { kind: 'carousel', title: 'Detectare, măsură și inspecție', text: 'Detectoare de materiale, telemetre și camere termice care arată conexiunile supraîncălzite înainte să devină o problemă.', subs: ['Detectoare', 'Aparate de măsură', 'Diagnosticare și inspecție', 'Camere termice şi termodetectoare'] },
       {

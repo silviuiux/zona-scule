@@ -298,7 +298,7 @@ export const MORE_SOLUTIONS: Solution[] = [
           { title: 'Echipe complete', text: 'Protecție, măsură și depozitare mobilă, pentru fiecare echipă.' },
         ],
       },
-      { kind: 'carousel', title: 'Platforme de acumulatori', text: 'Scule, seturi combinate, acumulatori și încărcătoare pe 18 V.', subs: ['Sistemul de 18 V', 'Seturi combinate', 'Acumulatori şi încărcătoare'] },
+      { kind: 'carousel', title: 'Platforme de acumulatori', text: 'Scule, seturi combinate, acumulatori și încărcătoare pe 18 V.', subs: ['Sistemul de 18 V', 'Seturi combinate', 'Baterii & încărcătoare'] },
       { kind: 'carousel', title: 'Aspirarea prafului', text: 'Extractoare și aspiratoare pentru praf de beton, plus atașamente direct la sculă.', subs: ['Extractoare praf & aspiratoare', 'Atașamente extractoare praf & aspiratoare', 'Aspiratoare industriale'] },
       { kind: 'image' },
       { kind: 'carousel', title: 'Măsură și trasare', text: 'Nivele laser, detectoare și instrumente de măsură.', subs: ['Nivele laser', 'Nivele laser cu linii în cruce', 'Instrumente masura', 'Detectoare'] },
@@ -762,7 +762,7 @@ export const MORE_SOLUTIONS: Solution[] = [
           { when: 'Ai nevoie de autonomie, nu de putere', then: 'Un acumulator cu mai mulți Ah, nu o sculă mai mare.' },
         ],
       },
-      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'Capacități diferite pentru aceeași platformă.', subs: ['Acumulatori şi încărcătoare', 'Acumulatori', 'Seturi acumulator și încărcător', 'Încărcătoare'] },
+      { kind: 'carousel', title: 'Acumulatori și încărcătoare', text: 'Capacități diferite pentru aceeași platformă.', subs: ['Baterii & încărcătoare', 'Acumulatori', 'Seturi acumulator și încărcător', 'Încărcătoare'] },
       { kind: 'carousel', title: 'Scule cu motor fără perii', text: 'Mai multă putere și autonomie din același acumulator.', subs: ['Scule electrice cu motor fără perii'] },
       { kind: 'tip', text: 'Cumpără la început un set cu două acumulatori și un încărcător rapid — iar sculele următoare, fără acumulator („solo”). Iese mult mai ieftin.', by: TEAM },
       {
