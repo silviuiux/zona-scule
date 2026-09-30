@@ -31,6 +31,8 @@ export default function ContactForm({
     email: '',
   })
   const [picked, setPicked] = useState<RecentProduct[]>([])
+  const [honeypot, setHoneypot] = useState('')
+  const [shownAt] = useState(() => Date.now())
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -58,6 +60,8 @@ export default function ContactForm({
       nume: form.nume,
       email: form.email,
       telefon: form.telefon,
+      website: honeypot,
+      elapsedMs: Date.now() - shownAt,
       produs: what,
       mesaj: [
         `Mă numesc ${form.nume.trim()} și sunt interesat să obțin o ofertă pentru ${what}.`,
@@ -179,6 +183,12 @@ export default function ContactForm({
           </p>
         ) : (
           <form onSubmit={handleSubmit}>
+            {/* Honeypot — off-screen, skipped by keyboard and screen readers */}
+            <input
+              type="text" name="website" value={honeypot} onChange={e => setHoneypot(e.target.value)}
+              tabIndex={-1} autoComplete="off" aria-hidden="true"
+              style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }}
+            />
             <div className="cf-letter">
               <div className="cf-line">
                 <span>Mă numesc</span>

@@ -205,6 +205,7 @@ export default function StatusClient({ rows: rawRows }: { rows: EnrichmentRow[] 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span className="admin-badge">Status produse</span>
             <a href="/admin" className="nav-link">Categorii</a>
+            <a href="/admin/mesaje" className="nav-link">Mesaje</a>
             <form action={logoutAction} style={{ margin: 0 }}>
               <button type="submit" className="nav-link" style={{ background: 'rgba(255,255,255,0.06)', cursor: 'pointer' }}>Ieșire</button>
             </form>

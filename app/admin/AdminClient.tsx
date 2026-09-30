@@ -431,6 +431,7 @@ export default function AdminClient({
             <span className="admin-badge">Category Audit</span>
             <a href="/admin/catalog" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Catalog</a>
             <a href="/admin/status" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Status produse</a>
+            <a href="/admin/mesaje" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Mesaje</a>
             <form action={logoutAction} style={{ margin: 0 }}>
               <button type="submit" className="btn btn-ghost">Ieșire</button>
             </form>

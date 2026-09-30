@@ -1,6 +1,7 @@
 'use server'
 
 import { supabase } from '@/lib/supabase'
+import { isLikelySpam } from '@/lib/contact-spam'
 
 export type ContactResult = { ok: boolean; error?: string }
 
@@ -11,6 +12,10 @@ export type ContactInput = {
   companie?: string
   produs?: string
   mesaj: string
+  /** Honeypot: a hidden field people never see; bots fill every input. */
+  website?: string
+  /** Milliseconds between the form rendering and the submit. */
+  elapsedMs?: number
 }
 
 const esc = (s: string) =>
@@ -87,6 +92,12 @@ export async function submitContactMessage(data: ContactInput): Promise<ContactR
   const email = data.email?.trim()
   const mesaj = data.mesaj?.trim()
 
+  // Bots: a filled honeypot or a sub-second submit is dropped silently —
+  // they get the same "sent" answer so there is nothing to tune against.
+  if (data.website?.trim() || (typeof data.elapsedMs === 'number' && data.elapsedMs < 2500)) {
+    return { ok: true }
+  }
+
   if (!nume || !email || !mesaj) {
     return { ok: false, error: 'Completați nume, email și mesaj.' }
   }
@@ -104,7 +115,12 @@ export async function submitContactMessage(data: ContactInput): Promise<ContactR
     mesaj,
   }
 
+  // Random-letter submissions are kept (flagged) so /admin/mesaje can show
+  // them, but they never trigger an email.
+  const spam = isLikelySpam({ ...payload })
+
   const { error } = await supabase.from('contact_messages').insert({
+    spam,
     nume,
     email,
     telefon: payload.telefon || null,
@@ -122,7 +138,7 @@ export async function submitContactMessage(data: ContactInput): Promise<ContactR
   }
 
   // Best-effort notification - the row is saved regardless of email outcome.
-  await sendContactNotification(payload)
+  if (!spam) await sendContactNotification(payload)
 
   return { ok: true }
 }

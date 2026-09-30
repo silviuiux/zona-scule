@@ -386,6 +386,7 @@ export default function CatalogClient({
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span className="cat-badge">{total.toLocaleString('ro')} produse</span>
             <a href="/admin" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Categorii</a>
+            <a href="/admin/mesaje" className="btn btn-ghost" style={{ textDecoration: 'none', display: 'inline-block' }}>Mesaje</a>
             <button
               className={refreshDone ? 'btn btn-green' : 'btn btn-red'}
               onClick={handleRefresh}
