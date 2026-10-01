@@ -4,7 +4,7 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 
 /**
  * The tiles filter's brand row: one pill per brand (name only), toggling
- * like the pill rows (several brands OR together), "Toate" first. A
+ * like the pill rows (several brands OR together), "Toate brandurile" first. A
  * carousel sized so six and a half pills show — the half says "there's
  * more". The arrows sit just outside the row, in the page gutter, like the
  * catalog's other carousels.
@@ -73,7 +73,7 @@ export default function BrandRail({
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
       </button>
       <div ref={track} className="br-track">
-        <Link href={allHref} className={`br-pill${noneOn ? ' on' : ''}`} aria-pressed={noneOn}>Toate</Link>
+        <Link href={allHref} className={`br-pill${noneOn ? ' on' : ''}`} aria-pressed={noneOn}>Toate brandurile</Link>
         {items.map(b => (
           <Link key={b.name} href={b.href} className={`br-pill${b.on ? ' on' : ''}`} aria-pressed={b.on}>{b.name}</Link>
         ))}

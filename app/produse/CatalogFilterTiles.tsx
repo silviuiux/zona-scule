@@ -2,6 +2,7 @@
 import { TransitionLink as Link } from '@/components/NavigationProgress'
 import { subList, type CategoryWithCount, type BrandWithCount, type SubcategoryWithCount } from '@/lib/supabase'
 import BrandRail from './BrandRail'
+import ColumnRail from './ColumnRail'
 
 /**
  * Tiles-mode filters for /produse (desktop): the catalog as a shop floor.
@@ -59,6 +60,19 @@ export default function CatalogFilterTiles({
   const shownSubs = subs
     .filter(s => s.product_count > 0 || isSub(s.name))
     .sort((a, b) => a.name.localeCompare(b.name, 'ro'))
+  // "Toate" first, then the subcategories A→Z, cut into columns of 12 rows
+  // that sit side by side in a carousel
+  type Row = { all: true } | { all: false; s: SubcategoryWithCount; on: boolean; next: string[] }
+  const rows: Row[] = [
+    { all: true },
+    ...shownSubs.map(s => {
+      const on = isSub(s.name)
+      return { all: false as const, s, on, next: on ? subSel.filter(v => norm(v) !== norm(s.name)) : [...subSel, s.name] }
+    }),
+  ]
+  const ROWS_PER_COLUMN = 12
+  const columns: Row[][] = []
+  for (let i = 0; i < rows.length; i += ROWS_PER_COLUMN) columns.push(rows.slice(i, i + ROWS_PER_COLUMN))
 
   return (
     <div className={`ft${picked ? ' picked' : ''}`}>
@@ -109,13 +123,12 @@ export default function CatalogFilterTiles({
         .ft-panel-d[open] .ft-panel-toggle .when-open { display: inline; }
         .ft-panel-d[open] .ft-panel-toggle .when-closed { display: none; }
         .ft-panel-sel { color: rgb(217,44,43); }
-        .ft-panel-d[open] .ft-subs { padding-bottom: 32px; }
+        .ft-panel-d[open] .cr { padding-bottom: 32px; }
         .ft-panel-title { font-family: 'Neuton', serif; font-size: 36px; line-height: 1; color: rgb(0,0,0); }
         .ft-panel-meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em; color: rgba(0,0,0,0.45); text-transform: uppercase; }
         .ft-panel-close { position: absolute; top: 30px; right: 32px; z-index: 1; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(0,0,0); text-decoration: none; }
         .ft-panel-close:hover { color: rgb(217,44,43); }
-        .ft-subs { list-style: none; columns: 4; column-gap: 32px; }
-        .ft-sub { break-inside: avoid; }
+        .ft-subs { list-style: none; }
         .ft-sub a {
           display: flex; align-items: baseline; gap: 10px; padding: 7px 0;
           border-bottom: 1px solid rgba(0,0,0,0.06);
@@ -135,7 +148,7 @@ export default function CatalogFilterTiles({
         .ft-sub.on a { color: rgb(217,44,43); }
         .ft-sub.on a span { color: rgb(217,44,43); }
 
-        @media (max-width: 1200px) { .ft-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } .ft-subs { columns: 3; } }
+        @media (max-width: 1200px) { .ft-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
       `}</style>
 
       <BrandRail
@@ -174,20 +187,21 @@ export default function CatalogFilterTiles({
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
             </span>
           </summary>
-          <ul className="ft-subs">
-            <li className={`ft-sub all${subSel.length === 0 ? ' on' : ''}`}>
-              <Link href={href(activeBrands, [catOne.name])}>Toate<span>{catOne.product_count.toLocaleString('ro')}</span></Link>
-            </li>
-            {shownSubs.map(s => {
-              const on = isSub(s.name)
-              const next = on ? subSel.filter(v => norm(v) !== norm(s.name)) : [...subSel, s.name]
-              return (
-                <li key={s.id} className={`ft-sub${on ? ' on' : ''}`}>
-                  <Link href={href(activeBrands, [catOne.name], next)} aria-pressed={on} scroll={false}><i aria-hidden="true" />{s.name}<span>{s.product_count.toLocaleString('ro')}</span></Link>
-                </li>
-              )
-            })}
-          </ul>
+          <ColumnRail label="Subcategorii">
+            {columns.map((col, ci) => (
+              <ul key={ci} className="ft-subs">
+                {col.map(item => item.all ? (
+                  <li key="__all" className={`ft-sub all${subSel.length === 0 ? ' on' : ''}`}>
+                    <Link href={href(activeBrands, [catOne.name])}>Toate<span>{catOne.product_count.toLocaleString('ro')}</span></Link>
+                  </li>
+                ) : (
+                  <li key={item.s.id} className={`ft-sub${item.on ? ' on' : ''}`}>
+                    <Link href={href(activeBrands, [catOne.name], item.next)} aria-pressed={item.on} scroll={false}><i aria-hidden="true" />{item.s.name}<span>{item.s.product_count.toLocaleString('ro')}</span></Link>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </ColumnRail>
         </details>
         </div>
       )}

@@ -2,7 +2,7 @@ import { TransitionLink as Link } from '@/components/NavigationProgress'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount, getCategoriesByBrands, filterList, subList } from '@/lib/supabase'
+import { getProducts, getCategoriesWithCount, getBrandsByFilter, getAllSubcategoriesWithCount, getSubcategoriesByBrandName, getSubcategoriesByCategoryName, getRawProductCount, getCategoriesByBrands, getSubcategoryCountsByFilters, filterList, subList } from '@/lib/supabase'
 import LoadMore from './LoadMore'
 import SubcategoryBar from './SubcategoryBar'
 import Sidebar from './Sidebar'
@@ -66,6 +66,40 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     catOne ? getSubcategoriesByCategoryName(catOne) : Promise.resolve([]),
     getRawProductCount(),
   ])
+
+  // With a brand or a search on top of the category, the panel's
+  // subcategory counts follow them too — a subcategory only shows a number
+  // the listing can actually deliver under the same filters.
+  const scopedSubs = catOne && (brandSel.length || sp.q)
+    ? await getSubcategoryCountsByFilters(categoriesResult.find(c => c.name.toLowerCase() === catOne.toLowerCase())?.name ?? catOne, brandSel, sp.q)
+        .then(counts => categorySubs.map(s => ({ ...s, product_count: counts[s.name.toLowerCase().trim()] ?? 0 })))
+    : categorySubs
+
+  // Zero results: work out which single filter is in the way, by counting
+  // what each one-filter-less combination would return.
+  const subSel = subList(sp.subcategorie)
+  const emptyHints: { label: string; href: string; count: number }[] = []
+  if (total === 0) {
+    const url = (b: string[], c: string[], s: string[], q?: string) => {
+      const p = new URLSearchParams()
+      if (b.length) p.set('brand', b.join(','))
+      if (c.length) p.set('categorie', c.join(','))
+      if (s.length) p.set('subcategorie', s.join('|'))
+      if (q) p.set('q', q)
+      const qs = p.toString().replace(/%2C/g, ',').replace(/%7C/g, '|')
+      return qs ? `/produse?${qs}` : '/produse'
+    }
+    const count = (b: string[], c: string[], s: string[], q?: string) =>
+      getProducts({ page: 1, pageSize: 1, brandName: b, categoryText: c, subcategoryText: s.join('|') || undefined, search: q })
+        .then(r => r.total).catch(() => 0)
+    const tries: { label: string; b: string[]; c: string[]; s: string[]; q?: string }[] = []
+    if (brandSel.length) tries.push({ label: brandSel.length === 1 ? `Fără brandul ${brandSel[0]}` : 'Fără filtrul de branduri', b: [], c: catSel, s: subSel, q: sp.q })
+    if (subSel.length) tries.push({ label: subSel.length === 1 ? `Fără subcategoria ${subSel[0]}` : 'Fără subcategoriile alese', b: brandSel, c: catSel, s: [], q: sp.q })
+    if (catSel.length) tries.push({ label: catSel.length === 1 ? `Fără categoria ${catSel[0]}` : 'Fără filtrul de categorii', b: brandSel, c: [], s: [], q: sp.q })
+    if (sp.q) tries.push({ label: `Fără căutarea „${sp.q}”`, b: brandSel, c: catSel, s: subSel })
+    const counts = await Promise.all(tries.map(t => count(t.b, t.c, t.s, t.q)))
+    tries.forEach((t, i) => emptyHints.push({ label: t.label, href: url(t.b, t.c, t.s, t.q), count: counts[i] }))
+  }
 
   // Hide the catch-all "Necategorizat" bucket from the sidebar category list
   const categories = categoriesResult.filter(c => c.name.toLowerCase() !== 'necategorizat')
@@ -262,6 +296,27 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           margin-bottom: 24px;
           display: flex; align-items: center; gap: 16px;
         }
+        .empty-state {
+          padding: 40px; margin-bottom: 40px;
+          background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.07); border-radius: 4px;
+          max-width: 760px;
+        }
+        .empty-kicker { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(217,44,43); }
+        .empty-title { font-family: 'Neuton', serif; font-weight: 400; font-size: 32px; line-height: 1.1; color: rgb(0,0,0); margin: 12px 0 16px; }
+        .empty-text { font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(0,0,0,0.7); margin-bottom: 20px; }
+        .empty-text b { color: rgb(0,0,0); font-weight: 600; }
+        .empty-hints { list-style: none; margin-bottom: 24px; border-top: 1px solid rgba(0,0,0,0.08); }
+        .empty-hints a {
+          display: flex; align-items: baseline; gap: 12px; padding: 12px 0;
+          border-bottom: 1px solid rgba(0,0,0,0.08); text-decoration: none;
+          font-family: 'Recursive', sans-serif; font-size: 14px; color: rgb(0,0,0);
+          transition: color 150ms;
+        }
+        .empty-hints a:hover { color: rgb(217,44,43); }
+        .empty-hints a span { margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: rgba(0,0,0,0.45); white-space: nowrap; }
+        .empty-reset { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(0,0,0); text-decoration: underline; text-underline-offset: 3px; }
+        .empty-reset:hover { color: rgb(217,44,43); }
+        @media (max-width: 767px) { .empty-state { padding: 24px; } .empty-title { font-size: 26px; } }
         .products-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -499,7 +554,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
               activeCats={catSel}
               activeBrands={brandSel}
               activeSub={sp.subcategorie}
-              subs={categorySubs}
+              subs={scopedSubs}
               search={sp.q}
             />
           }
@@ -540,9 +595,37 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             </div>
           )}
 
-          <div className="products-grid">
-            {products.map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
+          {total === 0 ? (
+            <div className="empty-state" role="status">
+              <span className="empty-kicker">0 rezultate</span>
+              <h2 className="empty-title">Niciun produs nu îndeplinește toate filtrele deodată</h2>
+              <p className="empty-text">
+                Filtrele se combină: un produs apare doar dacă e, în același timp,
+                {brandSel.length > 0 && <> de la <b>{brandSel.join(' sau ')}</b></>}
+                {catSel.length > 0 && <>{brandSel.length > 0 ? ',' : ''} în <b>{catSel.join(' sau ')}</b></>}
+                {subSel.length > 0 && <>{(brandSel.length || catSel.length) ? ',' : ''} în subcategoria <b>{subSel.join(' sau ')}</b></>}
+                {sp.q && <>{(brandSel.length || catSel.length || subSel.length) ? ' și' : ''} se potrivește cu <b>„{sp.q}”</b></>}.
+                {' '}Luate separat au produse, dar intersecția lor e goală.
+                {!sp.q && ' În listă apar doar produsele cu fotografie.'}
+              </p>
+              {emptyHints.some(h => h.count > 0) ? (
+                <ul className="empty-hints">
+                  {emptyHints.filter(h => h.count > 0).sort((a, b) => b.count - a.count).map(h => (
+                    <li key={h.href}>
+                      <Link href={h.href}>{h.label}<span>{h.count.toLocaleString('ro')} {h.count === 1 ? 'produs' : 'produse'}</span></Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="empty-text">Nici scoțând un singur filtru nu apar produse — încearcă o combinație nouă.</p>
+              )}
+              <Link href="/produse" className="empty-reset">Șterge toate filtrele</Link>
+            </div>
+          ) : (
+            <div className="products-grid">
+              {products.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
 
           {total > pageSize && (
             <LoadMore

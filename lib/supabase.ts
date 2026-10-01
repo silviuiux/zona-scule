@@ -122,6 +122,17 @@ export const filterList = (v?: string | string[] | null): string[] =>
 export const subList = (v?: string | string[] | null): string[] =>
   (Array.isArray(v) ? v : v ? v.split('|') : []).map(s => s.trim()).filter(Boolean)
 
+/** Prefix tsquery for the search box: "scul bos" → "scul:* & bos:*". */
+export function toPrefixTsQuery(search: string): string {
+  return search
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(t => t.replace(/[!&|()'":\\<>*]/g, '') + ':*')
+    .filter(t => t.length > 2) // drop empty after sanitizing
+    .join(' & ')
+}
+
 export async function getProducts({
   page = 1,
   pageSize = 24,
@@ -196,13 +207,7 @@ export async function getProducts({
     // Use the generated `search_vector` tsvector column with the existing GIN
     // index (`products_search_idx`). Build a prefix tsquery so partial words
     // ("scul" → "scule", "bos" → "bosch") still match. Tokens are AND-ed.
-    const tsq = search
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map(t => t.replace(/[!&|()'":\\<>*]/g, '') + ':*')
-      .filter(t => t.length > 2) // drop empty after sanitizing
-      .join(' & ')
+    const tsq = toPrefixTsQuery(search)
     if (tsq) {
       query = query.textSearch('search_vector', tsq, { config: 'ro_unaccent' })
     }
@@ -931,6 +936,26 @@ export async function getSuperviewProducts({
     categoryCount: groups.length,
     filters,
   }
+}
+
+/**
+ * Subcategory counts for one category under the brand / search filters
+ * that are active too, so the tiles panel never promises products the
+ * listing then can't show. Same visibility rules as getProducts().
+ */
+export async function getSubcategoryCountsByFilters(category: string, brands: string[], search?: string): Promise<Record<string, number>> {
+  const tsq = search ? toPrefixTsQuery(search) : ''
+  const { data, error } = await supabase.rpc('count_listing_subcategories', {
+    p_category: category,
+    p_brands: brands.length ? brands : null,
+    p_search: tsq || null,
+  })
+  const counts: Record<string, number> = {}
+  if (error || !data) return counts
+  for (const row of data as { subcategory_text: string; cnt: number }[]) {
+    if (row.subcategory_text) counts[row.subcategory_text.toLowerCase().trim()] = Number(row.cnt)
+  }
+  return counts
 }
 
 export async function getSubcategoriesByCategoryName(categoryName: string): Promise<SubcategoryWithCount[]> {
