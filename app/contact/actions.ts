@@ -28,7 +28,8 @@ const esc = (s: string) =>
  *
  * Env vars (Vercel -> Project -> Settings -> Environment Variables):
  *   RESEND_API_KEY      — required; if missing, notification is skipped.
- *   CONTACT_NOTIFY_TO   — recipient (default: silviuxardelean@gmail.com).
+ *   CONTACT_NOTIFY_TO   — recipient(s), comma-separated for several
+ *                         (default: silviuxardelean@gmail.com).
  *   CONTACT_NOTIFY_FROM — sender; until zonascule.ro is verified in Resend use
  *                         the default "onboarding@resend.dev".
  */
@@ -39,7 +40,10 @@ async function sendContactNotification(data: ContactInput) {
     return
   }
 
-  const to = process.env.CONTACT_NOTIFY_TO || 'silviuxardelean@gmail.com'
+  const to = (process.env.CONTACT_NOTIFY_TO || 'silviuxardelean@gmail.com')
+    .split(/[,;\s]+/)
+    .map(a => a.trim())
+    .filter(Boolean)
   const from = process.env.CONTACT_NOTIFY_FROM || 'Zona Scule <onboarding@resend.dev>'
 
   const row = (label: string, value?: string) =>
@@ -67,7 +71,7 @@ async function sendContactNotification(data: ContactInput) {
       },
       body: JSON.stringify({
         from,
-        to: [to],
+        to,
         reply_to: data.email,
         subject: `Contact nou - ${data.nume}`,
         html,
@@ -75,6 +79,9 @@ async function sendContactNotification(data: ContactInput) {
     })
     if (!res.ok) {
       console.error('Resend notification failed', res.status, await res.text())
+    } else {
+      const { id } = await res.json().catch(() => ({ id: undefined }))
+      console.info('Resend notification sent', id, 'to', to.join(', '))
     }
   } catch (err) {
     console.error('Resend notification error', err)
