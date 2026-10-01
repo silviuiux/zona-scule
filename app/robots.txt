@@ -1,0 +1,10 @@
+# Filtered catalog views (?brand=&categorie=&subcategorie=&q=) multiply into
+# an endless set of URLs; crawlers walking them was most of the site's
+# traffic. Product pages (/produse/<slug>), brand pages and the plain
+# catalog stay crawlable.
+User-Agent: *
+Allow: /
+Disallow: /produse?
+Disallow: /contact?
+Disallow: /admin
+Disallow: /api/
