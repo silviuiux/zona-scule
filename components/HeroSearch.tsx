@@ -70,48 +70,53 @@ export default function HeroSearch({ totalCount, initial }: { totalCount?: numbe
         .hero-search-clear:hover { color: rgb(217,44,43); }
       `}</style>
 
-      {/* Left icon: search when empty (submits), clear-X when active */}
-      {active ? (
-        <button
-          type="button"
-          className="hero-search-icon hero-search-clear"
-          onClick={clear}
-          aria-label="Șterge căutarea"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-      ) : (
-        <button type="submit" className="hero-search-icon" aria-label="Caută">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-          </svg>
-        </button>
-      )}
-
-      <div className="hero-search-input-wrap">
-        <input
-          ref={inputRef}
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder=""
-          autoComplete="off"
-          spellCheck={false}
-        />
-        {!q && (
-          <span className="hero-search-placeholder">
-            {shown ? (
-              <>
-                caută în <span className="hero-search-placeholder-count">{shown.toLocaleString('ro')}</span> de {noun}
-                {totalCount && totalCount > shown ? (
-                  <> și alte <span className="hero-search-placeholder-count">{(totalCount - shown).toLocaleString('ro')}</span> de produse</>
-                ) : null}
-              </>
-            ) : 'caută scule, branduri, accesorii'}
-          </span>
+      {/* Icon + input. A layout no-op on desktop (display: contents);
+          on mobile it becomes the bordered field above the full-width
+          button (see the hero styles in app/page.tsx). */}
+      <div className="hero-search-field">
+        {/* Left icon: search when empty (submits), clear-X when active */}
+        {active ? (
+          <button
+            type="button"
+            className="hero-search-icon hero-search-clear"
+            onClick={clear}
+            aria-label="Șterge căutarea"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        ) : (
+          <button type="submit" className="hero-search-icon" aria-label="Caută">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
         )}
+
+        <div className="hero-search-input-wrap">
+          <input
+            ref={inputRef}
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder=""
+            autoComplete="off"
+            spellCheck={false}
+          />
+          {!q && (
+            <span className="hero-search-placeholder">
+              {shown ? (
+                <>
+                  caută în <span className="hero-search-placeholder-count">{shown.toLocaleString('ro')}</span> de {noun}
+                  {totalCount && totalCount > shown ? (
+                    <span className="hero-search-placeholder-rest"> și alte <span className="hero-search-placeholder-count">{(totalCount - shown).toLocaleString('ro')}</span> de produse</span>
+                  ) : null}
+                </>
+              ) : 'caută scule, branduri, accesorii'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Red CTA — submits the typed query when there is one, otherwise

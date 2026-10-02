@@ -184,9 +184,15 @@ export default async function HomePage() {
           max-width: 620px;
         }
         @media (max-width: 768px) {
-          /* Full width instead of the desktop 50% cap — lets the subtitle
-             wrap onto ~2 lines instead of 5 in the narrow mobile column. */
-          .hero-sub { max-width: 100%; }
+          /* Full width instead of the desktop 50% cap, set a touch quieter
+             than the (much bigger) mobile title, and flowing as one
+             paragraph — the desktop line break leaves a ragged orphan. */
+          .hero-sub {
+            max-width: 46ch; margin-top: 0;
+            font-size: 15px; line-height: 1.55;
+            color: rgba(0,0,0,0.62);
+          }
+          .hero-sub br { display: none; }
         }
         .hero-cta-row {
           display: flex; align-items: stretch; gap: 0;
@@ -197,6 +203,8 @@ export default async function HomePage() {
           overflow: hidden;
         }
         /* ── Hero search input ── */
+        /* icon + input wrapper — no box of its own on desktop */
+        .hero-search-field { display: contents; }
         .hero-search-box {
           display: flex; align-items: center; gap: 14px;
           background: rgb(255,255,255);
@@ -537,27 +545,47 @@ export default async function HomePage() {
         @media (max-width: 768px) {
           /* Nav is fixed at --nav-h tall — padding-top must clear it before
              adding the actual breathing room, or content sits flush/under
-             the nav (was 48px total, less than the nav's own height). */
-          .hero { min-height: 75vh; padding-top: calc(var(--nav-h) + 32px); }
+             the nav (was 48px total, less than the nav's own height).
+             No min-height: the hero hugs its content instead of leaving a
+             blank band before the categories, so their first row peeks in. */
+          .hero { min-height: 0; padding-top: calc(var(--nav-h) + 24px); padding-bottom: 48px; }
           .hero-inner { gap: 20px; padding: 0 var(--gutter); }
+          .hero-title { margin-bottom: 4px; }
           .stats-grid { grid-template-columns: 1fr; min-height: 0; }
           .stat-cell, .stat-cell:first-child { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 28px; padding: 28px 0 32px; }
           .stat-cell:last-child { border-bottom: none; }
+          /* Search: a full-width, thumb-height field with the red button
+             stacked under it, instead of both squeezed into one row. */
           .hero-cta-row {
-            flex-direction: column; width: 100%;
+            flex-direction: column; width: 100%; min-width: 0; max-width: 520px;
             border: none; border-radius: 0; box-shadow: none;
-            gap: 12px;
+            overflow: visible; margin-top: 8px;
           }
           .hero-search-box {
-            min-width: 0; width: 100%;
-            height: auto; padding: 9px 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 4px;
+            flex-direction: column; align-items: stretch; gap: 10px;
+            min-width: 0; width: 100%; padding: 0;
+            background: transparent;
           }
+          .hero-search-field {
+            display: flex; align-items: center; gap: 12px;
+            height: 52px; padding: 0 16px;
+            background: rgb(255,255,255);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
+            transition: border-color 150ms;
+          }
+          .hero-search-field:focus-within { border-color: rgba(0,0,0,0.32); }
+          .hero-search-icon svg { width: 16px; height: 16px; }
+          /* 16px keeps iOS Safari from zooming the page on focus */
+          .hero-search-input-wrap input,
+          .hero-search-placeholder { font-size: 16px; }
+          /* just "caută în N de scule" — the "și alte …" tail only truncated */
+          .hero-search-placeholder-rest { display: none; }
           .hero-catalog-cta {
             justify-content: center;
-            height: auto; padding: 12px 24px;
-            border-radius: 3px;
+            height: 52px; padding: 0 24px;
+            border-radius: 4px;
+            font-size: 13px; letter-spacing: 0.06em;
           }
 
           /* Desktop uses an absolutely-positioned masonry (see .cat-card's
@@ -609,7 +637,7 @@ export default async function HomePage() {
       <section className="hero">
         <div className="hero-inner">
           <AnimatedHero brands={brands} words={heroWords} />
-          <p className="hero-sub">Scule electrice, abrazive și echipamente pentru industrie și construcții.<br />Branduri alese de profesioniști, de peste 26 de ani.</p>
+          <p className="hero-sub">Scule electrice, abrazive și echipamente pentru industrie și construcții. <br />Branduri alese de profesioniști, de peste 26 de ani.</p>
           <div className="hero-cta-row">
             <HeroSearch totalCount={totalCount} initial={heroWords[0] && { count: heroWords[0].count, noun: heroWords[0].noun }} />
           </div>

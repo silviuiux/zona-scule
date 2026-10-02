@@ -183,8 +183,11 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
           .hero-word-clip { height: 74px; }
         }
 
-        /* On mobile, stack the animated word below TOATE so it doesn't overflow */
+        /* Mobile: a three-line stack (Toate / word / de care ai nevoie.)
+           sized off the viewport so its longest line, "de care ai
+           nevoie." (≈6.2em of Neuton), runs nearly gutter to gutter. */
         @media (max-width: 768px) {
+          .hero-title { --hero-m: clamp(44px, 14vw, 76px); }
           .hero-line1 {
             flex-direction: column;
             align-items: flex-start;
@@ -193,10 +196,33 @@ export default function AnimatedHero({ brands, words }: { brands: Brand[]; words
           .hero-word-toate,
           .hero-animated-word,
           .hero-line2 {
-            font-size: 36px;
-            line-height: 1.05;
+            font-size: var(--hero-m);
+            line-height: 0.94;
+            letter-spacing: -0.015em;
           }
-          .hero-word-clip { height: 44px; }
+          /* The clip is taller than the line (room for ascenders and the
+             p of "aparatele"); the negative margins hand the extra back, so
+             in flow it takes the same 0.94em as the lines around it. */
+          .hero-word-clip {
+            font-size: var(--hero-m);
+            height: 1.2em; padding-bottom: 0;
+            margin: -0.13em 0;
+          }
+          .hero-animated-word { line-height: 1.2em; }
+
+          /* Brand chips: one swipeable row, bleeding to the screen edges,
+             instead of wrapping onto a second line. */
+          .brand-chips {
+            flex-wrap: nowrap; gap: 8px;
+            overflow-x: auto; overscroll-behavior-x: contain;
+            margin: 0 calc(-1 * var(--gutter)) 4px;
+            padding: 0 var(--gutter);
+            scrollbar-width: none;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--gutter), #000 calc(100% - 48px), transparent);
+                    mask-image: linear-gradient(90deg, transparent, #000 var(--gutter), #000 calc(100% - 48px), transparent);
+          }
+          .brand-chips::-webkit-scrollbar { display: none; }
+          .brand-chip { flex-shrink: 0; height: 32px; }
         }
       `}</style>
 
