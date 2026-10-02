@@ -1,6 +1,7 @@
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getProductBySlug, getAdjacentProducts, getFamilyVariantsFull, getApplicationImages } from '@/lib/supabase'
+import { getProductBySlug, getAdjacentProducts, getFamilyVariantsFull, getApplicationImages, getRelatedProducts } from '@/lib/supabase'
+import ProductCard from '@/components/ProductCard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import GallerySection from './GallerySection'
@@ -36,7 +37,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { prevSlug, nextSlug } = adjacent
 
   // sibling variants in the same family (empty if no family / single variant)
-  const familyVariants = product.family_id ? await getFamilyVariantsFull(product.family_id) : []
+  // and the "Produse similare" row, fetched together
+  const [familyVariants, related] = await Promise.all([
+    product.family_id ? getFamilyVariantsFull(product.family_id) : Promise.resolve([]),
+    getRelatedProducts(product).catch(() => ({ products: [], total: 0 })),
+  ])
   const variants = familyVariants.map(v => ({
     slug: v.slug, sku: v.sku, name: v.name, variant_label: v.variant_label,
     specs: v.specs, ean: v.ean,
@@ -266,6 +271,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     {a.detail && <span className="zs-check-why">{a.detail}</span>}
                   </div>
                 ))}
+              </div>
+            </section>
+          )}
+
+          {related.products.length > 0 && product.subcategory_text && (
+            <section className="zs-block">
+              {chapter('Produse similare', `Alte variante din ${product.subcategory_text}, cele mai apropiate de ${model} primele.`, (
+                <Link href={catalogHref({ subcategorie: product.subcategory_text })} className="zs-car-link">
+                  Vezi toate <b>{related.total.toLocaleString('ro')}</b> <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+              <div className="zs-scroll" data-reveal>
+                {related.products.map(p => <ProductCard key={p.id} product={p} />)}
               </div>
             </section>
           )}

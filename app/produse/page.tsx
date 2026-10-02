@@ -46,7 +46,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   // Fetch in parallel. allSubs feeds the unfiltered ("Toate") subcategory
   // pill bar.
-  const [{ products, total }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
+  const [{ products, total, matchMode, matchQuery }, categoriesResult, brands, allSubs, brandSubs, categorySubs, rawTotal] = await Promise.all([
     getProducts({
       page: 1,
       pageSize,
@@ -296,6 +296,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           margin-bottom: 24px;
           display: flex; align-items: center; gap: 16px;
         }
+        .search-note {
+          margin: 16px 0 0; max-width: 720px; padding-left: 12px;
+          font-family: 'Recursive', sans-serif; font-size: 14px; line-height: 1.6;
+          color: rgba(0,0,0,0.7); border-left: 2px solid rgb(217,44,43);
+        }
+        .search-note b { color: rgb(0,0,0); font-weight: 600; }
         .empty-state {
           padding: 40px; margin-bottom: 40px;
           background: rgb(255,255,255); border: 1px solid rgba(0,0,0,0.07); border-radius: 4px;
@@ -494,6 +500,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             <p className="cat-hero-desc">
               Scule electrice și de mână, accesorii și abrazive, aparate de măsură, echipamente de curățenie
               și de protecție — gama completă a producătorilor pe care îi distribuim, pentru profesioniști și firme.
+            </p>
+          )}
+
+          {/* How the search matched when it couldn't take the query as typed */}
+          {sp.q && total > 0 && matchMode === 'corrected' && matchQuery && (
+            <p className="search-note">
+              Nu am găsit „{sp.q}”. Îți arătăm rezultatele pentru <b>„{matchQuery}”</b>.
+            </p>
+          )}
+          {sp.q && total > 0 && matchMode === 'any' && (
+            <p className="search-note">
+              Niciun produs nu conține toate cuvintele din „{sp.q}”. Îți arătăm produsele care conțin măcar unul dintre ele, cele mai relevante primele.
             </p>
           )}
 

@@ -133,6 +133,10 @@ export function toPrefixTsQuery(search: string): string {
     .join(' & ')
 }
 
+/** How search_listing() matched the query: every word, the spelling-
+ *  corrected words, or any of the words. */
+export type SearchMatchMode = 'all' | 'corrected' | 'any'
+
 export async function getProducts({
   page = 1,
   pageSize = 24,
@@ -149,7 +153,30 @@ export async function getProducts({
   subcategoryText?: string | string[]
   search?: string
   featured?: boolean
-} = {}) {
+} = {}): Promise<{ products: Product[]; total: number; matchMode?: SearchMatchMode; matchQuery?: string }> {
+  // A search goes through search_listing() (Postgres): relevance-ranked
+  // instead of price-sorted, with synonyms ("flex" → polizor unghiular),
+  // Romanian word endings, every variant's SKU/EAN/model, and typo
+  // correction / any-word fallback when nothing matches all the words.
+  if (search?.trim() && !featured) {
+    const { data, error } = await supabase.rpc('search_listing', {
+      p_q: search,
+      p_brands: filterList(brandName),
+      p_cats: filterList(categoryText),
+      p_subs: subList(subcategoryText),
+      p_offset: (page - 1) * pageSize,
+      p_limit: pageSize,
+    })
+    if (error) throw error
+    const rows = (data ?? []) as (Product & { total: number; match_mode: SearchMatchMode; match_query: string })[]
+    return {
+      products: rows,
+      total: Number(rows[0]?.total ?? 0),
+      matchMode: rows[0]?.match_mode,
+      matchQuery: rows[0]?.match_query,
+    }
+  }
+
   // product_listing = one row per family (representative variant); products with
   // no family fall back to themselves, so nothing is hidden. 'exact' because
   // estimated counts are unreliable on a view.
@@ -1033,6 +1060,45 @@ export async function getProductsBySubcategories(
   if (error || !data) return { products: [], total: 0 }
   const shuffled = [...(data as Product[])].sort(() => Math.random() - 0.5)
   return { products: shuffled.slice(0, count), total: total ?? 0 }
+}
+
+/** "Produse similare" on a product page: other families from the same
+ *  subcategory, closest first — sharing words in the name (same kind of
+ *  tool: "polizor unghiular" next to "polizor unghiular"), same brand
+ *  (same battery platform), similar price rank — with photos only. */
+export async function getRelatedProducts(
+  p: { slug: string; name: string | null; brand_name: string | null; subcategory_text: string | null; family_id?: string | null; price?: number | null },
+  count = 12
+): Promise<{ products: Product[]; total: number }> {
+  if (!p.subcategory_text) return { products: [], total: 0 }
+  let q = supabase
+    .from('product_listing_mv')
+    .select(CARD_COLS + ', group_key', { count: 'exact' })
+    .not('slug', 'is', null)
+    .neq('slug', p.slug)
+    .or('main_image_storage_url.not.is.null,main_image_url.not.is.null')
+    .eq('subcategory_text', p.subcategory_text)
+    .order('price', { ascending: false, nullsFirst: false })
+    .limit(200)
+  if (p.family_id) q = q.neq('group_key', p.family_id)
+  const { data, error, count: total } = await q
+  if (error || !data) return { products: [], total: 0 }
+
+  const words = (s: string | null) => new Set(
+    (s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .split(/[^a-z0-9]+/).filter(w => w.length > 3 && !/^\d/.test(w)).map(w => w.slice(0, 6))
+  )
+  const own = words(p.name)
+  const scored = (data as unknown as Product[]).map(r => {
+    const w = words(r.name)
+    let shared = 0
+    for (const x of w) if (own.has(x)) shared++
+    const priceGap = p.price && r.price ? Math.abs(Math.log(Number(r.price) / Number(p.price))) : 1
+    const score = shared * 1.0 + (r.brand_name === p.brand_name ? 0.8 : 0) - Math.min(priceGap, 2) * 0.5
+    return { r, score }
+  })
+  scored.sort((a, b) => b.score - a.score)
+  return { products: scored.slice(0, count).map(x => x.r), total: Math.max(0, (total ?? 0)) }
 }
 
 /** Brands present across a set of subcategories, most products first. */
