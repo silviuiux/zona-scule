@@ -74,6 +74,10 @@ export type BrandPageConfig = {
    *  from the brand's own products. */
   bannerImage?: string
 
+  /** Overrides `bannerImage` on the /branduri "Selecție premium" banner only,
+   *  so the listing can show a different photo than the brand page's hero. */
+  listingBannerImage?: string
+
   eyebrow: string
   heroTitle: HeroLine[]
   heroSub: string
@@ -248,6 +252,8 @@ export const BRAND_PAGES: Record<string, BrandPageConfig> = {
     logo: { src: '/brand-logos/karcher.png', width: 1004, height: 263, alt: 'Kärcher' },
     // NT 75/2 Tact² Me Tc Adv — professional wet & dry vacuum, in use
     bannerImage: 'https://s1.kaercher-media.com/mam/16673160/application/147785/d0.jpg',
+    // /branduri banner: HD high-pressure washer in use
+    listingBannerImage: 'https://s1.kaercher-media.com/mam/18120000/application/92078/d0.jpg',
 
     eyebrow: 'Partener autorizat Karcher',
     heroTitle: [
@@ -734,12 +740,13 @@ export function getBrandHref(brandName: string): string {
   return config ? `/brand/${config.slug}` : `/produse?brand=${encodeURIComponent(brandName)}`
 }
 
-/** Brand-name → its configured application photo, if any. */
-export function getBrandBanner(brandName: string): string | null {
+/** Brand-name → its configured application photo, if any. With `listing`,
+ *  the /branduri override (`listingBannerImage`) wins over the page banner. */
+export function getBrandBanner(brandName: string, opts?: { listing?: boolean }): string | null {
   const config = Object.values(BRAND_PAGES).find(
     c => c.brandName.toLowerCase() === brandName.toLowerCase()
   )
-  return config?.bannerImage ?? null
+  return (opts?.listing && config?.listingBannerImage) || config?.bannerImage || null
 }
 
 /**

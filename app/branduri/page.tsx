@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -68,10 +67,7 @@ export default async function BranduriPage() {
           transition: border-color 200ms, box-shadow 300ms, transform 300ms cubic-bezier(0.2, 0.7, 0.1, 1);
         }
         .branduri-card:hover { border-color: rgba(0,0,0,0.16); box-shadow: 0 16px 40px rgba(0,0,0,0.07); transform: translateY(-3px); }
-        /* every mark in the same 160×48 box, top-left */
-        .branduri-card-mark { width: 160px; height: 48px; margin-bottom: auto; display: flex; align-items: center; }
-        .branduri-card-logo { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
-        /* Featured (logo) brands span two columns */
+        /* Featured brands (the ones with a logo — not shown on the card) span two columns */
         .branduri-card.wide { grid-column: span 2; }
         /* Subcategory ticker — slides in along the card's bottom edge on
            hover and scrolls the brand's subcategories, biggest first */
@@ -149,11 +145,6 @@ export default async function BranduriPage() {
                 const subs = tickers[bi]
                 return (
                   <Link key={b.id} href={getBrandHref(b.name)} className={`branduri-card${logo ? ' wide' : ''}`} data-reveal style={stagger(bi % 4)}>
-                    {logo && (
-                      <span className="branduri-card-mark">
-                        <Image src={logo.src} alt="" width={logo.width} height={logo.height} className="branduri-card-logo" />
-                      </span>
-                    )}
                     <span className="branduri-card-name">{b.name}</span>
                     <span className="branduri-card-count">{b.product_count.toLocaleString('ro')} produse</span>
                     {subs.length > 0 && (
@@ -175,7 +166,7 @@ export default async function BranduriPage() {
             // The brand's configured application photo, else the first
             // gallery image among the sampled products (closer to an
             // in-context shot than the plain catalog cutout).
-            const bannerSrc = getBrandBanner(b.name) ?? group.find(p => p.gallery_url_1)?.gallery_url_1
+            const bannerSrc = getBrandBanner(b.name, { listing: true }) ?? group.find(p => p.gallery_url_1)?.gallery_url_1
             return (
               <section key={b.name} className="zs-block branduri-promoted">
                 {chapter(`Selecție premium ${b.name}`, undefined, (
