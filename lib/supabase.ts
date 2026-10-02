@@ -894,7 +894,7 @@ export async function getSuperviewProducts({
     groups: [], totalProducts: 0, brandCount: 0, categoryCount: 0,
     filters: { brands: [], categories: [], subcategories: [] },
   }
-  const { data, error } = await supabase.rpc('get_superview_products')
+  const { data, error } = await supabase.rpc('get_superview_products_v2')
   if (error || !data) return empty
 
   const allProducts = (data as Product[]).filter(
@@ -971,11 +971,11 @@ export async function getSuperviewProducts({
  * listing then can't show. Same visibility rules as getProducts().
  */
 export async function getSubcategoryCountsByFilters(category: string, brands: string[], search?: string): Promise<Record<string, number>> {
-  const tsq = search ? toPrefixTsQuery(search) : ''
+  // raw text: the RPC matches it exactly like search_listing() does
   const { data, error } = await supabase.rpc('count_listing_subcategories', {
     p_category: category,
     p_brands: brands.length ? brands : null,
-    p_search: tsq || null,
+    p_search: search?.trim() || null,
   })
   const counts: Record<string, number> = {}
   if (error || !data) return counts
