@@ -296,8 +296,15 @@ export default async function HomePage() {
           will-change: transform, translate, opacity;
         }
         .cat-card.in-view { opacity: 1; translate: 0 0; }
+        /* Reduced motion (e.g. Windows' "Animation effects" off): no
+           entrance and no scroll-driven line-up — the grid sits flush from
+           first paint. The transform has to stay: top alone is the
+           staggered start, and at --destagger:1 the transform is what puts
+           each card on its row's line (with it removed, the cards stayed
+           staggered and the last row spilled over the stats band). */
         @media (prefers-reduced-motion: reduce) {
-          .cat-card { opacity: 1; translate: 0 0; transition: none; transform: none; }
+          .cats-masonry { --destagger: 1; }
+          .cat-card { opacity: 1; translate: 0 0; transition: none; }
         }
         .cat-card-img-wrap {
           position: absolute; inset: 0; overflow: hidden;
