@@ -18,7 +18,8 @@ import { useEffect } from 'react'
  *                  screen: --p 0 → 1 across its scroll length.
  *   [data-open]    a full-bleed photo opening from a framed picture as it
  *                  comes in: --o 0 → 1 from entering to filling the screen.
- *   .zs-progress   reading progress, --read 0 → 1 on <html>.
+ *   --read         reading progress 0 → 1 on <html>, drawn inside the nav
+ *                  bar by <Nav progress />.
  */
 export default function StoryMotion() {
   useEffect(() => {

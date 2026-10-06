@@ -97,7 +97,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <Nav />
+      <Nav progress />
       <TrackRecent slug={product.slug} name={title} brand={product.brand_name ?? null} sku={product.sku ?? null} image={mainImg ?? null} />
       <style>{SOLUTIONS_CSS + STORY_CSS + `
         /* ── Hero: text left, the product right, a full first screen ── */
@@ -174,7 +174,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       <ProductNavArrows prevSlug={prevSlug} nextSlug={nextSlug} />
       <StoryMotion />
-      <div className="zs-progress" aria-hidden="true"><span /></div>
       <StickyOfferBar brand={product.brand_name} title={model ?? title} href={offerHref} />
 
       <main className="zs-page zs-story">

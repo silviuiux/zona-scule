@@ -21,7 +21,9 @@ const MENU = [
   { href: '/zona-solutii', label: 'Zona Soluții', note: 'Meserii, ghiduri, proiecte' },
   { href: '/contact', label: 'Contact', note: 'Cere o ofertă' },
 ]
-export default function Nav() {
+/** `progress`: draw the page's reading progress (--read on <html>, set by
+ *  StoryMotion) as a line along the bar's bottom edge. */
+export default function Nav({ progress = false }: { progress?: boolean }) {
   const [q, setQ] = useState('')
   const [scrolled, setScrolled] = useState(false)
 
@@ -175,6 +177,15 @@ export default function Nav() {
         }
         .nav.scrolled { box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
         .nav.typing { background: rgb(243,243,243); }
+        /* Reading progress, inside the card: the clip is the bar's own
+           inner box (6px radius less the 1px border), so the 2px line
+           along the bottom follows the rounded corners. */
+        .nav-progress { position: absolute; inset: 0; border-radius: 5px; overflow: hidden; pointer-events: none; }
+        .nav-progress span {
+          position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+          background: rgb(217,44,43);
+          transform-origin: left; transform: scaleX(var(--read, 0));
+        }
         .nav .nav-inner { padding: 0 20px; }
         .nav .nav-panel { left: -1px; right: -1px; top: calc(100% + 8px); padding: 24px 20px 28px; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; }
         .nav .nav-panel::before { display: none; }
@@ -186,6 +197,7 @@ export default function Nav() {
         }
         html.nav-bar .nav.scrolled { box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06); }
         html.nav-bar .nav .nav-inner { padding: 0 var(--gutter); }
+        html.nav-bar .nav-progress { border-radius: 0; }
         html.nav-bar .nav .nav-panel { left: var(--gutter); right: var(--gutter); top: 100%; padding: 24px 0 28px; border: none; border-top: 1px solid rgba(0,0,0,0.14); border-bottom: 1px solid rgba(0,0,0,0.14); border-radius: 0; }
         html.nav-bar .nav .nav-panel::before { display: block; }
 
@@ -378,6 +390,7 @@ export default function Nav() {
       `}</style>
 
       <nav ref={navRef} className={`nav${scrolled ? ' scrolled' : ''}${searchOpen ? ' search-open' : ''}${typing ? ' typing' : ''}${menuOpen ? ' menu-open' : ''}`}>
+        {progress && <span className="nav-progress" aria-hidden="true"><span /></span>}
         <div ref={innerRef} className="nav-inner" style={{ ['--indent' as string]: `${indent + 12}px` }}>
           <Link href="/" className="nav-logo" aria-label="Zona Scule — acasă">
             <svg width="144" height="28" viewBox="0 0 159 31" fill="none" xmlns="http://www.w3.org/2000/svg">

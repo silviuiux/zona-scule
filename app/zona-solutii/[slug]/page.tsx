@@ -313,11 +313,10 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <Nav />
+      <Nav progress />
       <style>{SOLUTIONS_CSS + STORY_CSS}</style>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <StoryMotion />
-      <div className="zs-progress" aria-hidden="true"><span /></div>
       <main className="zs-page zs-story">
         <div className="zs-wrap">
           <header className="zs-story-hero">

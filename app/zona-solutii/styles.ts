@@ -338,10 +338,6 @@ export const STORY_CSS = `
   .zs-scroll-cue span { display: inline-block; animation: zs-cue 2.4s ease-in-out infinite; }
   @keyframes zs-cue { 0%, 100% { transform: translateY(-2px); opacity: 0.4; } 50% { transform: translateY(4px); opacity: 1; } }
 
-  /* ── Reading progress: a red hairline under the navbar ── */
-  .zs-progress { position: fixed; left: 0; right: 0; top: var(--nav-h); height: 2px; z-index: 90; pointer-events: none; }
-  .zs-progress span { display: block; height: 100%; background: rgb(217,44,43); transform-origin: left; transform: scaleX(var(--read, 0)); }
-
   /* ── First photo: pinned, growing from a framed picture to the whole
      screen (--p 0 → 1, set by StoryMotion; 1 without JS) ── */
   .zs-expand { --inset-x: max(var(--gutter), calc((100vw - 1440px) / 2 + var(--gutter))); position: relative; width: 100vw; margin-left: calc(50% - 50vw); height: 200vh; }

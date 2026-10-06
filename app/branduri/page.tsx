@@ -32,7 +32,7 @@ export default async function BranduriPage() {
 
   return (
     <>
-      <Nav />
+      <Nav progress />
       <style>{SOLUTIONS_CSS + STORY_CSS + `
         .branduri-page {
           padding-top: var(--nav-h);
@@ -122,7 +122,6 @@ export default async function BranduriPage() {
       `}</style>
 
       <StoryMotion />
-      <div className="zs-progress" aria-hidden="true"><span /></div>
       <main className="branduri-page zs-story">
         <div className="branduri-inner">
           <header className="branduri-hero">
